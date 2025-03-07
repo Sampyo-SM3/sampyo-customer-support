@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <!-- 진행 상태 표시 바 (커스텀 디자인) test!!-->
+    <!-- 진행 상태 표시 바 (커스텀 디자인 가나다라) test!!-->
     <v-row justify="center" class="mb-6">
       <v-col cols="12" class="d-flex align-center justify-center">
         <div class="stepper-container">
