@@ -93,3 +93,14 @@ pnpm-debug.log*
 
 # Cache
 .cache/
+
+# Maven 관련 불필요한 파일들
+.mvn/
+*.class
+*.war
+*.jar
+bin/
+target/
+**/target/
+**/bin/
+**/*.class
