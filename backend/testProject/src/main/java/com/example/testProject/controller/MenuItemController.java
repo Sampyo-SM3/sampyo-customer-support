@@ -17,7 +17,7 @@ public class MenuItemController {
     private MenuItemService menuitemService;
 
     @GetMapping
-    // test커밋_추웅도올
+    // test커밋 나는 세림세림
     public MenuItemResponseDto getMenuItems(@RequestParam(required = false) String auth, @RequestParam String id) {
     	System.out.println("------------getMenuItems-------------");
     	System.out.println(auth);
