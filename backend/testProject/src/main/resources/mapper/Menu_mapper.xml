@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.testProject.repository.MenuItemRepository">
+
+    <resultMap id="menuItemResultMap" type="com.example.testProject.dto.response.MenuItemResponseDto$MenuItem">
+        <result property="mCode" column="mCode"/>
+        <result property="mName" column="mName"/>
+        <result property="mComment" column="mComment"/>
+        <result property="mLev" column="mLev"/>
+        <result property="mAuth" column="mAuth"/>
+        <result property="mIcon" column="mIcon"/>
+        <result property="mGBN" column="mGBN"/>
+    </resultMap>
+
+    <select id="getMenuItems" parameterType="com.example.testProject.dto.request.MenuItemRequestDto" 
+            resultMap="menuItemResultMap">
+        EXEC MainMenu #{auth}, #{id}
+    </select>
+
+</mapper>
+

@@ -1,0 +1,5 @@
+<configuration>
+    <typeHandlers>
+        <typeHandler handler="com.example.testProject.config.LocalDateTypeHandler" javaType="java.time.LocalDate"/>
+    </typeHandlers>
+</configuration>
