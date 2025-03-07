@@ -1,5 +1,8 @@
 # Spring Boot
 HELP.md
+.metadata/
+.metadata
+*/.metadata/
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
