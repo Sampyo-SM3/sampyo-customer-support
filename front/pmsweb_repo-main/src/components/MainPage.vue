@@ -8,24 +8,6 @@
           <SideMenu />
         </v-col>
 
-        <!-- 메인 콘텐츠 영역 -->
-        <v-col class="pt-16 ml-16">
-          <!-- 브레드크럼 -->
-          <v-sheet class="breadcrumb-container px-4 py-2 ml-15" color="white" elevation="0">
-            <div class="d-flex align-center">
-              <span>안전관광시</span>
-              <v-icon size="small" class="mx-8">mdi-chevron-right</v-icon>
-              <span>열린경영</span>
-              <v-icon size="small" class="mx-1">mdi-chevron-right</v-icon>
-              <span>고객소리함</span>
-              <v-icon size="small" class="mx-1">mdi-chevron-right</v-icon>
-              <span>문의게시판</span>
-              <v-icon size="small" class="mx-1">mdi-chevron-right</v-icon>
-              <span class="font-weight-medium">문의게시판 운영규정</span>
-            </div>
-          </v-sheet>
-        </v-col>
-
         <v-col>
           <!-- 라우터 뷰 (실제 콘텐츠) -->
           <v-main>

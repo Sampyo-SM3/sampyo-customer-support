@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <!-- 진행 상태 표시 바 -->
-    <v-row justify="center" class="mb-6">
+    <v-row justify="center" class="mb-6 pt-6">
       <v-col cols="12" class="d-flex align-center justify-center">
         <div class="stepper-container">
           <div v-for="(status, index) in progressStatuses" :key="index" class="stepper-item"
@@ -14,7 +14,7 @@
       </v-col>
     </v-row>
 
-    <v-row>
+    <v-row class="pt-10">
       <!-- 왼쪽: 요구사항 정의서 -->
       <div class="leftForm">
 
@@ -22,9 +22,9 @@
           <div class="info-title-after"></div>요구사항 정의서
         </div>
 
-        <v-card class="pa-4 info-card">
+        <v-card class="pa-4 mt- info-card">
           <!-- 개요 -->
-          <div class="info-subtitle">1. 개요</div>
+          <div class="info-subtitle">&nbsp;개요</div>
           <v-simple-table dense class="custom-table outline1">
             <tbody>
               <tr>
@@ -51,7 +51,7 @@
           </v-simple-table>
 
           <!-- 세부 요구사항 -->
-          <div class="info-subtitle">2. 세부 요구사항</div>
+          <div class="info-subtitle pt-5">&nbsp;세부 요구사항</div>
           <v-simple-table dense class="custom-table outline2">
             <thead>
               <tr>
@@ -259,10 +259,10 @@ export default {
 }
 
 .info-subtitle {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
   color: #666;
-  margin: 20px 0 10px;
+  margin: 20px 0 10px;  
 }
 
 .info-title-after {
@@ -465,17 +465,29 @@ export default {
 }
 
 .outline1 {
-  width: 865px !important;
-  max-width: 865px !important;
-  min-width: 865px !important;
+  /*width: 865px !important;
+  max-width: 865px !important;   
+  min-width: 865px !important;*/
   display: table !important;
 }
 
+/* 개요테이블 제목 가로길이 */
 .outline1 .table-header {
   width: 130px !important;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #753333;
+}
+
+.outline2 {
+  width: 130px !important;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #753333;
 }
 
 .outlineTd {
   font-size: 13.5px;
+  color: #837974; /* 빨간색 */
 }
 </style>
