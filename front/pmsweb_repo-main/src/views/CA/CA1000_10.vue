@@ -1,7 +1,6 @@
 <template>
   <v-container>
-    <!-- 진행 상태 표시 바 (커스텀 디자인 가나다라) testaskjdhaksdjhaskjdhkasjdhkasjhd!!-->
-    <!-- 진행 상태 표시 바 (커스텀 디자인 가나다라미리리리리) test!!-->
+    <!-- 진행 상태 표시 바 -->
     <v-row justify="center" class="mb-6">
       <v-col cols="12" class="d-flex align-center justify-center">
         <div class="stepper-container">
@@ -16,93 +15,107 @@
     </v-row>
 
     <v-row>
-      <!-- 왼쪽: 고객 문의 내용 -->
-      <v-col cols="6">
-        <v-card class="pa-4">
-          <!-- 고객 문의 내용 제목 -->
-          <v-card-title class="section-title">
-            <!-- <v-icon class="mr-1 mb-1">mdi-account-question-outline</v-icon> 고객 문의 내용 -->
-            <div class="info-title-after"></div>고객 문의 내용
-          </v-card-title>
+      <!-- 왼쪽: 고객 문의 내용 (너비 고정) -->
+      <div class="leftForm">
+        <div class="section-title">
+          <div class="info-title-after"></div>고객 문의 내용
+        </div>
 
-          <v-divider class="mb-3"></v-divider>
-
+        <v-card class="pa-4 info-card">
           <!-- 고객 정보 -->
           <div class="info-subtitle">고객 정보</div>
-          <v-card class="pa-3 mb-3">
+          <v-card class="pa-3 mb-3 info-inner-card">
             <v-row>
               <v-col cols="6">
-                <p class="greyText"><span class="dot">▪</span> <span class="info-title">거래처명</span> <span
-                    class="separator">|</span> {{
-                      customer.USER_NM }}</p>
-                <p class="greyText"><span class="dot">▪</span> <span class="info-title">이메일</span> <span
-                    class="separator">&nbsp;&nbsp;&nbsp;&nbsp;|</span>
-                  {{
-                    customer.EMAIL }}</p>
+                <p class="greyText"><span class="dot">▪</span> <span class="info-title">거래처명</span>
+                  <span class="info-text customer-text">{{ customer.USER_NM }}</span>
+                </p>
+                <p class="greyText"><span class="dot">▪</span> <span class="info-title">이메일</span>
+                  <span class="info-text customer-text" style="margin-left:14px;">{{ customer.EMAIL }}</span>
+                </p>
               </v-col>
               <v-col cols="6">
-                <p class="greyText"><span class="dot">▪</span> <span class="info-title">연락처</span> <span
-                    class="separator">|</span> {{
-                      customer.MOBILE_NO }}</p>
-                <p class="greyText"><span class="dot">▪</span> <span class="info-title">현장명</span> <span
-                    class="separator">|</span> {{
-                      customer.siteNm }}</p>
+                <p class="greyText"><span class="dot">▪</span> <span class="info-title">연락처</span>
+                  <span class="info-text customer-text">{{ customer.MOBILE_NO }}</span>
+                </p>
+                <p class="greyText"><span class="dot">▪</span> <span class="info-title">현장명</span>
+                  <span class="info-text customer-text">{{ customer.siteNm }}</span>
+                </p>
               </v-col>
             </v-row>
           </v-card>
 
           <!-- 문의 기본 정보 -->
           <div class="info-subtitle">문의 기본 정보</div>
-          <v-card class="pa-3 mb-3">
+          <v-card class="pa-3 mb-3 info-inner-card">
             <v-row>
               <v-col cols="6">
-                <p class="greyText"><span class="dot">▪</span> <span class="info-title">부문</span> <span
-                    class="separator">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|</span> {{
-                      inquiry.QA_SECTOR }}</p>
-                <p class="greyText"><span class="dot">▪</span> <span class="info-title">문의구분</span> <span
-                    class="separator">|</span> {{
-                      inquiry.QA_TYPE }}</p>
+                <p class="greyText"><span class="dot">▪</span> <span class="info-title">부문</span>
+                  <span class="info-text customer-text" style="margin-left:30px;">{{ inquiry.QA_SECTOR }}</span>
+                </p>
+                <p class="greyText"><span class="dot">▪</span> <span class="info-title">문의구분</span>
+                  <span class="info-text customer-text">{{ inquiry.QA_TYPE }}</span>
+                </p>
               </v-col>
               <v-col cols="6">
-                <p class="greyText"><span class="dot">▪</span> <span class="info-title">제품종류</span> <span
-                    class="separator">|</span> </p>
-                <p class="greyText"><span class="dot">▪</span> <span class="info-title">요청일</span> <span
-                    class="separator">&nbsp;&nbsp;&nbsp;&nbsp;|</span> {{
-                      inquiry.INSERT_DT }}</p>
+                <p class="greyText"><span class="dot">▪</span> <span class="info-title">제품종류</span>
+                  <span class="info-text customer-text">{{ inquiry.PRODUCT_TYPE || '미정' }}</span>
+                </p>
+                <p class="greyText"><span class="dot">▪</span> <span class="info-title">요청일</span>
+                  <span class="info-text customer-text" style="margin-left:15px;">{{ inquiry.INSERT_DT }}</span>
+                </p>
               </v-col>
             </v-row>
           </v-card>
+
+          <!-- 고객 작성 내용 -->
+          <div class="info-subtitle">고객 작성 내용</div>
+          <v-card class="pa-3 mb-3 info-inner-card custom-card">
+            <!-- 파란색 상단 라인 -->
+            <div class="top-border"></div>
+
+            <!-- 제목 (굵게) -->
+            <p class="bold-text title-text">{{ inquiry.TITLE }}</p>
+
+            <!-- 설명 부분 -->
+            <p class="greyText description-text">{{ inquiry.DESCRIPTION }}</p>
+          </v-card>
+
         </v-card>
-      </v-col>
+      </div>
+
+
 
       <!-- 오른쪽: 문의 정보 관리 및 답변 -->
-      <v-col cols="5">
-        <v-card class="pa-4">
-          <!-- 고객 문의 내용 제목 -->
-          <v-card-title class="section-title">
-            <!-- <v-icon class="mr-1 mb-1">mdi-account-question-outline</v-icon> 고객 문의 내용 -->
-            <div class="info-title-after"></div>답변내용
-          </v-card-title>
+      <div class="rightForm">
+        <div class="section-title">
+          <div class="info-title-after"></div>답변 내용
+        </div>
 
-          <v-divider class="mb-3"></v-divider>
+        <v-card class="pa-4 info-card">
+          <!-- 댓글 섹션 -->
+          <div v-if="commentTextLength > 0">
+            <div class="info-subtitle">댓글 {{ commentTextLength }}</div>
+            <v-card id="commentArea" class="pa-3 mb-3 info-inner-card">
+              <v-list-item v-for="(comment, index) in comments" :key="index" class="comment-item">
+                <div class="comment-content">
+                  <div class="comment-text">{{ comment.text }}</div>
+                  <div class="comment-timestamp">{{ comment.timestamp }}</div>
+                </div>
+              </v-list-item>
+            </v-card>
+          </div>
 
-          <div class="info-subtitle">댓글</div>
-          <v-card class="pa-3 mb-3">
-            <v-list-item v-for="(comment, index) in comments" :key="index" class="comment-item">
-              <div class="comment-content">
-                <div class="comment-text">{{ comment.text }}</div>
-                <div class="comment-timestamp">{{ comment.timestamp }}</div>
-              </div>
-            </v-list-item>
-
-
-          </v-card>
-          <v-card class="pa-3 mt-3">
-            <v-textarea v-model="newComment" label="댓글 입력" class="mt-3"></v-textarea>
-            <v-btn color="primary" @click="addComment">등록</v-btn>
-          </v-card>
+          <!-- 댓글 입력 -->
+          <div class="comment-input-container">
+            <v-textarea v-model="newComment" label="댓글 입력" class="custom-textarea"></v-textarea>
+            <div class="btn-container">
+              <v-btn class="custom-btn" @click="addComment">등록</v-btn>
+            </div>
+          </div>
         </v-card>
-      </v-col>
+      </div>
+
     </v-row>
   </v-container>
 </template>
@@ -122,6 +135,8 @@ export default {
         QA_SECTOR: "몰탈",
         QA_TYPE: "자료요청",
         INSERT_DT: "2025-03-03",
+        TITLE: "해주세요 그냥 해주세요",
+        DESCRIPTION: "만들어줭 그냥 만들어줭요"
       },
       management: {
         SECTOR: "몰탈",
@@ -154,8 +169,13 @@ export default {
         this.comments.push({ text: this.newComment, timestamp });
         this.newComment = "";
       }
-    },
+    }
   },
+  computed: {
+    commentTextLength() {
+      return this.comments.length;
+    }
+  }
 };
 </script>
 
@@ -236,14 +256,13 @@ export default {
 
 .section-title {
   font-size: 20px;
-  /* 고객 문의 내용 제목 크기 키우기 */
-  font-weight: bold;
+  margin-bottom: 10px;
+  /* 박스와 간격 추가 */
 }
 
+
 .info-subtitle {
-  font-size: 16px;
-  /* "고객 정보", "문의 기본 정보" 크기 키우기 */
-  font-weight: bold;
+  font-size: 15px;
   color: #666666;
   margin-left: 5px;
   margin-bottom: 2px;
@@ -257,21 +276,33 @@ export default {
 }
 
 .separator {
-  color: #D3D3D3;
+  color: #E1E1E1;
+  /* 색상 변경 */
   margin-right: 5px;
 }
 
+
 .info-card {
   background-color: #f9f9f9;
-  /* 흰색 박스 스타일 */
-  border-radius: 8px;
-  /* 둥근 모서리 */
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-  /* 가벼운 그림자 */
+  border-radius: 0;
+  /* 모서리를 각지게 */
+  box-shadow: none !important;
+  /* 그림자 제거 */
+  border: 1px solid #ddd;
+  /* 경계선 유지 */
+}
+
+.info-inner-card {
+  background-color: #ffffff;
+  border-radius: 0;
+  /* 내부 카드도 각지게 */
+  padding: 12px;
+  box-shadow: none !important;
+  border: 1px solid #E3E3E3;
 }
 
 .greyText {
-  color: #666666;
+  color: #747470;
 }
 
 .info-title-after {
@@ -286,6 +317,13 @@ export default {
   top: 4px;
 }
 
+#commentArea {
+  max-height: 361px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: 1px solid #E3E3E3;
+}
+
 .comment-item {
   display: flex;
   width: 100%;
@@ -295,7 +333,6 @@ export default {
 .comment-content {
   display: flex;
   flex-direction: column;
-  /* 세로 정렬 */
   width: 100%;
 }
 
@@ -303,12 +340,96 @@ export default {
   text-align: left;
   font-size: 16px;
   margin-bottom: 5px;
-  /* 날짜와 간격 추가 */
 }
 
 .comment-timestamp {
   text-align: right;
   font-size: 12px;
   color: gray;
+}
+
+.info-text::before {
+  content: "";
+  display: inline-block;
+  width: 1px;
+  height: 11px;
+  background-color: #e1e1e1;
+  margin-right: 10px;
+  margin-left: 20px;
+}
+
+.top-border {
+  width: 100%;
+  height: 2px;
+  background-color: #1867C0
+    /* 파란색 */
+
+}
+
+/* 제목 박스 스타일 */
+.title-text {
+  font-size: 15px;
+  background-color: #f5f5f5;
+  /* 연한 회색 배경 */
+  padding: 10px;
+}
+
+/* 설명 스타일 (왼쪽 들여쓰기) */
+.description-text {
+  color: #666;
+  font-size: 14px;
+  margin-top: 10px;
+  margin-left: 15px;
+  /* 🔹 설명을 제목보다 안으로 들여쓰기 */
+  line-height: 1.6;
+}
+
+/* 카드 스타일 수정 */
+.custom-card {
+  background-color: #ffffff;
+  border-radius: 0;
+  /* 모서리 각지게 */
+  border: 1px solid #ddd;
+  padding: 15px;
+}
+
+.leftForm {
+  width: 850px;
+  margin-top: 10px;
+  margin-left: 20px;
+}
+
+.rightForm {
+  width: 720px;
+  margin-top: 10px;
+  margin-left: 20px;
+}
+
+.custom-btn {
+  background-color: #1867C0;
+  /* 파란색 */
+  color: white;
+  /* 글씨색 */
+  font-size: 13px;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  margin-top: -10px !important;
+}
+
+.comment-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.customer-text {
+  font-size: 15px;
+  color: #555;
 }
 </style>
