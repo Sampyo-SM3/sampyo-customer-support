@@ -15,76 +15,60 @@
     </v-row>
 
     <v-row>
-      <!-- 왼쪽: 고객 문의 내용 (너비 고정) -->
+      <!-- 왼쪽: 요구사항 정의서 -->
       <div class="leftForm">
         <div class="section-title">
-          <div class="info-title-after"></div>고객 문의 내용
+          <div class="info-title-after"></div>요구사항 정의서
         </div>
 
-        <v-card class="pa-4 info-card">
-          <!-- 고객 정보 -->
-          <div class="info-subtitle">고객 정보</div>
-          <v-card class="pa-3 mb-3 info-inner-card">
-            <v-row>
-              <v-col cols="6">
-                <p class="greyText"><span class="dot">▪</span> <span class="info-title">거래처명</span>
-                  <span class="info-text customer-text">{{ customer.USER_NM }}</span>
-                </p>
-                <p class="greyText"><span class="dot">▪</span> <span class="info-title">이메일</span>
-                  <span class="info-text customer-text" style="margin-left:14px;">{{ customer.EMAIL }}</span>
-                </p>
-              </v-col>
-              <v-col cols="6">
-                <p class="greyText"><span class="dot">▪</span> <span class="info-title">연락처</span>
-                  <span class="info-text customer-text">{{ customer.MOBILE_NO }}</span>
-                </p>
-                <p class="greyText"><span class="dot">▪</span> <span class="info-title">현장명</span>
-                  <span class="info-text customer-text">{{ customer.siteNm }}</span>
-                </p>
-              </v-col>
-            </v-row>
-          </v-card>
 
-          <!-- 문의 기본 정보 -->
-          <div class="info-subtitle">문의 기본 정보</div>
-          <v-card class="pa-3 mb-3 info-inner-card">
-            <v-row>
-              <v-col cols="6">
-                <p class="greyText"><span class="dot">▪</span> <span class="info-title">부문</span>
-                  <span class="info-text customer-text" style="margin-left:30px;">{{ inquiry.QA_SECTOR }}</span>
-                </p>
-                <p class="greyText"><span class="dot">▪</span> <span class="info-title">문의구분</span>
-                  <span class="info-text customer-text">{{ inquiry.QA_TYPE }}</span>
-                </p>
-              </v-col>
-              <v-col cols="6">
-                <p class="greyText"><span class="dot">▪</span> <span class="info-title">제품종류</span>
-                  <span class="info-text customer-text">{{ inquiry.PRODUCT_TYPE || '미정' }}</span>
-                </p>
-                <p class="greyText"><span class="dot">▪</span> <span class="info-title">요청일</span>
-                  <span class="info-text customer-text" style="margin-left:15px;">{{ inquiry.INSERT_DT }}</span>
-                </p>
-              </v-col>
-            </v-row>
-          </v-card>
+        <!-- 개요 -->
+        <div class="info-subtitle">1. 개요</div>
+        <v-simple-table dense class="custom-table outline1">
+          <tbody>
+            <tr>
+              <th class="table-header">과제명</th>
+              <td colspan="2" class="outlineTd">{{ inquiry.PROJECT_NAME }}</td>
+              <th class="table-header">사업 부문</th>
+              <td colspan="2" class="outlineTd">{{ inquiry.BUSINESS_SECTOR }}</td>
+            </tr>
+            <tr>
+              <th class="table-header">과제 개요</th>
+              <td colspan="5" class="outlineTd">{{ inquiry.PROJECT_OVERVIEW }}</td>
+            </tr>
+            <tr>
+              <th class="table-header">기존 문제점</th>
+              <td colspan="5" class="outlineTd">{{ inquiry.PAIN_POINT }}</td>
+            </tr>
+            <tr>
+              <th class="table-header">기대 효과</th>
+              <td colspan="2" class="outlineTd">{{ inquiry.EXPECTED_EFFECT }}</td>
+              <th class="table-header">최종 산출물</th>
+              <td colspan="2" class="outlineTd">{{ inquiry.DELIVERABLES }}</td>
+            </tr>
+          </tbody>
+        </v-simple-table>
 
-          <!-- 고객 작성 내용 -->
-          <div class="info-subtitle">고객 작성 내용</div>
-          <v-card class="pa-3 mb-3 info-inner-card custom-card">
-            <!-- 파란색 상단 라인 -->
-            <div class="top-border"></div>
+        <!-- 세부 요구사항 -->
+        <div class="info-subtitle">2. 세부 요구사항</div>
+        <v-simple-table dense class="custom-table outline2">
+          <thead>
+            <tr>
+              <th>세부 실행 과제</th>
+              <th>내용</th>
+              <th>IT 개발 요청</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(task, index) in inquiry.DETAIL_REQUIREMENTS" :key="index">
+              <td class="outlineTd">{{ task.taskName }}</td>
+              <td class="outlineTd">{{ task.description }}</td>
+              <td class="outlineTd">{{ task.itRequest }}</td>
+            </tr>
+          </tbody>
+        </v-simple-table>
 
-            <!-- 제목 (굵게) -->
-            <p class="bold-text title-text">{{ inquiry.TITLE }}</p>
-
-            <!-- 설명 부분 -->
-            <p class="greyText description-text">{{ inquiry.DESCRIPTION }}</p>
-          </v-card>
-
-        </v-card>
       </div>
-
-
 
       <!-- 오른쪽: 문의 정보 관리 및 답변 -->
       <div class="rightForm">
@@ -107,7 +91,7 @@
           </div>
 
           <!-- 댓글 입력 -->
-          <div class="comment-input-container">
+          <div class="comment-input-container" :class="{ 'mt-20': commentTextLength === 0 }">
             <v-textarea v-model="newComment" label="댓글 입력" class="custom-textarea"></v-textarea>
             <div class="btn-container">
               <v-btn class="custom-btn" @click="addComment">등록</v-btn>
@@ -132,11 +116,24 @@ export default {
         siteNm: "포항자이디오션",
       },
       inquiry: {
-        QA_SECTOR: "몰탈",
-        QA_TYPE: "자료요청",
-        INSERT_DT: "2025-03-03",
-        TITLE: "해주세요 그냥 해주세요",
-        DESCRIPTION: "만들어줭 그냥 만들어줭요"
+        PROJECT_NAME: "MQ01 몰탈 문서 자료실 개설",
+        BUSINESS_SECTOR: "몰탈",
+        PROJECT_OVERVIEW: "WEB에서 당사 제품 관련 자료를 자유롭게 내려 받고 인쇄할 수 있는 환경 제공 통해 고객 만족도 제고",
+        PAIN_POINT: "제품 사용설명서, 제품 성적서 등 당사 몰탈 제품을 구매하는 고객들이 필수적으로 참고해야 할 문서 자료를 입수하기 어려움",
+        EXPECTED_EFFECT: "업무 자동화, 고객 만족도 제고",
+        DELIVERABLES: "WebSite",
+        DETAIL_REQUIREMENTS: [
+          {
+            taskName: "1-1 몰탈 문서발급 메뉴 생성",
+            description: "스마트 오더 홈페이지에 몰탈 제품 관련 문서 자료를 다운받을 수 있는 자료실 개설",
+            itRequest: "스마트 오더 ‘몰탈 문서발급’ 메뉴 신설, 회원 및 사업자 로그인 후 접근 가능"
+          },
+          {
+            taskName: "1-2 삼표 스마트오더 홈페이지 접근성 개선",
+            description: "네이버, 구글 등 주요 포털 사이트에서 ‘삼표 몰탈’, ‘삼표 문서’, ‘삼표 스마트오더’ 검색 시 상위 노출되도록 조정",
+            itRequest: "네이버 고객센터 등 연락하여 검색 로직 수정 요청"
+          }
+        ]
       },
       management: {
         SECTOR: "몰탈",
@@ -256,16 +253,62 @@ export default {
 
 .section-title {
   font-size: 20px;
-  margin-bottom: 10px;
-  /* 박스와 간격 추가 */
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.info-subtitle {
+  font-size: 16px;
+  font-weight: bold;
+  color: #666;
+  margin: 20px 0 10px;
+}
+
+.info-title-after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 17px;
+  background-color: #1867C0;
+  margin-right: 10px;
+  margin-bottom: 3px;
+  position: relative;
+  top: 4px;
+}
+
+.info-card {
+  background-color: #f9f9f9;
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid #ddd;
+  padding-top: 0 !important;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.custom-table th,
+.custom-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.custom-table th {
+  background-color: #f1f1f1;
+  font-weight: bold;
+}
+
+.custom-table td {
+  background-color: white !important;
 }
 
 
-.info-subtitle {
-  font-size: 15px;
-  color: #666666;
-  margin-left: 5px;
-  margin-bottom: 2px;
+.table-header {
+  background-color: #e1e1e1;
+  text-align: center;
 }
 
 .dot {
@@ -279,17 +322,6 @@ export default {
   color: #E1E1E1;
   /* 색상 변경 */
   margin-right: 5px;
-}
-
-
-.info-card {
-  background-color: #f9f9f9;
-  border-radius: 0;
-  /* 모서리를 각지게 */
-  box-shadow: none !important;
-  /* 그림자 제거 */
-  border: 1px solid #ddd;
-  /* 경계선 유지 */
 }
 
 .info-inner-card {
@@ -394,13 +426,13 @@ export default {
 }
 
 .leftForm {
-  width: 850px;
+  width: 900px;
   margin-top: 10px;
   margin-left: 20px;
 }
 
 .rightForm {
-  width: 720px;
+  width: 670px;
   margin-top: 10px;
   margin-left: 20px;
 }
@@ -431,5 +463,24 @@ export default {
 .customer-text {
   font-size: 15px;
   color: #555;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.outline1 {
+  width: 900px !important;
+  max-width: 900px !important;
+  min-width: 900px !important;
+  display: table !important;
+}
+
+.outline1 .table-header {
+  width: 130px !important;
+}
+
+.outlineTd {
+  font-size: 14px;
 }
 </style>
