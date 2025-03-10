@@ -17,57 +17,58 @@
     <v-row>
       <!-- 왼쪽: 요구사항 정의서 -->
       <div class="leftForm">
+
         <div class="section-title">
           <div class="info-title-after"></div>요구사항 정의서
         </div>
 
+        <v-card class="pa-4 info-card outline1">
+          <!-- 개요 -->
+          <div class="info-subtitle">1. 개요</div>
+          <v-simple-table dense class="custom-table">
+            <tbody>
+              <tr>
+                <th class="table-header">과제명</th>
+                <td colspan="2" class="outlineTd">{{ inquiry.PROJECT_NAME }}</td>
+                <th class="table-header">사업 부문</th>
+                <td colspan="2" class="outlineTd">{{ inquiry.BUSINESS_SECTOR }}</td>
+              </tr>
+              <tr>
+                <th class="table-header">과제 개요</th>
+                <td colspan="5" class="outlineTd">{{ inquiry.PROJECT_OVERVIEW }}</td>
+              </tr>
+              <tr>
+                <th class="table-header">기존 문제점</th>
+                <td colspan="5" class="outlineTd">{{ inquiry.PAIN_POINT }}</td>
+              </tr>
+              <tr>
+                <th class="table-header">기대 효과</th>
+                <td colspan="2" class="outlineTd">{{ inquiry.EXPECTED_EFFECT }}</td>
+                <th class="table-header">최종 산출물</th>
+                <td colspan="2" class="outlineTd">{{ inquiry.DELIVERABLES }}</td>
+              </tr>
+            </tbody>
+          </v-simple-table>
 
-        <!-- 개요 -->
-        <div class="info-subtitle">1. 개요</div>
-        <v-simple-table dense class="custom-table outline1">
-          <tbody>
-            <tr>
-              <th class="table-header">과제명</th>
-              <td colspan="2" class="outlineTd">{{ inquiry.PROJECT_NAME }}</td>
-              <th class="table-header">사업 부문</th>
-              <td colspan="2" class="outlineTd">{{ inquiry.BUSINESS_SECTOR }}</td>
-            </tr>
-            <tr>
-              <th class="table-header">과제 개요</th>
-              <td colspan="5" class="outlineTd">{{ inquiry.PROJECT_OVERVIEW }}</td>
-            </tr>
-            <tr>
-              <th class="table-header">기존 문제점</th>
-              <td colspan="5" class="outlineTd">{{ inquiry.PAIN_POINT }}</td>
-            </tr>
-            <tr>
-              <th class="table-header">기대 효과</th>
-              <td colspan="2" class="outlineTd">{{ inquiry.EXPECTED_EFFECT }}</td>
-              <th class="table-header">최종 산출물</th>
-              <td colspan="2" class="outlineTd">{{ inquiry.DELIVERABLES }}</td>
-            </tr>
-          </tbody>
-        </v-simple-table>
-
-        <!-- 세부 요구사항 -->
-        <div class="info-subtitle">2. 세부 요구사항</div>
-        <v-simple-table dense class="custom-table outline2">
-          <thead>
-            <tr>
-              <th>세부 실행 과제</th>
-              <th>내용</th>
-              <th>IT 개발 요청</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(task, index) in inquiry.DETAIL_REQUIREMENTS" :key="index">
-              <td class="outlineTd">{{ task.taskName }}</td>
-              <td class="outlineTd">{{ task.description }}</td>
-              <td class="outlineTd">{{ task.itRequest }}</td>
-            </tr>
-          </tbody>
-        </v-simple-table>
-
+          <!-- 세부 요구사항 -->
+          <div class="info-subtitle">2. 세부 요구사항</div>
+          <v-simple-table dense class="custom-table">
+            <thead>
+              <tr>
+                <th>세부 실행 과제</th>
+                <th>내용</th>
+                <th>IT 개발 요청</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(task, index) in inquiry.DETAIL_REQUIREMENTS" :key="index">
+                <td class="outlineTd">{{ task.taskName }}</td>
+                <td class="outlineTd">{{ task.description }}</td>
+                <td class="outlineTd">{{ task.itRequest }}</td>
+              </tr>
+            </tbody>
+          </v-simple-table>
+        </v-card>
       </div>
 
       <!-- 오른쪽: 문의 정보 관리 및 답변 -->
@@ -76,7 +77,7 @@
           <div class="info-title-after"></div>답변 내용
         </div>
 
-        <v-card class="pa-4 info-card">
+        <v-card class="pa-4 info-card outline2">
           <!-- 댓글 섹션 -->
           <div v-if="commentTextLength > 0">
             <div class="info-subtitle">댓글 {{ commentTextLength }}</div>
@@ -305,12 +306,6 @@ export default {
   background-color: white !important;
 }
 
-
-.table-header {
-  background-color: #e1e1e1;
-  text-align: center;
-}
-
 .dot {
   color: #1867C0;
   /* 파란색 점 */
@@ -481,6 +476,6 @@ export default {
 }
 
 .outlineTd {
-  font-size: 14px;
+  font-size: 13.5px;
 }
 </style>
