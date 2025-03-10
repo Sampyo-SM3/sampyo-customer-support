@@ -1,6 +1,6 @@
 <template>
     <v-container fluid class="pa-10">
-      <v-row no-gutters class="search-row">
+      <v-row no-gutters class="search-row top-row">
         <!-- 요청기간 -->
         <v-col class="search-col request-period">
           <div class="label-box">요청기간</div>
@@ -51,6 +51,16 @@
           </div>
         </v-col>
       </v-row>
+  
+      <!-- 제품구분 행 추가 -->
+      <v-row no-gutters class="search-row bottom-row">
+        <v-col class="search-col product-category">
+          <div class="label-box">제품구분</div>
+          <div class="input-container pt-2 pb-2">
+      
+          </div>
+        </v-col>
+      </v-row>
     </v-container>
   </template>
   
@@ -60,7 +70,8 @@
       return {
         startDate: '2025-03-03',
         endDate: '2025-03-10',
-        dateRange: 'month'
+        dateRange: 'month',
+        productType: 'test1'
       }
     }
   }
@@ -72,23 +83,32 @@
     align-items: stretch;
     min-height: 40px;
     border-top: 1px solid #e0e0e0;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 0; /* 하단 테두리 제거 */
   }
+
+  .search-row.top-row {
+    border-top: 3px solid #e0e0e0;
+  }
+
+  .search-row.bottom-row {
+    border-bottom: 2px solid #e0e0e0;
+  }  
   
   .search-col {
     display: flex;
     align-items: center;
     padding: 0;
-    border-right: 1px solid #e0e0e0;
+    /* 오른쪽 테두리 제거 */
   }
   
-  .request-period {
+  .request-period, .product-category {
     max-width: 550px;
     flex-grow: 0;
   }
   
   .label-box {
-    width: 60px;
+    width: 100px;  
+    flex-shrink: 0;
     height: 100%;
     display: flex;
     align-items: center;
@@ -96,16 +116,17 @@
     font-size: 14px;
     font-weight: 500;
     color: #333;
-    background-color: #f0f0f0;
+    background-color: #f5f5f5; /* 배경색 더 연하게 */
     white-space: nowrap;
     padding: 0 4px;
+    border-right: 1px solid #eaeaea; /* 더 연한 색상의 테두리 */
   }
   
   .input-container {
     display: flex;
     align-items: center;
     flex: 1;
-    padding: 0 8px;
+    padding: 0 16px;
   }
   
   .date-wrapper {
@@ -155,7 +176,7 @@
     padding: 0 12px;
     height: 32px;
     letter-spacing: -0.5px;
-    border: 1px solid #dcdcdc;
+    border: 1px solid #eaeaea; /* 더 연한 테두리 색상 */
     border-radius: 0;
     background-color: #ffffff;
     color: #333333;
@@ -168,11 +189,11 @@
   }
   
   .date-btn:hover {
-    background-color: #f5f5f5;
+    background-color: #f9f9f9; /* 더 연한 호버 색상 */
   }
   
   .date-btn.active {
-    background-color: #e0f2fe;
+    background-color: #e8f4fd; /* 더 연한 활성 색상 */
     color: #2196F3;
   }
   </style>
