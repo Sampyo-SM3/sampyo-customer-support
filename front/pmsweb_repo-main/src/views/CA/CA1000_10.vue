@@ -1,4 +1,4 @@
-<template>
+<template style="margin-top:-30px;">
   <v-container>
     <!-- 진행 상태 표시 바 -->
     <v-row justify="center" class="mb-6 pt-6">
@@ -42,7 +42,6 @@
     <v-row>
       <!-- 왼쪽: 요구사항 정의서 -->
       <div class="leftForm">
-
         <div class="section-title">
           <div class="info-title-after"></div>요구사항 정의서
         </div>
