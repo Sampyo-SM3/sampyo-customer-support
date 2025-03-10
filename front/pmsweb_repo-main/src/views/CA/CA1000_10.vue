@@ -15,29 +15,23 @@
     </v-row>
 
     <!-- 여기서부터 접수상태 버튼 -->
-    <v-row class="mt-15">
-      <v-col cols="12" class="d-flex gap-4">
-        <div class="status-selection-container">
+    <v-row class="mt-10">
+      <v-col cols="auto" class="d-flex gap-4 align-center">
+        <div class="status-selection-container" style="margin-left:6px;">
           <div class="status-label-box">
             <span>접수상태</span>
           </div>
           <div class="status-select-box">
-            <v-select
-              v-model="selectedStatus"
-              :items="progressStatuses"
-              hide-details
-              density="compact"
-              variant="plain"
-              class="status-select"
-            ></v-select>
+            <v-select v-model="selectedStatus" :items="progressStatuses" hide-details density="compact" variant="plain"
+              class="status-select"></v-select>
           </div>
         </div>
 
         <v-btn class="action-btn save-btn" @click="saveStatus">
           저장
-        </v-btn>  
+        </v-btn>
       </v-col>
-    </v-row>    
+    </v-row>
 
     <v-row>
       <!-- 왼쪽: 요구사항 정의서 -->
@@ -129,6 +123,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data() {
     return {
@@ -182,6 +178,33 @@ export default {
     };
   },
   methods: {
+    async fetchRequireDetail() {
+      try {
+        const response = await axios.get("http://localhost:8080/api/require/detail", {
+          params: { seq: 1 }
+        });
+        console.log("📌 받아온 데이터:", response.data);
+        this.requireDetail = response.data; // 데이터를 저장
+
+        // 받아온 데이터를 inquiry에 업데이트
+        this.inquiry = {
+          PROJECT_NAME: response.data.projectName,
+          BUSINESS_SECTOR: response.data.businessSector,
+          PROJECT_OVERVIEW: response.data.projectOverview,
+          PAIN_POINT: response.data.currentIssue,
+          EXPECTED_EFFECT: response.data.expectedEffect,
+          DELIVERABLES: response.data.finalDeliverables,
+          DETAIL_REQUIREMENTS: response.data.detailRequirements || [] // 데이터가 없을 경우 기본값
+        };
+
+        this.step = parseInt(response.processState, 10);
+
+      } catch (error) {
+        console.error("❌ 오류 발생:", error);
+      }
+
+
+    },
     updateStep() {
       this.step = this.progressStatuses.indexOf(this.management.PROGRESS) + 1;
     },
@@ -199,7 +222,7 @@ export default {
       // 여기에 저장 로직을 추가할 수 있습니다
       alert('상태가 저장되었습니다: ' + this.selectedStatus);
     },
-  
+
   },
   computed: {
     commentTextLength() {
@@ -209,11 +232,18 @@ export default {
   created() {
     // 초기화 시 현재 상태 설정
     this.selectedStatus = this.management.PROGRESS;
+  },
+  mounted() {
+    this.fetchRequireDetail(); // API 호출
   }
 };
 </script>
 
 <style scoped>
+.template {
+  font-family: "Noto Sans KR", sans-serif;
+}
+
 .stepper-container {
   display: flex;
   align-items: center;
@@ -290,15 +320,18 @@ export default {
 
 .section-title {
   font-size: 20px;
-  font-weight: bold;
   margin-bottom: 15px;
+  font-weight: 500;
 }
 
 .info-subtitle {
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 17px;
+  line-height: 22px;
   color: #666;
-  margin: 20px 0 10px;  
+  -webkit-text-size-adjust: none;
+  letter-spacing: -0.05em;
+  margin: 20px 0 10px;
+  font-weight: 500;
 }
 
 .info-title-after {
@@ -323,6 +356,7 @@ export default {
 
 .custom-table {
   width: 100%;
+  display: table !important;
   border-collapse: collapse;
 }
 
@@ -425,26 +459,13 @@ export default {
   width: 100%;
   height: 2px;
   background-color: #1867C0
-    /* 파란색 */
-
 }
 
 /* 제목 박스 스타일 */
 .title-text {
   font-size: 15px;
   background-color: #f5f5f5;
-  /* 연한 회색 배경 */
   padding: 10px;
-}
-
-/* 설명 스타일 (왼쪽 들여쓰기) */
-.description-text {
-  color: #666;
-  font-size: 14px;
-  margin-top: 10px;
-  margin-left: 15px;
-  /* 🔹 설명을 제목보다 안으로 들여쓰기 */
-  line-height: 1.6;
 }
 
 /* 카드 스타일 수정 */
@@ -470,9 +491,7 @@ export default {
 
 .custom-btn {
   background-color: #1867C0;
-  /* 파란색 */
   color: white;
-  /* 글씨색 */
   font-size: 13px;
   border: none;
   box-shadow: none;
@@ -491,20 +510,8 @@ export default {
   justify-content: flex-end;
 }
 
-.customer-text {
-  font-size: 15px;
-  color: #555;
-}
-
 .mt-20 {
   margin-top: 20px;
-}
-
-.outline1 {
-  /*width: 865px !important;
-  max-width: 865px !important;   
-  min-width: 865px !important;*/
-  display: table !important;
 }
 
 /* 개요테이블 제목 가로길이 */
@@ -512,19 +519,22 @@ export default {
   width: 130px !important;
   font-size: 14.5px;
   font-weight: 500;
-  color: #753333;
+  color: #333333;
+  font-size: 14px;
+  /* color: #753333; */
 }
 
-.outline2 {
+.outline2 thead th {
   width: 130px !important;
-  font-size: 14.5px;
+  color: #333333;
+  font-size: 14px;
   font-weight: 500;
-  color: #753333;
 }
 
 .outlineTd {
   font-size: 13.5px;
-  color: #837974; /* 빨간색 */
+  color: #666666;
+  font-family: "Noto Sans KR"
 }
 
 .status-selection-container {
@@ -532,12 +542,11 @@ export default {
   /*height: 40px;*/
   width: 250px;
   border: 1px solid #DEE2E6;
-  
+
 }
 
 .status-label-box {
   width: 80px;
-  
   display: flex;
   align-items: center;
   justify-content: center;
@@ -550,44 +559,33 @@ export default {
 }
 
 .status-select-box {
-  width: 160px;  
+  width: 160px;
   background-color: #FFFFFF;
-}
-
-.status-select {
-/*  height: 40px; */  
 }
 
 .status-select :deep(.v-field) {
   border-radius: 0;
   box-shadow: none !important;
- /* min-height: 50px;*/
 }
 
 .status-select :deep(.v-field__input) {
   padding: 0 12px;
-  /* min-height: 50px; */
   font-size: 14px;
   display: flex;
   align-items: center;
 }
 
 .action-btn {
-  /*height: 50px;*/
-  width: 70px;
+  width: 65px;
+  height: 32px;
   text-transform: none;
-  font-size: 15px;
+  font-size: 14px;
   border-radius: 0;
   letter-spacing: 0;
-
-  background-color: #00B0F0 !important;
-  
-  color: white;  
+  background-color: #1867C0;
+  color: white;
+  box-shadow: none !important;
 }
-
-
-
-
 
 .gap-4 {
   gap: 5px;
