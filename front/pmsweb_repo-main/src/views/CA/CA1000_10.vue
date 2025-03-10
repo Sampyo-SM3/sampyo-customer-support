@@ -14,7 +14,32 @@
       </v-col>
     </v-row>
 
-    <v-row class="pt-10">
+    <!-- 여기서부터 접수상태 버튼 -->
+    <v-row class="mt-15">
+      <v-col cols="12" class="d-flex gap-4">
+        <div class="status-selection-container">
+          <div class="status-label-box">
+            <span>접수상태</span>
+          </div>
+          <div class="status-select-box">
+            <v-select
+              v-model="selectedStatus"
+              :items="progressStatuses"
+              hide-details
+              density="compact"
+              variant="plain"
+              class="status-select"
+            ></v-select>
+          </div>
+        </div>
+
+        <v-btn class="action-btn save-btn" @click="saveStatus">
+          저장
+        </v-btn>  
+      </v-col>
+    </v-row>    
+
+    <v-row>
       <!-- 왼쪽: 요구사항 정의서 -->
       <div class="leftForm">
 
@@ -100,7 +125,6 @@
           </div>
         </v-card>
       </div>
-
     </v-row>
   </v-container>
 </template>
@@ -110,6 +134,7 @@ export default {
   data() {
     return {
       step: 2,
+      selectedStatus: '미처리', // 추가된 상태 변수
       customer: {
         USER_NM: "배하준",
         MOBILE_NO: "010-8976-4852",
@@ -127,11 +152,11 @@ export default {
           {
             taskName: "1-1 몰탈 문서발급 메뉴 생성",
             description: "스마트 오더 홈페이지에 몰탈 제품 관련 문서 자료를 다운받을 수 있는 자료실 개설",
-            itRequest: "스마트 오더 ‘몰탈 문서발급’ 메뉴 신설, 회원 및 사업자 로그인 후 접근 가능"
+            itRequest: "스마트 오더 '몰탈 문서발급' 메뉴 신설, 회원 및 사업자 로그인 후 접근 가능"
           },
           {
             taskName: "1-2 삼표 스마트오더 홈페이지 접근성 개선",
-            description: "네이버, 구글 등 주요 포털 사이트에서 ‘삼표 몰탈’, ‘삼표 문서’, ‘삼표 스마트오더’ 검색 시 상위 노출되도록 조정",
+            description: "네이버, 구글 등 주요 포털 사이트에서 '삼표 몰탈', '삼표 문서', '삼표 스마트오더' 검색 시 상위 노출되도록 조정",
             itRequest: "네이버 고객센터 등 연락하여 검색 로직 수정 요청"
           }
         ]
@@ -167,12 +192,24 @@ export default {
         this.comments.push({ text: this.newComment, timestamp });
         this.newComment = "";
       }
-    }
+    },
+    // 추가된 메서드
+    saveStatus() {
+      this.management.PROGRESS = this.selectedStatus;
+      this.updateStep();
+      // 여기에 저장 로직을 추가할 수 있습니다
+      alert('상태가 저장되었습니다: ' + this.selectedStatus);
+    },
+  
   },
   computed: {
     commentTextLength() {
       return this.comments.length;
     }
+  },
+  created() {
+    // 초기화 시 현재 상태 설정
+    this.selectedStatus = this.management.PROGRESS;
   }
 };
 </script>
@@ -489,5 +526,71 @@ export default {
 .outlineTd {
   font-size: 13.5px;
   color: #837974; /* 빨간색 */
+}
+
+.status-selection-container {
+  display: flex;
+  /*height: 40px;*/
+  width: 250px;
+  border: 1px solid #DEE2E6;
+  
+}
+
+.status-label-box {
+  width: 80px;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #F8F9FA;
+  color: #4A5568;
+  font-size: 14px;
+  border-right: 1px solid #DEE2E6;
+  font-weight: 500;
+
+}
+
+.status-select-box {
+  width: 160px;  
+  background-color: #FFFFFF;
+}
+
+.status-select {
+/*  height: 40px; */  
+}
+
+.status-select :deep(.v-field) {
+  border-radius: 0;
+  box-shadow: none !important;
+ /* min-height: 50px;*/
+}
+
+.status-select :deep(.v-field__input) {
+  padding: 0 12px;
+  /* min-height: 50px; */
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.action-btn {
+  /*height: 50px;*/
+  width: 70px;
+  text-transform: none;
+  font-size: 15px;
+  border-radius: 0;
+  letter-spacing: 0;
+
+  background-color: #00B0F0 !important;
+  
+  color: white;  
+}
+
+
+
+
+
+.gap-4 {
+  gap: 5px;
 }
 </style>
