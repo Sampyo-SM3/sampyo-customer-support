@@ -22,10 +22,10 @@
           <div class="info-title-after"></div>요구사항 정의서
         </div>
 
-        <v-card class="pa-4 info-card outline1">
+        <v-card class="pa-4 info-card">
           <!-- 개요 -->
           <div class="info-subtitle">1. 개요</div>
-          <v-simple-table dense class="custom-table">
+          <v-simple-table dense class="custom-table outline1">
             <tbody>
               <tr>
                 <th class="table-header">과제명</th>
@@ -52,7 +52,7 @@
 
           <!-- 세부 요구사항 -->
           <div class="info-subtitle">2. 세부 요구사항</div>
-          <v-simple-table dense class="custom-table">
+          <v-simple-table dense class="custom-table outline2">
             <thead>
               <tr>
                 <th>세부 실행 과제</th>
@@ -77,7 +77,7 @@
           <div class="info-title-after"></div>답변 내용
         </div>
 
-        <v-card class="pa-4 info-card outline2">
+        <v-card class="pa-4 info-card">
           <!-- 댓글 섹션 -->
           <div v-if="commentTextLength > 0">
             <div class="info-subtitle">댓글 {{ commentTextLength }}</div>
@@ -465,9 +465,9 @@ export default {
 }
 
 .outline1 {
-  width: 900px !important;
-  max-width: 900px !important;
-  min-width: 900px !important;
+  width: 865px !important;
+  max-width: 865px !important;
+  min-width: 865px !important;
   display: table !important;
 }
 
