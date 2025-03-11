@@ -12,7 +12,7 @@
                 density="compact"
                 hide-details
                 readonly
-                variant="outlined"
+                variant="plain"
               ></v-text-field>
               <div class="calendar-icon-container">
                 <v-btn icon class="calendar-btn">
@@ -30,7 +30,7 @@
                 density="compact"
                 hide-details
                 readonly
-                variant="outlined"
+                variant="plain"
               ></v-text-field>
               <div class="calendar-icon-container">
                 <v-btn icon class="calendar-btn">
@@ -73,7 +73,7 @@
             <v-icon size="default" class="mr-1">mdi-account</v-icon>
             CS담당자 지정
           </v-btn>
-          <span class="mx-3 text-subtitle-2">총 {{ tableData.length }} 건 / 미처리: <span class="text-error">{{ getUnprocessedCount() }}</span></span>
+          <span class="mx-3 text-subtitle-2">총 {{ totalItems }} 건 / 미처리: <span class="text-error">{{ getUnprocessedCount() }}</span></span>
           
           <v-spacer></v-spacer>
           
@@ -101,11 +101,11 @@
               <div class="th-cell">완료일</div>              
               <div class="th-cell">담당자</div>
               <div class="th-cell">소요시간</div>
-              <div class="th-cell">메모</div>
+              <!-- <div class="th-cell">메모</div> -->
             </div>
             
             <!-- 테이블 데이터 행 -->
-            <div v-for="(item, index) in tableData" :key="index" class="table-row">
+            <div v-for="(item, index) in paginatedData" :key="index" class="table-row">
               <div class="td-cell checkbox-cell">
                 <v-checkbox hide-details density="compact" v-model="item.selected"></v-checkbox>
               </div>
@@ -120,7 +120,7 @@
               <div class="td-cell">{{ formatDate(item.completeDt) }}</div>
               <div class="td-cell">{{ item.manager || '-' }}</div>
               <div class="td-cell">{{ calculateDuration(item.insertDt, item.completeDt) }}</div>
-              <div class="td-cell">{{ item.memo || '-' }}</div>
+              <!-- <div class="td-cell">{{ item.memo || '-' }}</div> -->
             </div>
           </div>
           
@@ -136,9 +136,91 @@
           
           <!-- 페이지네이션 -->
           <div class="pagination-container" v-if="tableData.length > 0">
-            <v-btn icon="mdi-chevron-left" variant="text" size="small"></v-btn>
-            <v-btn size="small" variant="flat" color="primary">1</v-btn>
-            <v-btn icon="mdi-chevron-right" variant="text" size="small"></v-btn>
+            <v-btn 
+              icon="mdi-chevron-left" 
+              variant="text" 
+              size="small"
+              :disabled="currentPage === 1"
+              @click="currentPage--"
+            ></v-btn>
+            
+            <template v-if="totalPages <= 5">
+              <v-btn 
+                v-for="page in totalPages" 
+                :key="page" 
+                size="small" 
+                :variant="currentPage === page ? 'flat' : 'text'"
+                :color="currentPage === page ? 'primary' : ''"
+                @click="currentPage = page"
+              >
+                {{ page }}
+              </v-btn>
+            </template>
+            
+            <template v-else>
+              <!-- 처음 페이지 -->
+              <v-btn 
+                v-if="currentPage > 3" 
+                size="small" 
+                variant="text"
+                @click="currentPage = 1"
+              >
+                1
+              </v-btn>
+              
+              <!-- 생략 표시 -->
+              <span v-if="currentPage > 3" class="mx-1">...</span>
+              
+              <!-- 이전 페이지 -->
+              <v-btn 
+                v-if="currentPage > 1" 
+                size="small" 
+                variant="text"
+                @click="currentPage = currentPage - 1"
+              >
+                {{ currentPage - 1 }}
+              </v-btn>
+              
+              <!-- 현재 페이지 -->
+              <v-btn 
+                size="small" 
+                variant="flat"
+                color="primary"
+              >
+                {{ currentPage }}
+              </v-btn>
+              
+              <!-- 다음 페이지 -->
+              <v-btn 
+                v-if="currentPage < totalPages" 
+                size="small" 
+                variant="text"
+                @click="currentPage = currentPage + 1"
+              >
+                {{ currentPage + 1 }}
+              </v-btn>
+              
+              <!-- 생략 표시 -->
+              <span v-if="currentPage < totalPages - 2" class="mx-1">...</span>
+              
+              <!-- 마지막 페이지 -->
+              <v-btn 
+                v-if="currentPage < totalPages - 2" 
+                size="small" 
+                variant="text"
+                @click="currentPage = totalPages"
+              >
+                {{ totalPages }}
+              </v-btn>
+            </template>
+            
+            <v-btn 
+              icon="mdi-chevron-right" 
+              variant="text" 
+              size="small"
+              :disabled="currentPage === totalPages"
+              @click="currentPage++"
+            ></v-btn>
           </div>
         </v-col>
       </v-row>
@@ -158,8 +240,42 @@
         tableData: [],
         loading: false,
         selectAll: false,
+        // 페이징 관련 변수
+        currentPage: 1,
+        itemsPerPage: 10,
         // 상태값 목록 (실제 API에서 받아올 수 있음)
         statusList: ['미처리', '진행중', '보류중', '종결']
+      }
+    },
+    
+    computed: {
+      // 전체 페이지 수 계산
+      totalPages() {
+        return Math.ceil(this.tableData.length / this.itemsPerPage);
+      },
+      
+      // 현재 페이지에 표시할 데이터
+      paginatedData() {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        const end = start + this.itemsPerPage;
+        return this.tableData.slice(start, end);
+      },
+      
+      // 전체 아이템 수
+      totalItems() {
+        return this.tableData.length;
+      }
+    },
+    
+    watch: {
+      // API 파라미터가 변경되면 데이터 다시 로드
+      startDate() {
+        this.currentPage = 1; // 검색 조건 변경 시 첫 페이지로 리셋
+        // this.fetchData();
+      },
+      endDate() {
+        this.currentPage = 1;
+        // this.fetchData();
       }
     },
     
@@ -203,21 +319,23 @@
         this.endDate = this.formatDateForInput(today);
         
         // 날짜 변경 시 데이터 다시 로드
-        // this.fetchData();
+        this.fetchData();
       },
       
       // API 호출하여 데이터 가져오기
       async fetchData() {
         this.loading = true;
         try {
+          // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
           const response = await axios.get('http://localhost:8080/api/require/list', {
             params: {
               startDate: this.startDate,
-              endDate: this.endDate
-              // 필요한 경우 추가 파라미터
+              endDate: this.endDate,
+              // page: this.currentPage - 1, // 서버 측 페이징 시 0부터 시작하는 경우
+              // size: this.itemsPerPage
             }
           });
-
+  
           console.log('게시판 데이터 리스트 조회!! -> ' + response.data);
           
           // API 응답 데이터 처리
@@ -226,17 +344,23 @@
               ...item,
               selected: false,
               // API에서 진행상태가 오지 않으면 임의로 설정
-              status: item.status || this.getRandomStatus(),
+              status: item.processState || this.getRandomStatus(),
               // 첨부파일 여부 (임시로 랜덤하게 설정)
-              hasAttachment: Math.random() > 0.5
+              hasAttachment: Math.random() > 0.5,
+              // 테이블에 표시할 데이터 매핑
+              manager: item.requesterId || '-',  // 담당자 필드가 없어서 임시로 요청자 ID 사용
+              memo: item.currentIssue || '-'     // 메모 필드가 없어서 임시로 현재 이슈 사용
             }));
+            
+            // 서버 측 페이징 구현시 전체 개수 설정 (API 응답에서 받아야 함)
+            // this.totalItems = response.data.totalItems;
           } else {
             this.tableData = [];
           }
         } catch (error) {
           console.error('데이터 로드 중 오류 발생:', error);
           // 오류 발생 시 테스트 데이터 로드 (개발용)
-          this.loadTestData();
+        //   this.loadTestData();
         } finally {
           this.loading = false;
         }
@@ -250,68 +374,31 @@
         const lastWeek = new Date(today);
         lastWeek.setDate(today.getDate() - 7);
         
-        // this.tableData = [
-        //   {
-        //     seq: 'REQ001',
-        //     selected: false,
-        //     insertDt: today.toISOString(),
-        //     projectName: '시스템 유지보수 요청',
-        //     businessSector: 'IT부문',
-        //     status: '미처리',
-        //     completeDt: null,
-        //     manager: '김담당',
-        //     memo: '긴급 처리 필요',
-        //     hasAttachment: true
-        //   },
-        //   {
-        //     seq: 'REQ002',
-        //     selected: false,
-        //     insertDt: yesterday.toISOString(),
-        //     projectName: '데이터 복구 요청',
-        //     businessSector: '관리부문',
-        //     status: '진행중',
-        //     completeDt: null,
-        //     manager: '이매니저',
-        //     memo: '',
-        //     hasAttachment: false
-        //   },
-        //   {
-        //     seq: 'REQ003',
-        //     selected: false,
-        //     insertDt: lastWeek.toISOString(),
-        //     projectName: '기능 개선 요청',
-        //     businessSector: '개발부문',
-        //     status: '종결',
-        //     completeDt: yesterday.toISOString(),
-        //     manager: '박책임',
-        //     memo: '추가 요청사항 확인 필요',
-        //     hasAttachment: true
-        //   },
-        //   {
-        //     seq: 'REQ004',
-        //     selected: false,
-        //     insertDt: lastWeek.toISOString(),
-        //     projectName: '오류 수정 요청',
-        //     businessSector: 'IT부문',
-        //     status: '보류중',
-        //     completeDt: null,
-        //     manager: '최팀장',
-        //     memo: '사용자 확인 대기중',
-        //     hasAttachment: false
-        //   },
-        //   {
-        //     seq: 'REQ005',
-        //     selected: false,
-        //     insertDt: lastWeek.toISOString(),
-        //     projectName: '시스템 업데이트 요청',
-        //     businessSector: '개발부문',
-        //     status: '진행중',
-        //     completeDt: null,
-        //     manager: '정대리',
-        //     memo: '',
-        //     hasAttachment: true
-        //   }
-        // ];
+        // 20개의 테스트 데이터 생성
+        this.tableData = Array.from({ length: 20 }, (_, i) => {
+          const insertDate = new Date(today);
+          insertDate.setDate(today.getDate() - (i * 3));
+          
+          const completeDate = i % 4 === 0 ? null : new Date(insertDate);
+          if (completeDate) {
+            completeDate.setDate(insertDate.getDate() + (i % 10) + 1);
+          }
+          
+          const statusIndex = i % 4;
+          
+          return {
+            seq: `REQ${(1000 + i).toString().padStart(3, '0')}`,
+            selected: false,
+            insertDt: insertDate.toISOString(),
+            projectName: `프로젝트 요청 ${i + 1}`,
+            businessSector: ['IT부문', '영업부문', '개발부문', '마케팅부문', '생산부문'][i % 5],
+            status: this.statusList[statusIndex],
+            completeDt: completeDate?.toISOString() || null,
+            manager: [`김담당`, `이매니저`, `박책임`, `최팀장`, `정대리`][i % 5],
+            memo: statusIndex === 0 ? '긴급 처리 필요' : statusIndex === 1 ? '일정 조정 중' : statusIndex === 2 ? '진행 보류 요청' : '정상 처리 완료',
+            hasAttachment: i % 3 === 0
+          };
+        });
       },
       
       // 날짜 포맷 함수 (ISO 문자열 -> YYYY-MM-DD 형식)
@@ -356,7 +443,8 @@
       
       // 전체 선택/해제 토글
       toggleSelectAll() {
-        this.tableData.forEach(item => {
+        // 현재 페이지의 항목만 선택/해제
+        this.paginatedData.forEach(item => {
           item.selected = this.selectAll;
         });
       },
@@ -411,6 +499,7 @@
     display: flex;
     align-items: center;
     padding: 0;
+    border-left: 1px solid #e0e0e0;
   }
   
   .request-period, .product-category {
@@ -419,7 +508,7 @@
   }
   
   .label-box {
-    width: 100px;  
+    width: 80px;  
     flex-shrink: 0;
     height: 100%;
     display: flex;
@@ -427,11 +516,11 @@
     justify-content: center;
     font-size: 14px;
     font-weight: 500;
-    color: #333;
+    color: #578ADB;
     background-color: #f5f5f5;
     white-space: nowrap;
     padding: 0 4px;
-    border-right: 1px solid #eaeaea;
+    border-right: 1px solid #eaeaea;    
   }
   
   .input-container {
@@ -445,7 +534,8 @@
     position: relative;
     display: flex;
     align-items: center;
-    width: 160px;
+    width: 125px;
+    color: #7A5344;
   }
   
   .date-input {
@@ -481,6 +571,7 @@
   
   .date-btn-container {
     display: flex;
+    
   }
   
   .date-btn {
@@ -490,8 +581,8 @@
     letter-spacing: -0.5px;
     border: 1px solid #eaeaea;
     border-radius: 0;
-    background-color: #ffffff;
-    color: #333333;
+    background-color: #ffffff;    
+    color: #7A5344;    
     box-shadow: none;
     margin: 0;
   }
@@ -524,16 +615,22 @@
     width: 100%;
     position: relative;
   }
-  
+ 
+  /* 1페이지의 1행만 열 간격이 틀어지는 현상이 있어서 강제로 사이즈를 지정함 */
+  .table-header, .table-row {
+    display: grid;
+    grid-template-columns: 60px 80px 100px 1fr 100px 90px 100px 90px 100px;
+}
+
   .table-header {
-    display: flex;
+    /* display: flex; */
     background-color: #f5f5f5;
     font-weight: 500;
     border-bottom: 1px solid #e0e0e0;
   }
   
   .table-row {
-    display: flex;
+    /* display: flex; */
     border-bottom: 1px solid #e0e0e0;
   }
   
@@ -546,9 +643,9 @@
     border-right: 1px solid #e0e0e0;
     display: flex;
     align-items: center;
-    font-size: 13px;
+    font-size: 13px;          
   }
-  
+
   .th-cell {
     justify-content: center;
     font-weight: 500;
@@ -572,7 +669,7 @@
   .th-cell:nth-child(7), .td-cell:nth-child(7) { flex: 0 0 100px; justify-content: center; } /* 완료일 */
   .th-cell:nth-child(8), .td-cell:nth-child(8) { flex: 0 0 90px; justify-content: center; } /* 담당자 */    
   .th-cell:nth-child(9), .td-cell:nth-child(9) { flex: 0 0 100px; justify-content: center; } /* 소요시간 */    
-  .th-cell:nth-child(10), .td-cell:nth-child(10) { flex: 0 0 180px; } /* 메모 */    
+  /* .th-cell:nth-child(10), .td-cell:nth-child(10) { flex: 0 0 180px; }  */
   
   .header-with-divider {
     display: flex;
