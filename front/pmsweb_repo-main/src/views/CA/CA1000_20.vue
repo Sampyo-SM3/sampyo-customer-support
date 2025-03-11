@@ -76,15 +76,22 @@
           </div>
         </v-col>
       </v-row>
-  
-      <!-- 제품구분 행 추가 -->
+        
       <v-row no-gutters class="search-row bottom-row">
         <v-col class="search-col product-category">
-          <div class="label-box">제품구분</div>
-          <div class="input-container pt-2 pb-2">
-            <!-- 여기에 제품구분 내용 추가 -->
-          </div>
+          <div class="label-box">담당자</div>
+               
+          <v-text-field                         
+            v-model="requesterId"
+            placeholder="담당자명 입력을 입력하세요"
+            clearable
+            hide-details
+            density="compact"
+            variant="outlined"
+            class="manager-search"              
+          ></v-text-field>
         </v-col>
+        
       </v-row>
       
       <br>
@@ -277,6 +284,7 @@
       return {
         startDate: '',
         endDate: '',
+        requesterId: '',
         dateRange: 'month',
         productType: 'test1',
         tableData: [],
@@ -370,11 +378,13 @@
         try {
             console.log(this.startDate);
             console.log(this.endDate);
+            console.log(this.requesterId);
           // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
           const response = await axios.get('http://localhost:8080/api/require/list', {
             params: {
               startDate: this.startDate,
               endDate: this.endDate,
+              requesterId: this.requesterID
               // page: this.currentPage - 1, // 서버 측 페이징 시 0부터 시작하는 경우
               // size: this.itemsPerPage
             }
@@ -516,6 +526,12 @@
   </script>
   
   <style scoped>
+  .manager-search {
+    padding-block : 10px;
+    padding-left : 10px;
+    width: 800px;
+  }
+
   .select-btn {
     color : white;
     background-color : #23BBF5 !important; 
