@@ -69,6 +69,12 @@
         <where>
             <if test="requesterId != null and requesterId != ''">
                 requester_id = #{requesterId}
+            </if>            
+            <if test="startDate != null and startDate != ''">
+                AND insert_dt >= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND insert_dt &lt;= #{endDate}
             </if>
         </where>        
         ORDER BY seq DESC
