@@ -28,7 +28,7 @@ public class requireController {
     }
     
     
-    @PostMapping("/require/list")
+    @GetMapping("/require/list")
     public List<RequireDTO> getAllRequires() {
     	return requireService.getAllRequires();
     }
