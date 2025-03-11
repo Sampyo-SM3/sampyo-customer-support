@@ -1,6 +1,7 @@
 package com.example.testProject.controller;
 
 import com.example.testProject.dto.RequireDTO;
+import com.example.testProject.dto.RequireSearchCriteria;
 import com.example.testProject.dto.UserDTO;
 import com.example.testProject.service.RequireService;
 import com.example.testProject.service.UserService;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,6 +47,21 @@ public class requireController {
             return ResponseEntity.status(500).body("서버 오류 발생: " + e.getMessage());
         }
     }
+    
+    @GetMapping("/require/search")
+    public ResponseEntity<?> searchRequires(@ModelAttribute RequireSearchCriteria criteria) {    	
+        try {        	
+            List<RequireDTO> requires = requireService.searchRequiresByCriteria(criteria);
+            
+            if (requires.isEmpty()) {
+                return ResponseEntity.ok().body("검색 조건에 해당하는 데이터가 존재하지 않습니다.");
+            }
+            
+            return ResponseEntity.ok(requires);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 오류 발생_ /require/search\": " + e.getMessage());
+        }
+    }    
 
     
 }
