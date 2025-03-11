@@ -1,4 +1,4 @@
-<template>
+  <template>
     <v-container fluid class="pa-10">
       <v-row no-gutters class="search-row top-row">
         <!-- 요청기간 -->
@@ -40,13 +40,38 @@
             </div>
             
             <div class="date-buttons">
-              <div class="date-btn-container">
-                <v-btn value="today" class="date-btn" @click="setDateRange('today')">오늘</v-btn>
-                <v-btn value="week" class="date-btn" @click="setDateRange('week')">1주일</v-btn>
-                <v-btn value="15days" class="date-btn" @click="setDateRange('15days')">15일</v-btn>
-                <v-btn value="month" class="date-btn" @click="setDateRange('month')">1개월</v-btn>
-                <v-btn value="3months" class="date-btn" @click="setDateRange('3months')">3개월</v-btn>
-              </div>
+            <div class="date-btn-container">
+                <v-btn 
+                value="today" 
+                class="date-btn" 
+                :class="{ 'active-date-btn': dateRange === 'today' }"
+                @click="setDateRange('today')"
+                >오늘</v-btn>
+                <v-btn 
+                value="week" 
+                class="date-btn" 
+                :class="{ 'active-date-btn': dateRange === 'week' }"
+                @click="setDateRange('week')"
+                >1주일</v-btn>
+                <v-btn 
+                value="15days" 
+                class="date-btn" 
+                :class="{ 'active-date-btn': dateRange === '15days' }"
+                @click="setDateRange('15days')"
+                >15일</v-btn>
+                <v-btn 
+                value="month" 
+                class="date-btn" 
+                :class="{ 'active-date-btn': dateRange === 'month' }"
+                @click="setDateRange('month')"
+                >1개월</v-btn>
+                <v-btn 
+                value="3months" 
+                class="date-btn" 
+                :class="{ 'active-date-btn': dateRange === '3months' }"
+                @click="setDateRange('3months')"
+                >3개월</v-btn>
+            </div>
             </div>
           </div>
         </v-col>
@@ -61,10 +86,21 @@
           </div>
         </v-col>
       </v-row>
-  
+      
       <br>
-      <v-divider></v-divider>
+      
+      <div class="d-flex justify-center">
+        <v-btn variant="flat" class="select-btn d-flex align-center" size="x-large" @click="fetchData()">          
+          조회
+        </v-btn>
+      </div>    
       <br>
+      <br>
+      <br>      
+
+    <br>
+    <v-divider></v-divider>
+    <br>
   
       <!-- 데이터 테이블 상단 버튼 영역 -->
       <v-row class="top-button-row mb-2">
@@ -112,8 +148,7 @@
               <div class="td-cell">{{ item.seq }}</div>
               <div class="td-cell">{{ formatDate(item.insertDt) }}</div>
               <div class="td-cell title-cell">
-                <a :href="`#${item.seq}`" class="title-link">{{ item.projectName }}</a>
-                <span v-if="item.hasAttachment" class="file-indicator">[0]</span>
+                <a :href="`#${item.seq}`" class="title-link">{{ item.projectName }}</a>                
               </div>              
               <div class="td-cell">{{ item.businessSector }}</div>
               <div class="td-cell" :class="getStatusClass(item.status)">{{ item.status }}</div>
@@ -319,13 +354,15 @@
         this.endDate = this.formatDateForInput(today);
         
         // 날짜 변경 시 데이터 다시 로드
-        this.fetchData();
+        // this.fetchData();
       },
       
       // API 호출하여 데이터 가져오기
       async fetchData() {
         this.loading = true;
         try {
+            console.log(this.startDate);
+            console.log(this.endDate);
           // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
           const response = await axios.get('http://localhost:8080/api/require/list', {
             params: {
@@ -345,8 +382,7 @@
               selected: false,
               // API에서 진행상태가 오지 않으면 임의로 설정
               status: item.processState || this.getRandomStatus(),
-              // 첨부파일 여부 (임시로 랜덤하게 설정)
-              hasAttachment: Math.random() > 0.5,
+              
               // 테이블에 표시할 데이터 매핑
               manager: item.requesterId || '-',  // 담당자 필드가 없어서 임시로 요청자 ID 사용
               memo: item.currentIssue || '-'     // 메모 필드가 없어서 임시로 현재 이슈 사용
@@ -395,8 +431,7 @@
             status: this.statusList[statusIndex],
             completeDt: completeDate?.toISOString() || null,
             manager: [`김담당`, `이매니저`, `박책임`, `최팀장`, `정대리`][i % 5],
-            memo: statusIndex === 0 ? '긴급 처리 필요' : statusIndex === 1 ? '일정 조정 중' : statusIndex === 2 ? '진행 보류 요청' : '정상 처리 완료',
-            hasAttachment: i % 3 === 0
+            memo: statusIndex === 0 ? '긴급 처리 필요' : statusIndex === 1 ? '일정 조정 중' : statusIndex === 2 ? '진행 보류 요청' : '정상 처리 완료'            
           };
         });
       },
@@ -474,6 +509,11 @@
   </script>
   
   <style scoped>
+  .select-btn {
+    color : white;
+    background-color : #23BBF5 !important; 
+  }
+
   .custom-btn {
     font-size: 14px;
     height : 35px; 
@@ -602,6 +642,15 @@
     background-color: #e8f4fd;
     color: #2196F3;
   }
+
+  /* 활성화된 날짜 버튼 스타일 - 이 부분이 추가됩니다 */
+  .active-date-btn {
+    background-color: #e8f4fd !important;
+    color: #2196F3 !important;
+    border-color: #2196F3 !important;
+    font-weight: 500;
+    border-left: 1px solid #2196F3 !important;
+  }  
   
   /* 상단 버튼 행 스타일 */
   .top-button-row {
