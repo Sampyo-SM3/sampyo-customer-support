@@ -90,7 +90,7 @@
       <br>
       
       <div class="d-flex justify-center">
-        <v-btn variant="flat" class="select-btn d-flex align-center" size="x-large" @click="fetchData()">          
+        <v-btn variant="flat" class="select-btn d-flex align-center" size="large" @click="fetchData()">          
           조회
         </v-btn>
       </div>    
@@ -109,7 +109,14 @@
             <v-icon size="default" class="mr-1">mdi-account</v-icon>
             CS담당자 지정
           </v-btn>
-          <span class="mx-3 text-subtitle-2">총 {{ totalItems }} 건 / 미처리: <span class="text-error">{{ getUnprocessedCount() }}</span></span>
+          <span class="mx-3">
+            <span class="text-subtitle-2 text-grey">총 </span>
+            <span class="text-subtitle-2 font-weight-bold">{{ totalItems }}</span>
+            <!-- <span class="text-subtitle-2 text-grey">건</span> -->
+            <span class="text-subtitle-2 text-grey"> / 미처리: </span>
+            <span class="text-subtitle-2 font-weight-bold text-red">{{ getUnprocessedCount() }}</span>            
+            
+          </span>
           
           <v-spacer></v-spacer>
           
