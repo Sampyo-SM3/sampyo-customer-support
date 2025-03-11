@@ -16,7 +16,7 @@
               ></v-text-field>
               <div class="calendar-icon-container">
                 <v-btn icon class="calendar-btn">
-                  <v-icon size="small" color="#2196F3">mdi-calendar</v-icon>
+                  <v-icon size="small" color="#7A7A7A">mdi-calendar-search</v-icon>
                 </v-btn>
               </div>
             </div>
@@ -34,7 +34,7 @@
               ></v-text-field>
               <div class="calendar-icon-container">
                 <v-btn icon class="calendar-btn">
-                  <v-icon size="small" color="#2196F3">mdi-calendar</v-icon>
+                  <v-icon size="small" color="#7A7A7A">mdi-calendar-search</v-icon>
                 </v-btn>
               </div>
             </div>
@@ -539,11 +539,14 @@
   }
   
   .date-input {
-    width: 120px;
+    width: 120px;    
+    align-items: center; /* 수직 가운데 정렬 */    
   }
   
   .date-input :deep(.v-field__input) {
-    font-size: 15px;
+    font-size: 15px;      
+    padding-top: 0;
+    padding-bottom: 0;    
   }
   
   .calendar-icon-container {
