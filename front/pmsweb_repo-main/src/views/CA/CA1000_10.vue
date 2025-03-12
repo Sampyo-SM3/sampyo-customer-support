@@ -79,10 +79,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(task, index) in inquiry.DETAIL_REQUIREMENTS" :key="index">
-                <td class="outlineTd">{{ task.taskName }}</td>
-                <td class="outlineTd">{{ task.description }}</td>
-                <td class="outlineTd">{{ task.itRequest }}</td>
+              <tr>
+                <td class="outlineTd">{{ inquiry.DETAIL_TASK }}</td>
+                <td class="outlineTd">{{ inquiry.DETAIL_CONTENT }}</td>
+                <td class="outlineTd">{{ inquiry.DETAIL_IT_DEV_REQUEST }}</td>
               </tr>
             </tbody>
           </v-simple-table>
@@ -128,7 +128,7 @@ import axios from "axios";
 export default {
   data() {
     return {
-      step: 1,
+      step: 2,
       selectedStatus: '미처리', // 추가된 상태 변수
       customer: {
         USER_NM: "배하준",
@@ -143,18 +143,9 @@ export default {
         PAIN_POINT: "제품 사용설명서, 제품 성적서 등 당사 몰탈 제품을 구매하는 고객들이 필수적으로 참고해야 할 문서 자료를 입수하기 어려움",
         EXPECTED_EFFECT: "업무 자동화, 고객 만족도 제고",
         DELIVERABLES: "WebSite",
-        DETAIL_REQUIREMENTS: [
-          {
-            taskName: "1-1 몰탈 문서발급 메뉴 생성",
-            description: "스마트 오더 홈페이지에 몰탈 제품 관련 문서 자료를 다운받을 수 있는 자료실 개설",
-            itRequest: "스마트 오더 '몰탈 문서발급' 메뉴 신설, 회원 및 사업자 로그인 후 접근 가능"
-          },
-          {
-            taskName: "1-2 삼표 스마트오더 홈페이지 접근성 개선",
-            description: "네이버, 구글 등 주요 포털 사이트에서 '삼표 몰탈', '삼표 문서', '삼표 스마트오더' 검색 시 상위 노출되도록 조정",
-            itRequest: "네이버 고객센터 등 연락하여 검색 로직 수정 요청"
-          }
-        ]
+        DETAIL_TASK: "수집 방식 최적화 필요",
+        DETAIL_CONTENT: "수집 방식 최적화 필요",
+        DETAIL_IT_DEV_REQUEST: "AI 모델 튜닝 필요"
       },
       management: {
         SECTOR: "몰탈",
@@ -194,7 +185,9 @@ export default {
           PAIN_POINT: response.data.currentIssue,
           EXPECTED_EFFECT: response.data.expectedEffect,
           DELIVERABLES: response.data.finalDeliverables,
-          DETAIL_REQUIREMENTS: response.data.detailRequirements || [] // 데이터가 없을 경우 기본값
+          DETAIL_TASK: response.data.detailTask,
+          DETAIL_CONTENT: response.data.detailContent,
+          DETAIL_IT_DEV_REQUEST: response.data.detailItDevRequest
         };
       } catch (error) {
         console.error("❌ 오류 발생:", error);
@@ -227,16 +220,11 @@ export default {
   created() {
     // 초기화 시 현재 상태 설정
     this.selectedStatus = this.management.PROGRESS;
-    this.step = this.stepValue; // step 초기화
   },
   mounted() {
     this.fetchRequireDetail(); // API 호출
   },
   watch: {
-    selectedStatus(newVal, oldVal) {
-      console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
-      this.step = this.stepValue; // selectedStatus 값 변경 시 step 업데이트
-    }
   }
 };
 </script>
