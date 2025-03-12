@@ -335,6 +335,27 @@
       </v-col>
     </v-row>
   </v-container>
+
+  <!-- 스낵바로 오류 메시지 표시 -->
+  <v-snackbar
+    v-model="showError"
+    color="warning"
+    timeout="5000"
+    location="center"
+    elevation="8"              
+    variant="elevated" 
+  >
+    {{ errorMessages[0] }}
+    
+    <template v-slot:actions>
+      <v-btn
+        variant="text"
+        @click="showError = false"
+      >
+        닫기
+      </v-btn>
+    </template>
+  </v-snackbar>  
 </template>
   
 <script>
@@ -359,7 +380,9 @@ export default {
       currentPage: 1,
       itemsPerPage: 10,
       // 상태값 목록 (실제 API에서 받아올 수 있음)
-      statusList: ['미처리', '진행중', '보류중', '종결']
+      statusList: ['미처리', '진행중', '보류중', '종결'],
+      errorMessages: [],
+      showError: false,
     }
   },
   
@@ -385,12 +408,10 @@ export default {
   watch: {
     // API 파라미터가 변경되면 데이터 다시 로드
     startDate() {
-      this.currentPage = 1; // 검색 조건 변경 시 첫 페이지로 리셋
-      // this.fetchData();
+      this.currentPage = 1; // 검색 조건 변경 시 첫 페이지로 리셋      
     },
     endDate() {
-      this.currentPage = 1;
-      // this.fetchData();
+      this.currentPage = 1;      
     },
     Date_startDate(newValue) {
       if (newValue) {
@@ -430,6 +451,120 @@ export default {
   },
   
   methods: {
+
+    isValidDate(options = {}) {
+      console.log('--isValidDate--')
+      const errors = [];
+      
+      // 기본 옵션 설정
+      const {
+        maxDays = null,        
+        allowFutureDates = true,
+        allowPastDates = true,
+        minDate = null,
+        maxDate = null,        
+      } = options;
+
+      console.log(options);
+      
+      // 1. 기본 입력 검사
+      if (!this.startDate || !this.endDate) {
+        errors.push('시작일과 종료일을 모두 입력해주세요.');
+        return { isValid: false, errors };
+      }
+      
+      // 2. 날짜 형식 검사 (YYYY-MM-DD)
+      const dateFormatRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateFormatRegex.test(this.startDate)) {
+        errors.push('시작일의 형식이 올바르지 않습니다. (YYYY-MM-DD)');
+      }
+      if (!dateFormatRegex.test(this.endDate)) {
+        errors.push('종료일의 형식이 올바르지 않습니다. (YYYY-MM-DD)');
+      }
+      
+      // 형식이 올바르지 않으면 여기서 중단
+      if (errors.length > 0) {
+        return { isValid: false, errors };
+      }
+      
+      // 3. 유효한 날짜인지 검사
+      const isValidDateObj = (dateStr) => {
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const date = new Date(year, month - 1, day);
+        return (
+          date.getFullYear() === year &&
+          date.getMonth() === month - 1 &&
+          date.getDate() === day
+        );
+      };
+      
+      if (!isValidDateObj(this.startDate)) {
+        errors.push('시작일이 유효한 날짜가 아닙니다.');
+      }
+      if (!isValidDateObj(this.endDate)) {
+        errors.push('종료일이 유효한 날짜가 아닙니다.');
+      }
+      
+      // 유효한 날짜가 아니면 여기서 중단
+      if (errors.length > 0) {
+        return { isValid: false, errors };
+      }
+      
+      // 날짜 객체 생성
+      const startDate = new Date(this.startDate);
+      const endDate = new Date(this.endDate);
+      
+      // 4. 날짜 범위 검사 (시작일 <= 종료일)
+      if (startDate > endDate) {
+        errors.push('시작일이 종료일보다 나중일 수 없습니다.');
+      }
+      
+      // 5. 최대 기간 검사
+      if (maxDays) {        
+        const diffTime = Math.abs(endDate - startDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+        if (diffDays > maxDays) {
+          errors.push(`조회 기간은 최대 ${maxDays}일까지 가능합니다.`);
+        }
+      }
+      
+      // 7. 현재 날짜와 비교
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // 시간 부분 제거
+      
+      // 미래 날짜 검사
+      if (!allowFutureDates && startDate > today) {
+        errors.push('시작일은 오늘 이후일 수 없습니다.');
+      }
+      
+      // 과거 날짜 검사
+      if (!allowPastDates && endDate < today) {
+        errors.push('종료일은 오늘 이전일 수 없습니다.');
+      }
+      
+      // 8. 허용된 날짜 범위 검사
+      if (minDate) {
+        const minDateObj = new Date(minDate);
+        if (startDate < minDateObj) {
+          errors.push(`시작일은 ${minDate} 이후여야 합니다.`);
+        }
+      }
+      
+      if (maxDate) {
+        const maxDateObj = new Date(maxDate);
+        if (endDate > maxDateObj) {
+          errors.push(`종료일은 ${maxDate} 이전이어야 합니다.`);
+        }
+      }      
+      
+      // 최종 결과 반환
+      return {
+        isValid: errors.length === 0,
+        errors
+      };
+    },
+
     // 날짜 범위 설정 함수
     setDateRange(range) {
       this.dateRange = range;
@@ -460,13 +595,28 @@ export default {
       
       this.startDate = this.formatDateForInput(start);
       this.endDate = this.formatDateForInput(today);
-      
-      // 날짜 변경 시 데이터 다시 로드
-      // this.fetchData();
+        
     },
     
     // API 호출하여 데이터 가져오기
     async fetchData() {
+
+      // 날짜 유효성 검사
+      const validation = this.isValidDate({
+        maxDays: 60,                    // 최대 90일까지만 선택 가능
+        allowFutureDates: false,        // 미래 날짜 불허용
+        minDate: '2025-01-01',          // 최소 날짜
+        maxDate: '2025-12-31',          // 최대 날짜        
+      });      
+      
+      if (!validation.isValid) {
+        // 오류 메시지 표시
+        this.errorMessages = validation.errors;
+        this.showError = true;
+        return;
+      }
+
+
       this.loading = true;
       try {
         console.log(this.startDate);
