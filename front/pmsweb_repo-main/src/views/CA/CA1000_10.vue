@@ -128,7 +128,7 @@ import axios from "axios";
 export default {
   data() {
     return {
-      step: 2,
+      step: 1,
       selectedStatus: '미처리', // 추가된 상태 변수
       customer: {
         USER_NM: "배하준",
@@ -196,14 +196,9 @@ export default {
           DELIVERABLES: response.data.finalDeliverables,
           DETAIL_REQUIREMENTS: response.data.detailRequirements || [] // 데이터가 없을 경우 기본값
         };
-
-        this.step = parseInt(response.processState, 10);
-
       } catch (error) {
         console.error("❌ 오류 발생:", error);
       }
-
-
     },
     updateStep() {
       this.step = this.progressStatuses.indexOf(this.management.PROGRESS) + 1;
@@ -221,20 +216,27 @@ export default {
       this.updateStep();
       // 여기에 저장 로직을 추가할 수 있습니다
       alert('상태가 저장되었습니다: ' + this.selectedStatus);
-    },
-
+    }
   },
   computed: {
     commentTextLength() {
       return this.comments.length;
     }
+
   },
   created() {
     // 초기화 시 현재 상태 설정
     this.selectedStatus = this.management.PROGRESS;
+    this.step = this.stepValue; // step 초기화
   },
   mounted() {
     this.fetchRequireDetail(); // API 호출
+  },
+  watch: {
+    selectedStatus(newVal, oldVal) {
+      console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
+      this.step = this.stepValue; // selectedStatus 값 변경 시 step 업데이트
+    }
   }
 };
 </script>
