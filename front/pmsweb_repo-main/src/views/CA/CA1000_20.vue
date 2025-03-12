@@ -1,7 +1,18 @@
   <template>
     <v-container fluid class="pa-10">
+      <v-row>
+        <v-col>
+        <div class="title-div">고갱님의 소리~</div>
+        <div class="mt-2">
+            <v-divider thickness="3" color="#578ADB"></v-divider>
+        </div>
+        </v-col>        
+      </v-row>
+
+      <br>
+
       <v-row no-gutters class="search-row top-row">
-        <!-- 요청기간 -->
+        <!-- 요청기간 -->        
         <v-col class="search-col request-period">
           <div class="label-box">요청기간</div>
           <div class="input-container pt-2 pb-2">
@@ -102,8 +113,7 @@
         </v-btn>
       </div>    
       <br>
-      <br>
-      <br>      
+      <br>    
 
     <br>
     <v-divider></v-divider>
@@ -380,13 +390,11 @@
             console.log(this.endDate);
             console.log(this.requesterId);
           // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
-          const response = await axios.get('http://localhost:8080/api/require/list', {
+          const response = await axios.get('http://localhost:8080/api/require/search', {
             params: {
-              startDate: this.startDate,
-              endDate: this.endDate,
-              requesterId: this.requesterID
-              // page: this.currentPage - 1, // 서버 측 페이징 시 0부터 시작하는 경우
-              // size: this.itemsPerPage
+              startDate: this.startDate + ' 00:00:00',
+              endDate: this.endDate + ' 23:59:59',
+              requesterId: this.requesterId
             }
           });
   
@@ -526,6 +534,10 @@
   </script>
   
   <style scoped>
+  .title-div  {
+    font-size: 25px;
+  }
+
   .manager-search {
     padding-block : 10px;
     padding-left : 10px;
