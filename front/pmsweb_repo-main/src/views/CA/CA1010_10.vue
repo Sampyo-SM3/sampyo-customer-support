@@ -5,37 +5,27 @@
       <h2>고객 문의 내역</h2>
       <v-divider></v-divider>
     </div>
-    
+
     <!-- 검색 영역 -->
     <div class="search-area">
       <div class="search-row">
         <div class="search-item">
           <div class="search-label">요청기간</div>
           <div class="search-input-group">
-            <v-text-field
-              v-model="searchParams.startDate"
-              hide-details
-              density="compact"
-              class="date-input"
-              readonly
-            ></v-text-field>
+            <v-text-field v-model="searchParams.startDate" hide-details density="compact" class="date-input"
+              readonly></v-text-field>
             <v-btn icon size="small" variant="text" color="primary" class="date-btn">
               <v-icon>mdi-calendar</v-icon>
             </v-btn>
             <span class="mx-1">-</span>
-            <v-text-field
-              v-model="searchParams.endDate"
-              hide-details
-              density="compact"
-              class="date-input"
-              readonly
-            ></v-text-field>
+            <v-text-field v-model="searchParams.endDate" hide-details density="compact" class="date-input"
+              readonly></v-text-field>
             <v-btn icon size="small" variant="text" color="primary" class="date-btn">
               <v-icon>mdi-calendar</v-icon>
             </v-btn>
           </div>
         </div>
-        
+
         <div class="search-item">
           <v-btn-toggle v-model="searchParams.period" density="compact" mandatory class="period-toggle">
             <v-btn value="today">오늘</v-btn>
@@ -44,57 +34,30 @@
             <v-btn value="all">전체</v-btn>
           </v-btn-toggle>
         </div>
-        
+
         <div class="search-item">
-          <v-select
-            v-model="searchParams.progressStatus"
-            :items="progressStatuses"
-            label="진행상태"
-            hide-details
-            density="compact"
-            class="status-select"
-            variant="outlined"
-          ></v-select>
+          <v-select v-model="searchParams.progressStatus" :items="progressStatuses" label="진행상태" hide-details
+            density="compact" class="status-select" variant="outlined"></v-select>
         </div>
-        
+
         <div class="search-item">
-          <v-select
-            v-model="searchParams.inquiryType"
-            :items="inquiryTypes"
-            label="진행상태"
-            hide-details
-            density="compact"
-            class="status-select"
-            variant="outlined"
-          ></v-select>
+          <v-select v-model="searchParams.inquiryType" :items="inquiryTypes" label="진행상태" hide-details density="compact"
+            class="status-select" variant="outlined"></v-select>
         </div>
-        
+
         <div class="search-item flex-grow-1">
-          <v-select
-            v-model="searchParams.searchType"
-            :items="searchTypes"
-            label="전체"
-            hide-details
-            density="compact"
-            class="search-type-select"
-            variant="outlined"
-          ></v-select>
-          <v-text-field
-            v-model="searchParams.keyword"
-            hide-details
-            density="compact"
-            placeholder="검색어 입력"
-            class="keyword-input"
-            variant="outlined"
-          ></v-text-field>
+          <v-select v-model="searchParams.searchType" :items="searchTypes" label="전체" hide-details density="compact"
+            class="search-type-select" variant="outlined"></v-select>
+          <v-text-field v-model="searchParams.keyword" hide-details density="compact" placeholder="검색어 입력"
+            class="keyword-input" variant="outlined"></v-text-field>
         </div>
-        
+
         <div class="search-item">
           <v-btn color="primary" class="search-btn">검색</v-btn>
         </div>
       </div>
     </div>
-    
+
     <!-- 툴바 영역 -->
     <div class="toolbar-area">
       <div class="left-tools">
@@ -113,18 +76,13 @@
         </v-btn>
       </div>
     </div>
-    
+
     <!-- 테이블 영역 -->
     <v-table density="compact" class="inquiry-table">
       <thead>
         <tr>
           <th class="text-center" style="width: 40px">
-            <v-checkbox
-              v-model="selectAll"
-              hide-details
-              density="compact"
-              @click="toggleSelectAll"
-            ></v-checkbox>
+            <v-checkbox v-model="selectAll" hide-details density="compact" @click="toggleSelectAll"></v-checkbox>
           </th>
           <th class="text-center" style="width: 80px">접수번호</th>
           <th class="text-center" style="width: 100px">요청일</th>
@@ -138,23 +96,14 @@
       <tbody>
         <tr v-for="item in inquiryItems" :key="item.id" @click="viewDetail(item)" style="cursor: pointer;">
           <td class="text-center" @click.stop>
-            <v-checkbox
-              v-model="item.selected"
-              hide-details
-              density="compact"
-            ></v-checkbox>
+            <v-checkbox v-model="item.selected" hide-details density="compact"></v-checkbox>
           </td>
           <td class="text-center">{{ item.id }}</td>
           <td class="text-center">{{ item.requestDate }}</td>
           <td>{{ item.title }}</td>
           <td class="text-center">{{ item.writer }}</td>
           <td class="text-center">
-            <v-chip
-              size="small"
-              :color="getStatusColor(item.status)"
-              text-color="white"
-              class="status-chip"
-            >
+            <v-chip size="small" :color="getStatusColor(item.status)" text-color="white" class="status-chip">
               {{ item.status }}
             </v-chip>
           </td>
@@ -163,14 +112,10 @@
         </tr>
       </tbody>
     </v-table>
-    
+
     <!-- 페이지네이션 -->
     <div class="pagination-area">
-      <v-pagination
-        v-model="page"
-        :length="totalPages"
-        :total-visible="7"
-      ></v-pagination>
+      <v-pagination v-model="page" :length="totalPages" :total-visible="7"></v-pagination>
     </div>
   </v-container>
 </template>
@@ -189,14 +134,14 @@ export default {
         searchType: '전체',
         keyword: ''
       },
-      
+
       // 선택 관련
       selectAll: false,
-      
+
       // 페이지네이션
       page: 1,
       totalPages: 1,
-      
+
       // 조회 결과 데이터
       inquiryItems: [
         {
@@ -240,7 +185,7 @@ export default {
           elapsedTime: '0일 16시간'
         }
       ],
-      
+
       // 셀렉트 옵션들
       progressStatuses: ['전체', '미처리', '처리중', '완료', '보류'],
       inquiryTypes: ['전체', '제품/기술문의', '배차문의', '불편사항', '자료요청', '1:1문의'],
@@ -275,8 +220,8 @@ export default {
   watch: {
     inquiryItems: {
       handler() {
-        this.selectAll = this.inquiryItems.length > 0 && 
-                        this.inquiryItems.every(item => item.selected);
+        this.selectAll = this.inquiryItems.length > 0 &&
+          this.inquiryItems.every(item => item.selected);
       },
       deep: true
     }
@@ -365,7 +310,8 @@ export default {
   padding: 0 10px;
 }
 
-.left-tools, .right-tools {
+.left-tools,
+.right-tools {
   display: flex;
   align-items: center;
 }
