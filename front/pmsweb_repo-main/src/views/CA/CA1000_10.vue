@@ -8,7 +8,8 @@
             :class="{ active: step >= index + 1 }">
             <div class="step-circle">{{ index + 1 }}</div>
             <span class="step-label">{{ status }}</span>
-            <div v-if="index < progressStatuses.length - 1" class="step-line"></div>
+            <div v-if="index < progressStatuses.length - 1" class="step-line"
+              :class="{ 'step-line-active': step > index + 1 }"></div>
           </div>
         </div>
       </v-col>
@@ -16,7 +17,7 @@
 
     <!-- 여기서부터 접수상태 버튼 -->
     <v-row class="mt-10">
-      <v-col cols="auto" class="d-flex gap-4 align-center">
+      <v-col cols="auto" class="d-flex align-center">
         <div class="status-selection-container" style="margin-left:6px;">
           <div class="status-label-box">
             <span>접수상태</span>
@@ -128,7 +129,7 @@ import axios from "axios";
 export default {
   data() {
     return {
-      step: 2,
+      step: 1,
       selectedStatus: '미처리', // 추가된 상태 변수
       customer: {
         USER_NM: "배하준",
@@ -176,6 +177,23 @@ export default {
         });
         console.log("📌 받아온 데이터:", response.data);
         this.requireDetail = response.data; // 데이터를 저장
+
+        switch (response.data.processState) {
+          case '미처리':
+            this.step = 1;
+            break;
+          case '진행중':
+            this.step = 2;
+            break;
+          case '보류중':
+            this.step = 3;
+            break;
+          case '종결':
+            this.stepteValue = 4;
+            break;
+          default:
+            this.step = 1; // 기본값 (예외 처리)
+        }
 
         // 받아온 데이터를 inquiry에 업데이트
         this.inquiry = {
@@ -283,10 +301,18 @@ export default {
   width: 100%;
   height: 5px;
   background-color: lightgray;
+  /* 기본 회색 */
   top: 50%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1;
+  transition: background-color 0.3s ease-in-out;
+  /* 색상 변경 애니메이션 */
+}
+
+/* ✅ 진행된 상태일 때 파란색으로 변경 */
+.step-line-active {
+  background-color: #5B9BD5;
 }
 
 .active .step-circle {
@@ -296,10 +322,6 @@ export default {
 
 .active .step-label {
   color: #1867C0;
-}
-
-.active+.step-line {
-  background-color: #1867C0;
 }
 
 .info-title {
@@ -567,7 +589,7 @@ export default {
 
 .action-btn {
   width: 65px;
-  height: 32px;
+  height: 34px;
   text-transform: none;
   font-size: 14px;
   border-radius: 0;
@@ -575,9 +597,5 @@ export default {
   background-color: #1867C0;
   color: white;
   box-shadow: none !important;
-}
-
-.gap-4 {
-  gap: 5px;
 }
 </style>
