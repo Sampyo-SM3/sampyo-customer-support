@@ -90,7 +90,7 @@
                 AND insert_dt &lt;= #{endDate}
             </if>
         </where>        
-        ORDER BY seq DESC
+        ORDER BY seq
     </select>    
 
 </mapper>

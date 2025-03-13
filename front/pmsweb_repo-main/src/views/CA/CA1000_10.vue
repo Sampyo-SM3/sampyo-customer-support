@@ -1,5 +1,5 @@
 <template style="margin-top:-30px;">
-  <v-container>
+  <v-container class="ml-16 mr-16">
     <!-- 진행 상태 표시 바 -->
     <v-row justify="center" class="mb-6 pt-6">
       <v-col cols="12" class="d-flex align-center justify-center">
@@ -15,7 +15,7 @@
       </v-col>
     </v-row>
 
-    <!-- 여기서부터 접수상태 버튼 -->
+    <!-- 접수 상태 버튼 -->
     <v-row class="mt-10">
       <v-col cols="auto" class="d-flex align-center">
         <div class="status-selection-container" style="margin-left:6px;">
@@ -35,63 +35,67 @@
     </v-row>
 
     <v-row>
-      <!-- 왼쪽: 요구사항 정의서 -->
-      <div class="leftForm">
-        <div class="section-title">
-          <div class="info-title-after"></div>요구사항 정의서
+      <v-col cols="12">
+        <!-- 상단: 요구사항 정의서 -->
+        <div>
+          <div class="section-title">
+            <div class="info-title-after"></div>요구사항 정의서
+          </div>
+
+          <v-card class="pa-4 mt- info-card">
+            <!-- 개요 -->
+            <div class="info-subtitle">&nbsp;개요</div>
+            <v-simple-table dense class="custom-table outline1">
+              <tbody>
+                <tr>
+                  <th class="table-header">과제명</th>
+                  <td colspan="2" class="outlineTd">{{ inquiry.PROJECT_NAME }}</td>
+                  <th class="table-header">사업 부문</th>
+                  <td colspan="2" class="outlineTd">{{ inquiry.BUSINESS_SECTOR }}</td>
+                </tr>
+                <tr>
+                  <th class="table-header">과제 개요</th>
+                  <td colspan="5" class="outlineTd">{{ inquiry.PROJECT_OVERVIEW }}</td>
+                </tr>
+                <tr>
+                  <th class="table-header">기존 문제점</th>
+                  <td colspan="5" class="outlineTd">{{ inquiry.PAIN_POINT }}</td>
+                </tr>
+                <tr>
+                  <th class="table-header">기대 효과</th>
+                  <td colspan="2" class="outlineTd">{{ inquiry.EXPECTED_EFFECT }}</td>
+                  <th class="table-header">최종 산출물</th>
+                  <td colspan="2" class="outlineTd">{{ inquiry.DELIVERABLES }}</td>
+                </tr>
+              </tbody>
+            </v-simple-table>
+
+            <!-- 세부 요구사항 -->
+            <div class="info-subtitle pt-5">&nbsp;세부 요구사항</div>
+            <v-simple-table dense class="custom-table outline2">
+              <thead>
+                <tr>
+                  <th>세부 실행 과제</th>
+                  <th>내용</th>
+                  <th>IT 개발 요청</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="outlineTd">{{ inquiry.DETAIL_TASK }}</td>
+                  <td class="outlineTd">{{ inquiry.DETAIL_CONTENT }}</td>
+                  <td class="outlineTd">{{ inquiry.DETAIL_IT_DEV_REQUEST }}</td>
+                </tr>
+              </tbody>
+            </v-simple-table>
+          </v-card>
         </div>
+      </v-col>
+    </v-row>
 
-        <v-card class="pa-4 mt- info-card">
-          <!-- 개요 -->
-          <div class="info-subtitle">&nbsp;개요</div>
-          <v-simple-table dense class="custom-table outline1">
-            <tbody>
-              <tr>
-                <th class="table-header">과제명</th>
-                <td colspan="2" class="outlineTd">{{ inquiry.PROJECT_NAME }}</td>
-                <th class="table-header">사업 부문</th>
-                <td colspan="2" class="outlineTd">{{ inquiry.BUSINESS_SECTOR }}</td>
-              </tr>
-              <tr>
-                <th class="table-header">과제 개요</th>
-                <td colspan="5" class="outlineTd">{{ inquiry.PROJECT_OVERVIEW }}</td>
-              </tr>
-              <tr>
-                <th class="table-header">기존 문제점</th>
-                <td colspan="5" class="outlineTd">{{ inquiry.PAIN_POINT }}</td>
-              </tr>
-              <tr>
-                <th class="table-header">기대 효과</th>
-                <td colspan="2" class="outlineTd">{{ inquiry.EXPECTED_EFFECT }}</td>
-                <th class="table-header">최종 산출물</th>
-                <td colspan="2" class="outlineTd">{{ inquiry.DELIVERABLES }}</td>
-              </tr>
-            </tbody>
-          </v-simple-table>
-
-          <!-- 세부 요구사항 -->
-          <div class="info-subtitle pt-5">&nbsp;세부 요구사항</div>
-          <v-simple-table dense class="custom-table outline2">
-            <thead>
-              <tr>
-                <th>세부 실행 과제</th>
-                <th>내용</th>
-                <th>IT 개발 요청</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="outlineTd">{{ inquiry.DETAIL_TASK }}</td>
-                <td class="outlineTd">{{ inquiry.DETAIL_CONTENT }}</td>
-                <td class="outlineTd">{{ inquiry.DETAIL_IT_DEV_REQUEST }}</td>
-              </tr>
-            </tbody>
-          </v-simple-table>
-        </v-card>
-      </div>
-
-      <!-- 오른쪽: 문의 정보 관리 및 답변 -->
-      <div class="rightForm">
+    <!-- 하단: 댓글 섹션을 아래로 배치 -->
+    <v-row>
+      <v-col cols="12">
         <div class="section-title">
           <div class="info-title-after"></div>답변 내용
         </div>
@@ -101,32 +105,42 @@
           <div v-if="commentTextLength > 0">
             <div class="info-subtitle">댓글 {{ commentTextLength }}</div>
             <v-card id="commentArea" class="pa-3 mb-3 info-inner-card">
-              <v-list-item v-for="(comment, index) in comments" :key="index" class="comment-item">
-                <div class="comment-content">
-                  <div class="comment-text">{{ comment.text }}</div>
-                  <div class="comment-timestamp">{{ comment.timestamp }}</div>
-                </div>
-              </v-list-item>
+              <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
+                :all-comments="comments" @reply="handleReply" />
             </v-card>
           </div>
 
           <!-- 댓글 입력 -->
           <div class="comment-input-container" :class="{ 'mt-20': commentTextLength === 0 }">
-            <v-textarea v-model="newComment" label="댓글 입력" class="custom-textarea"></v-textarea>
+            <v-textarea v-model="newComment" :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"
+              class="custom-textarea"></v-textarea>
             <div class="btn-container">
+              <v-btn v-if="replyTo" text @click="cancelReply" class="mr-2">답글 취소</v-btn>
               <v-btn class="custom-btn" @click="addComment">등록</v-btn>
             </div>
           </div>
         </v-card>
-      </div>
+      </v-col>
     </v-row>
   </v-container>
 </template>
 
+
 <script>
 import axios from "axios";
+import CommentTree from './CommentTree.vue';  // CommentTree 컴포넌트 import
 
 export default {
+  // props 정의 추가
+  props: {
+    receivedSeq: {
+      type: [Number, String],
+      required: false
+    }
+  },
+  components: {
+    CommentTree
+  },
   data() {
     return {
       step: 1,
@@ -146,7 +160,20 @@ export default {
         DELIVERABLES: "WebSite",
         DETAIL_TASK: "수집 방식 최적화 필요",
         DETAIL_CONTENT: "수집 방식 최적화 필요",
-        DETAIL_IT_DEV_REQUEST: "AI 모델 튜닝 필요"
+        DETAIL_IT_DEV_REQUEST: "AI 모델 튜닝 필요",
+        REQUESTERID: "test",
+        DETAIL_REQUIREMENTS: [
+          {
+            taskName: "1-1 몰탈 문서발급 메뉴 생성",
+            description: "스마트 오더 홈페이지에 몰탈 제품 관련 문서 자료를 다운받을 수 있는 자료실 개설",
+            itRequest: "스마트 오더 '몰탈 문서발급' 메뉴 신설, 회원 및 사업자 로그인 후 접근 가능"
+          },
+          {
+            taskName: "1-2 삼표 스마트오더 홈페이지 접근성 개선",
+            description: "네이버, 구글 등 주요 포털 사이트에서 '삼표 몰탈', '삼표 문서', '삼표 스마트오더' 검색 시 상위 노출되도록 조정",
+            itRequest: "네이버 고객센터 등 연락하여 검색 로직 수정 요청"
+          }
+        ]
       },
       management: {
         SECTOR: "몰탈",
@@ -163,17 +190,21 @@ export default {
       answer: "",
       comments: [],
       newComment: "",
+      replyTo: null,
       sectors: ["시멘트", "분체", "골재", "몰탈", "레미콘", "기타"],
       progressStatuses: ["미처리", "진행", "보류중", "종결"],
       qaTypes: ["제품/기술문의", "배차문의", "불편사항", "자료요청", "1:1문의"],
       receiptPaths: ["WEB", "KAKAO", "CALL", "CRM", "SIDP"],
+
     };
   },
   methods: {
     async fetchRequireDetail() {
+      console.log('--fetchRequireDetail--');
+      console.log(this.receivedSeq);
       try {
         const response = await axios.get("http://localhost:8080/api/require/detail", {
-          params: { seq: 1 }
+          params: { seq: this.receivedSeq }
         });
         console.log("📌 받아온 데이터:", response.data);
         this.requireDetail = response.data; // 데이터를 저장
@@ -214,12 +245,156 @@ export default {
     updateStep() {
       this.step = this.progressStatuses.indexOf(this.management.PROGRESS) + 1;
     },
-    addComment() {
-      if (this.newComment.trim()) {
-        const timestamp = new Date().toLocaleString();
-        this.comments.push({ text: this.newComment, timestamp });
-        this.newComment = "";
+    async addComment() {
+      // try {
+      //   const commentData = {
+      //     postId: this.receivedSeq,
+      //     userId: this.inquiry.REQUESTERID,
+      //     content: this.newComment,
+      //     parentId: this.replyTo ? this.replyTo.commentId : null,
+      //     depth: this.replyTo ? this.replyTo.depth + 1 : 0
+      //   };
+
+      //   const response = await axios.post('http://localhost:8080/api/comments', commentData);
+
+      //   if (response.data) {
+      //     await this.fetchComments();
+      //     this.newComment = '';
+      //     this.replyTo = null;
+      //   }
+      // } catch (error) {
+      //   console.error('댓글 등록 실패:', error);
+      // }
+
+      this.fetchComments();
+      this.newComment = '';
+      this.replyTo = null;
+    },
+    // async fetchComments() {
+    fetchComments() {
+      // try {
+      //   const response = await axios.get(`http://localhost:8080/api/comments/${this.receivedSeq}`);
+      //   this.comments = response.data;
+      // } catch (error) {
+      //   console.error('댓글 조회 실패:', error);
+      // }
+      try {
+        // const response = await axios.get(`http://localhost:8080/api/comments/${this.receivedSeq}`);
+        this.comments = [
+          {
+            commentId: 10,
+            postId: 1,
+            userId: "john_doe",
+            content: "요구사항 정의서 잘 보았습니다. 검토 후 회신드리겠습니다.",
+            parentId: null,
+            depth: 0,
+            createdAt: "2024-03-13 09:30:00",
+            deleteYn: "N"
+          },
+          {
+            commentId: 11,
+            postId: 1,
+            userId: "emma_smith",
+            content: "검토 완료되었나요? 일정 확인이 필요합니다.",
+            parentId: null,
+            depth: 0,
+            createdAt: "2024-03-13 10:15:00",
+            deleteYn: "N"
+          },
+          {
+            commentId: 12,
+            postId: 1,
+            userId: "alex_kim",
+            content: "네, 다음 주 월요일까지 개발 완료하겠습니다.",
+            parentId: 11,
+            depth: 1,
+            createdAt: "2024-03-13 10:30:00",
+            deleteYn: "N"
+          },
+          {
+            commentId: 13,
+            postId: 1,
+            userId: "emma_smith",
+            content: "알겠습니다. 개발 시작하시면 공유 부탁드립니다.",
+            parentId: 12,
+            depth: 2,
+            createdAt: "2024-03-13 10:45:00",
+            deleteYn: "N"
+          },
+          {
+            commentId: 14,
+            postId: 1,
+            userId: "mike_wilson",
+            content: "저도 개발 진행상황 공유 받고 싶습니다.",
+            parentId: 13,
+            depth: 3,
+            createdAt: "2024-03-13 11:00:00",
+            deleteYn: "N"
+          },
+          {
+            commentId: 15,
+            postId: 1,
+            userId: "sarah_lee",
+            content: "API 스펙도 함께 공유해주시면 감사하겠습니다.",
+            parentId: 14,
+            depth: 4,
+            createdAt: "2024-03-13 11:15:00",
+            deleteYn: "N"
+          },
+          {
+            commentId: 16,
+            postId: 1,
+            userId: "alex_kim",
+            content: "네, API 문서 작성 후 함께 공유하도록 하겠습니다.",
+            parentId: 15,
+            depth: 5,
+            createdAt: "2024-03-13 11:30:00",
+            deleteYn: "N"
+          },
+          {
+            commentId: 17,
+            postId: 1,
+            userId: "tom_park",
+            content: "새로운 요구사항이 있습니다. 논의가 필요합니다.",
+            parentId: null,
+            depth: 0,
+            createdAt: "2024-03-13 13:00:00",
+            deleteYn: "N"
+          },
+          {
+            commentId: 18,
+            postId: 1,
+            userId: "emma_smith",
+            content: "어떤 내용인가요? 자세히 설명해주세요.",
+            parentId: 17,
+            depth: 1,
+            createdAt: "2024-03-13 13:15:00",
+            deleteYn: "N"
+          },
+          {
+            commentId: 19,
+            postId: 1,
+            userId: "tom_park",
+            content: "보안 관련 기능이 추가되어야 할 것 같습니다.",
+            parentId: 18,
+            depth: 2,
+            createdAt: "2024-03-13 13:30:00",
+            deleteYn: "N"
+          }
+        ];
+
+      } catch (error) {
+        console.error('댓글 조회 실패:', error);
       }
+    },
+
+    handleReply(comment) {
+      this.replyTo = comment;
+    },
+
+    cancelReply() {
+      this.replyTo = null;
+      this.newComment = '';
     },
     // 추가된 메서드
     saveStatus() {
@@ -230,6 +405,9 @@ export default {
     }
   },
   computed: {
+    topLevelComments() {
+      return this.comments.filter(comment => !comment.parentId);
+    },
     commentTextLength() {
       return this.comments.length;
     }
@@ -240,9 +418,25 @@ export default {
     this.selectedStatus = this.management.PROGRESS;
   },
   mounted() {
+    console.log('--mounted--');
+    console.log('받은 receivedSeq:', this.receivedSeq);
+    console.log('현재 라우트 정보:', this.$route);
     this.fetchRequireDetail(); // API 호출
+
+    this.fetchComments();
+
   },
   watch: {
+    receivedSeq: {
+      handler(newValue, oldValue) {
+        console.log('receivedSeq 변경됨:', newValue, '이전 값:', oldValue);
+      },
+      immediate: true  // 컴포넌트 생성 시점에도 즉시 실행
+    },
+    selectedStatus(newVal, oldVal) {
+      console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
+      this.step = this.stepValue; // selectedStatus 값 변경 시 step 업데이트
+    }
   }
 };
 </script>
@@ -492,7 +686,6 @@ export default {
 .leftForm {
   width: 900px;
   margin-top: 10px;
-  margin-left: 20px;
 }
 
 .rightForm {
@@ -597,5 +790,42 @@ export default {
   background-color: #1867C0;
   color: white;
   box-shadow: none !important;
+}
+
+.gap-4 {
+  gap: 5px;
+}
+
+.comment-item {
+  margin-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.comment-user {
+  font-weight: 500;
+  color: #333;
+}
+
+.comment-timestamp {
+  font-size: 12px;
+  color: #666;
+}
+
+.comment-actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.comment-text {
+  color: #444;
+  font-size: 14px;
+  line-height: 1.5;
 }
 </style>
