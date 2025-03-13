@@ -98,21 +98,28 @@
         <v-card class="pa-4 info-card">
           <!-- 댓글 섹션 -->
           <div v-if="commentTextLength > 0">
-            <div class="info-subtitle">댓글 {{ commentTextLength }}</div>
-            <v-card id="commentArea" class="pa-3 mb-3 info-inner-card">
-              <v-list-item v-for="(comment, index) in comments" :key="index" class="comment-item">
-                <div class="comment-content">
-                  <div class="comment-text">{{ comment.text }}</div>
-                  <div class="comment-timestamp">{{ comment.timestamp }}</div>
-                </div>
-              </v-list-item>
-            </v-card>
-          </div>
+          <div class="info-subtitle">댓글 {{ commentTextLength }}</div>
+          <v-card id="commentArea" class="pa-3 mb-3 info-inner-card">
+            <!-- 재귀적 컴포넌트로 댓글 트리 구조 표현 -->
+            <comment-tree
+              v-for="comment in topLevelComments"
+              :key="comment.commentId"
+              :comment="comment"
+              :all-comments="comments"
+              @reply="handleReply"
+            />
+          </v-card>
+        </div>
 
           <!-- 댓글 입력 -->
           <div class="comment-input-container" :class="{ 'mt-20': commentTextLength === 0 }">
-            <v-textarea v-model="newComment" label="댓글 입력" class="custom-textarea"></v-textarea>
+            <v-textarea 
+              v-model="newComment" 
+              :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'" 
+              class="custom-textarea"
+            ></v-textarea>
             <div class="btn-container">
+              <v-btn v-if="replyTo" text @click="cancelReply" class="mr-2">답글 취소</v-btn>
               <v-btn class="custom-btn" @click="addComment">등록</v-btn>
             </div>
           </div>
@@ -124,6 +131,7 @@
 
 <script>
 import axios from "axios";
+import CommentTree from './CommentTree.vue';  // CommentTree 컴포넌트 import
 
 export default {
   // props 정의 추가
@@ -133,6 +141,9 @@ export default {
       required: false      
     }
   },  
+  components: {
+    CommentTree
+  },
   data() {
     return {
       step: 1,
@@ -150,6 +161,7 @@ export default {
         PAIN_POINT: "제품 사용설명서, 제품 성적서 등 당사 몰탈 제품을 구매하는 고객들이 필수적으로 참고해야 할 문서 자료를 입수하기 어려움",
         EXPECTED_EFFECT: "업무 자동화, 고객 만족도 제고",
         DELIVERABLES: "WebSite",
+        REQUESTERID: "test",
         DETAIL_REQUIREMENTS: [
           {
             taskName: "1-1 몰탈 문서발급 메뉴 생성",
@@ -178,10 +190,12 @@ export default {
       answer: "",
       comments: [],
       newComment: "",
+      replyTo: null,      
       sectors: ["시멘트", "분체", "골재", "몰탈", "레미콘", "기타"],
       progressStatuses: ["미처리", "진행", "보류중", "종결"],
       qaTypes: ["제품/기술문의", "배차문의", "불편사항", "자료요청", "1:1문의"],
-      receiptPaths: ["WEB", "KAKAO", "CALL", "CRM", "SIDP"],
+      receiptPaths: ["WEB", "KAKAO", "CALL", "CRM", "SIDP"],      
+      
     };
   },
   methods: {
@@ -212,13 +226,157 @@ export default {
     updateStep() {
       this.step = this.progressStatuses.indexOf(this.management.PROGRESS) + 1;
     },
-    addComment() {
-      if (this.newComment.trim()) {
-        const timestamp = new Date().toLocaleString();
-        this.comments.push({ text: this.newComment, timestamp });
-        this.newComment = "";
-      }
+    async addComment() {
+      // try {
+      //   const commentData = {
+      //     postId: this.receivedSeq,
+      //     userId: this.inquiry.REQUESTERID,
+      //     content: this.newComment,
+      //     parentId: this.replyTo ? this.replyTo.commentId : null,
+      //     depth: this.replyTo ? this.replyTo.depth + 1 : 0
+      //   };
+
+      //   const response = await axios.post('http://localhost:8080/api/comments', commentData);
+        
+      //   if (response.data) {
+      //     await this.fetchComments();
+      //     this.newComment = '';
+      //     this.replyTo = null;
+      //   }
+      // } catch (error) {
+      //   console.error('댓글 등록 실패:', error);
+      // }
+
+          this.fetchComments();
+          this.newComment = '';
+          this.replyTo = null;      
     },
+    // async fetchComments() {
+    fetchComments() {
+      // try {
+      //   const response = await axios.get(`http://localhost:8080/api/comments/${this.receivedSeq}`);
+      //   this.comments = response.data;
+      // } catch (error) {
+      //   console.error('댓글 조회 실패:', error);
+      // }
+      try {
+        // const response = await axios.get(`http://localhost:8080/api/comments/${this.receivedSeq}`);
+        this.comments = [
+ {
+   commentId: 10,
+   postId: 1,
+   userId: "john_doe",
+   content: "요구사항 정의서 잘 보았습니다. 검토 후 회신드리겠습니다.",
+   parentId: null,
+   depth: 0,
+   createdAt: "2024-03-13 09:30:00",
+   deleteYn: "N"
+ },
+ {
+   commentId: 11,
+   postId: 1,
+   userId: "emma_smith", 
+   content: "검토 완료되었나요? 일정 확인이 필요합니다.",
+   parentId: null,
+   depth: 0,
+   createdAt: "2024-03-13 10:15:00",
+   deleteYn: "N"
+ },
+ {
+   commentId: 12,
+   postId: 1,
+   userId: "alex_kim",
+   content: "네, 다음 주 월요일까지 개발 완료하겠습니다.",
+   parentId: 11,
+   depth: 1,
+   createdAt: "2024-03-13 10:30:00",
+   deleteYn: "N"
+ },
+ {
+   commentId: 13,
+   postId: 1,
+   userId: "emma_smith",
+   content: "알겠습니다. 개발 시작하시면 공유 부탁드립니다.",
+   parentId: 12,
+   depth: 2,
+   createdAt: "2024-03-13 10:45:00",
+   deleteYn: "N"
+ },
+ {
+   commentId: 14,
+   postId: 1,
+   userId: "mike_wilson",
+   content: "저도 개발 진행상황 공유 받고 싶습니다.",
+   parentId: 13,
+   depth: 3,
+   createdAt: "2024-03-13 11:00:00",
+   deleteYn: "N"
+ },
+ {
+   commentId: 15,
+   postId: 1,
+   userId: "sarah_lee",
+   content: "API 스펙도 함께 공유해주시면 감사하겠습니다.",
+   parentId: 14,
+   depth: 4,
+   createdAt: "2024-03-13 11:15:00",
+   deleteYn: "N"
+ },
+ {
+   commentId: 16,
+   postId: 1,
+   userId: "alex_kim",
+   content: "네, API 문서 작성 후 함께 공유하도록 하겠습니다.",
+   parentId: 15,
+   depth: 5,
+   createdAt: "2024-03-13 11:30:00",
+   deleteYn: "N"
+ },
+ {
+   commentId: 17,
+   postId: 1,
+   userId: "tom_park",
+   content: "새로운 요구사항이 있습니다. 논의가 필요합니다.",
+   parentId: null,
+   depth: 0,
+   createdAt: "2024-03-13 13:00:00",
+   deleteYn: "N"
+ },
+ {
+   commentId: 18,
+   postId: 1,
+   userId: "emma_smith",
+   content: "어떤 내용인가요? 자세히 설명해주세요.",
+   parentId: 17,
+   depth: 1,
+   createdAt: "2024-03-13 13:15:00",
+   deleteYn: "N"
+ },
+ {
+   commentId: 19,
+   postId: 1,
+   userId: "tom_park",
+   content: "보안 관련 기능이 추가되어야 할 것 같습니다.",
+   parentId: 18,
+   depth: 2,
+   createdAt: "2024-03-13 13:30:00",
+   deleteYn: "N"
+ }
+]; 
+   
+      } catch (error) {
+        console.error('댓글 조회 실패:', error);
+      }      
+    },
+
+    handleReply(comment) {
+      this.replyTo = comment;
+    },
+
+    cancelReply() {
+      this.replyTo = null;
+      this.newComment = '';
+    },    
     // 추가된 메서드
     saveStatus() {
       this.management.PROGRESS = this.selectedStatus;
@@ -228,6 +386,9 @@ export default {
     }
   },
   computed: {
+    topLevelComments() {
+      return this.comments.filter(comment => !comment.parentId);
+    },
     commentTextLength() {
       return this.comments.length;
     }
@@ -243,6 +404,8 @@ export default {
     console.log('받은 receivedSeq:', this.receivedSeq);
     console.log('현재 라우트 정보:', this.$route);
     this.fetchRequireDetail(); // API 호출
+
+    this.fetchComments();
 
   },
   watch: {
@@ -610,5 +773,38 @@ export default {
 
 .gap-4 {
   gap: 5px;
+}
+
+.comment-item {
+  margin-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.comment-user {
+  font-weight: 500;
+  color: #333;
+}
+
+.comment-timestamp {
+  font-size: 12px;
+  color: #666;
+}
+
+.comment-actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.comment-text {
+  color: #444;
+  font-size: 14px;
+  line-height: 1.5;
 }
 </style>

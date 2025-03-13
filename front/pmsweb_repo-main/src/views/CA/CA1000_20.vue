@@ -513,6 +513,8 @@ export default {
       // 날짜 객체 생성
       const startDate = new Date(this.startDate);
       const endDate = new Date(this.endDate);
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);      
       
       // 4. 날짜 범위 검사 (시작일 <= 종료일)
       if (startDate > endDate) {
@@ -535,6 +537,8 @@ export default {
       
       // 미래 날짜 검사
       if (!allowFutureDates && startDate > today) {
+        console.log('startDate -> ' + startDate);
+        console.log('today -> ' + today);
         errors.push('시작일은 오늘 이후일 수 없습니다.');
       }
       
