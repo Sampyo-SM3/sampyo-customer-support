@@ -96,18 +96,24 @@
         </div>
 
         <v-card class="pa-4 info-card">
-          <!-- 댓글 섹션 -->
-          <div v-if="commentTextLength > 0">
+        <!-- 댓글 섹션 -->
+        <div>
           <div class="info-subtitle">댓글 {{ commentTextLength }}</div>
           <v-card id="commentArea" class="pa-3 mb-3 info-inner-card">
-            <!-- 재귀적 컴포넌트로 댓글 트리 구조 표현 -->
-            <comment-tree
-              v-for="comment in topLevelComments"
-              :key="comment.commentId"
-              :comment="comment"
-              :all-comments="comments"
-              @reply="handleReply"
-            />
+            <!-- 댓글이 있는 경우 -->
+            <template v-if="comments && comments.length > 0">
+              <comment-tree
+                v-for="comment in topLevelComments"
+                :key="comment.commentId"
+                :comment="comment"
+                :all-comments="comments"
+                @reply="handleReply"
+              />
+            </template>
+            <!-- 댓글이 없는 경우 -->
+            <div v-else class="no-comments">
+              등록된 댓글이 없습니다.
+            </div>
           </v-card>
         </div>
 
@@ -227,145 +233,45 @@ export default {
       this.step = this.progressStatuses.indexOf(this.management.PROGRESS) + 1;
     },
     async addComment() {
-      // try {
-      //   const commentData = {
-      //     postId: this.receivedSeq,
-      //     userId: this.inquiry.REQUESTERID,
-      //     content: this.newComment,
-      //     parentId: this.replyTo ? this.replyTo.commentId : null,
-      //     depth: this.replyTo ? this.replyTo.depth + 1 : 0
-      //   };
+      console.log('--addComment--')
+      try {
+        const commentData = {
+          postId: this.receivedSeq,
+          // userId: this.inquiry.REQUESTERID,
+          userId: 'test',
+          content: this.newComment,
+          parentId: this.replyTo ? this.replyTo.commentId : null,
+          depth: this.replyTo ? this.replyTo.depth + 1 : 0          
+        };        
+        console.log(commentData);
 
-      //   const response = await axios.post('http://localhost:8080/api/comments', commentData);
-        
-      //   if (response.data) {
-      //     await this.fetchComments();
-      //     this.newComment = '';
-      //     this.replyTo = null;
-      //   }
-      // } catch (error) {
-      //   console.error('댓글 등록 실패:', error);
-      // }
+        // const commentData = {
+        //   "postId": 11,
+        //   "userId": "john_doe",
+        //   "content": "첫 번째 테스트 댓글입니다.",
+        //   "parentId": null,
+        //   "depth": 0
+        // }   
 
-          this.fetchComments();
+        const response = await axios.post('http://localhost:8080/api/comments/add', commentData);
+        // http://localhost:8080/api/comments/add
+        console.log('response.data -> ' + response.data);
+        if (response.data) {
+          await this.fetchComments();
           this.newComment = '';
-          this.replyTo = null;      
+          this.replyTo = null;
+        }
+      } catch (error) {
+        console.error('댓글 등록 실패:', error);
+      }    
     },
+
     async fetchComments() {
-    // fetchComments() {
+      console.log('--fetchComments--');
       try {
         const response = await axios.get(`http://localhost:8080/api/comments?postId=${this.receivedSeq}`);
-        // http://localhost:8080/api/comments?postId=1
-        this.comments = response.data;
-      } catch (error) {
-        console.error('댓글 조회 실패:', error);
-      }
-      try {
-        const response = await axios.get(`http://localhost:8080/api/comments/${this.receivedSeq}`);
-        this.comments = response.data;
-//         this.comments = [
-//  {
-//    commentId: 10,
-//    postId: 1,
-//    userId: "john_doe",
-//    content: "요구사항 정의서 잘 보았습니다. 검토 후 회신드리겠습니다.",
-//    parentId: null,
-//    depth: 0,
-//    createdAt: "2024-03-13 09:30:00",
-//    deleteYn: "N"
-//  },
-//  {
-//    commentId: 11,
-//    postId: 1,
-//    userId: "emma_smith", 
-//    content: "검토 완료되었나요? 일정 확인이 필요합니다.",
-//    parentId: null,
-//    depth: 0,
-//    createdAt: "2024-03-13 10:15:00",
-//    deleteYn: "N"
-//  },
-//  {
-//    commentId: 12,
-//    postId: 1,
-//    userId: "alex_kim",
-//    content: "네, 다음 주 월요일까지 개발 완료하겠습니다.",
-//    parentId: 11,
-//    depth: 1,
-//    createdAt: "2024-03-13 10:30:00",
-//    deleteYn: "N"
-//  },
-//  {
-//    commentId: 13,
-//    postId: 1,
-//    userId: "emma_smith",
-//    content: "알겠습니다. 개발 시작하시면 공유 부탁드립니다.",
-//    parentId: 12,
-//    depth: 2,
-//    createdAt: "2024-03-13 10:45:00",
-//    deleteYn: "N"
-//  },
-//  {
-//    commentId: 14,
-//    postId: 1,
-//    userId: "mike_wilson",
-//    content: "저도 개발 진행상황 공유 받고 싶습니다.",
-//    parentId: 13,
-//    depth: 3,
-//    createdAt: "2024-03-13 11:00:00",
-//    deleteYn: "N"
-//  },
-//  {
-//    commentId: 15,
-//    postId: 1,
-//    userId: "sarah_lee",
-//    content: "API 스펙도 함께 공유해주시면 감사하겠습니다.",
-//    parentId: 14,
-//    depth: 4,
-//    createdAt: "2024-03-13 11:15:00",
-//    deleteYn: "N"
-//  },
-//  {
-//    commentId: 16,
-//    postId: 1,
-//    userId: "alex_kim",
-//    content: "네, API 문서 작성 후 함께 공유하도록 하겠습니다.",
-//    parentId: 15,
-//    depth: 5,
-//    createdAt: "2024-03-13 11:30:00",
-//    deleteYn: "N"
-//  },
-//  {
-//    commentId: 17,
-//    postId: 1,
-//    userId: "tom_park",
-//    content: "새로운 요구사항이 있습니다. 논의가 필요합니다.",
-//    parentId: null,
-//    depth: 0,
-//    createdAt: "2024-03-13 13:00:00",
-//    deleteYn: "N"
-//  },
-//  {
-//    commentId: 18,
-//    postId: 1,
-//    userId: "emma_smith",
-//    content: "어떤 내용인가요? 자세히 설명해주세요.",
-//    parentId: 17,
-//    depth: 1,
-//    createdAt: "2024-03-13 13:15:00",
-//    deleteYn: "N"
-//  },
-//  {
-//    commentId: 19,
-//    postId: 1,
-//    userId: "tom_park",
-//    content: "보안 관련 기능이 추가되어야 할 것 같습니다.",
-//    parentId: 18,
-//    depth: 2,
-//    createdAt: "2024-03-13 13:30:00",
-//    deleteYn: "N"
-//  }
-// ]; 
-   
+        this.comments = Array.isArray(response.data) ? response.data : [];
+        console.log(this.comments);
       } catch (error) {
         console.error('댓글 조회 실패:', error);
       }      
@@ -379,6 +285,7 @@ export default {
       this.replyTo = null;
       this.newComment = '';
     },    
+
     // 추가된 메서드
     saveStatus() {
       this.management.PROGRESS = this.selectedStatus;
@@ -389,10 +296,13 @@ export default {
   },
   computed: {
     topLevelComments() {
-      return this.comments.filter(comment => !comment.parentId);
+      // 안전하게 체크
+      return Array.isArray(this.comments) 
+        ? this.comments.filter(comment => !comment.parentId)
+        : [];
     },
     commentTextLength() {
-      return this.comments.length;
+      return Array.isArray(this.comments) ? this.comments.length : 0;
     }
 
   },
@@ -431,6 +341,13 @@ export default {
 <style scoped>
 .template {
   font-family: "Noto Sans KR", sans-serif;
+}
+
+.no-comments {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-size: 14px;
 }
 
 .stepper-container {
