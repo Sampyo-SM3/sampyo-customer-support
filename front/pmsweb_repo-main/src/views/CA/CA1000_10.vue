@@ -128,10 +128,9 @@ import axios from "axios";
 export default {
   // props 정의 추가
   props: {
-    seq: {
+    receivedSeq: {
       type: [Number, String],
-      required: false,
-      default: null
+      required: false      
     }
   },  
   data() {
@@ -187,9 +186,11 @@ export default {
   },
   methods: {
     async fetchRequireDetail() {
+      console.log('--fetchRequireDetail--');
+      console.log(this.receivedSeq);
       try {
         const response = await axios.get("http://localhost:8080/api/require/detail", {
-          params: { seq: 1 }
+          params: { seq: this.receivedSeq }
         });
         console.log("📌 받아온 데이터:", response.data);
         this.requireDetail = response.data; // 데이터를 저장
@@ -238,9 +239,19 @@ export default {
     this.step = this.stepValue; // step 초기화
   },
   mounted() {
+    console.log('--mounted--');
+    console.log('받은 receivedSeq:', this.receivedSeq);
+    console.log('현재 라우트 정보:', this.$route);
     this.fetchRequireDetail(); // API 호출
+
   },
   watch: {
+    receivedSeq: {
+    handler(newValue, oldValue) {
+      console.log('receivedSeq 변경됨:', newValue, '이전 값:', oldValue);
+    },
+    immediate: true  // 컴포넌트 생성 시점에도 즉시 실행
+  },    
     selectedStatus(newVal, oldVal) {
       console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
       this.step = this.stepValue; // selectedStatus 값 변경 시 step 업데이트

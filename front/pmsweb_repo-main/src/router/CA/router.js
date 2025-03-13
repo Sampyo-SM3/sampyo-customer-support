@@ -14,9 +14,10 @@ export const caRoutes = [
     component: CA1000_20
   },  
   {  
-    path: 'ca1000_10/:seq?', // seq 파라미터를 선택적으로 받음
+    path: 'ca1000_10/:receivedSeq?', // receivedSeq 파라미터를 선택적으로 받음
     name: 'CA1000_10',
-    component: CA1000_10
+    component: CA1000_10,
+    props: true
   },    
   
   // 다른 라우트 정의...
