@@ -84,13 +84,30 @@ export default defineComponent({
     const { menuData, isLoading, error } = storeToRefs(menuStore);
     const auth = ref('CA');
     const id = ref('아이디!!아직 아이디별 권한 관리는 안됨');
+    const isFirstLoad = ref(true);
 
-    onMounted(() => {         
-      menuStore.fetchMenuData(auth.value, id.value)
-    })    
+    onMounted(async () => {         
+      await menuStore.fetchMenuData(auth.value, id.value)
+      
 
-    watch(menuData, (newValue) => {
-      console.log('menuData changed:', newValue);
+
+      watch(menuData, (newValue) => {
+        console.log('menuData changed:', newValue);
+
+        // 첫 로드시에만 실행
+        if (isFirstLoad.value && menuData.value && menuData.value.length > 0) {
+          const firstClickableMenu = menuData.value.find(item => 
+            item.LEV === 3 && isClickable(item.M_CODE)
+          );
+
+          if (firstClickableMenu) {
+            activateMenuItem(firstClickableMenu);
+            isFirstLoad.value = false;  // 플래그 변경
+          }
+        }
+      }); 
+
+      
     });    
 
     const processedMenuItems = computed(() => {
