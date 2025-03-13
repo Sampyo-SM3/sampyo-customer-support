@@ -1,8 +1,10 @@
 package com.example.testProject.controller;
 
+import com.example.testProject.dto.CommentDTO;
 import com.example.testProject.dto.RequireDTO;
 import com.example.testProject.dto.RequireSearchCriteria;
 import com.example.testProject.dto.UserDTO;
+import com.example.testProject.service.CommentService;
 import com.example.testProject.service.RequireService;
 import com.example.testProject.service.UserService;
 import com.example.testProject.service.testService;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class requireController {
 
     private final RequireService requireService;
+    
 
     // ✅ 두 개의 서비스 모두 초기화
     public requireController(RequireService requireService) {
@@ -67,7 +70,6 @@ public class requireController {
             return ResponseEntity.status(500).body("서버 오류 발생_ /require/search\": " + e.getMessage());
         }
     }    
-
-   
+     
     
 }

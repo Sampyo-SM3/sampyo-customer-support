@@ -27,7 +27,6 @@
               class="status-select"></v-select>
           </div>
         </div>
-
         <v-btn class="action-btn save-btn" @click="saveStatus">
           저장
         </v-btn>
@@ -128,7 +127,7 @@
 
 <script>
 import axios from "axios";
-import CommentTree from './CommentTree.vue';  // CommentTree 컴포넌트 import
+import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포넌트 import
 
 export default {
   // props 정의 추가
@@ -270,14 +269,8 @@ export default {
       this.newComment = '';
       this.replyTo = null;
     },
-    // async fetchComments() {
-    fetchComments() {
-      // try {
-      //   const response = await axios.get(`http://localhost:8080/api/comments/${this.receivedSeq}`);
-      //   this.comments = response.data;
-      // } catch (error) {
-      //   console.error('댓글 조회 실패:', error);
-      // }
+    async fetchComments() {
+      // fetchComments() {
       try {
         // const response = await axios.get(`http://localhost:8080/api/comments/${this.receivedSeq}`);
         this.comments = [
@@ -382,7 +375,117 @@ export default {
             deleteYn: "N"
           }
         ];
-
+        const response = await axios.get(`http://localhost:8080/api/comments?postId=${this.receivedSeq}`);
+        // http://localhost:8080/api/comments?postId=1
+        this.comments = response.data;
+      } catch (error) {
+        console.error('댓글 조회 실패:', error);
+      }
+      try {
+        const response = await axios.get(`http://localhost:8080/api/comments/${this.receivedSeq}`);
+        this.comments = response.data;
+        //         this.comments = [
+        //  {
+        //    commentId: 10,
+        //    postId: 1,
+        //    userId: "john_doe",
+        //    content: "요구사항 정의서 잘 보았습니다. 검토 후 회신드리겠습니다.",
+        //    parentId: null,
+        //    depth: 0,
+        //    createdAt: "2024-03-13 09:30:00",
+        //    deleteYn: "N"
+        //  },
+        //  {
+        //    commentId: 11,
+        //    postId: 1,
+        //    userId: "emma_smith", 
+        //    content: "검토 완료되었나요? 일정 확인이 필요합니다.",
+        //    parentId: null,
+        //    depth: 0,
+        //    createdAt: "2024-03-13 10:15:00",
+        //    deleteYn: "N"
+        //  },
+        //  {
+        //    commentId: 12,
+        //    postId: 1,
+        //    userId: "alex_kim",
+        //    content: "네, 다음 주 월요일까지 개발 완료하겠습니다.",
+        //    parentId: 11,
+        //    depth: 1,
+        //    createdAt: "2024-03-13 10:30:00",
+        //    deleteYn: "N"
+        //  },
+        //  {
+        //    commentId: 13,
+        //    postId: 1,
+        //    userId: "emma_smith",
+        //    content: "알겠습니다. 개발 시작하시면 공유 부탁드립니다.",
+        //    parentId: 12,
+        //    depth: 2,
+        //    createdAt: "2024-03-13 10:45:00",
+        //    deleteYn: "N"
+        //  },
+        //  {
+        //    commentId: 14,
+        //    postId: 1,
+        //    userId: "mike_wilson",
+        //    content: "저도 개발 진행상황 공유 받고 싶습니다.",
+        //    parentId: 13,
+        //    depth: 3,
+        //    createdAt: "2024-03-13 11:00:00",
+        //    deleteYn: "N"
+        //  },
+        //  {
+        //    commentId: 15,
+        //    postId: 1,
+        //    userId: "sarah_lee",
+        //    content: "API 스펙도 함께 공유해주시면 감사하겠습니다.",
+        //    parentId: 14,
+        //    depth: 4,
+        //    createdAt: "2024-03-13 11:15:00",
+        //    deleteYn: "N"
+        //  },
+        //  {
+        //    commentId: 16,
+        //    postId: 1,
+        //    userId: "alex_kim",
+        //    content: "네, API 문서 작성 후 함께 공유하도록 하겠습니다.",
+        //    parentId: 15,
+        //    depth: 5,
+        //    createdAt: "2024-03-13 11:30:00",
+        //    deleteYn: "N"
+        //  },
+        //  {
+        //    commentId: 17,
+        //    postId: 1,
+        //    userId: "tom_park",
+        //    content: "새로운 요구사항이 있습니다. 논의가 필요합니다.",
+        //    parentId: null,
+        //    depth: 0,
+        //    createdAt: "2024-03-13 13:00:00",
+        //    deleteYn: "N"
+        //  },
+        //  {
+        //    commentId: 18,
+        //    postId: 1,
+        //    userId: "emma_smith",
+        //    content: "어떤 내용인가요? 자세히 설명해주세요.",
+        //    parentId: 17,
+        //    depth: 1,
+        //    createdAt: "2024-03-13 13:15:00",
+        //    deleteYn: "N"
+        //  },
+        //  {
+        //    commentId: 19,
+        //    postId: 1,
+        //    userId: "tom_park",
+        //    content: "보안 관련 기능이 추가되어야 할 것 같습니다.",
+        //    parentId: 18,
+        //    depth: 2,
+        //    createdAt: "2024-03-13 13:30:00",
+        //    deleteYn: "N"
+        //  }
+        // ]; 
       } catch (error) {
         console.error('댓글 조회 실패:', error);
       }
@@ -421,8 +524,11 @@ export default {
     console.log('--mounted--');
     console.log('받은 receivedSeq:', this.receivedSeq);
     console.log('현재 라우트 정보:', this.$route);
+
+    // 요구사항 정의서 데이터 가져오기
     this.fetchRequireDetail(); // API 호출
 
+    // 댓글 데이터 가져오기
     this.fetchComments();
 
   },
@@ -744,14 +850,12 @@ export default {
 
 .status-selection-container {
   display: flex;
-  /*height: 40px;*/
   width: 250px;
   border: 1px solid #DEE2E6;
-
 }
 
 .status-label-box {
-  width: 80px;
+  width: 90px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -760,7 +864,8 @@ export default {
   font-size: 14px;
   border-right: 1px solid #DEE2E6;
   font-weight: 500;
-
+  border-radius: 0px;
+  /* ⬅ 모서리 각지게 */
 }
 
 .status-select-box {
@@ -769,7 +874,9 @@ export default {
 }
 
 .status-select :deep(.v-field) {
-  border-radius: 0;
+  /* ⬅ 테두리 연하게 */
+  border-radius: 0px;
+  /* ⬅ 모서리 각지게 */
   box-shadow: none !important;
 }
 
@@ -780,16 +887,18 @@ export default {
   align-items: center;
 }
 
+
 .action-btn {
   width: 65px;
-  height: 34px;
+  height: 40px;
   text-transform: none;
   font-size: 14px;
-  border-radius: 0;
+  border-radius: 4px;
   letter-spacing: 0;
   background-color: #1867C0;
   color: white;
   box-shadow: none !important;
+  margin-left: 8px;
 }
 
 .gap-4 {
