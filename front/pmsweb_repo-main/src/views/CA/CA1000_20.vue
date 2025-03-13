@@ -223,7 +223,8 @@
             <div class="td-cell">{{ item.seq }}</div>
             <div class="td-cell">{{ formatDate(item.insertDt) }}</div>
             <div class="td-cell title-cell">
-              <a :href="`#${item.seq}`" class="title-link">{{ item.projectName }}</a>                
+              <!-- <a :href="`#${item.seq}`" class="title-link">{{ item.projectName }}</a>                 -->
+              <router-link :to="{ name: 'CA1000_10', params: { seq: item.seq } }" class="title-link">{{ item.projectName }}</router-link>
             </div>              
             <div class="td-cell">{{ item.businessSector }}</div>
             <div class="td-cell" :class="getStatusClass(item.status)">{{ item.status }}</div>

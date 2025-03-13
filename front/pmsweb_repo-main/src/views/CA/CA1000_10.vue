@@ -126,6 +126,14 @@
 import axios from "axios";
 
 export default {
+  // props 정의 추가
+  props: {
+    seq: {
+      type: [Number, String],
+      required: false,
+      default: null
+    }
+  },  
   data() {
     return {
       step: 1,
