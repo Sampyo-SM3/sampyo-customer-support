@@ -7,7 +7,7 @@
         <div class="comment-content">
           <div class="comment-header">
             <span class="comment-user">{{ comment.userId }}</span>
-            <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
+            <span class="comment-date">{{ formatDate(comment.formattedCreatedAt) }}</span>
           </div>
           <div class="comment-text">{{ comment.content }}</div>
           <v-btn text class="reply-btn" @click="$emit('reply', comment)">답글</v-btn>

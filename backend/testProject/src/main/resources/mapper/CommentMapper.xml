@@ -18,5 +18,27 @@
 		ORDER BY groupId, c.depth, c.createdAt;
         
     </select>
+    
+    
+    <insert id="addComment" parameterType="com.example.testProject.dto.CommentDTO">
+		INSERT INTO comments (
+			postId,	
+			userId,	
+			content,	
+			parentId,	
+			depth,	
+			createdAt,	
+			deleteYn	
+		) VALUES (	
+			#{postId},	
+			#{userId},	
+			#{content},	
+			#{parentId},	
+			#{depth},	
+			#{createdAt},	
+			#{deleteYn}
+		)
+
+    </insert>    
 
 </mapper>

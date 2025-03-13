@@ -101,14 +101,20 @@
 
         <v-card class="pa-4 info-card">
           <!-- 댓글 섹션 -->
-          <div v-if="commentTextLength > 0">
+          <div>
             <div class="info-subtitle">댓글 {{ commentTextLength }}</div>
             <v-card id="commentArea" class="pa-3 mb-3 info-inner-card">
-              <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
-                :all-comments="comments" @reply="handleReply" />
+              <!-- 댓글이 있는 경우 -->
+              <template v-if="comments && comments.length > 0">
+                <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
+                  :all-comments="comments" @reply="handleReply" />
+              </template>
+              <!-- 댓글이 없는 경우 -->
+              <div v-else class="no-comments">
+                등록된 댓글이 없습니다.
+              </div>
             </v-card>
           </div>
-
           <!-- 댓글 입력 -->
           <div class="comment-input-container" :class="{ 'mt-20': commentTextLength === 0 }">
             <v-textarea v-model="newComment" :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"
@@ -245,32 +251,43 @@ export default {
       this.step = this.progressStatuses.indexOf(this.management.PROGRESS) + 1;
     },
     async addComment() {
-      // try {
-      //   const commentData = {
-      //     postId: this.receivedSeq,
-      //     userId: this.inquiry.REQUESTERID,
-      //     content: this.newComment,
-      //     parentId: this.replyTo ? this.replyTo.commentId : null,
-      //     depth: this.replyTo ? this.replyTo.depth + 1 : 0
-      //   };
+      console.log('--addComment--')
+      try {
+        const commentData = {
+          postId: this.receivedSeq,
+          // userId: this.inquiry.REQUESTERID,
+          userId: 'test',
+          content: this.newComment,
+          parentId: this.replyTo ? this.replyTo.commentId : null,
+          depth: this.replyTo ? this.replyTo.depth + 1 : 0
+        };
+        console.log(commentData);
 
-      //   const response = await axios.post('http://localhost:8080/api/comments', commentData);
+        // const commentData = {
+        //   "postId": 11,
+        //   "userId": "john_doe",
+        //   "content": "첫 번째 테스트 댓글입니다.",
+        //   "parentId": null,
+        //   "depth": 0
+        // }   
 
-      //   if (response.data) {
-      //     await this.fetchComments();
-      //     this.newComment = '';
-      //     this.replyTo = null;
-      //   }
-      // } catch (error) {
-      //   console.error('댓글 등록 실패:', error);
-      // }
-
-      this.fetchComments();
-      this.newComment = '';
-      this.replyTo = null;
+        const response = await axios.post('http://localhost:8080/api/comments/add', commentData);
+        // http://localhost:8080/api/comments/add
+        console.log('response.data -> ' + response.data);
+        if (response.data) {
+          await this.fetchComments();
+          this.newComment = '';
+          this.replyTo = null;
+        }
+      } catch (error) {
+        console.error('댓글 등록 실패:', error);
+      }
     },
+
     async fetchComments() {
-      // fetchComments() {
+
+      console.log('--fetchComments--');
+
       try {
         // const response = await axios.get(`http://localhost:8080/api/comments/${this.receivedSeq}`);
         this.comments = [
@@ -509,10 +526,13 @@ export default {
   },
   computed: {
     topLevelComments() {
-      return this.comments.filter(comment => !comment.parentId);
+      // 안전하게 체크
+      return Array.isArray(this.comments)
+        ? this.comments.filter(comment => !comment.parentId)
+        : [];
     },
     commentTextLength() {
-      return this.comments.length;
+      return Array.isArray(this.comments) ? this.comments.length : 0;
     }
 
   },
@@ -550,6 +570,13 @@ export default {
 <style scoped>
 .template {
   font-family: "Noto Sans KR", sans-serif;
+}
+
+.no-comments {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-size: 14px;
 }
 
 .stepper-container {
