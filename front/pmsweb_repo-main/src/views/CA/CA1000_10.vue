@@ -42,29 +42,42 @@
           </div>
 
           <v-card class="pa-4 mt- info-card">
+            <!-- 요청자 정보 -->
+            <div class="info-subtitle">&nbsp;요청자 정보</div>
+            <v-simple-table dense class="custom-table outline1">
+              <tbody>
+                <tr>
+                  <th class="table-header">요청자</th>
+                  <td class="outlineTd">{{ inquiry.REQUESTER_NAME }}</td>
+                  <th class="table-header">소속</th>
+                  <td class="outlineTd">{{ inquiry.REQUESTER_DEPT_NM }}</td>
+                  <th class="table-header">이메일</th>
+                  <td class="outlineTd">{{ inquiry.REQUESTER_EMAIL }}</td>
+                  <th class="table-header">연락처</th>
+                  <td class="outlineTd">{{ inquiry.REQUESTER_PHONE }}</td>
+                </tr>
+              </tbody>
+            </v-simple-table>
+
             <!-- 개요 -->
-            <div class="info-subtitle">&nbsp;개요</div>
+            <div class="info-subtitle pt-5">&nbsp;개요</div>
             <v-simple-table dense class="custom-table outline1">
               <tbody>
                 <tr>
                   <th class="table-header">과제명</th>
-                  <td colspan="2" class="outlineTd">{{ inquiry.PROJECT_NAME }}</td>
-                  <th class="table-header">사업 부문</th>
-                  <td colspan="2" class="outlineTd">{{ inquiry.BUSINESS_SECTOR }}</td>
-                </tr>
-                <tr>
+                  <td class="outlineTd">{{ inquiry.PROJECT_NAME }}</td>
                   <th class="table-header">과제 개요</th>
-                  <td colspan="5" class="outlineTd">{{ inquiry.PROJECT_OVERVIEW }}</td>
+                  <td class="outlineTd">{{ inquiry.PROJECT_OVERVIEW }}</td>
+                  <th class="table-header">사업 부문</th>
+                  <td class="outlineTd">{{ inquiry.BUSINESS_SECTOR }}</td>
                 </tr>
                 <tr>
                   <th class="table-header">기존 문제점</th>
-                  <td colspan="5" class="outlineTd">{{ inquiry.PAIN_POINT }}</td>
-                </tr>
-                <tr>
+                  <td class="outlineTd">{{ inquiry.PAIN_POINT }}</td>
                   <th class="table-header">기대 효과</th>
-                  <td colspan="2" class="outlineTd">{{ inquiry.EXPECTED_EFFECT }}</td>
+                  <td class="outlineTd">{{ inquiry.EXPECTED_EFFECT }}</td>
                   <th class="table-header">최종 산출물</th>
-                  <td colspan="2" class="outlineTd">{{ inquiry.DELIVERABLES }}</td>
+                  <td class="outlineTd">{{ inquiry.DELIVERABLES }}</td>
                 </tr>
               </tbody>
             </v-simple-table>
@@ -91,6 +104,7 @@
         </div>
       </v-col>
     </v-row>
+
 
     <!-- 하단: 댓글 섹션을 아래로 배치 -->
     <v-row>
@@ -144,13 +158,11 @@ export default {
     return {
       step: 1,
       selectedStatus: '미처리', // 추가된 상태 변수
-      customer: {
-        USER_NM: "배하준",
-        MOBILE_NO: "010-8976-4852",
-        EMAIL: "hjbae@gsenc.com",
-        siteNm: "포항자이디오션",
-      },
       inquiry: {
+        REQUESTER_NAME: "배하준",
+        REQUESTER_DEPT_NM: "010-8976-4852",
+        REQUESTER_EMAIL: "hjbae@gsenc.com",
+        REQUESTER_PHONE: "포항자이디오션",
         PROJECT_NAME: "MQ01 몰탈 문서 자료실 개설",
         BUSINESS_SECTOR: "몰탈",
         PROJECT_OVERVIEW: "WEB에서 당사 제품 관련 자료를 자유롭게 내려 받고 인쇄할 수 있는 환경 제공 통해 고객 만족도 제고",
@@ -161,18 +173,21 @@ export default {
         DETAIL_CONTENT: "수집 방식 최적화 필요",
         DETAIL_IT_DEV_REQUEST: "AI 모델 튜닝 필요",
         REQUESTERID: "test",
-        DETAIL_REQUIREMENTS: [
-          {
-            taskName: "1-1 몰탈 문서발급 메뉴 생성",
-            description: "스마트 오더 홈페이지에 몰탈 제품 관련 문서 자료를 다운받을 수 있는 자료실 개설",
-            itRequest: "스마트 오더 '몰탈 문서발급' 메뉴 신설, 회원 및 사업자 로그인 후 접근 가능"
-          },
-          {
-            taskName: "1-2 삼표 스마트오더 홈페이지 접근성 개선",
-            description: "네이버, 구글 등 주요 포털 사이트에서 '삼표 몰탈', '삼표 문서', '삼표 스마트오더' 검색 시 상위 노출되도록 조정",
-            itRequest: "네이버 고객센터 등 연락하여 검색 로직 수정 요청"
-          }
-        ]
+        // 아래 데이터는 DETAIL_TASK, DETAIL_CONTENT, DETAIL_IT_DEV_REQUEST로 가져오고 있습니다.
+        // 추후 데이터를 한 줄 씩 보여주는 방식으로 변경하면 아래 주석 부분을 사용해야 합니다.
+        /////////////////////////////////////////////////////////////////////////////////
+        // DETAIL_REQUIREMENTS: [
+        //   {
+        //     taskName: "1-1 몰탈 문서발급 메뉴 생성",
+        //     description: "스마트 오더 홈페이지에 몰탈 제품 관련 문서 자료를 다운받을 수 있는 자료실 개설",
+        //     itRequest: "스마트 오더 '몰탈 문서발급' 메뉴 신설, 회원 및 사업자 로그인 후 접근 가능"
+        //   },
+        //   {
+        //     taskName: "1-2 삼표 스마트오더 홈페이지 접근성 개선",
+        //     description: "네이버, 구글 등 주요 포털 사이트에서 '삼표 몰탈', '삼표 문서', '삼표 스마트오더' 검색 시 상위 노출되도록 조정",
+        //     itRequest: "네이버 고객센터 등 연락하여 검색 로직 수정 요청"
+        //   }
+        // ]
       },
       management: {
         SECTOR: "몰탈",
@@ -208,6 +223,7 @@ export default {
         console.log("📌 받아온 데이터:", response.data);
         this.requireDetail = response.data; // 데이터를 저장
 
+        //임시로 조건문처리 해놓음
         switch (response.data.processState) {
           case '미처리':
             this.step = 1;
@@ -227,6 +243,10 @@ export default {
 
         // 받아온 데이터를 inquiry에 업데이트
         this.inquiry = {
+          REQUESTER_NAME: response.data.requesterName,
+          REQUESTER_DEPT_NM: response.data.requesterPhone,
+          REQUESTER_EMAIL: response.data.requesterEmail,
+          REQUESTER_PHONE: response.data.requesterDeptNm,
           PROJECT_NAME: response.data.projectName,
           BUSINESS_SECTOR: response.data.businessSector,
           PROJECT_OVERVIEW: response.data.projectOverview,
@@ -273,108 +293,7 @@ export default {
       // fetchComments() {
       try {
         // const response = await axios.get(`http://localhost:8080/api/comments/${this.receivedSeq}`);
-        this.comments = [
-          {
-            commentId: 10,
-            postId: 1,
-            userId: "john_doe",
-            content: "요구사항 정의서 잘 보았습니다. 검토 후 회신드리겠습니다.",
-            parentId: null,
-            depth: 0,
-            createdAt: "2024-03-13 09:30:00",
-            deleteYn: "N"
-          },
-          {
-            commentId: 11,
-            postId: 1,
-            userId: "emma_smith",
-            content: "검토 완료되었나요? 일정 확인이 필요합니다.",
-            parentId: null,
-            depth: 0,
-            createdAt: "2024-03-13 10:15:00",
-            deleteYn: "N"
-          },
-          {
-            commentId: 12,
-            postId: 1,
-            userId: "alex_kim",
-            content: "네, 다음 주 월요일까지 개발 완료하겠습니다.",
-            parentId: 11,
-            depth: 1,
-            createdAt: "2024-03-13 10:30:00",
-            deleteYn: "N"
-          },
-          {
-            commentId: 13,
-            postId: 1,
-            userId: "emma_smith",
-            content: "알겠습니다. 개발 시작하시면 공유 부탁드립니다.",
-            parentId: 12,
-            depth: 2,
-            createdAt: "2024-03-13 10:45:00",
-            deleteYn: "N"
-          },
-          {
-            commentId: 14,
-            postId: 1,
-            userId: "mike_wilson",
-            content: "저도 개발 진행상황 공유 받고 싶습니다.",
-            parentId: 13,
-            depth: 3,
-            createdAt: "2024-03-13 11:00:00",
-            deleteYn: "N"
-          },
-          {
-            commentId: 15,
-            postId: 1,
-            userId: "sarah_lee",
-            content: "API 스펙도 함께 공유해주시면 감사하겠습니다.",
-            parentId: 14,
-            depth: 4,
-            createdAt: "2024-03-13 11:15:00",
-            deleteYn: "N"
-          },
-          {
-            commentId: 16,
-            postId: 1,
-            userId: "alex_kim",
-            content: "네, API 문서 작성 후 함께 공유하도록 하겠습니다.",
-            parentId: 15,
-            depth: 5,
-            createdAt: "2024-03-13 11:30:00",
-            deleteYn: "N"
-          },
-          {
-            commentId: 17,
-            postId: 1,
-            userId: "tom_park",
-            content: "새로운 요구사항이 있습니다. 논의가 필요합니다.",
-            parentId: null,
-            depth: 0,
-            createdAt: "2024-03-13 13:00:00",
-            deleteYn: "N"
-          },
-          {
-            commentId: 18,
-            postId: 1,
-            userId: "emma_smith",
-            content: "어떤 내용인가요? 자세히 설명해주세요.",
-            parentId: 17,
-            depth: 1,
-            createdAt: "2024-03-13 13:15:00",
-            deleteYn: "N"
-          },
-          {
-            commentId: 19,
-            postId: 1,
-            userId: "tom_park",
-            content: "보안 관련 기능이 추가되어야 할 것 같습니다.",
-            parentId: 18,
-            depth: 2,
-            createdAt: "2024-03-13 13:30:00",
-            deleteYn: "N"
-          }
-        ];
+        this.comments = [];
         const response = await axios.get(`http://localhost:8080/api/comments?postId=${this.receivedSeq}`);
         // http://localhost:8080/api/comments?postId=1
         this.comments = response.data;
@@ -384,108 +303,6 @@ export default {
       try {
         const response = await axios.get(`http://localhost:8080/api/comments/${this.receivedSeq}`);
         this.comments = response.data;
-        //         this.comments = [
-        //  {
-        //    commentId: 10,
-        //    postId: 1,
-        //    userId: "john_doe",
-        //    content: "요구사항 정의서 잘 보았습니다. 검토 후 회신드리겠습니다.",
-        //    parentId: null,
-        //    depth: 0,
-        //    createdAt: "2024-03-13 09:30:00",
-        //    deleteYn: "N"
-        //  },
-        //  {
-        //    commentId: 11,
-        //    postId: 1,
-        //    userId: "emma_smith", 
-        //    content: "검토 완료되었나요? 일정 확인이 필요합니다.",
-        //    parentId: null,
-        //    depth: 0,
-        //    createdAt: "2024-03-13 10:15:00",
-        //    deleteYn: "N"
-        //  },
-        //  {
-        //    commentId: 12,
-        //    postId: 1,
-        //    userId: "alex_kim",
-        //    content: "네, 다음 주 월요일까지 개발 완료하겠습니다.",
-        //    parentId: 11,
-        //    depth: 1,
-        //    createdAt: "2024-03-13 10:30:00",
-        //    deleteYn: "N"
-        //  },
-        //  {
-        //    commentId: 13,
-        //    postId: 1,
-        //    userId: "emma_smith",
-        //    content: "알겠습니다. 개발 시작하시면 공유 부탁드립니다.",
-        //    parentId: 12,
-        //    depth: 2,
-        //    createdAt: "2024-03-13 10:45:00",
-        //    deleteYn: "N"
-        //  },
-        //  {
-        //    commentId: 14,
-        //    postId: 1,
-        //    userId: "mike_wilson",
-        //    content: "저도 개발 진행상황 공유 받고 싶습니다.",
-        //    parentId: 13,
-        //    depth: 3,
-        //    createdAt: "2024-03-13 11:00:00",
-        //    deleteYn: "N"
-        //  },
-        //  {
-        //    commentId: 15,
-        //    postId: 1,
-        //    userId: "sarah_lee",
-        //    content: "API 스펙도 함께 공유해주시면 감사하겠습니다.",
-        //    parentId: 14,
-        //    depth: 4,
-        //    createdAt: "2024-03-13 11:15:00",
-        //    deleteYn: "N"
-        //  },
-        //  {
-        //    commentId: 16,
-        //    postId: 1,
-        //    userId: "alex_kim",
-        //    content: "네, API 문서 작성 후 함께 공유하도록 하겠습니다.",
-        //    parentId: 15,
-        //    depth: 5,
-        //    createdAt: "2024-03-13 11:30:00",
-        //    deleteYn: "N"
-        //  },
-        //  {
-        //    commentId: 17,
-        //    postId: 1,
-        //    userId: "tom_park",
-        //    content: "새로운 요구사항이 있습니다. 논의가 필요합니다.",
-        //    parentId: null,
-        //    depth: 0,
-        //    createdAt: "2024-03-13 13:00:00",
-        //    deleteYn: "N"
-        //  },
-        //  {
-        //    commentId: 18,
-        //    postId: 1,
-        //    userId: "emma_smith",
-        //    content: "어떤 내용인가요? 자세히 설명해주세요.",
-        //    parentId: 17,
-        //    depth: 1,
-        //    createdAt: "2024-03-13 13:15:00",
-        //    deleteYn: "N"
-        //  },
-        //  {
-        //    commentId: 19,
-        //    postId: 1,
-        //    userId: "tom_park",
-        //    content: "보안 관련 기능이 추가되어야 할 것 같습니다.",
-        //    parentId: 18,
-        //    depth: 2,
-        //    createdAt: "2024-03-13 13:30:00",
-        //    deleteYn: "N"
-        //  }
-        // ]; 
       } catch (error) {
         console.error('댓글 조회 실패:', error);
       }
@@ -637,12 +454,12 @@ export default {
 }
 
 .info-subtitle {
-  font-size: 17px;
+  font-size: 16px;
   line-height: 22px;
   color: #666;
   -webkit-text-size-adjust: none;
   letter-spacing: -0.05em;
-  margin: 20px 0 10px;
+  margin: 20px 0 6px;
   font-weight: 500;
 }
 
