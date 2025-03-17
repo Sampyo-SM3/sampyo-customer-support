@@ -72,108 +72,87 @@
       </v-container>
     </v-main>
   </v-app>
+
+  <!-- 스낵바로 오류 메시지 표시 -->
+  <v-snackbar
+    v-model="showError"
+    color="warning"
+    timeout="5000"
+    location="center"
+    elevation="8"              
+    variant="elevated" 
+  >
+    {{ errorMessages }}
+    
+    <template v-slot:actions>
+      <v-btn
+        variant="text"
+        @click="showError = false"
+      >
+        닫기
+      </v-btn>
+    </template>
+  </v-snackbar>  
 </template>
 
 <script>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-
-// import axios from 'axios'
-
-// const apiResponse = ref('')
-const loading = ref(false)
-const error = ref(null)
-
+import axios from 'axios'
 
 export default {
   name: 'LoginPage',
-  setup() {
-    const router = useRouter()
-    const username = ref('')
-    const password = ref('')
-    const showPassword = ref(false)
-
-    const login = async () => {
-      console.log('로그인 시도:', username.value, password.value)
-
-      // test
-
-      loading.value = true
-      error.value = null
-      
-      /*
-      try {
-        // Spring Boot API 엔드포인트 호출
-        const response = await axios.get('http://localhost:8080/api')
-        
-        // 응답 데이터를 변수에 저장
-        apiResponse.value = response.data
-        
-        // 콘솔에 결과 출력
-        console.log('API 응답 결과:', response.data)
-      } catch (err) {
-        error.value = 'API 호출 중 오류가 발생했습니다: ' + err.message
-        console.error('API 호출 오류:', err)
-      } finally {
-        loading.value = false
-      }  
-        */
-       
-        
-        // try {
-        //   console.log('1');
-        //   // Spring Boot API 엔드포인트 호출 - 변경된 URL 사용
-        //   // const response = await axios.get('http://localhost:29000/api/user?id=12345')      
-        //   const response = await axios.get('http://192.168.41.153:29000/api/users?id=123')      
-        //   console.log('2');                    
-
-        //   // 응답 데이터를 변수에 저장
-        //   apiResponse.value = response.data
-          
-        //   // 콘솔에 결과 출력
-        //   console.log('API 응답 결과:', response.data)
-          
-        //   // 사용자 정보 메시지로 표시
-        //   const userData = response.data
-        //   const formattedDate = new Date(userData.enter_dt).toLocaleDateString()
-          
-        //   alert(`
-        //     사용자 정보:
-        //     ID: ${userData.id}
-        //     이름: ${userData.name}
-        //     나이: ${userData.age}
-        //     이메일: ${userData.email}
-        //     가입일: ${formattedDate}
-        //   `)
-          
-        // } catch (err) {
-        //   error.value = 'API 호출 중 오류가 발생했습니다: ' + err.message
-        //   console.error('API 호출 오류:', err)                    
-        // } finally {
-        //   loading.value = false
-        // }        
-
-
-      // 여기에 실제 로그인 로직을 구현하세요
-      // 예를 들어, API 호출을 통한 인증 등
-      
-      // 로그인 성공 후 MainPage로 이동
-      router.push({ name: 'Main' })
-
-      
+  data() {
+    return {
+      username: '',
+      password: '',
+      showPassword: false,
+      loading: false,
+      showError: false,
+      errorMessages: '',
     }
+  },
+  methods: {
+    async login() {
+      this.loading = true;
+      
+      try {
+        const loginData = {
+          id: this.username,
+          password: this.password
+        };
 
-    const googleLogin = () => {
+        const response = await axios.post('http://localhost:8080/api/login', loginData);
+        
+        console.log('로그인 성공:', response.data);
+        this.$router.push({ name: 'Main' });
+        
+      } catch (error) {
+        // API 호출 실패 또는 오류 응답
+        if (error.response) {
+          // 서버가 응답했지만 오류 상태 코드 (4xx, 5xx)
+          console.error('로그인 실패:', error.response.data.message);
+          
+          this.errorMessages = error.response.data.message;
+          this.showError = true;          
+        } else if (error.request) {
+          // 요청은 전송되었지만 응답이 수신되지 않음
+          console.error('서버에서 응답이 없습니다:', error.request);
+
+          this.errorMessages = error.request;
+          this.showError = true;                    
+        } else {
+          // 요청 설정 중 오류 발생
+          console.error('요청 오류:', error.message);
+
+          this.errorMessages = error.message;
+          this.showError = true;                  
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
+    googleLogin() {
       console.log('Google 로그인 시도')
       // 여기에 Google 로그인 로직을 구현하세요
-    }
-
-    return {
-      username,
-      password,
-      showPassword,
-      login,
-      googleLogin
     }
   }
 }

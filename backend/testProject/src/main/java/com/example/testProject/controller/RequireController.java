@@ -3,10 +3,8 @@ package com.example.testProject.controller;
 import com.example.testProject.dto.CommentDTO;
 import com.example.testProject.dto.RequireDTO;
 import com.example.testProject.dto.RequireSearchCriteria;
-import com.example.testProject.dto.UserDTO;
 import com.example.testProject.service.CommentService;
 import com.example.testProject.service.RequireService;
-import com.example.testProject.service.UserService;
 import com.example.testProject.service.testService;
 
 import java.util.List;
@@ -22,13 +20,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api")
-public class requireController {
+public class RequireController {
 
     private final RequireService requireService;
     
 
     // ✅ 두 개의 서비스 모두 초기화
-    public requireController(RequireService requireService) {
+    public RequireController(RequireService requireService) {
         this.requireService = requireService;
     }
     

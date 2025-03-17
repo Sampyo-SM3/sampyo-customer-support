@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api")
-public class commentController {    
+public class CommentController {    
 	
     private final CommentService commentService;
     
 
     // ✅ 두 개의 서비스 모두 초기화
-    public commentController(CommentService commentService) {
+    public CommentController(CommentService commentService) {
         this.commentService = commentService;
     }
       

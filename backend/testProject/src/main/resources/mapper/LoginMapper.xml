@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.testProject.repository.LoginRepository">
+
+    <!-- 사용자 ID와 회사코드로 사용자 정보 조회 -->
+    <select id="findByIdAndCompanyCd" resultType="com.example.testProject.dto.EmployeePreferenceDto">
+        SELECT 
+            COMPANY_CD as companyCd,
+            ID as id,
+            NAME as name,
+            ADMIN as admin,
+            PWD as pwd
+        FROM 
+            sys_empref 
+        WHERE 
+            ID = #{id} 
+            AND COMPANY_CD = #{companyCd}
+    </select>
+    
+    <!-- 사용자 존재 여부 확인 -->
+    <select id="isUserExists" resultType="boolean">
+        SELECT 
+            CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM 
+            sys_empref 
+        WHERE 
+            ID = #{id} 
+            AND COMPANY_CD = #{companyCd}
+    </select>
+    
+    <!-- 비밀번호 검증 - PWDCOMPARE 함수 사용 -->
+    <select id="verifyPassword" resultType="boolean">
+        SELECT 
+            CASE WHEN PWDCOMPARE(#{rawPassword}, #{storedPassword}) = 1 THEN 1 ELSE 0 END
+    </select>
+    
+    <!-- 다른 방식의 비밀번호 검증 - 암호화한 값 직접 비교 -->
+    <select id="verifyPasswordAlternative" resultType="boolean">
+        SELECT 
+            CASE WHEN 
+                (SELECT PWDENCRYPT(#{rawPassword})) = #{storedPassword} 
+            THEN 1 ELSE 0 END
+    </select>
+    
+    <!-- 비밀번호 일치 여부 직접 확인 (단일 쿼리로) -->
+    <select id="checkPasswordMatch" resultType="boolean">
+        SELECT 
+            CASE WHEN EXISTS (
+                SELECT 1 
+                FROM sys_empref 
+                WHERE ID = #{id} 
+                  AND COMPANY_CD = #{companyCd} 
+                  AND PWDCOMPARE(#{password}, PWD) = 1
+            ) THEN 1 ELSE 0 END
+    </select>
+
+</mapper>
