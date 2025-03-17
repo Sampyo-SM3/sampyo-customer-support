@@ -98,14 +98,13 @@ export default {
         await axios.post("http://localhost:8080/api/insertComment", commentData);
         alert("댓글 등록 성공!");
 
-        this.$emit("refresh", commentData.postId);
-
       } catch (error) {
         console.error("❌ 댓글 등록 실패");
         alert("댓글 등록 실패!");
 
       } finally {
         // ✅ 입력 필드 초기화 & 대댓글 입력창 닫기
+        this.$emit("refresh");
         this.replyContent = "";
         this.showReplyInput = false;
         this.replyParent = null;

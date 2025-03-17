@@ -119,7 +119,7 @@
             <div class="info-subtitle">댓글 {{ commentTextLength }}</div>
             <v-card id="commentArea" class="pa-3 mb-3 info-inner-card">
               <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
-                :all-comments="comments" @reply="addReply" @refresh="fetchComments" />
+                :all-comments="comments" @refresh="fetchComments" />
             </v-card>
           </div>
 
@@ -309,7 +309,9 @@ export default {
       }
     },
     async fetchComments() {
-      // fetchComments() {
+
+      console.log('a');
+
       try {
         // const response = await axios.get(`http://localhost:8080/api/comments/${this.receivedSeq}`);
         this.comments = [];
