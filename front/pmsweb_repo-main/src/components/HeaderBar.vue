@@ -28,9 +28,9 @@
       </v-tabs>
 
       <v-spacer></v-spacer>
-
+      {{ userIdDisplay }} 님 환영합니다.
       <!-- 검색바 -->               
-      <v-text-field 
+      <!-- <v-text-field 
         rounded="lg"        
         v-model="search"
         placeholder="검색"
@@ -41,10 +41,10 @@
         hide-details
         variant="outlined"                   
         density="compact"
-        class="custom-searchbar"/>           
+        class="custom-searchbar"/>            -->
                 
       <!-- 언어 선택 드롭다운 -->
-      <v-menu offset-y>
+      <!-- <v-menu offset-y>
         <template v-slot:activator="{ props }">
           <v-btn
             v-bind="props"
@@ -63,17 +63,16 @@
             <v-list-item-title>{{ language }}</v-list-item-title>
           </v-list-item>
         </v-list>
-      </v-menu>
+      </v-menu> -->
 
       <!-- 알림 아이콘 -->
-      <v-btn icon class="mr-4">
-        <v-icon>mdi-bell-outline</v-icon>
-        
-      </v-btn>      
+      <!-- <v-btn icon class="mr-4">
+        <v-icon>mdi-bell-outline</v-icon>        
+      </v-btn>       -->
 
       <!-- 로그인 버튼 -->
-      <v-btn class="login-btn">
-        <p class="login-text">로그인</p>
+      <v-btn class="login-btn" @click="handleLoginLogout">
+        <p class="login-text">{{ userLoginStatus ? '로그아웃' : '로그인' }}</p>
       </v-btn>
     </v-container>
   </v-app-bar>
@@ -83,8 +82,11 @@
 <script>
 import { ref, defineComponent, onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useAuthStore } from '@/store/auth';  
 import { useMenuStore } from '@/store/menuStore';
 import axios from 'axios'
+import { useRouter } from 'vue-router';  // useRouter 임포트
+
 
 export default defineComponent({
   name: 'HeaderBar',
@@ -95,12 +97,42 @@ export default defineComponent({
     const activeTab = ref(null)        
     const menuItems = ref([]) 
 
+    const userIdDisplay = ref('');    
+    const userLoginStatus = ref('');    
+
+    // auth 스토어 사용
+    const authStore = useAuthStore();    
+
+    // 라우터 사용
+    const router = useRouter();    
+
+    // 로그인/로그아웃 처리 함수
+    const handleLoginLogout = () => {
+      if (userLoginStatus.value) {
+        // 로그인 상태일 경우 로그아웃
+        authStore.logout();  // Pinia의 logout 호출
+        userLoginStatus.value = false;  // 로그인 상태 반영
+
+        router.push({ name: 'Login' });
+      } else {
+        // 로그인 상태가 아닐 경우 로그인 (로그인 로직은 추가적으로 구현 필요)
+        // userLoginStatus.value = true;
+        // authStore.login();  // Pinia의 login 호출
+      }
+    };    
+    
     const showSideMenu = (item) => {
       console.log('--------showSideMenu--------')
       console.log('item-> ', item)
-   
-      menuStore.fetchMenuData(item.m_code, 'javachohj')
-    }    
+      
+      // 로컬 저장소에서 user_id 가져오기
+      const userId = localStorage.getItem('user_id');
+      if (userId) {
+        menuStore.fetchMenuData(item.m_code, userId);  // user_id를 사용하여 메뉴 데이터 가져오기
+      } else {
+        console.error('User ID is not found in localStorage');
+      }
+    }
 
     const fetchMenuData = async (id) => {
       console.log('----------fetchMenuData2----------')
@@ -128,11 +160,20 @@ export default defineComponent({
       } finally {
         isLoading.value = false
       }
-    }    
-    
+    }            
+
     onMounted(() => {            
-      fetchMenuData('javachohj')
-    })
+      // 로컬 저장소에서 user_id 가져오기
+      const userId = localStorage.getItem('user_id');      
+      if (userId) {
+        fetchMenuData(userId)  // user_id로 메뉴 데이터 가져오기
+      } else {
+        console.error('User ID is not found in localStorage');
+      }
+
+      userIdDisplay.value = localStorage.getItem('user_id');  
+      userLoginStatus.value = localStorage.getItem('isAuthenticated');         
+    })    
 
     // 메뉴 아이템이 로드된 후 첫 번째 항목의 클릭 이벤트 트리거
     watch(menuItems, (newMenuItems) => {
@@ -149,6 +190,10 @@ export default defineComponent({
       menuItems,
       activeTab,
       showSideMenu,
+      TextDecoderStream,
+      userIdDisplay,
+      userLoginStatus,
+      handleLoginLogout,
     }
   }
 })
