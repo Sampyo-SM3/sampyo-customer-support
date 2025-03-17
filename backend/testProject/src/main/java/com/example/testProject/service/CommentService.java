@@ -22,4 +22,10 @@ public class CommentService {
     	System.out.println("postId -> " + postId);
         return commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
     }
+    
+    public void insertComment(CommentDTO comment) {
+        System.out.println("insertComment() -> postId: " + comment.getPostId() + ", userId: " + comment.getUserId());
+        commentRepository.insertComment(comment);
+    }
+    
 }

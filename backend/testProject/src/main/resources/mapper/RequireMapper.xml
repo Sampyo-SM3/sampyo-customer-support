@@ -8,54 +8,54 @@
 <select id="getAllRequires" resultType="com.example.testProject.dto.RequireDTO">
     select 
         seq, 
-        project_name, 
-        business_sector, 
-        project_overview, 
-        requester_position, 
-        current_issue, 
-        expected_effect, 
-        final_deliverables, 
-        detail_task, 
-        detail_content, 
-        detail_it_dev_request, 
-        process_state, 
-        requester_id, 
-        requester_name, 
-        requester_dept_cd, 
-        requester_dept_nm, 
-        requester_email, 
-        requester_phone, 
-        insert_dt, 
-        update_dt, 
-        complete_dt 
-    from ca1000_10;
+        projectName, 
+        businessSector, 
+        projectOverview, 
+        requesterPosition, 
+        currentIssue, 
+        expectedEffect, 
+        finalDeliverables, 
+        detailTask, 
+        detailContent, 
+        detailItDevRequest, 
+        processState, 
+        requesterId, 
+        requesterName, 
+        requesterDeptCd, 
+        requesterDeptNm, 
+        requesterEmail, 
+        requesterPhone, 
+        insertDt, 
+        updateDt, 
+        completeDt 
+    from board;
 </select>
 
 <!-- ✅ 특정 SEQ 데이터 조회 -->
 <select id="getRequire" parameterType="int" resultType="com.example.testProject.dto.RequireDTO">
     select 
         seq, 
-        project_name, 
-        business_sector, 
-        project_overview, 
-        requester_position, 
-        current_issue, 
-        expected_effect, 
-        final_deliverables, 
-        detail_task, 
-        detail_content, 
-        detail_it_dev_request, 
-        process_state, 
-        requester_id, 
-        requester_name, 
-        requester_dept_cd, 
-        requester_dept_nm, 
-        requester_email, 
-        requester_phone, 
-        insert_dt, 
-        update_dt, 
-        complete_dt 
-    from ca1000_10
+        projectName, 
+        businessSector, 
+        projectOverview, 
+        requesterPosition, 
+        currentIssue, 
+        expectedEffect, 
+        finalDeliverables, 
+        detailTask, 
+        detailContent, 
+        detailItDevRequest, 
+        processState, 
+        requesterId, 
+        requesterName, 
+        requesterDeptCd, 
+        requesterDeptNm, 
+        requesterEmail, 
+        requesterPhone, 
+        insertDt, 
+        updateDt, 
+        completeDt 
+    from board
     where seq = #{seq};
 </select>
 
@@ -64,30 +64,30 @@
     <select id="searchRequiresByCriteria" parameterType="com.example.testProject.dto.RequireSearchCriteria" resultType="com.example.testProject.dto.RequireDTO">
         SELECT 
             seq, 
-            project_name, 
-            business_sector, 
-            project_overview, 
-            requester_position, 
-            current_issue, 
-            expected_effect, 
-            final_deliverables, 
-            requester_id, 
-            requester_email, 
-            requester_phone, 
-            process_state, 
-            insert_dt, 
-            complete_dt, 
-            complete_dt
-        FROM ca1000_10
+            projectName, 
+            businessSector, 
+            projectOverview, 
+            requesterPosition, 
+            currentIssue, 
+            expectedEffect, 
+            finalDeliverables, 
+            requesterId, 
+            requesterEmail, 
+            requesterPhone, 
+            processState, 
+            insertDt, 
+            completeDt, 
+            completeDt
+        FROM board
         <where>
             <if test="requesterId != null and requesterId != ''">
-                requester_id = #{requesterId}
+                requesterId = #{requesterId}
             </if>            
             <if test="startDate != null and startDate != ''">
-                AND insert_dt >= #{startDate}
+                AND insertDt >= #{startDate}
             </if>
             <if test="endDate != null and endDate != ''">
-                AND insert_dt &lt;= #{endDate}
+                AND insertDt &lt;= #{endDate}
             </if>
         </where>        
         ORDER BY seq

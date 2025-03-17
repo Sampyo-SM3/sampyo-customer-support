@@ -19,4 +19,18 @@
         
     </select>
 
+<insert id="insertComment" parameterType="com.example.testProject.dto.CommentDTO">
+    INSERT INTO Comments (postId, userId, content, parentId, depth, createdAt, updatedAt, deleteYn)
+    VALUES (
+        #{postId}, 
+        #{userId}, 
+        #{content}, 
+        #{parentId, jdbcType=INTEGER}, 
+        CASE 
+            WHEN #{parentId} IS NULL THEN 0 
+            ELSE (SELECT depth FROM Comments WHERE commentId = #{parentId}) + 1 
+        END, 
+        GETDATE(), GETDATE(), 'N'
+    )
+</insert>
 </mapper>

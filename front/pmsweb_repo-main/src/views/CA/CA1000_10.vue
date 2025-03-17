@@ -125,13 +125,14 @@
 
           <!-- 댓글 입력 -->
           <div class="comment-input-container" :class="{ 'mt-20': commentTextLength === 0 }">
-            <v-textarea v-model="newComment" :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"
+            <v-textarea v-model="newComment.content" :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"
               class="custom-textarea"></v-textarea>
             <div class="btn-container">
               <v-btn v-if="replyTo" text @click="cancelReply" class="mr-2">답글 취소</v-btn>
-              <v-btn class="custom-btn" @click="addComment">등록</v-btn>
+              <v-btn class="custom-btn" @click="addComment()">등록</v-btn>
             </div>
           </div>
+
         </v-card>
       </v-col>
     </v-row>
@@ -203,7 +204,12 @@ export default {
       },
       answer: "",
       comments: [],
-      newComment: "",
+      newComment: {
+        content: "", // 댓글 내용
+        postId: null, // 게시글 ID
+        userId: "test_user", // 유저 ID
+        parentId: null // 부모 댓글 ID
+      },
       replyTo: null,
       sectors: ["시멘트", "분체", "골재", "몰탈", "레미콘", "기타"],
       progressStatuses: ["미처리", "진행", "보류중", "종결"],
@@ -244,9 +250,9 @@ export default {
         // 받아온 데이터를 inquiry에 업데이트
         this.inquiry = {
           REQUESTER_NAME: response.data.requesterName,
-          REQUESTER_DEPT_NM: response.data.requesterPhone,
+          REQUESTER_DEPT_NM: response.data.requesterDeptNm,
           REQUESTER_EMAIL: response.data.requesterEmail,
-          REQUESTER_PHONE: response.data.requesterDeptNm,
+          REQUESTER_PHONE: response.data.requesterPhone,
           PROJECT_NAME: response.data.projectName,
           BUSINESS_SECTOR: response.data.businessSector,
           PROJECT_OVERVIEW: response.data.projectOverview,
@@ -265,29 +271,42 @@ export default {
       this.step = this.progressStatuses.indexOf(this.management.PROGRESS) + 1;
     },
     async addComment() {
-      // try {
-      //   const commentData = {
-      //     postId: this.receivedSeq,
-      //     userId: this.inquiry.REQUESTERID,
-      //     content: this.newComment,
-      //     parentId: this.replyTo ? this.replyTo.commentId : null,
-      //     depth: this.replyTo ? this.replyTo.depth + 1 : 0
-      //   };
 
-      //   const response = await axios.post('http://localhost:8080/api/comments', commentData);
+      if (!this.newComment.content) {
+        alert("댓글을 입력해주세요.");
+        return;
+      }
 
-      //   if (response.data) {
-      //     await this.fetchComments();
-      //     this.newComment = '';
-      //     this.replyTo = null;
-      //   }
-      // } catch (error) {
-      //   console.error('댓글 등록 실패:', error);
-      // }
+      // 부모 댓글인지 확인 후 parentId 설정
+      var newParentId = this.replyTo ? this.replyTo.commentId : null;
 
-      this.fetchComments();
-      this.newComment = '';
-      this.replyTo = null;
+      // 백엔드로 보낼 데이터 객체
+      const commentData = {
+        postId: Number(this.newComment.postId) || 1, // 게시글 ID
+        userId: this.newComment.userId || "test_user", // 유저 ID
+        content: this.newComment.content, // 댓글 내용
+        parentId: newParentId, // 부모 댓글 ID (없으면 NULL)
+        depth: this.replyTo ? Number(this.replyTo.depth) + 1 : 0, // 대댓글이면 +1, 최상위 댓글이면 0
+        createdAt: new Date().toISOString(),
+        deleteYn: "N"
+      };
+
+      try {
+        // API 요청: 댓글 DB에 저장
+        await axios.post("http://localhost:8080/api/insertComment", commentData);
+        alert("댓글 등록 성공!");
+
+        // 입력 필드 초기화
+        this.newComment.content = "";
+        this.replyTo = null;
+
+        // 댓글 목록 새로고침
+        this.fetchComments();
+      } catch (error) {
+        console.log(error);
+        console.error("댓글 등록 실패");
+        this.fetchComments();
+      }
     },
     async fetchComments() {
       // fetchComments() {
@@ -314,7 +333,7 @@ export default {
 
     cancelReply() {
       this.replyTo = null;
-      this.newComment = '';
+      this.newComment.newComment = '';
     },
     // 추가된 메서드
     saveStatus() {
