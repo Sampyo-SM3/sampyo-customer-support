@@ -1,9 +1,8 @@
 <template>
-  <v-container fluid class="pa-10">
-    <!-- 기존 코드 유지... -->
+  <v-container fluid class="pa-10">    
     <v-row>
       <v-col>
-        <div class="title-div">고갱님의 소리~</div>
+        <div class="title-div">~~고갱님의 소리~</div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
@@ -453,7 +452,7 @@ export default {
   methods: {
 
     isValidDate(options = {}) {
-      console.log('--isValidDate--')
+      // console.log('--isValidDate--')
       const errors = [];
       
       // 기본 옵션 설정
@@ -465,7 +464,7 @@ export default {
         maxDate = null,        
       } = options;
 
-      console.log(options);
+      // console.log(options);
       
       // 1. 기본 입력 검사
       if (!this.startDate || !this.endDate) {
