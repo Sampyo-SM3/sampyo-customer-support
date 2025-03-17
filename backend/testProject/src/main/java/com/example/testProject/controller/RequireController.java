@@ -22,13 +22,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api")
-public class requireController {
+public class RequireController {
 
     private final RequireService requireService;
     
 
     // ✅ 두 개의 서비스 모두 초기화
-    public requireController(RequireService requireService) {
+    public RequireController(RequireService requireService) {
         this.requireService = requireService;
     }
     
