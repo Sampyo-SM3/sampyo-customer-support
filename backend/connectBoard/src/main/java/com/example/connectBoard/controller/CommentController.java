@@ -21,7 +21,7 @@ public class CommentController {
     private final CommentService commentService;
     
 
-    // ✅ 두 개의 서비스 모두 초기화
+    // ✅ 두 개의 서비스 모두 초기화 
     public CommentController(CommentService commentService) {
         this.commentService = commentService;
     }
