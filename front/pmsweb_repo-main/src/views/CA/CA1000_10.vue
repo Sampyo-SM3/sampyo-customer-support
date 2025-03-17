@@ -120,6 +120,9 @@
             <v-card id="commentArea" class="pa-3 mb-3 info-inner-card">
               <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
                 :all-comments="comments" @reply="handleReply" />
+              <v-btn class="delete-btn ml-2" small text color="red" @click="deleteComment(comment.commentId)">
+                삭제
+              </v-btn>
             </v-card>
           </div>
 
