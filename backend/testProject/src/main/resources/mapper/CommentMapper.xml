@@ -2,10 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.testProject.repository.CommentRepository">
+<mapper namespace="com.example.connectBoard.repository.CommentRepository">
 
     <!-- 게시글의 모든 댓글과 대댓글 조회 -->
-    <select id="findByPostIdOrderByCreatedAtAsc" parameterType="Long" resultType="com.example.testProject.dto.CommentDTO">   	
+    <select id="findByPostIdOrderByCreatedAtAsc" parameterType="Long" resultType="com.example.connectBoard.dto.CommentDTO">   	
 		SELECT 
 		   c.*,
 		   CASE 
@@ -19,7 +19,7 @@
         
     </select>
 
-<insert id="insertComment" parameterType="com.example.testProject.dto.CommentDTO">
+<insert id="insertComment" parameterType="com.example.connectBoard.dto.CommentDTO">
     INSERT INTO Comments (postId, userId, content, parentId, depth, createdAt, updatedAt, deleteYn)
     VALUES (
         #{postId}, 
