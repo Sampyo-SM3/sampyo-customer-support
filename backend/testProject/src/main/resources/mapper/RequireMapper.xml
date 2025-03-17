@@ -1,96 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.testProject.repository.RequireRepository">
-
-<!-- ✅ 모든 데이터 조회 -->
-<select id="getAllRequires" resultType="com.example.testProject.dto.RequireDTO">
-    select 
-        seq, 
-        project_name, 
-        business_sector, 
-        project_overview, 
-        requester_position, 
-        current_issue, 
-        expected_effect, 
-        final_deliverables, 
-        detail_task, 
-        detail_content, 
-        detail_it_dev_request, 
-        process_state, 
-        requester_id, 
-        requester_name, 
-        requester_dept_cd, 
-        requester_dept_nm, 
-        requester_email, 
-        requester_phone, 
-        insert_dt, 
-        update_dt, 
-        complete_dt 
-    from ca1000_10;
-</select>
-
-<!-- ✅ 특정 SEQ 데이터 조회 -->
-<select id="getRequire" parameterType="int" resultType="com.example.testProject.dto.RequireDTO">
-    select 
-        seq, 
-        project_name, 
-        business_sector, 
-        project_overview, 
-        requester_position, 
-        current_issue, 
-        expected_effect, 
-        final_deliverables, 
-        detail_task, 
-        detail_content, 
-        detail_it_dev_request, 
-        process_state, 
-        requester_id, 
-        requester_name, 
-        requester_dept_cd, 
-        requester_dept_nm, 
-        requester_email, 
-        requester_phone, 
-        insert_dt, 
-        update_dt, 
-        complete_dt 
-    from ca1000_10
-    where seq = #{seq};
-</select>
-
-    
-    <!-- 검색 조건에 따른 요청 목록 조회 -->
-    <select id="searchRequiresByCriteria" parameterType="com.example.testProject.dto.RequireSearchCriteria" resultType="com.example.testProject.dto.RequireDTO">
-        SELECT 
-            seq, 
-            project_name, 
-            business_sector, 
-            project_overview, 
-            requester_position, 
-            current_issue, 
-            expected_effect, 
-            final_deliverables, 
-            requester_id, 
-            requester_email, 
-            requester_phone, 
-            process_state, 
-            insert_dt, 
-            complete_dt, 
-            complete_dt
-        FROM ca1000_10
-        <where>
-            <if test="requesterId != null and requesterId != ''">
-                requester_id = #{requesterId}
-            </if>            
-            <if test="startDate != null and startDate != ''">
-                AND insert_dt >= #{startDate}
-            </if>
-            <if test="endDate != null and endDate != ''">
-                AND insert_dt &lt;= #{endDate}
-            </if>
-        </where>        
-        ORDER BY seq
-    </select>    
+	
+	<!-- ✅ 모든 데이터 조회 -->
+	<select id="getAllRequires" resultType="com.example.testProject.dto.RequireDTO">
+		select
+		seq,
+		projectName,
+		businessSector,
+		projectOverview,
+		requesterPosition,
+		currentIssue,
+		expectedEffect,
+		finalDeliverables,
+		detailTask,
+		detailContent,
+		detailItDevRequest,
+		processState,
+		requesterId,
+		requesterName,
+		requesterDeptCd,
+		requesterDeptNm,
+		requesterEmail,
+		requesterPhone,
+		insertDt,
+		updateDt,
+		completeDt
+		from board;
+	</select>
+	
+	<!-- ✅ 특정 SEQ 데이터 조회 -->
+	<select id="getRequire" parameterType="int" resultType="com.example.testProject.dto.RequireDTO">
+		select
+		    seq,
+		    projectName,
+		    businessSector,
+		    projectOverview,
+		    requesterPosition,
+		    currentIssue,
+		    expectedEffect,
+		    finalDeliverables,
+		    detailTask,
+		    detailContent,
+		    detailItDevRequest,
+		    processState,
+		    requesterId,
+		    requesterName,
+		    requesterDeptCd,
+		    requesterDeptNm,
+		    requesterEmail,
+		    requesterPhone,
+		    insertDt,
+		    updateDt,
+		    completeDt
+		from board
+		where seq = #{seq};
+	</select>
+	
+	
+	<!-- 검색 조건에 따른 요청 목록 조회 -->
+	<select id="searchRequiresByCriteria" parameterType="com.example.testProject.dto.RequireSearchCriteria" resultType="com.example.testProject.dto.RequireDTO">
+		SELECT
+		    seq,
+		    projectName,
+		    businessSector,
+		    projectOverview,
+		    requesterPosition,
+		    currentIssue,
+		    expectedEffect,
+		    finalDeliverables,
+		    requesterId,
+		    requesterEmail,
+		    requesterPhone,
+		    processState,
+		    insertDt,
+		    completeDt,
+		    completeDt
+		FROM board
+	<where>
+	    <if test="requesterId != null and requesterId != ''">
+	        requesterId = #{requesterId}
+	    </if>
+	    <if test="startDate != null and startDate != ''">
+	        AND insertDt >= #{startDate}
+	    </if>
+	    <if test="endDate != null and endDate != ''">
+	        AND insertDt &lt;= #{endDate}
+	    </if>
+	</where>
+		ORDER BY seq
+	</select>
 
 </mapper>
