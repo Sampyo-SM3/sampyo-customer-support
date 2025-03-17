@@ -4,7 +4,7 @@
 
 <mapper namespace="com.example.testProject.repository.RequireRepository">
 	
-	<!-- ✅ 모든 데이터 조회 -->
+	<!-- ✅ 모든 데이터 조회1212 -->
 	<select id="getAllRequires" resultType="com.example.testProject.dto.RequireDTO">
 		select
 		seq,
