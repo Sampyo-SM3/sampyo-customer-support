@@ -96,7 +96,9 @@
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
+import { useAuthStore } from '@/store/auth';
+
 
 export default {
   name: 'LoginPage',
@@ -108,44 +110,38 @@ export default {
       loading: false,
       showError: false,
       errorMessages: '',
+      
     }
   },
+  computed: {
+    // 컴포넌트 내에서 authStore에 접근할 수 있게 함
+    authStore() {
+      return useAuthStore();
+    }
+  },  
   methods: {
     async login() {
       this.loading = true;
       
       try {
-        const loginData = {
-          id: this.username,
+        // const response = await axios.post('http://localhost:8080/api/login', loginData);
+        const success = await this.authStore.login({
+          username: this.username,
           password: this.password
-        };
-
-        const response = await axios.post('http://localhost:8080/api/login', loginData);
+        });        
         
-        console.log('로그인 성공:', response.data);
-        this.$router.push({ name: 'Main' });
-        
-      } catch (error) {
-        // API 호출 실패 또는 오류 응답
-        if (error.response) {
-          // 서버가 응답했지만 오류 상태 코드 (4xx, 5xx)
-          console.error('로그인 실패:', error.response.data.message);
-          
-          this.errorMessages = error.response.data.message;
-          this.showError = true;          
-        } else if (error.request) {
-          // 요청은 전송되었지만 응답이 수신되지 않음
-          console.error('서버에서 응답이 없습니다:', error.request);
-
-          this.errorMessages = error.request;
-          this.showError = true;                    
+        if (success) {
+          console.log('로그인 성공:');
+          this.$router.push({ name: 'Main' });
         } else {
-          // 요청 설정 중 오류 발생
-          console.error('요청 오류:', error.message);
-
-          this.errorMessages = error.message;
-          this.showError = true;                  
-        }
+          // 로그인 실패 (authStore에서 false 반환)
+          this.showError = true;
+          this.errorMessages = this.authStore.error || '로그인에 실패했습니다.';
+        }      
+      } catch (error) {
+        console.error('로그인 처리 중 오류:', error);
+        this.errorMessages = '로그인 처리 중 오류가 발생했습니다.';
+        this.showError = true;            
       } finally {
         this.loading = false;
       }
