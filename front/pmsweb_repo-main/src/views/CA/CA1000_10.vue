@@ -119,10 +119,7 @@
             <div class="info-subtitle">댓글 {{ commentTextLength }}</div>
             <v-card id="commentArea" class="pa-3 mb-3 info-inner-card">
               <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
-                :all-comments="comments" @reply="handleReply" />
-              <v-btn class="delete-btn ml-2" small text color="red" @click="deleteComment(comment.commentId)">
-                삭제
-              </v-btn>
+                :all-comments="comments" @refresh="fetchComments" />
             </v-card>
           </div>
 
@@ -312,7 +309,9 @@ export default {
       }
     },
     async fetchComments() {
-      // fetchComments() {
+
+      console.log('a');
+
       try {
         // const response = await axios.get(`http://localhost:8080/api/comments/${this.receivedSeq}`);
         this.comments = [];
@@ -329,9 +328,9 @@ export default {
         console.error('댓글 조회 실패:', error);
       }
     },
-
     handleReply(comment) {
       this.replyTo = comment;
+      console.log(this.replyTo);
     },
 
     cancelReply() {
