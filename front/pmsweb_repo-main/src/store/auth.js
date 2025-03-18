@@ -31,9 +31,9 @@ export const useAuthStore = defineStore("auth", {
 
           // 사용자 정보 로컬 스토리지에 저장
           localStorage.setItem('user_id', response.data.id);
-          localStorage.setItem('userInfo', response.data);
-          localStorage.setItem('isAuthenticated', true);          
-          
+          localStorage.setItem('userInfo', JSON.stringify(response.data));          
+          localStorage.setItem('isAuthenticated', true);   
+
           // 토큰이 있는 경우 저장
           if (response.data.token) {
             this.token = response.data.token;

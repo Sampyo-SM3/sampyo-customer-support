@@ -28,7 +28,7 @@
       </v-tabs>
 
       <v-spacer></v-spacer>
-      {{ userIdDisplay }} 님 환영합니다.
+
       <!-- 검색바 -->               
       <!-- <v-text-field 
         rounded="lg"        
@@ -70,8 +70,20 @@
         <v-icon>mdi-bell-outline</v-icon>        
       </v-btn>       -->
 
+      <div class="pr-10">
+        <v-icon>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="24" height="24">
+            <circle cx="50" cy="30" r="20" :fill="iconColor"/>
+            <circle cx="50" cy="30" r="15" fill="#f8f9fa"/>
+            <path d="M30,80 C30,65 70,65 70,80" :fill="iconColor" :stroke="iconColor" stroke-width="1"/>
+          </svg>
+        </v-icon>
+        {{ userNameDisplay }} 
+      </div>
+
+
       <!-- 로그인 버튼 -->
-      <v-btn class="login-btn" @click="handleLoginLogout">
+      <v-btn class="login-btn mr-3" @click="handleLoginLogout">
         <p class="login-text">{{ userLoginStatus ? '로그아웃' : '로그인' }}</p>
       </v-btn>
     </v-container>
@@ -98,6 +110,7 @@ export default defineComponent({
     const menuItems = ref([]) 
 
     const userIdDisplay = ref('');    
+    const userNameDisplay = ref('');    
     const userLoginStatus = ref('');    
 
     // auth 스토어 사용
@@ -173,6 +186,10 @@ export default defineComponent({
 
       userIdDisplay.value = localStorage.getItem('user_id');  
       userLoginStatus.value = localStorage.getItem('isAuthenticated');         
+      
+      const retrievedData = localStorage.getItem('userInfo');
+      const userInfo = JSON.parse(retrievedData);
+      userNameDisplay.value = userInfo.name; // '관리자'                           
     })    
 
     // 메뉴 아이템이 로드된 후 첫 번째 항목의 클릭 이벤트 트리거
@@ -192,6 +209,7 @@ export default defineComponent({
       showSideMenu,
       TextDecoderStream,
       userIdDisplay,
+      userNameDisplay,
       userLoginStatus,
       handleLoginLogout,
     }
