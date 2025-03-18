@@ -152,7 +152,7 @@ export default defineComponent({
 
       // 라우터를 통해 해당 컴포넌트로 이동
       if (item.M_CODE.includes('_')) {
-        const path = `/views/${item.M_CODE.substring(0, 2)}/${item.M_CODE}`
+        const path = `/views/${item.M_CODE.substring(0, 2)}/${item.M_CODE}`        
         router.push(path)
       }
     }
@@ -182,8 +182,27 @@ export default defineComponent({
       console.log('item.isOpen -> ', item.isOpen)
     }
 
-
-
+    const activateFirstSubmenuByHeader = (headerCode) => {
+      console.log('activateFirstSubmenuByHeader called with:', headerCode);
+      
+      if (!menuData.value || menuData.value.length === 0) {
+        console.log('No menu data available');
+        return;
+      }
+      
+      // 해당 대메뉴에 속하는 첫 번째 클릭 가능한 항목 찾기
+      const targetMenu = menuData.value.find(item => 
+        (item.LEV === 3 || item.LEV === 4) && 
+        isClickable(item.M_CODE)
+      );
+      
+      if (targetMenu) {
+        console.log('First clickable menu found:', targetMenu.M_NAME);
+        activateMenuItem(targetMenu);
+      } else {
+        console.log('No clickable menu found for header:', headerCode);
+      }
+    };
 
     return {
       processedMenuItems,
@@ -193,7 +212,8 @@ export default defineComponent({
       error,  
       auth,
       id,          
-      menuData: computed(() => menuStore.menuData),      
+      menuData: computed(() => menuStore.menuData),
+      activateFirstSubmenuByHeader      
     }
   }
 })

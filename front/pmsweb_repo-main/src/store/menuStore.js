@@ -12,7 +12,7 @@ export const useMenuStore = defineStore("menu", {
   }),
   actions: {
     async fetchMenuData(auth, id) {
-      console.log("-------store fetchMenuData ---------");
+      console.log("-------fetchMenuData ---------");
       try {
         this.isLoading = true;
         

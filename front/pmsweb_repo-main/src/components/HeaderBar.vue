@@ -12,7 +12,7 @@
 
       <!-- 메뉴 아이템들 -->
       <v-tabs v-model="activeTab">
-        <v-tab class="custom-tab" :ripple="false" @click="showSideMenu(item)" v-for="item in menuItems" :key="item" :value="item" >
+        <v-tab class="custom-tab" :ripple="false" @click="handleMenuClick(item)" v-for="item in menuItems" :key="item" :value="item" >
           <p class="tab-text">{{ item.m_name }}</p>          
         </v-tab>
 
@@ -92,7 +92,7 @@
 
 
 <script>
-import { ref, defineComponent, onMounted, watch } from 'vue';
+import { ref, defineComponent, onMounted, watch, provide  } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useAuthStore } from '@/store/auth';  
 import { useMenuStore } from '@/store/menuStore';
@@ -102,8 +102,8 @@ import { useRouter } from 'vue-router';  // useRouter 임포트
 
 export default defineComponent({
   name: 'HeaderBar',
-  emits: ['navigate'],
-  setup() {          
+  emits: ['navigate', 'menuSelected'],
+  setup(props, { emit }) {    
     const menuStore = useMenuStore()    
     const { isLoading, error } = storeToRefs(menuStore);  
     const activeTab = ref(null)        
@@ -202,11 +202,35 @@ export default defineComponent({
       }
     }, { immediate: true })
 
+
+
+
+
+    // 사이드메뉴 참조를 위한 설정
+    const sideMenuRef = ref(null);
+    provide('sideMenuRef', sideMenuRef); // 자식 컴포넌트에서 접근 가능하도록 provide    
+
+    // 메뉴 클릭 핸들러 수정
+    const handleMenuClick = (item) => {
+      console.log('--------handleMenuClick--------');
+      console.log('item-> ', item);
+      
+      // 기존 사이드메뉴 데이터 로드 함수 호출
+      showSideMenu(item);
+      
+      // 헤더 메뉴 클릭 이벤트 발생 - 부모 컴포넌트에 알림
+      emit('menuSelected', item.m_code);
+    };
+
+
+
+
     return {      
       error,  
       menuItems,
       activeTab,
-      showSideMenu,
+      handleMenuClick,
+      sideMenuRef,
       TextDecoderStream,
       userIdDisplay,
       userNameDisplay,

@@ -1,11 +1,11 @@
 <template>
   <v-app>
-    <HeaderBar />
+    <HeaderBar @menuSelected="handleMenuSelection" />
     <v-container fluid class="pa-0">
       <v-row no-gutters>
         <!-- 사이드 메뉴 -->
         <v-col cols="auto" class="side-menu-col">
-          <SideMenu />
+          <SideMenu ref="sideMenu" />
         </v-col>
 
         <v-col>
@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import { ref } from 'vue';
 import SideMenu from '@/components/SideMenu.vue';
 import HeaderBar from '@/components/HeaderBar.vue';
 
@@ -30,7 +31,25 @@ export default {
   components: {
     SideMenu,
     HeaderBar
-  }
+  },
+  setup() {
+    const sideMenu = ref(null);
+    
+    const handleMenuSelection = (headerCode) => {
+      console.log('Header menu selected:', headerCode);
+      // 메뉴 데이터가 로드된 후 약간의 지연을 주어 사이드메뉴 첫 항목 활성화
+      setTimeout(() => {
+        if (sideMenu.value) {
+          sideMenu.value.activateFirstSubmenuByHeader(headerCode);
+        }
+      }, 300); // 메뉴 데이터 로드 시간을 고려한 지연 시간
+    };
+    
+    return {
+      sideMenu,
+      handleMenuSelection
+    };
+  }  
 }
 </script>
 
