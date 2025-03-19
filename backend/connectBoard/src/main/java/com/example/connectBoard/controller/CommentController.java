@@ -71,6 +71,6 @@ public class CommentController {
             return ResponseEntity.status(500).body("서버 오류 발생: " + e.getMessage());
         }
     }
-   
+    
     
 }

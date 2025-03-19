@@ -160,20 +160,20 @@ export default {
       step: 1,
       selectedStatus: '미처리', // 추가된 상태 변수
       inquiry: {
-        REQUESTER_NAME: "배하준",
-        REQUESTER_DEPT_NM: "010-8976-4852",
-        REQUESTER_EMAIL: "hjbae@gsenc.com",
-        REQUESTER_PHONE: "포항자이디오션",
-        PROJECT_NAME: "MQ01 몰탈 문서 자료실 개설",
-        BUSINESS_SECTOR: "몰탈",
-        PROJECT_OVERVIEW: "WEB에서 당사 제품 관련 자료를 자유롭게 내려 받고 인쇄할 수 있는 환경 제공 통해 고객 만족도 제고",
-        PAIN_POINT: "제품 사용설명서, 제품 성적서 등 당사 몰탈 제품을 구매하는 고객들이 필수적으로 참고해야 할 문서 자료를 입수하기 어려움",
-        EXPECTED_EFFECT: "업무 자동화, 고객 만족도 제고",
-        DELIVERABLES: "WebSite",
-        DETAIL_TASK: "수집 방식 최적화 필요",
-        DETAIL_CONTENT: "수집 방식 최적화 필요",
-        DETAIL_IT_DEV_REQUEST: "AI 모델 튜닝 필요",
-        REQUESTERID: "test",
+        REQUESTER_NAME: "",
+        REQUESTER_DEPT_NM: "",
+        REQUESTER_EMAIL: "",
+        REQUESTER_PHONE: "",
+        PROJECT_NAME: "",
+        BUSINESS_SECTOR: "",
+        PROJECT_OVERVIEW: "",
+        PAIN_POINT: "",
+        EXPECTED_EFFECT: "",
+        DELIVERABLES: "",
+        DETAIL_TASK: "",
+        DETAIL_CONTENT: "",
+        DETAIL_IT_DEV_REQUEST: "",
+        REQUESTERID: "",
         // 아래 데이터는 DETAIL_TASK, DETAIL_CONTENT, DETAIL_IT_DEV_REQUEST로 가져오고 있습니다.
         // 추후 데이터를 한 줄 씩 보여주는 방식으로 변경하면 아래 주석 부분을 사용해야 합니다.
         /////////////////////////////////////////////////////////////////////////////////
@@ -212,13 +212,23 @@ export default {
       },
       replyTo: null,
       sectors: ["시멘트", "분체", "골재", "몰탈", "레미콘", "기타"],
-      progressStatuses: ["미처리", "진행", "보류중", "종결"],
+      progressStatuses: [],
       qaTypes: ["제품/기술문의", "배차문의", "불편사항", "자료요청", "1:1문의"],
       receiptPaths: ["WEB", "KAKAO", "CALL", "CRM", "SIDP"],
 
     };
   },
   methods: {
+    async getStatus() {
+      try {
+        const statusList = await axios.get("http://localhost:8080/api/status/list");
+        console.log('statusList' + statusList.data.codeName);
+        this.progressStatuses = statusList.data.map(status => status.codeName);
+
+      } catch (error) {
+        console.error("❌ 오류 발생:", error);
+      }
+    },
     async fetchRequireDetail() {
       console.log('--fetchRequireDetail--');
       console.log(this.receivedSeq);
@@ -310,8 +320,6 @@ export default {
     },
     async fetchComments() {
 
-      console.log('a');
-
       try {
         // const response = await axios.get(`http://localhost:8080/api/comments/${this.receivedSeq}`);
         this.comments = [];
@@ -330,7 +338,6 @@ export default {
     },
     handleReply(comment) {
       this.replyTo = comment;
-      console.log(this.replyTo);
     },
 
     cancelReply() {
@@ -362,6 +369,9 @@ export default {
     console.log('--mounted--');
     console.log('받은 receivedSeq:', this.receivedSeq);
     console.log('현재 라우트 정보:', this.$route);
+
+    //미처리 리스트 가져오기
+    this.getStatus();
 
     // 요구사항 정의서 데이터 가져오기
     this.fetchRequireDetail(); // API 호출
@@ -565,7 +575,7 @@ export default {
 }
 
 #commentArea {
-  max-height: 361px;
+  max-height: auto;
   overflow-y: auto;
   overflow-x: hidden;
   border: 1px solid #E3E3E3;
