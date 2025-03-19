@@ -17,13 +17,13 @@
         </v-tab>
 
         <!-- Business 탭 추가 -->
-        <v-btn
+        <!-- <v-btn
           class="business-btn"
           variant="text"
         >
           <p class="business-text">Business</p>
           <v-icon right>mdi-open-in-new</v-icon>
-        </v-btn>   
+        </v-btn>    -->
         
       </v-tabs>
 
@@ -83,9 +83,12 @@
 
 
       <!-- 로그인 버튼 -->
+      
       <v-btn class="login-btn mr-3" @click="handleLoginLogout">
         <p class="login-text">{{ userLoginStatus ? '로그아웃' : '로그인' }}</p>
       </v-btn>
+      
+
     </v-container>
   </v-app-bar>
 </template>
@@ -247,18 +250,14 @@ export default defineComponent({
 <style scoped>
 
 .login-btn {  
-  background-color: #00B0F3;
-  color: white;  
-  border-radius: 10px !important; /* 원하는 수치값으로 조정하세요 */     
-  width: 10px;   
+  background-color: #1867C0;
+  border-radius: 10px !important;
+  color: white;    
+  width: 80px; /* 원하는 길이로 조정 */ 
 }
 
 .login-text {
-  transform: translateY(-1px);
-}
-
-.login-btn {
-  border-radius: 8px !important;
+  transform: translateY(-1px);  
 }
 
 .language-select {

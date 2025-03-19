@@ -90,10 +90,15 @@
 
     <br>
 
-    <div class="d-flex justify-center">
-      <v-btn variant="flat" class="select-btn d-flex align-center" size="large" @click="fetchData()">
+    <div class="d-flex justify-center">      
+      <!-- <v-btn variant="flat" class="select-btn d-flex align-center pl-3 pr-4" size="large" @click="fetchData()">
+        <v-icon size="default" class="mr-1">mdi-account</v-icon>
         조회
-      </v-btn>
+      </v-btn> -->
+      <v-btn variant="flat" color="primary" class="custom-btn mr-2 white-text d-flex align-center" size="small" @click="fetchData()">
+          <v-icon size="default" class="mr-1">mdi-magnify</v-icon>
+          조회
+        </v-btn>      
     </div>
     <br>
     <br>
@@ -670,6 +675,8 @@ export default {
 .custom-btn {
   font-size: 14px;
   height: 35px;
+  border-radius: 10px;
+
 }
 
 /* 날짜 선택 관련 스타일 */
@@ -829,6 +836,8 @@ export default {
   border: 1px solid #e0e0e0;
   width: 100%;
   position: relative;
+  border-radius: 10px; /* 모서리 라운드 처리 */
+  overflow: hidden; /* 내부 요소가 라운드 처리된 모서리를 벗어나지 않도록 함 */  
 }
 
 /* 1페이지의 1행만 열 간격이 틀어지는 현상이 있어서 강제로 사이즈를 지정함 */
@@ -839,7 +848,7 @@ export default {
 }
 
 .table-header {
-  background-color: #f5f5f5;
+  background-color: #D0DFF1;
   font-weight: 500;
   border-bottom: 1px solid #e0e0e0;
 }
@@ -867,9 +876,20 @@ export default {
   white-space: nowrap;
 }
 
+/*
 .th-cell:last-child,
 .td-cell:last-child {
   border-right: none;
+}
+*/
+
+.th-cell,
+.td-cell {
+  padding: 8px 12px;
+  border-right: none; /* 오른쪽 테두리 제거 */
+  display: flex;
+  align-items: center;
+  font-size: 13px;
 }
 
 .checkbox-cell {

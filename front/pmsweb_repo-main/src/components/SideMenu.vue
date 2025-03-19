@@ -228,7 +228,7 @@ export default defineComponent({
   font-weight: 500;
   color: #9e9e9e; /* 옅은 회색 */
   font-size: 12px; /* 더 작은 폰트 크기 */
-  text-transform: uppercase;
+  /* text-transform: uppercase; */
 }
 
 :deep(.menu-item) {
@@ -278,7 +278,7 @@ export default defineComponent({
 .active-item {
   /* 활성 항목 배경색 (원하는 색상으로 변경 가능) */
   /* background-color: #e3f2fd;  */
-  background-color: #00B0F0;
+  background-color: #B0CAE6;
   
 }
 
@@ -310,8 +310,8 @@ export default defineComponent({
 
 /* 하위메뉴가 없는 중메뉴 클릭 시 스타일 수정 */
 :deep(.menu-item.no-submenu.active-item) {  
-  background-color: #00B0F0;  
-  font-weight: bold;
+  background-color: #B0CAE6;    
+  font-weight: bold;  
   border-radius: 8px !important;    
   margin-left: 10px;
   margin-right: 10px;     
@@ -319,15 +319,17 @@ export default defineComponent({
 }
 
 :deep(.menu-item.no-submenu.active-item) * {
-  color: white !important;
+  color: #4E71C1 !important;
 }
 
 :deep(.custom-menu-title) {
+  color: #82391F !important;
   transition: padding-left 0.3s ease;
   font-weight: 600;     
   font-size: 13px;
   color: #003044;
   line-height: 3 !important;
+  padding-left: 20px;
 }
 
 :deep(.menu-item.no-submenu.active-item .custom-menu-icon) {
@@ -352,6 +354,7 @@ export default defineComponent({
 
 .custom-drawer {
   border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+  background-color: #F0F4F8;
 }
 
 :deep(.tighter-menu-spacing) {
