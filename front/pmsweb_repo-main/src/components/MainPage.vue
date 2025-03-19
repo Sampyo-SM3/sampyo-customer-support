@@ -1,24 +1,23 @@
 <template>
   <v-app>    
     <HeaderBar @menuSelected="handleMenuSelection" />
-    <v-container fluid class="pa-0">
-      <v-row no-gutters>
+    <v-container fluid class="pt-0 pr-0 pl-0">
+      <v-row no-gutters style="height: 100vh;">
 
         <!-- 사이드 메뉴 -->
-        <v-col cols="auto" class="side-menu-col">
+        <v-col cols="auto" class="side-menu-col" style="height: 100vh;">
           <SideMenu ref="sideMenu" @menu-clicked="handleMenuClick" />
         </v-col>
 
  
 
-        <v-col>
-          <!-- 라우터 뷰 (실제 콘텐츠) -->
+        <!-- 실제 콘텐츠 -->
+        <v-col style="height: 100vh; overflow-y: auto;">
           <v-main>
-            <!-- <div>test_text</div> -->
-            
             <router-view></router-view>
           </v-main>
         </v-col>
+        
       </v-row>
     </v-container>
   </v-app>
@@ -87,7 +86,5 @@ export default {
 </script>
 
 <style scoped>
-.breadcrumb-container {
-  background-color: red;
-}
+
 </style>

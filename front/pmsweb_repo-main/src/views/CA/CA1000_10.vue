@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="pa-10">    
+  <v-container fluid class="pr-10 pl-10 pt-7">    
     
     <v-row>
       <div class="breadcrumb-div pl-3"> {{ savedMidMenu }} &nbsp; > &nbsp; {{ savedSubMenu }}</div>
@@ -672,7 +672,7 @@ export default {
   }
 }</script>
 
-<style scoped>
+<style scoped>  
   .breadcrumb-div {
     font-size: 12px;
     color: #A1A6A6;
