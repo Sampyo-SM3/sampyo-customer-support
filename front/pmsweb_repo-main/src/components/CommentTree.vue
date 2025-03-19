@@ -27,7 +27,7 @@
     <!-- 대댓글 목록 -->
     <div class="replies-container">
       <comment-tree v-for="child in childComments" :key="child.commentId" :comment="child" :all-comments="allComments"
-        @reply="$emit('reply', $event)" @delete="$emit('delete', $event)" />
+        @reply="$emit('reply', $event)" @delete="$emit('delete', $event)" @refresh="$emit('refresh')" />
     </div>
   </div>
 </template>
