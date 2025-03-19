@@ -74,11 +74,12 @@ import { computed, defineComponent, onMounted, watch, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMenuStore } from '@/store/menuStore';
 import { useRouter } from 'vue-router';
+import { useBreadcrumbStore } from '@/store/breadcrumbStore';
 
 export default defineComponent({
   name: 'SideMenu', 
   emits: ['navigate'],
-  setup() {          
+  setup(props, { emit }) { // emit을 받아옴
     const router = useRouter()
     const menuStore = useMenuStore()    
     const { menuData, isLoading, error } = storeToRefs(menuStore);
@@ -89,8 +90,6 @@ export default defineComponent({
     onMounted(async () => {         
       await menuStore.fetchMenuData(auth.value, id.value)
       
-
-
       watch(menuData, (newValue) => {
         console.log('menuData changed:', newValue);
 
@@ -142,6 +141,19 @@ export default defineComponent({
     
     const activateMenuItem = (item) => {
       console.log(`Activate menu item: ${item.M_NAME}, Code: ${item.M_CODE}`)
+      console.log(menuData.value);
+
+      const level3Name = item.M_NAME;
+      const level2Name = getLevel2MenuName(item.M_CODE);
+
+      // breadcrumbStore 초기화
+      const breadcrumbStore = useBreadcrumbStore();
+      breadcrumbStore.setMenuPath(level2Name, level3Name);
+            
+      
+
+      
+
       menuData.value.forEach(menuItem => {
         menuItem.isActive = false
         if (menuItem.children) {
@@ -155,8 +167,29 @@ export default defineComponent({
         const path = `/views/${item.M_CODE.substring(0, 2)}/${item.M_CODE}`        
         router.push(path)
       }
+
+      // 메뉴 클릭 이벤트 발생 (새로 추가)
+      emit('menu-clicked', item);      
     }
   
+    const getLevel2MenuName = (mCode) => {
+      // mCode가 없거나 문자열이 아닌 경우 빈 문자열 반환
+      if (!mCode || typeof mCode !== 'string') {
+        return '';
+      }
+      
+      // 레벨3 메뉴 코드에서 상위 레벨2 메뉴 코드 추출 (앞 4자리)
+      // 예: 'CA1000_10'에서 'CA10' 추출
+      const parentCode = mCode.substring(0, 4);
+      
+      // menuData.value 배열에서 해당 코드와 일치하는 레벨2 메뉴 항목 찾기
+      const level2Item = menuData.value.find(item => 
+        item.LEV === 2 && item.M_CODE === parentCode
+      );
+      
+      // 찾은 항목이 있으면 M_NAME 반환, 없으면 빈 문자열 반환
+      return level2Item ? level2Item.M_NAME : '';
+    };    
 
     const isClickable = (mCode) => {
       return mCode.includes('_')
@@ -207,6 +240,7 @@ export default defineComponent({
     return {
       processedMenuItems,
       activateMenuItem,
+      getLevel2MenuName,
       isClickable,
       toggleMenu,
       error,  

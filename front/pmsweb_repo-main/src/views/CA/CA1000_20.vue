@@ -361,10 +361,6 @@ export default {
     this.selectedStatus = this.management.PROGRESS;
   },
   mounted() {
-    console.log('--mounted--');
-    console.log('받은 receivedSeq:', this.receivedSeq);
-    console.log('현재 라우트 정보:', this.$route);
-
     //미처리 리스트 가져오기
     this.getStatus();
 
@@ -377,9 +373,6 @@ export default {
   },
   watch: {
     receivedSeq: {
-      handler(newValue, oldValue) {
-        console.log('receivedSeq 변경됨:', newValue, '이전 값:', oldValue);
-      },
       immediate: true  // 컴포넌트 생성 시점에도 즉시 실행
     },
     selectedStatus(newVal, oldVal) {
