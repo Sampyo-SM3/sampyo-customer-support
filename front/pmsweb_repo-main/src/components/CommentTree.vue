@@ -11,7 +11,7 @@
         </div>
         <div class="comment-text">{{ comment.content }}</div>
         <v-btn text class="reply-btn" @click="toggleReplyInput(comment)">답글</v-btn>
-        <v-btn text class="reply-btn" @click="$emit('delete', comment.commentId)">삭제</v-btn>
+        <v-btn text class="reply-btn" @click="deleteComment(comment.commentId)">삭제</v-btn>
 
         <!-- ✅ 답글 입력창을 댓글과 같은 div 안에 배치 -->
         <div v-if="showReplyInput" class="reply-input-container">
@@ -116,6 +116,18 @@ export default {
     },
     formatDate(dateStr) {
       return dateStr.split('.').join('-');
+    },
+    async deleteComment(commentId) {
+      if (confirm("댓글을 삭제하시겠습니까?")) {
+        try {
+          await axios.post(`http://localhost:8080/api/deleteComment/${commentId}`);
+          alert("댓글이 삭제되었습니다.");
+        } catch (error) {
+          console.log(error);
+          alert("삭제를 실패하였습니다. 관리자에게 문의하세요.");
+        }
+      }
+      this.$emit("refresh");
     }
   }
 };

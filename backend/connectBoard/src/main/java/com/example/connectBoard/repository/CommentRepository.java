@@ -12,4 +12,6 @@ public interface CommentRepository {
     List<CommentDTO> findByPostIdOrderByCreatedAtAsc(Long postId);
 
     void insertComment(CommentDTO comment);
+    
+    void deleteComment(Integer commentId);
 }

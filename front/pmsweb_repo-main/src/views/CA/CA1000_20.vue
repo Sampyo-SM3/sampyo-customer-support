@@ -7,7 +7,7 @@
           <div v-for="(status, index) in progressStatuses" :key="index" class="stepper-item"
             :class="{ active: step >= index + 1 }">
             <div class="step-circle">{{ index + 1 }}</div>
-            <span class="step-label">{{ status }}</span>
+            <span class="step-label">{{ status.text }}</span>
             <div v-if="index < progressStatuses.length - 1" class="step-line"
               :class="{ 'step-line-active': step > index + 1 }"></div>
           </div>
@@ -18,16 +18,16 @@
     <!-- 접수 상태 버튼 -->
     <v-row class="mt-10">
       <v-col cols="auto" class="d-flex align-center">
-        <div class="status-selection-container" style="margin-left:6px;">
+        <div class="status-selection-container">
           <div class="status-label-box">
             <span>접수상태</span>
           </div>
           <div class="status-select-box">
-            <v-select v-model="selectedStatus" :items="progressStatuses" hide-details density="compact" variant="plain"
-              class="status-select"></v-select>
+            <v-select v-model="selectedStatus" :items="progressStatuses" item-title="text" item-value="value"
+              hide-details density="compact" variant="plain" class="status-select"></v-select>
           </div>
         </div>
-        <v-btn class="action-btn save-btn" @click="saveStatus">
+        <v-btn class=" action-btn save-btn" @click="saveStatus">
           저장
         </v-btn>
       </v-col>
@@ -158,7 +158,7 @@ export default {
   data() {
     return {
       step: 1,
-      selectedStatus: '미처리', // 추가된 상태 변수
+      selectedStatus: '', // 추가된 상태 변수
       inquiry: {
         REQUESTER_NAME: "",
         REQUESTER_DEPT_NM: "",
@@ -191,16 +191,7 @@ export default {
         // ]
       },
       management: {
-        SECTOR: "몰탈",
-        CS_MANAGER: "",
-        PROGRESS: "종결",
-        QA_TYPE: "자료요청",
-        DEPARTMENT: "",
-        RECEIPT_PATH: "WEB",
-        SALES_MANAGER: "",
-        INVESTIGATOR: "",
-        RECEIPT_DATE: "",
-        COMPLETION_DATE: "",
+        PROGRESS: ""
       },
       answer: "",
       comments: [],
@@ -222,8 +213,19 @@ export default {
     async getStatus() {
       try {
         const statusList = await axios.get("http://localhost:8080/api/status/list");
-        console.log('statusList' + statusList.data.codeName);
-        this.progressStatuses = statusList.data.map(status => status.codeName);
+
+        // 상태 이름 리스트 저장
+        this.progressStatuses = statusList.data.map(status => ({
+          text: status.codeName,  // UI에 표시할 값
+          value: status.codeId    // 실제 선택될 값
+        }));
+
+        // 상태 매핑 (codeName → 숫자 변환용)
+        this.statusMapping = statusList.data.reduce((map, status) => {
+          map[status.codeId] = status.orderNum; // "P" → 1, "I" → 2, "H" → 3, "C" → 4
+          return map;
+        }, {});
+        console.log("✅ 상태 매핑 완료:", this.statusMapping);
 
       } catch (error) {
         console.error("❌ 오류 발생:", error);
@@ -233,29 +235,19 @@ export default {
       console.log('--fetchRequireDetail--');
       console.log(this.receivedSeq);
       try {
+        await this.getStatus();
+
         const response = await axios.get("http://localhost:8080/api/require/detail", {
           params: { seq: this.receivedSeq }
         });
         console.log("📌 받아온 데이터:", response.data);
         this.requireDetail = response.data; // 데이터를 저장
 
-        //임시로 조건문처리 해놓음
-        switch (response.data.processState) {
-          case '미처리':
-            this.step = 1;
-            break;
-          case '진행중':
-            this.step = 2;
-            break;
-          case '보류중':
-            this.step = 3;
-            break;
-          case '종결':
-            this.stepteValue = 4;
-            break;
-          default:
-            this.step = 1; // 기본값 (예외 처리)
-        }
+        this.step = this.statusMapping[response.data.processState] || 1;
+
+        // ✅ 선택된 상태 반영 (P, I, H, C → UI에서 표시할 text 값)
+        const matchedStatus = this.progressStatuses.find(status => status.value === response.data.processState);
+        this.selectedStatus = matchedStatus ? matchedStatus.value : "P";
 
         // 받아온 데이터를 inquiry에 업데이트
         this.inquiry = {
@@ -271,7 +263,10 @@ export default {
           DELIVERABLES: response.data.finalDeliverables,
           DETAIL_TASK: response.data.detailTask,
           DETAIL_CONTENT: response.data.detailContent,
-          DETAIL_IT_DEV_REQUEST: response.data.detailItDevRequest
+          DETAIL_IT_DEV_REQUEST: response.data.detailItDevReques,
+          management: {
+            PROGRESS: response.data.processState || "P" // 업데이트된 상태 적용
+          }
         };
       } catch (error) {
         console.error("❌ 오류 발생:", error);
@@ -389,7 +384,6 @@ export default {
     },
     selectedStatus(newVal, oldVal) {
       console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
-      this.step = this.stepValue; // selectedStatus 값 변경 시 step 업데이트
     }
   }
 };
@@ -699,7 +693,9 @@ export default {
 .status-selection-container {
   display: flex;
   width: 250px;
+  height: 38px;
   border: 1px solid #DEE2E6;
+  margin-left: 6px;
 }
 
 .status-label-box {
@@ -713,18 +709,16 @@ export default {
   border-right: 1px solid #DEE2E6;
   font-weight: 500;
   border-radius: 0px;
-  /* ⬅ 모서리 각지게 */
 }
 
 .status-select-box {
-  width: 160px;
+  width: 150px;
+  font-size: 14px;
   background-color: #FFFFFF;
 }
 
 .status-select :deep(.v-field) {
-  /* ⬅ 테두리 연하게 */
   border-radius: 0px;
-  /* ⬅ 모서리 각지게 */
   box-shadow: none !important;
 }
 
@@ -734,7 +728,6 @@ export default {
   display: flex;
   align-items: center;
 }
-
 
 .action-btn {
   width: 65px;

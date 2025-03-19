@@ -14,6 +14,7 @@ public class StatusDTO {
     private String category;    // 코드 카테고리 (기본값: "STATUS")
     private String parentCodeId; // 상위 코드 ID (NULL이면 최상위 코드)
     private String useYn;       // 활성 여부 (Y/N)
+    private Integer orderNum;	//순번
     private  LocalDate insertDt; // 생성 날짜
     private  LocalDate updateDt; // 업데이트 날짜
 }

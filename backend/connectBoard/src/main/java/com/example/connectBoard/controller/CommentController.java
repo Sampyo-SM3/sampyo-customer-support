@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -67,6 +68,17 @@ public class CommentController {
         try {
             commentService.insertComment(comment);
             return ResponseEntity.ok("댓글이 성공적으로 등록되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 오류 발생: " + e.getMessage());
+        }
+    }
+    
+	/* 댓글 삭제 */
+    @PostMapping("/deleteComment/{commentId}")
+    public ResponseEntity<?> deleteComment(@PathVariable("commentId") Integer commentId) {
+        try {
+            commentService.deleteComment(commentId);
+            return ResponseEntity.ok("댓글이 성공적으로 삭제되었습니다.");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("서버 오류 발생: " + e.getMessage());
         }

@@ -28,4 +28,9 @@ public class CommentService {
         commentRepository.insertComment(comment);
     }
     
+    public void deleteComment(Integer commentId) {
+        commentRepository.deleteComment(commentId);
+    }
+
+    
 }

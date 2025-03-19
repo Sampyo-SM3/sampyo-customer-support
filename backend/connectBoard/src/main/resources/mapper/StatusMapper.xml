@@ -12,9 +12,9 @@
 			category, 
 			parentCodeId, 
 			useYn, 
+			orderNum,
 			insertDt, 
-			updateDt, 
-			orderNum 
+			updateDt			
 		FROM code_master 
 		ORDER BY orderNum;
     </select>
