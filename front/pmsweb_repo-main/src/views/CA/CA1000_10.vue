@@ -1,8 +1,14 @@
 <template>
   <v-container fluid class="pa-10">    
+    
     <v-row>
-      <v-col>
-        <div class="title-div">고갱님의 소리!~</div>
+      <div class="breadcrumb-div pl-3"> {{ savedMidMenu }} &nbsp; > &nbsp; {{ savedSubMenu }}</div>
+      
+    </v-row>
+
+    <v-row>
+      <v-col>        
+        <div class="title-div">SR요청</div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
@@ -247,6 +253,7 @@
 </template>
 
 <script>
+// import SideMenu from '@/components/SideMenu.vue';
 import axios from 'axios';
 
 export default {
@@ -271,6 +278,8 @@ export default {
       statusList: ['미처리', '진행중', '보류중', '종결'],
       errorMessages: [],
       showError: false,
+      savedMidMenu: '',
+      savedSubMenu: '',      
     }
   },
 
@@ -336,9 +345,22 @@ export default {
     this.setDateRange('month');
     // 데이터 로드
     this.fetchData();
+
+    this.checkLocalStorage();
   },
 
-  methods: {    
+  methods: {        
+      checkLocalStorage() {
+      const midMenuFromStorage = localStorage.getItem('midMenu');
+      const subMenuFromStorage = localStorage.getItem('subMenu');
+      
+      this.savedMidMenu = midMenuFromStorage ? JSON.parse(midMenuFromStorage) : null;
+      this.savedSubMenu = subMenuFromStorage ? JSON.parse(subMenuFromStorage) : null;
+      
+      console.log('메뉴 클릭 후 midMenu:', this.savedMidMenu);
+      console.log('메뉴 클릭 후 subMenu:', this.savedSubMenu);
+    },
+
     isValidDate(options = {}) {
       // console.log('--isValidDate--')
       const errors = [];
@@ -352,8 +374,6 @@ export default {
         maxDate = null,
       } = options;
 
-      // console.log(options);
-      
       // 1. 기본 입력 검사
       if (!this.startDate || !this.endDate) {
         errors.push('시작일과 종료일을 모두 입력해주세요.');
@@ -424,8 +444,6 @@ export default {
 
       // 미래 날짜 검사
       if (!allowFutureDates && startDate > today) {
-        console.log('startDate -> ' + startDate);
-        console.log('today -> ' + today);
         errors.push('시작일은 오늘 이후일 수 없습니다.');
       }
 
@@ -521,8 +539,6 @@ export default {
             requesterId: this.requesterId
           }
         });
-
-        console.log('게시판 데이터 리스트 조회!! -> ' + response.data);
 
         // API 응답 데이터 처리
         if (response.data && Array.isArray(response.data)) {
@@ -657,6 +673,11 @@ export default {
 }</script>
 
 <style scoped>
+  .breadcrumb-div {
+    font-size: 12px;
+    color: #A1A6A6;
+  }
+
 .title-div {
   font-size: 25px;
 }

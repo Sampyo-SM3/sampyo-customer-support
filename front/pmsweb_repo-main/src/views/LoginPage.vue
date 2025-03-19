@@ -131,7 +131,6 @@ export default {
         });        
         
         if (success) {
-          console.log('로그인 성공:');
           this.$router.push({ name: 'Main' });
         } else {
           // 로그인 실패 (authStore에서 false 반환)
@@ -147,7 +146,6 @@ export default {
       }
     },
     googleLogin() {
-      console.log('Google 로그인 시도')
       // 여기에 Google 로그인 로직을 구현하세요
     }
   }
