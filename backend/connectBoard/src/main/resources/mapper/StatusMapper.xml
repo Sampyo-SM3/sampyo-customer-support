@@ -4,7 +4,7 @@
 <mapper namespace="com.example.connectBoard.repository.StatusRepository">
 
 	<!--접수 상태 List-->
-    <select id="getAllStatuses" resultType="com.example.connectBoard.dto.StatusDTO">   
+    <select id="getAllStatuses" parameterType="com.example.connectBoard.dto.CommentDTO">   
 		SELECT 
 			codeId, 
 			codeName, 
@@ -19,5 +19,10 @@
 		ORDER BY orderNum;
     </select>
 
+	<update id="updateStatus" parameterType="com.example.connectBoard.dto.RequireDTO">
+   		UPDATE board 
+    	SET processState = #{processState}
+    	WHERE seq = #{seq} 
+	</update>
 </mapper>
 

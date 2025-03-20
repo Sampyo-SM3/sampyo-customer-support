@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.connectBoard.dto.CommentDTO;
+import com.example.connectBoard.dto.RequireDTO;
 import com.example.connectBoard.dto.StatusDTO;
 import com.example.connectBoard.repository.StatusRepository;
 
@@ -21,5 +23,8 @@ public class StatusService {
     	 return statusRepository.getAllStatuses();
     }
 
+    public void updateStatus(RequireDTO require) {
+    	statusRepository.updateStatus(require);
+    }
     
 }
