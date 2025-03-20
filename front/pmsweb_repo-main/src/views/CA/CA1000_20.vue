@@ -216,7 +216,7 @@ export default {
   methods: {
     async getStatus() {
       try {
-        const statusList = await apiClient.get("http://localhost:8080/api/status/list");
+        const statusList = await apiClient.get("/api/status/list");
 
         // 상태 이름 리스트 저장
         this.progressStatuses = statusList.data.map(status => ({

@@ -119,7 +119,7 @@ export default {
     async deleteComment(commentId) {
       if (confirm("댓글을 삭제하시겠습니까?")) {
         try {
-          await apiClient.post(`http://localhost:8080/api/deleteComment/${commentId}`);
+          await apiClient.post(`/api/deleteComment/${commentId}`);
           alert("댓글이 삭제되었습니다.");
         } catch (error) {
           console.log(error);
