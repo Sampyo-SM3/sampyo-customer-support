@@ -1,21 +1,29 @@
 <template>
   <v-app>    
     <HeaderBar @menuSelected="handleMenuSelection" />
-    <v-container fluid class="pa-0">
-      <v-row no-gutters>
+    <v-container fluid class="pt-0 pr-0 pl-0">
+      <v-row no-gutters style="height: 100vh;">
 
         <!-- 사이드 메뉴 -->
-        <v-col cols="auto" class="side-menu-col">
+        <v-col cols="auto" class="side-menu-col" style="height: 100vh;">
           <SideMenu ref="sideMenu" @menu-clicked="handleMenuClick" />
         </v-col>
 
- 
-
-        <v-col>
-          <!-- 라우터 뷰 (실제 콘텐츠) -->
-          <v-main>
-            <!-- <div>test_text</div> -->
-            
+        <!-- 실제 콘텐츠 -->
+        <v-col style="height: 100vh; overflow-y: auto;">
+          <!-- 브레드크럼 및 제목 영역 css잘몰라서 강제로 위치맞춤..-->          
+          <div class="breadcrum-div d-flex align-center text-body-2 ml-16 pl-10 pt-15">          
+            <br><br><br><br>
+            <!-- <span class="mid-menu-text">Home</span> -->
+            <v-icon size="small" class="mx-1">mdi-chevron-right</v-icon>          
+            <span class="mid-menu-text"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              {{ savedMidMenu }} </span> 
+            <v-icon size="small" class="mx-1">mdi-chevron-right</v-icon>
+            <span class="sub-menu-text"> {{ savedSubMenu }} </span>
+          </div>                                  
+                    
+          <!-- 메인 컨텐츠 영역 -->
+          <v-main class="main">
             <router-view></router-view>
           </v-main>
         </v-col>
@@ -23,7 +31,6 @@
     </v-container>
   </v-app>
 </template>
-
 <script>
 import { ref, onMounted } from 'vue';
 import SideMenu from '@/components/SideMenu.vue';
@@ -87,7 +94,19 @@ export default {
 </script>
 
 <style scoped>
-.breadcrumb-container {
-  background-color: red;
-}
+
+  .main {
+    padding-top: 0px;
+    margin-top: -40px;
+  }
+  
+  .mid-menu-text {
+    font-size: 12px;
+    color: #A1A6A6;
+  }
+
+  .sub-menu-text {
+    font-size: 12px;
+    color: #A1A6A6;
+  }  
 </style>

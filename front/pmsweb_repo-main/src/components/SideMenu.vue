@@ -389,9 +389,11 @@ export default defineComponent({
 .custom-drawer {
   border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
   background-color: #F0F4F8;
+  /* background-color: red; */
+  height: 100vh !important;
 }
 
-:deep(.tighter-menu-spacing) {
+:deep(.tighter-menu-spacing) {  
   --v-list-item-min-height: 10px !important; 
   --v-list-item-padding-top: 0 !important;
   --v-list-item-padding-bottom: 0 !important;

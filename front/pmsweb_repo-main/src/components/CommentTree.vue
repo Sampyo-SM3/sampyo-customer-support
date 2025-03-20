@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import apiClient from '@/api';
 
 export default {
   name: 'CommentTree',
@@ -94,7 +94,7 @@ export default {
 
       try {
         // API 요청: 댓글 DB에 저장
-        await axios.post("http://localhost:8080/api/insertComment", commentData);
+        await apiClient.post("api/insertComment", commentData);
         alert("댓글 등록 성공!");
 
       } catch (error) {
@@ -119,7 +119,7 @@ export default {
     async deleteComment(commentId) {
       if (confirm("댓글을 삭제하시겠습니까?")) {
         try {
-          await axios.post(`http://localhost:8080/api/deleteComment/${commentId}`);
+          await apiClient.post(`http://localhost:8080/api/deleteComment/${commentId}`);
           alert("댓글이 삭제되었습니다.");
         } catch (error) {
           console.log(error);
