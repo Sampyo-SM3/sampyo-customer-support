@@ -17,7 +17,9 @@ public class CorsConfig {
                         "http://localhost:8081", 
                         "http://localhost:8080", 
                         "http://192.168.41.155:8081",
-                        "http://localhost:29000"  // 추가된 부분
+                        "http://localhost:29000",
+                        "http://172.17.22.120:8080",
+                        "http://172.17.22.120:8081"
                     )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
