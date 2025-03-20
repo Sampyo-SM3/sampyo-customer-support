@@ -354,11 +354,29 @@ export default {
       this.newComment.newComment = '';
     },
     // 추가된 메서드
-    saveStatus() {
-      this.management.PROGRESS = this.selectedStatus;
-      this.updateStep();
-      // 여기에 저장 로직을 추가할 수 있습니다
-      alert('상태가 저장되었습니다: ' + this.selectedStatus);
+    async saveStatus() {
+      try {
+        const statusData = {
+          seq: this.receivedSeq,
+          processState: this.selectedStatus
+        };
+
+        // API 요청: 댓글 DB에 저장
+        await apiClient.post("/api/updateStatus", statusData);
+        alert("접수상태가 저장되었습니다.");
+
+        // 상세정보 새로고침
+        this.fetchRequireDetail();
+
+        //this.management.PROGRESS = this.selectedStatus;
+        //this.updateStep();
+      } catch (error) {
+        console.error("상태 저장 실패");
+        this.fetchRequireDetail();
+      }
+
+
+
     }
   },
   computed: {
