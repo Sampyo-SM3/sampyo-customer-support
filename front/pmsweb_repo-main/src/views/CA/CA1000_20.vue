@@ -150,13 +150,16 @@ export default {
     receivedSeq: {
       type: [Number, String],
       required: false
-    }
+    },
+    userId: JSON.parse(localStorage.getItem("userInfo"))?.id || null
   },
   components: {
     CommentTree
   },
   data() {
     return {
+      userInfo: null,       //사용자 ID
+
       step: 1,
       selectedStatus: '', // 추가된 상태 변수
       inquiry: {
@@ -225,22 +228,18 @@ export default {
           map[status.codeId] = status.orderNum; // "P" → 1, "I" → 2, "H" → 3, "C" → 4
           return map;
         }, {});
-        console.log("✅ 상태 매핑 완료:", this.statusMapping);
 
       } catch (error) {
         console.error("❌ 오류 발생:", error);
       }
     },
     async fetchRequireDetail() {
-      console.log('--fetchRequireDetail--');
-      console.log(this.receivedSeq);
       try {
         await this.getStatus();
 
         const response = await axios.get("http://localhost:8080/api/require/detail", {
           params: { seq: this.receivedSeq }
         });
-        console.log("📌 받아온 데이터:", response.data);
         this.requireDetail = response.data; // 데이터를 저장
 
         this.step = this.statusMapping[response.data.processState] || 1;
@@ -263,7 +262,7 @@ export default {
           DELIVERABLES: response.data.finalDeliverables,
           DETAIL_TASK: response.data.detailTask,
           DETAIL_CONTENT: response.data.detailContent,
-          DETAIL_IT_DEV_REQUEST: response.data.detailItDevReques,
+          DETAIL_IT_DEV_REQUEST: response.data.detailItDevRequest,
           management: {
             PROGRESS: response.data.processState || "P" // 업데이트된 상태 적용
           }
@@ -288,7 +287,7 @@ export default {
       // 백엔드로 보낼 데이터 객체
       const commentData = {
         postId: Number(this.newComment.postId) || 1, // 게시글 ID
-        userId: this.newComment.userId || "test_user", // 유저 ID
+        userId: this.userInfo.id || "", // 유저 ID
         content: this.newComment.content, // 댓글 내용
         parentId: newParentId, // 부모 댓글 ID (없으면 NULL)
         depth: this.replyTo ? Number(this.replyTo.depth) + 1 : 0, // 대댓글이면 +1, 최상위 댓글이면 0
@@ -308,7 +307,6 @@ export default {
         // 댓글 목록 새로고침
         this.fetchComments();
       } catch (error) {
-        console.log(error);
         console.error("댓글 등록 실패");
         this.fetchComments();
       }
@@ -359,6 +357,8 @@ export default {
   created() {
     // 초기화 시 현재 상태 설정
     this.selectedStatus = this.management.PROGRESS;
+
+    this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
   },
   mounted() {
     //미처리 리스트 가져오기

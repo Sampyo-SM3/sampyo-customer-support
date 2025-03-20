@@ -68,11 +68,10 @@ export default {
     toggleReplyInput(cmt) {
       this.replyParent = cmt;
       this.showReplyInput = !this.showReplyInput;  // 클릭할 때마다 입력창 표시/숨김
+
+      console.log(this.userInfo);
     },
     async submitReply() {
-      console.log(this.replyParent);
-      console.log(this.replyContent);
-
       if (!this.replyContent.trim()) {
         alert("댓글을 입력해주세요.");
         return;
