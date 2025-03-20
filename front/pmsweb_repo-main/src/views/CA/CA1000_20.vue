@@ -236,34 +236,49 @@ export default {
     },
     async fetchRequireDetail() {
       try {
+        console.log("🚀 fetchRequireDetail() 실행!");
+
         const response = await apiClient.get("/api/require/detail", {
           params: { seq: this.receivedSeq }
         });
-        this.requireDetail = response.data; // 데이터를 저장
 
-        this.step = this.statusMapping[response.data.processState] || 1;
+        console.log("📌 API 응답 데이터:", response.data); // ✅ 응답 데이터 확인
+        console.log("📌 processState 값:", response.data?.processState); // ✅ processState 확인
+        console.log("📌 statusMapping 상태:", this.statusMapping); // ✅ statusMapping 객체 확인
 
-        // ✅ 선택된 상태 반영 (P, I, H, C → UI에서 표시할 text 값)
-        const matchedStatus = this.progressStatuses.find(status => status.value === response.data.processState);
+        // ✅ response.data 또는 processState가 존재하는지 확인 후 할당
+        if (!response.data || !response.data.processState) {
+          console.warn("⚠ processState 값이 없습니다. 기본값(P)로 설정합니다.");
+        }
+
+        const processState = response.data?.processState || "P"; // 기본값 설정
+
+        // ✅ 상태 매핑 체크 후 기본값 설정
+        this.step = this.statusMapping?.[processState] ?? 1;
+
+        console.log(`✅ this.step 값 설정됨: ${this.step}`);
+
+        // ✅ 선택된 상태 반영
+        const matchedStatus = this.progressStatuses.find(status => status.value === processState);
         this.selectedStatus = matchedStatus ? matchedStatus.value : "P";
 
-        // 받아온 데이터를 inquiry에 업데이트
+        // ✅ 받아온 데이터를 inquiry에 업데이트
         this.inquiry = {
-          REQUESTER_NAME: response.data.requesterName,
-          REQUESTER_DEPT_NM: response.data.requesterDeptNm,
-          REQUESTER_EMAIL: response.data.requesterEmail,
-          REQUESTER_PHONE: response.data.requesterPhone,
-          PROJECT_NAME: response.data.projectName,
-          BUSINESS_SECTOR: response.data.businessSector,
-          PROJECT_OVERVIEW: response.data.projectOverview,
-          PAIN_POINT: response.data.currentIssue,
-          EXPECTED_EFFECT: response.data.expectedEffect,
-          DELIVERABLES: response.data.finalDeliverables,
-          DETAIL_TASK: response.data.detailTask,
-          DETAIL_CONTENT: response.data.detailContent,
-          DETAIL_IT_DEV_REQUEST: response.data.detailItDevRequest,
+          REQUESTER_NAME: response.data?.requesterName || "",
+          REQUESTER_DEPT_NM: response.data?.requesterDeptNm || "",
+          REQUESTER_EMAIL: response.data?.requesterEmail || "",
+          REQUESTER_PHONE: response.data?.requesterPhone || "",
+          PROJECT_NAME: response.data?.projectName || "",
+          BUSINESS_SECTOR: response.data?.businessSector || "",
+          PROJECT_OVERVIEW: response.data?.projectOverview || "",
+          PAIN_POINT: response.data?.currentIssue || "",
+          EXPECTED_EFFECT: response.data?.expectedEffect || "",
+          DELIVERABLES: response.data?.finalDeliverables || "",
+          DETAIL_TASK: response.data?.detailTask || "",
+          DETAIL_CONTENT: response.data?.detailContent || "",
+          DETAIL_IT_DEV_REQUEST: response.data?.detailItDevRequest || "",
           management: {
-            PROGRESS: response.data.processState || "P" // 업데이트된 상태 적용
+            PROGRESS: processState
           }
         };
       } catch (error) {
@@ -320,12 +335,14 @@ export default {
         this.comments = response.data;
       } catch (error) {
         console.error('댓글 조회 실패:', error);
+        this.comments = []; // ✅ 오류 발생 시 빈 배열 설정
       }
       try {
         const response = await apiClient.get(`/api/comments/${this.receivedSeq}`);
         this.comments = response.data;
       } catch (error) {
         console.error('댓글 조회 실패:', error);
+        this.comments = []; // ✅ 오류 발생 시 빈 배열 설정
       }
     },
     handleReply(comment) {
@@ -346,12 +363,11 @@ export default {
   },
   computed: {
     topLevelComments() {
-      return this.comments.filter(comment => !comment.parentId);
+      return Array.isArray(this.comments) ? this.comments.filter(comment => !comment.parentId) : [];
     },
     commentTextLength() {
-      return this.comments.length;
+      return Array.isArray(this.comments) ? this.comments.length : 0;
     }
-
   },
   created() {
     // 초기화 시 현재 상태 설정
