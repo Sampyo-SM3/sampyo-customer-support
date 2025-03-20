@@ -96,7 +96,6 @@
 </template>
 
 <script>
-// import axios from 'axios'
 import { useAuthStore } from '@/store/auth';
 
 
@@ -123,11 +122,12 @@ export default {
     async login() {
       this.loading = true;
       
-      try {
-        // const response = await axios.post('http://localhost:8080/api/login', loginData);
+      try {        
         const success = await this.authStore.login({
-          username: this.username,
-          password: this.password
+          // username: this.username,
+          // password: this.password
+          username: '1',
+          password: '1' 
         });        
         
         if (success) {

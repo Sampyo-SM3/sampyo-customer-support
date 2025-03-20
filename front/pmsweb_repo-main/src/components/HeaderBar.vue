@@ -99,8 +99,9 @@ import { ref, defineComponent, onMounted, watch, provide  } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useAuthStore } from '@/store/auth';  
 import { useMenuStore } from '@/store/menuStore';
-import axios from 'axios'
 import { useRouter } from 'vue-router';  // useRouter 임포트
+import apiClient from '@/api';
+
 
 
 export default defineComponent({
@@ -154,7 +155,7 @@ export default defineComponent({
       console.log('----------fetchMenuData2----------')
       try {        
         isLoading.value = true        
-        const response = await axios.get('http://localhost:8080/api/menuitem', {
+        const response = await apiClient.get('/api/menuitem', {
           params: {
             auth: '',
             id: id

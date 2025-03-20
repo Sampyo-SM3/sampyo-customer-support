@@ -1,5 +1,6 @@
 <template style="margin-top:-30px;">
-  <v-container class="ml-16 mr-16">
+  <!-- <v-container class="ml-16 mr-16"> -->
+  <v-container fluid class="pr-5 pl-5 pt-7">    
     <!-- 진행 상태 표시 바 -->
     <v-row justify="center" class="mb-6 pt-6">
       <v-col cols="12" class="d-flex align-center justify-center">
@@ -141,7 +142,7 @@
 
 
 <script>
-import axios from "axios";
+import apiClient from '@/api';
 import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포넌트 import
 
 export default {
@@ -221,7 +222,7 @@ export default {
   methods: {
     async getStatus() {
       try {
-        const statusList = await axios.get("http://localhost:8080/api/status/list");
+        const statusList = await apiClient.get("/api/status/list");
         console.log('statusList' + statusList.data.codeName);
         this.progressStatuses = statusList.data.map(status => status.codeName);
 
@@ -233,7 +234,7 @@ export default {
       console.log('--fetchRequireDetail--');
       console.log(this.receivedSeq);
       try {
-        const response = await axios.get("http://localhost:8080/api/require/detail", {
+        const response = await apiClient.get("/api/require/detail", {
           params: { seq: this.receivedSeq }
         });
         console.log("📌 받아온 데이터:", response.data);
@@ -303,7 +304,7 @@ export default {
 
       try {
         // API 요청: 댓글 DB에 저장
-        await axios.post("http://localhost:8080/api/insertComment", commentData);
+        await apiClient.post("/api/insertComment", commentData);
         alert("댓글 등록 성공!");
 
         // 입력 필드 초기화
@@ -321,16 +322,16 @@ export default {
     async fetchComments() {
 
       try {
-        // const response = await axios.get(`http://localhost:8080/api/comments/${this.receivedSeq}`);
+        // const response = await apiClient.get(`/api/comments/${this.receivedSeq}`);
         this.comments = [];
-        const response = await axios.get(`http://localhost:8080/api/comments?postId=${this.receivedSeq}`);
-        // http://localhost:8080/api/comments?postId=1
+        const response = await apiClient.get(`/api/comments?postId=${this.receivedSeq}`);
+        // /api/comments?postId=1
         this.comments = response.data;
       } catch (error) {
         console.error('댓글 조회 실패:', error);
       }
       try {
-        const response = await axios.get(`http://localhost:8080/api/comments/${this.receivedSeq}`);
+        const response = await apiClient.get(`/api/comments/${this.receivedSeq}`);
         this.comments = response.data;
       } catch (error) {
         console.error('댓글 조회 실패:', error);

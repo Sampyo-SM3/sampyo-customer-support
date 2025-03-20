@@ -1,6 +1,7 @@
 // stores/auth.js
 import { defineStore } from "pinia";
 import axios from "axios";
+import apiClient from '@/api';
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
@@ -17,8 +18,8 @@ export const useAuthStore = defineStore("auth", {
       try {
         this.isLoading = true;
         this.error = null;
-        
-        const response = await axios.post('http://localhost:8080/api/login', {
+                
+        const response = await apiClient.post('/api/login', {
           id: credentials.username,
           password: credentials.password,          
         });
@@ -72,7 +73,7 @@ export const useAuthStore = defineStore("auth", {
       delete axios.defaults.headers.common['Authorization'];
       
       // 필요한 경우 서버에 로그아웃 요청
-      // axios.post('http://localhost:8080/api/logout');
+      // axios.post('http://222222:8080/api/logout');
     },
     
     // 사용자 정보 가져오기 --> 아직 사용안하는중
@@ -82,7 +83,7 @@ export const useAuthStore = defineStore("auth", {
       try {
         this.isLoading = true;
         
-        const response = await axios.get(`http://localhost:8080/api/user/${this.userId}`);
+        const response = await apiClient.get(`/api/user/${this.userId}`);
         
         if (response.data) {
           this.userInfo = response.data;

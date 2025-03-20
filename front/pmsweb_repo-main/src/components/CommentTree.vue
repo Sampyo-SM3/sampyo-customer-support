@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import apiClient from '@/api';
 
 export default {
   name: 'CommentTree',
@@ -95,7 +95,7 @@ export default {
 
       try {
         // API 요청: 댓글 DB에 저장
-        await axios.post("http://localhost:8080/api/insertComment", commentData);
+        await apiClient.post("api/insertComment", commentData);
         alert("댓글 등록 성공!");
 
       } catch (error) {

@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="pr-10 pl-10 pt-7">    
+  <v-container fluid class="pr-5 pl-5 pt-7">    
     
     
     <!-- <v-row>
@@ -253,8 +253,7 @@
 </template>
 
 <script>
-// import SideMenu from '@/components/SideMenu.vue';
-import axios from 'axios';
+import apiClient from '@/api';
 
 export default {
   data() {
@@ -532,7 +531,7 @@ export default {
         console.log(this.endDate);
         console.log(this.requesterId);
         // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
-        const response = await axios.get('http://localhost:8080/api/require/search', {
+        const response = await apiClient.get('/api/require/search', {
           params: {
             startDate: this.startDate + ' 00:00:00',
             endDate: this.endDate + ' 23:59:59',

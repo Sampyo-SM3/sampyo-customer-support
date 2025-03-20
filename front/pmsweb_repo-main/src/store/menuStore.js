@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
-import axios from "axios";
+// import axios from "axios";
+import apiClient from '@/api';
 
 export const useMenuStore = defineStore("menu", {
   state: () => ({
@@ -16,7 +17,7 @@ export const useMenuStore = defineStore("menu", {
       try {
         this.isLoading = true;
         
-        const response = await axios.get("http://localhost:8080/api/menuitem", {        
+        const response = await apiClient.get("/api/menuitem", {        
           params: {
             auth: auth,
             id: id,
@@ -59,7 +60,7 @@ export const useMenuStore = defineStore("menu", {
         
         // 회원 정보를 가져오는 API 호출
         /*
-        const response = await axios.get("http://localhost:8080/api/user", {
+        const response = await axios.get("http://123:8080/api/user", {
           params: {
             id: this.userId
           }
