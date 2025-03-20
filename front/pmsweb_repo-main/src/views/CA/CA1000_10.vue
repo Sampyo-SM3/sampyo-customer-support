@@ -1,10 +1,10 @@
 <template>
   <v-container fluid class="pr-10 pl-10 pt-7">    
     
-    <v-row>
-      <div class="breadcrumb-div pl-3"> {{ savedMidMenu }} &nbsp; > &nbsp; {{ savedSubMenu }}</div>
-      
-    </v-row>
+    
+    <!-- <v-row>
+      <div class="breadcrumb-div pl-3"> {{ savedMidMenu }} &nbsp; > &nbsp; {{ savedSubMenu }}</div>      
+    </v-row> -->
 
     <v-row>
       <v-col>        
