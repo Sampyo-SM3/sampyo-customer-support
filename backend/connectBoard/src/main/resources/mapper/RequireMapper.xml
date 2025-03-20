@@ -93,6 +93,29 @@
 	</where>
 		ORDER BY seq
 	</select>
+	
+	<!-- 게시글 등록 -->
+	<insert id="insertRequire" parameterType="com.example.connectBoard.dto.RequireDTO">
+        INSERT INTO board (
+            projectName,
+            insertDt,
+            updateDt,
+            requesterId,
+            requesterName,
+            processState
+        ) VALUES (
+            #{projectName, jdbcType=VARCHAR},
+            GETDATE(),
+            GETDATE(),
+            #{requesterId, jdbcType=VARCHAR},
+            #{requesterName, jdbcType=VARCHAR},
+            #{processState, jdbcType=VARCHAR}
+        )
+    	)
+    	
+    	
+    	
+	</insert>	
 
 </mapper>
 

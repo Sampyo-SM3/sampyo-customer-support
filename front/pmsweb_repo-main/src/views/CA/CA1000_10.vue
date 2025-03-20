@@ -118,7 +118,7 @@
       <v-col class="d-flex align-center">
         <v-btn variant="flat" color="primary" class="custom-btn mr-2 white-text d-flex align-center" size="small">
           <v-icon size="default" class="mr-1">mdi-account</v-icon>
-          CS담당자 지정
+          test
         </v-btn>
         <span class="mx-3">
           <span class="text-subtitle-2 text-grey">총 </span>
@@ -130,11 +130,18 @@
         </span>
 
         <v-spacer></v-spacer>
+        
+        <v-btn 
+          variant="flat" 
+          color="success" 
+          class="custom-btn white-text d-flex align-center" 
+          size="small" 
+          @click="$router.push({ name: 'CA_PostCreateForm' })">
 
-        <v-btn variant="flat" color="success" class="custom-btn white-text d-flex align-center" size="small">
-          <v-icon size="default" class="mr-1">mdi-file-excel</v-icon>
-          엑셀 다운로드
+          <v-icon size="default" class="mr-1">mdi-pencil</v-icon>
+          게시글 작성
         </v-btn>
+        
       </v-col>
     </v-row>
 
@@ -166,7 +173,7 @@
             <div class="td-cell">{{ item.seq }}</div>
             <div class="td-cell">{{ formatDate(item.insertDt) }}</div>
             <div class="td-cell title-cell">
-              <router-link :to="{ name: 'CA1000_20', params: { receivedSeq: item.seq } }" class="title-link">{{
+              <router-link :to="{ name: 'CA_PostDetailForm', params: { receivedSeq: item.seq } }" class="title-link">{{
                 item.projectName }}</router-link>
             </div>
             <div class="td-cell">{{ item.businessSector }}</div>
@@ -685,6 +692,7 @@ export default {
   padding-block: 10px;
   padding-left: 10px;
   width: 800px;
+  font-weight: 400;
 }
 
 .select-btn {
@@ -798,12 +806,49 @@ export default {
   /* 하단 테두리 제거 */
 }
 
+/* 테두리 라운드 처리를 위한 스타일 */
 .search-row.top-row {
-  border-top: 3px solid #e0e0e0;
+  border-top: 2px solid #e0e0e0;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  overflow: hidden;
 }
 
 .search-row.bottom-row {
   border-bottom: 2px solid #e0e0e0;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  overflow: hidden;
+}
+
+.search-row.bottom-row .search-col:first-child {
+  border-bottom-left-radius: 8px;
+}
+
+/* 마지막 열에 오른쪽 라운드 적용 */
+.search-row.top-row .search-col:last-child {
+  border-top-right-radius: 8px;
+}
+
+.search-row.bottom-row .search-col:last-child {
+  border-bottom-right-radius: 8px;
+}
+
+/* 전체 검색 영역에 그림자 효과 추가 (선택사항) */
+.search-row {
+  display: flex;
+  align-items: stretch;
+  min-height: 40px;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 0;
+  border-left: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+}
+
+
+/* 첫 번째 열에 왼쪽 라운드 적용 */
+.search-row.top-row .search-col:first-child {
+  border-top-left-radius: 8px;
 }
 
 .search-col {
@@ -819,6 +864,7 @@ export default {
   flex-grow: 0;
 }
 
+/* 수정된 스타일 */
 .label-box {
   width: 80px;
   flex-shrink: 0;
@@ -828,8 +874,8 @@ export default {
   justify-content: center;
   font-size: 14px;
   font-weight: 500;
-  color: #578ADB;
-  background-color: #f5f5f5;
+  color: #333333;
+  background-color: #e6eef8; /* 그리드 헤더와 같은 색상으로 변경 */
   white-space: nowrap;
   padding: 0 4px;
   border-right: 1px solid #eaeaea;
