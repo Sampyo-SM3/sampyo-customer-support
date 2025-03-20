@@ -126,8 +126,8 @@
 
           <!-- 댓글 입력 -->
           <div class="comment-input-container" :class="{ 'mt-20': commentTextLength === 0 }">
-            <v-textarea v-model="newComment.content" :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"
-              class="custom-textarea"></v-textarea>
+            <v-textarea id="commentArea" v-model="newComment.content"
+              :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'" class="custom-textarea"></v-textarea>
             <div class="btn-container">
               <v-btn v-if="replyTo" text @click="cancelReply" class="mr-2">답글 취소</v-btn>
               <v-btn class="custom-btn" @click="addComment()">등록</v-btn>
@@ -242,10 +242,6 @@ export default {
           params: { seq: this.receivedSeq }
         });
 
-        console.log("📌 API 응답 데이터:", response.data); // ✅ 응답 데이터 확인
-        console.log("📌 processState 값:", response.data?.processState); // ✅ processState 확인
-        console.log("📌 statusMapping 상태:", this.statusMapping); // ✅ statusMapping 객체 확인
-
         // ✅ response.data 또는 processState가 존재하는지 확인 후 할당
         if (!response.data || !response.data.processState) {
           console.warn("⚠ processState 값이 없습니다. 기본값(P)로 설정합니다.");
@@ -320,6 +316,7 @@ export default {
 
         // 댓글 목록 새로고침
         this.fetchComments();
+
       } catch (error) {
         console.error("댓글 등록 실패");
         this.fetchComments();
