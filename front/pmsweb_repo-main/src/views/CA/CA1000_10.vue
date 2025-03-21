@@ -95,6 +95,7 @@
     </v-row>
 
     <br>
+    <br>
 
     <div class="d-flex justify-center">      
       <!-- <v-btn variant="flat" class="select-btn d-flex align-center pl-3 pr-4" size="large" @click="fetchData()">
@@ -110,16 +111,16 @@
     <br>
 
     <br>
-    <v-divider></v-divider>
+    <!-- <v-divider></v-divider> -->
     <br>
 
     <!-- 데이터 테이블 상단 버튼 영역 -->
     <v-row class="top-button-row mb-2">
       <v-col class="d-flex align-center">
-        <v-btn variant="flat" color="primary" class="custom-btn mr-2 white-text d-flex align-center" size="small">
+        <!-- <v-btn variant="flat" color="primary" class="custom-btn mr-2 white-text d-flex align-center" size="small">
           <v-icon size="default" class="mr-1">mdi-account</v-icon>
           test
-        </v-btn>
+        </v-btn> -->
         <span class="mx-3">
           <span class="text-subtitle-2 text-grey">총 </span>
           <span class="text-subtitle-2 font-weight-bold">{{ totalItems }}</span>
@@ -285,7 +286,7 @@ export default {
       errorMessages: [],
       showError: false,
       savedMidMenu: '',
-      savedSubMenu: '',      
+      savedSubMenu: '',
     }
   },
 
@@ -534,9 +535,6 @@ export default {
 
       this.loading = true;
       try {
-        console.log(this.startDate);
-        console.log(this.endDate);
-        console.log(this.requesterId);
         // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
         const response = await apiClient.get('/api/require/search', {
           params: {
@@ -545,7 +543,7 @@ export default {
             requesterId: this.requesterId
           }
         });
-
+        
         // API 응답 데이터 처리
         if (response.data && Array.isArray(response.data)) {
           this.tableData = response.data.map(item => ({

@@ -55,7 +55,7 @@
         취소
     </v-btn>                
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <v-btn variant="flat" color="primary" class="custom-btn mr-2 white-text d-flex align-center" size="large" @click="fetchData()">
+      <v-btn variant="flat" color="primary" class="custom-btn mr-2 white-text d-flex align-center" size="large" @click="insertBoard()">
           <v-icon size="default" class="mr-1">mdi-check</v-icon>
           접수
       </v-btn>                          
@@ -79,7 +79,7 @@
 </template>
 
 <script>
-// import apiClient from '@/api';
+import apiClient from '@/api';
 
 export default {
   data() {
@@ -88,6 +88,7 @@ export default {
       errorMessages: [],
       showError: false,
       userName: null,
+      userId: null,
       title: '',
       content: ''
     }
@@ -111,7 +112,62 @@ export default {
     this.getUserInfo();
   },
 
-  methods: {        
+  methods: {    
+    validateBoard() {      
+      // 검증 초기화
+      this.errorMessages = [];
+      
+      // 제목 검증
+      if (!this.title || this.title.trim() === '') {
+        this.errorMessages.push('제목을 입력해주세요.');
+        this.showError = true;
+        return false;
+      }
+      
+      // 내용 검증
+      if (!this.content || this.content.trim() === '') {
+        this.errorMessages.push('내용을 입력해주세요.');
+        this.showError = true;
+        return false;
+      }
+      
+      return true;
+    },
+
+    async insertBoard() {
+      this.showError = false;
+
+      if (!this.validateBoard()) {
+        return; // 검증 실패 시 함수 종료
+      }
+
+      try {
+        const boardData = {
+          "projectName": this.title,
+          "projectContent": this.content,
+          "requesterId": this.userId,
+          "requesterName": this.userName,
+          "processState": "C",
+          "businessSector": "시멘트"
+        };
+
+        const response = await apiClient.post("/api/require/insert", boardData);
+        
+        console.log("게시글이 성공적으로 등록되었습니다.", response.data);
+        // 여기에 성공 후 처리할 로직 추가 (예: 목록 페이지로 이동, 알림 표시 등)
+        this.$router.push({ name: 'CA1000_10' });
+        
+        
+      } catch (error) {
+        // 에러 처리
+        console.error("게시글 등록 중 오류가 발생했습니다.", error);
+        
+        // 스낵바에 오류 메시지 표시
+        this.errorMessages = ["게시글 등록 중 오류가 발생했습니다."];
+        this.showError = true;        
+      }
+},
+
     checkLocalStorage() {
       const midMenuFromStorage = localStorage.getItem('midMenu');
       const subMenuFromStorage = localStorage.getItem('subMenu');
@@ -125,7 +181,8 @@ export default {
 
     getUserInfo() {
       // localStorage에서 userInfo를 가져와서 userName에 할당
-      this.userName = JSON.parse(localStorage.getItem("userInfo"))?.name || null;
+      this.userName = JSON.parse(localStorage.getItem("userInfo"))?.name || null;      
+      this.userId = JSON.parse(localStorage.getItem("userInfo"))?.id || null;
     },
 
     goBack() {

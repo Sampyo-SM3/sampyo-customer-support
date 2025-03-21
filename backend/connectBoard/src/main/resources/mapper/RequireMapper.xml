@@ -30,6 +30,7 @@
 			updateDt,
 			completeDt
 		from board;
+		
 	</select>
 	
 	<!-- ✅ 특정 SEQ 데이터 조회 -->
@@ -91,13 +92,15 @@
 	        AND insertDt &lt;= #{endDate}
 	    </if>
 	</where>
-		ORDER BY seq
+		ORDER BY seq DESC
 	</select>
 	
 	<!-- 게시글 등록 -->
 	<insert id="insertRequire" parameterType="com.example.connectBoard.dto.RequireDTO">
         INSERT INTO board (
             projectName,
+            projectContent,
+            businessSector,
             insertDt,
             updateDt,
             requesterId,
@@ -105,12 +108,13 @@
             processState
         ) VALUES (
             #{projectName, jdbcType=VARCHAR},
+            #{projectContent, jdbcType=VARCHAR},
+            #{businessSector, jdbcType=VARCHAR},
             GETDATE(),
             GETDATE(),
             #{requesterId, jdbcType=VARCHAR},
             #{requesterName, jdbcType=VARCHAR},
-            #{processState, jdbcType=VARCHAR}
-        )
+            #{processState, jdbcType=VARCHAR}        
     	)
     	
     	

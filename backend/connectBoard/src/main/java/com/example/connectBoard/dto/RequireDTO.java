@@ -10,6 +10,7 @@ import lombok.Setter;
 public class RequireDTO {
     private Integer seq;
     private String projectName;
+    private String projectContent;
     private String businessSector;
     private String projectOverview;
     private String requesterPosition;
