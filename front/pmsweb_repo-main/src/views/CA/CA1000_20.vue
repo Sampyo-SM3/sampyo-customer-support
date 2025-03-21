@@ -126,8 +126,8 @@
 
           <!-- 댓글 입력 -->
           <div class="comment-input-container" :class="{ 'mt-20': commentTextLength === 0 }">
-            <v-textarea id="commentArea" v-model="newComment.content"
-              :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'" class="custom-textarea"></v-textarea>
+            <v-textarea v-model="newComment.content" :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"
+              class="custom-textarea"></v-textarea>
             <div class="btn-container">
               <v-btn v-if="replyTo" text @click="cancelReply" class="mr-2">답글 취소</v-btn>
               <v-btn class="custom-btn" @click="addComment()">등록</v-btn>
@@ -252,8 +252,6 @@ export default {
         // ✅ 상태 매핑 체크 후 기본값 설정
         this.step = this.statusMapping?.[processState] ?? 1;
 
-        console.log(`✅ this.step 값 설정됨: ${this.step}`);
-
         // ✅ 선택된 상태 반영
         const matchedStatus = this.progressStatuses.find(status => status.value === processState);
         this.selectedStatus = matchedStatus ? matchedStatus.value : "P";
@@ -308,7 +306,7 @@ export default {
       try {
         // API 요청: 댓글 DB에 저장
         await apiClient.post("/api/insertComment", commentData);
-        alert("댓글 등록 성공!");
+        alert("댓글이 저장되었습니다.");
 
         // 입력 필드 초기화
         this.newComment.content = "";
