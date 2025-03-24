@@ -1,802 +1,1096 @@
-<template style="margin-top:-30px;">
-  <!-- <v-container class="ml-16 mr-16"> -->
+<template>
   <v-container fluid class="pr-5 pl-5 pt-7">
-    <!-- 진행 상태 표시 바 -->
-    <v-row justify="center" class="mb-6 pt-6">
-      <v-col cols="12" class="d-flex align-center justify-center">
-        <div class="stepper-container">
-          <div v-for="(status, index) in progressStatuses" :key="index" class="stepper-item"
-            :class="{ active: step >= index + 1 }">
-            <div class="step-circle">{{ index + 1 }}</div>
-            <span class="step-label">{{ status.text }}</span>
-            <div v-if="index < progressStatuses.length - 1" class="step-line"
-              :class="{ 'step-line-active': step > index + 1 }"></div>
-          </div>
-        </div>
-      </v-col>
-    </v-row>
 
-    <!-- 접수 상태 버튼 -->
-    <v-row class="mt-10">
-      <v-col cols="auto" class="d-flex align-center">
-        <div class="status-selection-container">
-          <div class="status-label-box">
-            <span>접수상태</span>
-          </div>
-          <div class="status-select-box">
-            <v-select v-model="selectedStatus" :items="progressStatuses" item-title="text" item-value="value"
-              hide-details density="compact" variant="plain" class="status-select"></v-select>
-          </div>
-        </div>
-        <v-btn class=" action-btn save-btn" @click="saveStatus">
-          저장
-        </v-btn>
-      </v-col>
-    </v-row>
+
+    <!-- <v-row>
+      <div class="breadcrumb-div pl-3"> {{ savedMidMenu }} &nbsp; > &nbsp; {{ savedSubMenu }}</div>      
+    </v-row> -->
 
     <v-row>
-      <v-col cols="12">
-        <!-- 상단: 요구사항 정의서 -->
-        <div>
-          <div class="section-title">
-            <div class="info-title-after"></div>요구사항 정의서
-          </div>
-
-          <v-card class="pa-4 mt- info-card">
-            <!-- 요청자 정보 -->
-            <div class="info-subtitle">&nbsp;요청자 정보</div>
-            <v-simple-table dense class="custom-table outline1">
-              <tbody>
-                <tr>
-                  <th class="table-header">요청자</th>
-                  <td class="outlineTd">{{ inquiry.REQUESTER_NAME }}</td>
-                  <th class="table-header">소속</th>
-                  <td class="outlineTd">{{ inquiry.REQUESTER_DEPT_NM }}</td>
-                  <th class="table-header">이메일</th>
-                  <td class="outlineTd">{{ inquiry.REQUESTER_EMAIL }}</td>
-                  <th class="table-header">연락처</th>
-                  <td class="outlineTd">{{ inquiry.REQUESTER_PHONE }}</td>
-                </tr>
-              </tbody>
-            </v-simple-table>
-
-            <!-- 개요 -->
-            <div class="info-subtitle pt-5">&nbsp;개요</div>
-            <v-simple-table dense class="custom-table outline1">
-              <tbody>
-                <tr>
-                  <th class="table-header">과제명</th>
-                  <td class="outlineTd">{{ inquiry.PROJECT_NAME }}</td>
-                  <th class="table-header">과제 개요</th>
-                  <td class="outlineTd">{{ inquiry.PROJECT_OVERVIEW }}</td>
-                  <th class="table-header">사업 부문</th>
-                  <td class="outlineTd">{{ inquiry.BUSINESS_SECTOR }}</td>
-                </tr>
-                <tr>
-                  <th class="table-header">기존 문제점</th>
-                  <td class="outlineTd">{{ inquiry.PAIN_POINT }}</td>
-                  <th class="table-header">기대 효과</th>
-                  <td class="outlineTd">{{ inquiry.EXPECTED_EFFECT }}</td>
-                  <th class="table-header">최종 산출물</th>
-                  <td class="outlineTd">{{ inquiry.DELIVERABLES }}</td>
-                </tr>
-              </tbody>
-            </v-simple-table>
-
-            <!-- 세부 요구사항 -->
-            <div class="info-subtitle pt-5">&nbsp;세부 요구사항</div>
-            <v-simple-table dense class="custom-table outline2">
-              <thead>
-                <tr>
-                  <th>세부 실행 과제</th>
-                  <th>내용</th>
-                  <th>IT 개발 요청</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="outlineTd">{{ inquiry.DETAIL_TASK }}</td>
-                  <td class="outlineTd">{{ inquiry.DETAIL_CONTENT }}</td>
-                  <td class="outlineTd">{{ inquiry.DETAIL_IT_DEV_REQUEST }}</td>
-                </tr>
-              </tbody>
-            </v-simple-table>
-          </v-card>
+      <v-col>
+        <div class="title-div">SR요청</div>
+        <div class="mt-2">
+          <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
       </v-col>
     </v-row>
 
+    <br>
 
-    <!-- 하단: 댓글 섹션을 아래로 배치 -->
-    <v-row>
-      <v-col cols="12">
-        <div class="section-title">
-          <div class="info-title-after"></div>답변 내용
-        </div>
-
-        <v-card class="pa-4 info-card">
-          <!-- 댓글 섹션 -->
-          <div v-if="commentTextLength > 0">
-            <div class="info-subtitle">댓글 {{ commentTextLength }}</div>
-            <v-card id="commentArea" class="pa-3 mb-3 info-inner-card">
-              <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
-                :all-comments="comments" @refresh="fetchComments" />
-            </v-card>
+    <v-row no-gutters class="search-row top-row">
+      <!-- 요청기간 -->
+      <v-col class="search-col request-period">
+        <div class="label-box">요청기간</div>
+        <div class="input-container pt-2 pb-2">
+          <div class="date-wrapper">
+            <!-- 시작일 입력 필드 -->
+            <v-menu v-model="startDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
+              min-width="auto">
+              <template v-slot:activator="{ props }">
+                <div class="date-field-wrapper" v-bind="props">
+                  <v-text-field v-model="startDate" class="date-input" density="compact" hide-details readonly
+                    variant="plain"></v-text-field>
+                  <div class="calendar-icon-container">
+                    <v-btn icon class="calendar-btn">
+                      <v-icon size="small" color="#7A7A7A">mdi-calendar-search</v-icon>
+                    </v-btn>
+                  </div>
+                </div>
+              </template>
+              <v-date-picker v-model="Date_startDate" @update:model-value="startDateMenu = false" locale="ko-KR"
+                elevation="1" color="blue" width="290" first-day-of-week="1" show-adjacent-months scrollable
+                :allowed-dates="allowedDates"></v-date-picker>
+            </v-menu>
           </div>
 
-          <!-- 댓글 입력 -->
-          <div class="comment-input-container" :class="{ 'mt-20': commentTextLength === 0 }">
-            <v-textarea v-model="newComment.content" :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"
-              class="custom-textarea"></v-textarea>
-            <div class="btn-container">
-              <v-btn v-if="replyTo" text @click="cancelReply" class="mr-2">답글 취소</v-btn>
-              <v-btn class="custom-btn" @click="addComment()">등록</v-btn>
+          <span class="date-separator">~</span>
+
+          <div class="date-wrapper">
+            <!-- 종료일 입력 필드 -->
+            <v-menu v-model="endDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
+              min-width="auto">
+              <template v-slot:activator="{ props }">
+                <div class="date-field-wrapper" v-bind="props">
+                  <v-text-field v-model="endDate" class="date-input" density="compact" hide-details readonly
+                    variant="plain"></v-text-field>
+                  <div class="calendar-icon-container">
+                    <v-btn icon class="calendar-btn">
+                      <v-icon size="small" color="#7A7A7A">mdi-calendar-search</v-icon>
+                    </v-btn>
+                  </div>
+                </div>
+              </template>
+              <v-date-picker v-model="Date_endDate" @update:model-value="endDateMenu = false" locale="ko-KR"
+                elevation="1" color="blue" width="290" first-day-of-week="1" show-adjacent-months scrollable
+                :allowed-dates="allowedDates"></v-date-picker>
+            </v-menu>
+          </div>
+
+          <div class="date-buttons">
+            <div class="date-btn-container">
+              <v-btn value="today" class="date-btn" :class="{ 'active-date-btn': dateRange === 'today' }"
+                @click="setDateRange('today')">오늘</v-btn>
+              <v-btn value="week" class="date-btn" :class="{ 'active-date-btn': dateRange === 'week' }"
+                @click="setDateRange('week')">1주일</v-btn>
+              <v-btn value="15days" class="date-btn" :class="{ 'active-date-btn': dateRange === '15days' }"
+                @click="setDateRange('15days')">15일</v-btn>
+              <v-btn value="month" class="date-btn" :class="{ 'active-date-btn': dateRange === 'month' }"
+                @click="setDateRange('month')">1개월</v-btn>
+              <v-btn value="3months" class="date-btn" :class="{ 'active-date-btn': dateRange === '3months' }"
+                @click="setDateRange('3months')">3개월</v-btn>
             </div>
           </div>
+        </div>
+      </v-col>
+    </v-row>
 
-        </v-card>
+    <v-row no-gutters class="search-row bottom-row">
+      <v-col class="search-col product-category">
+        <div class="label-box">담당자</div>
+
+        <v-text-field v-model="requesterId" placeholder="담당자명 입력을 입력하세요" clearable hide-details density="compact"
+          variant="outlined" class="manager-search"></v-text-field>
+      </v-col>
+
+    </v-row>
+
+    <br>
+    <br>
+
+    <div class="d-flex justify-center">
+      <!-- <v-btn variant="flat" class="select-btn d-flex align-center pl-3 pr-4" size="large" @click="fetchData()">
+        <v-icon size="default" class="mr-1">mdi-account</v-icon>
+        조회
+      </v-btn> -->
+      <v-btn variant="flat" color="primary" class="custom-btn mr-2 white-text d-flex align-center" size="small"
+        @click="fetchData()">
+        <v-icon size="default" class="mr-1">mdi-magnify</v-icon>
+        조회
+      </v-btn>
+    </div>
+    <br>
+    <br>
+
+    <br>
+    <!-- <v-divider></v-divider> -->
+    <br>
+
+    <!-- 데이터 테이블 상단 버튼 영역 -->
+    <v-row class="top-button-row mb-2">
+      <v-col class="d-flex align-center">
+        <!-- <v-btn variant="flat" color="primary" class="custom-btn mr-2 white-text d-flex align-center" size="small">
+          <v-icon size="default" class="mr-1">mdi-account</v-icon>
+          test
+        </v-btn> -->
+        <span class="mx-3">
+          <span class="text-subtitle-2 text-grey">총 </span>
+          <span class="text-subtitle-2 font-weight-bold">{{ totalItems }}</span>
+          <!-- <span class="text-subtitle-2 text-grey">건</span> -->
+          <span class="text-subtitle-2 text-grey"> / 미처리: </span>
+          <span class="text-subtitle-2 font-weight-bold text-red">{{ getUnprocessedCount() }}</span>
+
+        </span>
+
+        <v-spacer></v-spacer>
+
+        <v-btn variant="flat" color="success" class="custom-btn white-text d-flex align-center" size="small"
+          @click="$router.push({ name: 'CA_PostCreateForm' })">
+
+          <v-icon size="default" class="mr-1">mdi-pencil</v-icon>
+          게시글 작성
+        </v-btn>
+
+      </v-col>
+    </v-row>
+
+    <!-- 데이터 테이블 -->
+    <v-row class="grid-table ma-0 pa-0">
+      <v-col class="pa-0">
+        <div class="table-container">
+          <!-- 테이블 헤더 -->
+          <div class="table-header">
+            <div class="th-cell checkbox-cell">
+              <v-checkbox hide-details density="compact" v-model="selectAll" @change="toggleSelectAll"></v-checkbox>
+            </div>
+            <div class="th-cell">접수번호</div>
+            <div class="th-cell">요청일</div>
+            <div class="th-cell">제목</div>
+            <div class="th-cell">사업부문</div>
+            <div class="th-cell">진행상태</div>
+            <div class="th-cell">완료일</div>
+            <div class="th-cell">담당자</div>
+            <div class="th-cell">소요시간</div>
+            <!-- <div class="th-cell">메모</div> -->
+          </div>
+
+          <!-- 테이블 데이터 행 -->
+          <div v-for="(item, index) in paginatedData" :key="index" class="table-row">
+            <div class="td-cell checkbox-cell">
+              <v-checkbox hide-details density="compact" v-model="item.selected"></v-checkbox>
+            </div>
+            <div class="td-cell">{{ item.seq }}</div>
+            <div class="td-cell">{{ formatDate(item.insertDt) }}</div>
+            <div class="td-cell title-cell">
+              <router-link :to="{ name: 'CA_PostDetailForm2', params: { receivedSeq: item.seq } }" class="title-link">{{
+                item.projectName }}</router-link>
+            </div>
+            <div class="td-cell">{{ item.businessSector }}</div>
+            <div class="td-cell" :class="getStatusClass(item.status)">{{ item.status }}</div>
+            <div class="td-cell">{{ formatDate(item.completeDt) }}</div>
+            <div class="td-cell">{{ item.manager || '-' }}</div>
+            <div class="td-cell">{{ calculateDuration(item.insertDt, item.completeDt) }}</div>
+            <!-- <div class="td-cell">{{ item.memo || '-' }}</div> -->
+          </div>
+        </div>
+
+        <!-- 로딩 표시 -->
+        <div v-if="loading" class="loading-overlay">
+          <v-progress-circular indeterminate color="primary"></v-progress-circular>
+        </div>
+
+        <!-- 데이터 없음 표시 -->
+        <div v-if="!loading && tableData.length === 0" class="no-data">
+          조회된 데이터가 없습니다.
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div class="pagination-container" v-if="tableData.length > 0">
+          <v-btn icon="mdi-chevron-left" variant="text" size="small" :disabled="currentPage === 1"
+            @click="currentPage--"></v-btn>
+
+          <template v-if="totalPages <= 5">
+            <v-btn v-for="page in totalPages" :key="page" size="small" :variant="currentPage === page ? 'flat' : 'text'"
+              :color="currentPage === page ? 'primary' : ''" @click="currentPage = page">
+              {{ page }}
+            </v-btn>
+          </template>
+
+          <template v-else>
+            <!-- 처음 페이지 -->
+            <v-btn v-if="currentPage > 3" size="small" variant="text" @click="currentPage = 1">
+              1
+            </v-btn>
+
+            <!-- 생략 표시 -->
+            <span v-if="currentPage > 3" class="mx-1">...</span>
+
+            <!-- 이전 페이지 -->
+            <v-btn v-if="currentPage > 1" size="small" variant="text" @click="currentPage = currentPage - 1">
+              {{ currentPage - 1 }}
+            </v-btn>
+
+            <!-- 현재 페이지 -->
+            <v-btn size="small" variant="flat" color="primary">
+              {{ currentPage }}
+            </v-btn>
+
+            <!-- 다음 페이지 -->
+            <v-btn v-if="currentPage < totalPages" size="small" variant="text" @click="currentPage = currentPage + 1">
+              {{ currentPage + 1 }}
+            </v-btn>
+
+            <!-- 생략 표시 -->
+            <span v-if="currentPage < totalPages - 2" class="mx-1">...</span>
+
+            <!-- 마지막 페이지 -->
+            <v-btn v-if="currentPage < totalPages - 2" size="small" variant="text" @click="currentPage = totalPages">
+              {{ totalPages }}
+            </v-btn>
+          </template>
+
+          <v-btn icon="mdi-chevron-right" variant="text" size="small" :disabled="currentPage === totalPages"
+            @click="currentPage++"></v-btn>
+        </div>
       </v-col>
     </v-row>
   </v-container>
-</template>
 
+  <!-- 스낵바로 오류 메시지 표시 -->
+  <v-snackbar v-model="showError" color="warning" timeout="5000" location="center" elevation="8" variant="elevated">
+    {{ errorMessages[0] }}
+
+    <template v-slot:actions>
+      <v-btn variant="text" @click="showError = false">
+        닫기
+      </v-btn>
+    </template>
+  </v-snackbar>
+</template>
 
 <script>
 import apiClient from '@/api';
-import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포넌트 import
 
 export default {
-  // props 정의 추가
-  props: {
-    receivedSeq: {
-      type: [Number, String],
-      required: false
-    },
-    userId: JSON.parse(localStorage.getItem("userInfo"))?.id || null
-  },
-  components: {
-    CommentTree
-  },
   data() {
     return {
-      userInfo: null,       //사용자 ID
-
-      step: 1,
-      selectedStatus: '', // 추가된 상태 변수
-      inquiry: {
-        REQUESTER_NAME: "",
-        REQUESTER_DEPT_NM: "",
-        REQUESTER_EMAIL: "",
-        REQUESTER_PHONE: "",
-        PROJECT_NAME: "",
-        BUSINESS_SECTOR: "",
-        PROJECT_OVERVIEW: "",
-        PAIN_POINT: "",
-        EXPECTED_EFFECT: "",
-        DELIVERABLES: "",
-        DETAIL_TASK: "",
-        DETAIL_CONTENT: "",
-        DETAIL_IT_DEV_REQUEST: "",
-        REQUESTERID: "",
-        // 아래 데이터는 DETAIL_TASK, DETAIL_CONTENT, DETAIL_IT_DEV_REQUEST로 가져오고 있습니다.
-        // 추후 데이터를 한 줄 씩 보여주는 방식으로 변경하면 아래 주석 부분을 사용해야 합니다.
-        /////////////////////////////////////////////////////////////////////////////////
-        // DETAIL_REQUIREMENTS: [
-        //   {
-        //     taskName: "1-1 몰탈 문서발급 메뉴 생성",
-        //     description: "스마트 오더 홈페이지에 몰탈 제품 관련 문서 자료를 다운받을 수 있는 자료실 개설",
-        //     itRequest: "스마트 오더 '몰탈 문서발급' 메뉴 신설, 회원 및 사업자 로그인 후 접근 가능"
-        //   },
-        //   {
-        //     taskName: "1-2 삼표 스마트오더 홈페이지 접근성 개선",
-        //     description: "네이버, 구글 등 주요 포털 사이트에서 '삼표 몰탈', '삼표 문서', '삼표 스마트오더' 검색 시 상위 노출되도록 조정",
-        //     itRequest: "네이버 고객센터 등 연락하여 검색 로직 수정 요청"
-        //   }
-        // ]
-      },
-      management: {
-        PROGRESS: ""
-      },
-      answer: "",
-      comments: [],
-      newComment: {
-        content: "", // 댓글 내용
-        postId: null, // 게시글 ID
-        userId: "test_user", // 유저 ID
-        parentId: null // 부모 댓글 ID
-      },
-      replyTo: null,
-      sectors: ["시멘트", "분체", "골재", "몰탈", "레미콘", "기타"],
-      progressStatuses: [],
-      qaTypes: ["제품/기술문의", "배차문의", "불편사항", "자료요청", "1:1문의"],
-      receiptPaths: ["WEB", "KAKAO", "CALL", "CRM", "SIDP"],
-
-    };
+      Date_startDate: new Date(),
+      Date_endDate: new Date(),
+      startDate: '',
+      endDate: '',
+      startDateMenu: false,  // 시작일 날짜 선택기 메뉴 표시 여부
+      endDateMenu: false,    // 종료일 날짜 선택기 메뉴 표시 여부
+      requesterId: '',
+      dateRange: 'month',
+      productType: 'test1',
+      tableData: [],
+      loading: false,
+      selectAll: false,
+      // 페이징 관련 변수
+      currentPage: 1,
+      itemsPerPage: 10,
+      // 상태값 목록 (실제 API에서 받아올 수 있음)
+      statusList: ['미처리', '진행중', '보류중', '종결'],
+      errorMessages: [],
+      showError: false,
+      savedMidMenu: '',
+      savedSubMenu: '',
+    }
   },
+
+  computed: {
+    // 전체 페이지 수 계산
+    totalPages() {
+      return Math.ceil(this.tableData.length / this.itemsPerPage);
+    },
+
+    // 현재 페이지에 표시할 데이터
+    paginatedData() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.tableData.slice(start, end);
+    },
+
+    // 전체 아이템 수
+    totalItems() {
+      return this.tableData.length;
+    }
+  },
+
+  watch: {
+    // API 파라미터가 변경되면 데이터 다시 로드
+    startDate() {
+      this.currentPage = 1; // 검색 조건 변경 시 첫 페이지로 리셋      
+    },
+    endDate() {
+      this.currentPage = 1;
+    },
+    Date_startDate(newValue) {
+      if (newValue) {
+        // Date 객체를 'YYYY-MM-DD' 형식의 문자열로 변환
+        const date = new Date(newValue);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        // 형식화된 문자열을 startDate에 할당
+        this.startDate = `${year}-${month}-${day}`;
+      } else {
+        this.startDate = '';
+      }
+    },
+    Date_endDate(newValue) {
+      if (newValue) {
+        // Date 객체를 'YYYY-MM-DD' 형식의 문자열로 변환
+        const date = new Date(newValue);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        // 형식화된 문자열을 startDate에 할당
+        this.endDate = `${year}-${month}-${day}`;
+      } else {
+        this.endDate = '';
+      }
+    }
+  },
+
+  mounted() {
+    // 컴포넌트 마운트 시 기본 날짜 범위 설정
+    this.setDateRange('month');
+    // 데이터 로드
+    this.fetchData();
+
+    this.checkLocalStorage();
+  },
+
   methods: {
-    async getStatus() {
-      try {
-        const statusList = await apiClient.get("/api/status/list");
+    checkLocalStorage() {
+      const midMenuFromStorage = localStorage.getItem('midMenu');
+      const subMenuFromStorage = localStorage.getItem('subMenu');
 
-        // 상태 이름 리스트 저장
-        this.progressStatuses = statusList.data.map(status => ({
-          text: status.codeName,  // UI에 표시할 값
-          value: status.codeId    // 실제 선택될 값
-        }));
+      this.savedMidMenu = midMenuFromStorage ? JSON.parse(midMenuFromStorage) : null;
+      this.savedSubMenu = subMenuFromStorage ? JSON.parse(subMenuFromStorage) : null;
 
-        // 상태 매핑 (codeName → 숫자 변환용)
-        this.statusMapping = statusList.data.reduce((map, status) => {
-          map[status.codeId] = status.orderNum; // "P" → 1, "I" → 2, "H" → 3, "C" → 4
-          return map;
-        }, {});
-
-      } catch (error) {
-        console.error("❌ 오류 발생:", error);
-      }
+      console.log('메뉴 클릭 후 midMenu:', this.savedMidMenu);
+      console.log('메뉴 클릭 후 subMenu:', this.savedSubMenu);
     },
-    async fetchRequireDetail() {
-      try {
-        console.log("🚀 fetchRequireDetail() 실행!");
 
-        const response = await apiClient.get("/api/require/detail", {
-          params: { seq: this.receivedSeq }
-        });
+    isValidDate(options = {}) {
+      // console.log('--isValidDate--')
+      const errors = [];
 
-        // ✅ response.data 또는 processState가 존재하는지 확인 후 할당
-        if (!response.data || !response.data.processState) {
-          console.warn("⚠ processState 값이 없습니다. 기본값(P)로 설정합니다.");
+      // 기본 옵션 설정
+      const {
+        maxDays = null,
+        allowFutureDates = true,
+        allowPastDates = true,
+        minDate = null,
+        maxDate = null,
+      } = options;
+
+      // 1. 기본 입력 검사
+      if (!this.startDate || !this.endDate) {
+        errors.push('시작일과 종료일을 모두 입력해주세요.');
+        return { isValid: false, errors };
+      }
+
+      // 2. 날짜 형식 검사 (YYYY-MM-DD)
+      const dateFormatRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateFormatRegex.test(this.startDate)) {
+        errors.push('시작일의 형식이 올바르지 않습니다. (YYYY-MM-DD)');
+      }
+      if (!dateFormatRegex.test(this.endDate)) {
+        errors.push('종료일의 형식이 올바르지 않습니다. (YYYY-MM-DD)');
+      }
+
+      // 형식이 올바르지 않으면 여기서 중단
+      if (errors.length > 0) {
+        return { isValid: false, errors };
+      }
+
+      // 3. 유효한 날짜인지 검사
+      const isValidDateObj = (dateStr) => {
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const date = new Date(year, month - 1, day);
+        return (
+          date.getFullYear() === year &&
+          date.getMonth() === month - 1 &&
+          date.getDate() === day
+        );
+      };
+
+      if (!isValidDateObj(this.startDate)) {
+        errors.push('시작일이 유효한 날짜가 아닙니다.');
+      }
+      if (!isValidDateObj(this.endDate)) {
+        errors.push('종료일이 유효한 날짜가 아닙니다.');
+      }
+
+      // 유효한 날짜가 아니면 여기서 중단
+      if (errors.length > 0) {
+        return { isValid: false, errors };
+      }
+
+      // 날짜 객체 생성
+      const startDate = new Date(this.startDate);
+      const endDate = new Date(this.endDate);
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
+
+      // 4. 날짜 범위 검사 (시작일 <= 종료일)
+      if (startDate > endDate) {
+        errors.push('시작일이 종료일보다 나중일 수 없습니다.');
+      }
+
+      // 5. 최대 기간 검사
+      if (maxDays) {
+        const diffTime = Math.abs(endDate - startDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays > maxDays) {
+          errors.push(`조회 기간은 최대 ${maxDays}일까지 가능합니다.`);
         }
-
-        const processState = response.data?.processState || "P"; // 기본값 설정
-
-        // ✅ 상태 매핑 체크 후 기본값 설정
-        this.step = this.statusMapping?.[processState] ?? 1;
-
-        // ✅ 선택된 상태 반영
-        const matchedStatus = this.progressStatuses.find(status => status.value === processState);
-        this.selectedStatus = matchedStatus ? matchedStatus.value : "P";
-
-        // ✅ 받아온 데이터를 inquiry에 업데이트
-        this.inquiry = {
-          REQUESTER_NAME: response.data?.requesterName || "",
-          REQUESTER_DEPT_NM: response.data?.requesterDeptNm || "",
-          REQUESTER_EMAIL: response.data?.requesterEmail || "",
-          REQUESTER_PHONE: response.data?.requesterPhone || "",
-          PROJECT_NAME: response.data?.projectName || "",
-          BUSINESS_SECTOR: response.data?.businessSector || "",
-          PROJECT_OVERVIEW: response.data?.projectOverview || "",
-          PAIN_POINT: response.data?.currentIssue || "",
-          EXPECTED_EFFECT: response.data?.expectedEffect || "",
-          DELIVERABLES: response.data?.finalDeliverables || "",
-          DETAIL_TASK: response.data?.detailTask || "",
-          DETAIL_CONTENT: response.data?.detailContent || "",
-          DETAIL_IT_DEV_REQUEST: response.data?.detailItDevRequest || "",
-          management: {
-            PROGRESS: processState
-          }
-        };
-      } catch (error) {
-        console.error("❌ 오류 발생:", error);
       }
-    },
-    updateStep() {
-      this.step = this.progressStatuses.indexOf(this.management.PROGRESS) + 1;
-    },
-    async addComment() {
 
-      if (!this.newComment.content) {
-        alert("댓글을 입력해주세요.");
+      // 7. 현재 날짜와 비교
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // 시간 부분 제거
+
+      // 미래 날짜 검사
+      if (!allowFutureDates && startDate > today) {
+        errors.push('시작일은 오늘 이후일 수 없습니다.');
+      }
+
+      // 과거 날짜 검사
+      if (!allowPastDates && endDate < today) {
+        errors.push('종료일은 오늘 이전일 수 없습니다.');
+      }
+
+      // 8. 허용된 날짜 범위 검사
+      if (minDate) {
+        const minDateObj = new Date(minDate);
+        if (startDate < minDateObj) {
+          errors.push(`시작일은 ${minDate} 이후여야 합니다.`);
+        }
+      }
+
+      if (maxDate) {
+        const maxDateObj = new Date(maxDate);
+        if (endDate > maxDateObj) {
+          errors.push(`종료일은 ${maxDate} 이전이어야 합니다.`);
+        }
+      }
+
+      // 최종 결과 반환
+      return {
+        isValid: errors.length === 0,
+        errors
+      };
+    },
+
+    // 날짜 범위 설정 함수
+    setDateRange(range) {
+      this.dateRange = range;
+      const today = new Date();
+      let start = new Date(today);
+
+      switch (range) {
+        case 'today':
+          // 오늘 날짜로 시작일과 종료일 모두 설정
+          break;
+        case 'week':
+          // 1주일 전
+          start.setDate(today.getDate() - 7);
+          break;
+        case '15days':
+          // 15일 전
+          start.setDate(today.getDate() - 15);
+          break;
+        case 'month':
+          // 1개월 전
+          start.setMonth(today.getMonth() - 1);
+          break;
+        case '3months':
+          // 3개월 전
+          start.setMonth(today.getMonth() - 3);
+          break;
+      }
+
+      this.startDate = this.formatDateForInput(start);
+      this.endDate = this.formatDateForInput(today);
+
+    },
+
+    // API 호출하여 데이터 가져오기
+    async fetchData() {
+
+      // 날짜 유효성 검사
+      const validation = this.isValidDate({
+        maxDays: 60,                    // 최대 90일까지만 선택 가능
+        allowFutureDates: false,        // 미래 날짜 불허용
+        minDate: '2025-01-01',          // 최소 날짜
+        maxDate: '2025-12-31',          // 최대 날짜        
+      });
+
+      if (!validation.isValid) {
+        // 오류 메시지 표시
+        this.errorMessages = validation.errors;
+        this.showError = true;
         return;
       }
 
-      // 부모 댓글인지 확인 후 parentId 설정
-      var newParentId = this.replyTo ? this.replyTo.commentId : null;
 
-      // 백엔드로 보낼 데이터 객체
-      const commentData = {
-        postId: Number(this.newComment.postId) || 1, // 게시글 ID
-        userId: this.userInfo.id || "", // 유저 ID
-        content: this.newComment.content, // 댓글 내용
-        parentId: newParentId, // 부모 댓글 ID (없으면 NULL)
-        depth: this.replyTo ? Number(this.replyTo.depth) + 1 : 0, // 대댓글이면 +1, 최상위 댓글이면 0
-        createdAt: new Date().toISOString(),
-        deleteYn: "N"
-      };
-
+      this.loading = true;
       try {
-        // API 요청: 댓글 DB에 저장
-        await apiClient.post("/api/insertComment", commentData);
-        alert("댓글이 저장되었습니다.");
+        // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
+        const response = await apiClient.get('/api/require/search', {
+          params: {
+            startDate: this.startDate + ' 00:00:00',
+            endDate: this.endDate + ' 23:59:59',
+            requesterId: this.requesterId
+          }
+        });
 
-        // 입력 필드 초기화
-        this.newComment.content = "";
-        this.replyTo = null;
+        // API 응답 데이터 처리
+        if (response.data && Array.isArray(response.data)) {
+          this.tableData = response.data.map(item => ({
+            ...item,
+            selected: false,
+            // API에서 진행상태가 오지 않으면 임의로 설정
+            status: item.processState || this.getRandomStatus(),
 
-        // 댓글 목록 새로고침
-        this.fetchComments();
+            // 테이블에 표시할 데이터 매핑
+            manager: item.requesterId || '-',  // 담당자 필드가 없어서 임시로 요청자 ID 사용
+            memo: item.currentIssue || '-'     // 메모 필드가 없어서 임시로 현재 이슈 사용
+          }));
 
+          // 서버 측 페이징 구현시 전체 개수 설정 (API 응답에서 받아야 함)
+          // this.totalItems = response.data.totalItems;
+        } else {
+          this.tableData = [];
+        }
       } catch (error) {
-        console.error("댓글 등록 실패");
-        this.fetchComments();
+        console.error('데이터 로드 중 오류 발생:', error);
+        // 오류 발생 시 테스트 데이터 로드 (개발용)
+        //   this.loadTestData();
+      } finally {
+        this.loading = false;
       }
     },
-    async fetchComments() {
 
-      try {
-        // const response = await apiClient.get(`/api/comments/${this.receivedSeq}`);
-        this.comments = [];
-        const response = await apiClient.get(`/api/comments?postId=${this.receivedSeq}`);
-        // /api/comments?postId=1
-        this.comments = response.data;
-      } catch (error) {
-        console.error('댓글 조회 실패:', error);
-        this.comments = []; // ✅ 오류 발생 시 빈 배열 설정
-      }
-      try {
-        const response = await apiClient.get(`/api/comments/${this.receivedSeq}`);
-        this.comments = response.data;
-      } catch (error) {
-        console.error('댓글 조회 실패:', error);
-        this.comments = []; // ✅ 오류 발생 시 빈 배열 설정
-      }
-    },
-    handleReply(comment) {
-      this.replyTo = comment;
-    },
+    // 테스트 데이터 로드 (API 연결 전이나 오류 시 사용)
+    loadTestData() {
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      const lastWeek = new Date(today);
+      lastWeek.setDate(today.getDate() - 7);
 
-    cancelReply() {
-      this.replyTo = null;
-      this.newComment.newComment = '';
-    },
-    // 추가된 메서드
-    async saveStatus() {
-      try {
-        const statusData = {
-          seq: this.receivedSeq,
-          processState: this.selectedStatus
+      // 20개의 테스트 데이터 생성
+      this.tableData = Array.from({ length: 20 }, (_, i) => {
+        const insertDate = new Date(today);
+        insertDate.setDate(today.getDate() - (i * 3));
+
+        const completeDate = i % 4 === 0 ? null : new Date(insertDate);
+        if (completeDate) {
+          completeDate.setDate(insertDate.getDate() + (i % 10) + 1);
+        }
+
+        const statusIndex = i % 4;
+
+        return {
+          seq: `REQ${(1000 + i).toString().padStart(3, '0')}`,
+          selected: false,
+          insertDt: insertDate.toISOString(),
+          projectName: `프로젝트 요청 ${i + 1}`,
+          businessSector: ['IT부문', '영업부문', '개발부문', '마케팅부문', '생산부문'][i % 5],
+          status: this.statusList[statusIndex],
+          completeDt: completeDate?.toISOString() || null,
+          manager: [`김담당`, `이매니저`, `박책임`, `최팀장`, `정대리`][i % 5],
+          memo: statusIndex === 0 ? '긴급 처리 필요' : statusIndex === 1 ? '일정 조정 중' : statusIndex === 2 ? '진행 보류 요청' : '정상 처리 완료'
         };
+      });
+    },
 
-        // API 요청: 댓글 DB에 저장
-        await apiClient.post("/api/updateStatus", statusData);
-        alert("접수상태가 저장되었습니다.");
+    // 날짜 포맷 함수 (ISO 문자열 -> YYYY-MM-DD 형식)
+    formatDate(dateString) {
+      if (!dateString) return '-';
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '-';
 
-        // 상세정보 새로고침
-        this.fetchRequireDetail();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    },
 
-        //this.management.PROGRESS = this.selectedStatus;
-        //this.updateStep();
-      } catch (error) {
-        console.error("상태 저장 실패");
-        this.fetchRequireDetail();
+    // 입력용 날짜 포맷 함수
+    formatDateForInput(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    },
+
+    // 소요시간 계산 함수
+    calculateDuration(startDate, endDate) {
+      if (!startDate || !endDate) return '-';
+
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) return '-';
+
+      const diffTime = Math.abs(end - start);
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      const diffHours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+      return `${diffDays}일 ${diffHours}시간`;
+    },
+
+    // 미처리 건수 계산
+    getUnprocessedCount() {
+      return this.tableData.filter(item => item.status === '미처리').length;
+    },
+
+    // 전체 선택/해제 토글
+    toggleSelectAll() {
+      // 현재 페이지의 항목만 선택/해제
+      this.paginatedData.forEach(item => {
+        item.selected = this.selectAll;
+      });
+    },
+
+    // 랜덤 상태값 반환 (API에서 상태값이 없을 경우 사용)
+    getRandomStatus() {
+      return this.statusList[Math.floor(Math.random() * this.statusList.length)];
+    },
+
+    // 상태에 따른 클래스 반환
+    getStatusClass(status) {
+      switch (status) {
+        case '미처리':
+          return 'text-error';
+        case '진행중':
+          return 'text-info';
+        case '보류중':
+          return 'text-warning';
+        case '종결':
+          return 'text-success';
+        default:
+          return '';
       }
-
-
-
-    }
-  },
-  computed: {
-    topLevelComments() {
-      return Array.isArray(this.comments) ? this.comments.filter(comment => !comment.parentId) : [];
-    },
-    commentTextLength() {
-      return Array.isArray(this.comments) ? this.comments.length : 0;
-    }
-  },
-  created() {
-    // 초기화 시 현재 상태 설정
-    this.selectedStatus = this.management.PROGRESS;
-
-    this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
-  },
-  mounted() {
-    //미처리 리스트 가져오기
-    this.getStatus();
-
-    // 요구사항 정의서 데이터 가져오기
-    this.fetchRequireDetail(); // API 호출
-
-    // 댓글 데이터 가져오기
-    this.fetchComments();
-
-  },
-  watch: {
-    receivedSeq: {
-      immediate: true  // 컴포넌트 생성 시점에도 즉시 실행
-    },
-    selectedStatus(newVal, oldVal) {
-      console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
     }
   }
-};
-</script>
+}</script>
 
 <style scoped>
-.template {
-  font-family: "Noto Sans KR", sans-serif;
-}
-
-.stepper-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  max-width: 600px;
-  position: relative;
-  user-select: none;
-}
-
-.stepper-item {
-  display: flex;
-  align-items: center;
-  position: relative;
-  flex: 1;
-}
-
-.step-circle {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background-color: lightgray;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: bold;
-  color: white;
-  z-index: 2;
-  user-select: none;
-}
-
-.step-label {
-  margin-top: 12px;
-  text-align: center;
-  font-size: 14px;
-  font-weight: bold;
-  position: absolute;
-  bottom: -30px;
-  left: 15%;
-  transform: translateX(-50%);
-  user-select: none;
-}
-
-.step-line {
-  position: absolute;
-  width: 100%;
-  height: 5px;
-  background-color: lightgray;
-  /* 기본 회색 */
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1;
-  transition: background-color 0.3s ease-in-out;
-  /* 색상 변경 애니메이션 */
-}
-
-/* ✅ 진행된 상태일 때 파란색으로 변경 */
-.step-line-active {
-  background-color: #5B9BD5;
-}
-
-.active .step-circle {
-  background-color: #1867C0;
-  font-size: 20px;
-}
-
-.active .step-label {
-  color: #1867C0;
-}
-
-.info-title {
-  color: black;
-  /* 파란색 강조 */
-  margin-right: 8px;
-}
-
-.section-title {
-  font-size: 20px;
-  margin-bottom: 15px;
-  font-weight: 500;
-}
-
-.info-subtitle {
-  font-size: 16px;
-  line-height: 22px;
-  color: #666;
-  -webkit-text-size-adjust: none;
-  letter-spacing: -0.05em;
-  margin: 20px 0 6px;
-  font-weight: 500;
-}
-
-.info-title-after {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 17px;
-  background-color: #1867C0;
-  margin-right: 10px;
-  margin-bottom: 3px;
-  position: relative;
-  top: 4px;
-}
-
-.info-card {
-  background-color: #f9f9f9;
-  border-radius: 0;
-  box-shadow: none;
-  border: 1px solid #ddd;
-  padding-top: 0 !important;
-}
-
-.custom-table {
-  width: 100%;
-  display: table !important;
-  border-collapse: collapse;
-}
-
-.custom-table th,
-.custom-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-
-.custom-table th {
-  background-color: #f1f1f1;
-  font-weight: bold;
-}
-
-.custom-table td {
-  background-color: white !important;
-}
-
-.dot {
-  color: #1867C0;
-  /* 파란색 점 */
-  font-weight: bold;
-  margin-right: 5px;
-}
-
-.separator {
-  color: #E1E1E1;
-  /* 색상 변경 */
-  margin-right: 5px;
-}
-
-.info-inner-card {
-  background-color: #ffffff;
-  border-radius: 0;
-  /* 내부 카드도 각지게 */
-  padding: 12px;
-  box-shadow: none !important;
-  border: 1px solid #E3E3E3;
-}
-
-.greyText {
-  color: #747470;
-}
-
-.info-title-after {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 17px;
-  background-color: #1867C0;
-  margin-right: 10px;
-  margin-bottom: 3px;
-  position: relative;
-  top: 4px;
-}
-
-#commentArea {
-  max-height: auto;
-  overflow-y: auto;
-  overflow-x: hidden;
-  border: 1px solid #E3E3E3;
-}
-
-.comment-item {
-  display: flex;
-  width: 100%;
-  padding: 10px;
-}
-
-.comment-content {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.comment-text {
-  text-align: left;
-  font-size: 16px;
-  margin-bottom: 5px;
-}
-
-.comment-timestamp {
-  text-align: right;
+.breadcrumb-div {
   font-size: 12px;
-  color: gray;
+  color: #A1A6A6;
 }
 
-.info-text::before {
-  content: "";
-  display: inline-block;
-  width: 1px;
-  height: 11px;
-  background-color: #e1e1e1;
-  margin-right: 10px;
-  margin-left: 20px;
+.title-div {
+  font-size: 25px;
 }
 
-.top-border {
-  width: 100%;
-  height: 2px;
-  background-color: #1867C0
+.manager-search {
+  padding-block: 10px;
+  padding-left: 10px;
+  width: 800px;
+  font-weight: 400;
 }
 
-/* 제목 박스 스타일 */
-.title-text {
-  font-size: 15px;
-  background-color: #f5f5f5;
-  padding: 10px;
-}
-
-/* 카드 스타일 수정 */
-.custom-card {
-  background-color: #ffffff;
-  border-radius: 0;
-  /* 모서리 각지게 */
-  border: 1px solid #ddd;
-  padding: 15px;
-}
-
-.leftForm {
-  width: 900px;
-  margin-top: 10px;
-}
-
-.rightForm {
-  width: 670px;
-  margin-top: 10px;
-  margin-left: 20px;
+.select-btn {
+  color: white;
+  background-color: #23BBF5 !important;
 }
 
 .custom-btn {
-  background-color: #1867C0;
-  color: white;
-  font-size: 13px;
-  border: none;
-  box-shadow: none;
+  font-size: 14px;
+  height: 35px;
+  border-radius: 10px;
+
+}
+
+/* 날짜 선택 관련 스타일 */
+.date-field-wrapper {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+
+}
+
+.date-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 125px;
+  color: #7A5344;
+}
+
+.date-input {
+  width: 120px;
+  align-items: center;
+  /* 수직 가운데 정렬 */
+}
+
+.date-input :deep(.v-field__input) {
+  font-size: 15px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.calendar-icon-container {
+  display: flex;
+  align-items: center;
+  margin-left: 12px;
+}
+
+.calendar-btn {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  z-index: 1;
+}
+
+.date-separator {
+  margin: 0 10px;
+  font-size: 16px;
+  color: #757575;
+}
+
+.date-buttons {
+  margin-left: 20px;
+}
+
+.date-btn-container {
+  display: flex;
+}
+
+.date-btn {
+  min-width: 48px;
+  padding: 0 12px;
+  height: 32px;
+  letter-spacing: -0.5px;
+  border: 1px solid #eaeaea;
   border-radius: 0;
-  margin-top: -10px !important;
+  background-color: #ffffff;
+  color: #7A5344;
+  box-shadow: none;
+  margin: 0;
 }
 
-.comment-input-container {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+.date-btn:not(:first-child) {
+  border-left: none;
 }
 
-.btn-container {
-  display: flex;
-  justify-content: flex-end;
+.date-btn:hover {
+  background-color: #f9f9f9;
 }
 
-.mt-20 {
-  margin-top: 20px;
+.date-btn.active {
+  background-color: #e8f4fd;
+  color: #2196F3;
 }
 
-/* 개요테이블 제목 가로길이 */
-.outline1 .table-header {
-  width: 130px !important;
-  font-size: 14.5px;
+.active-date-btn {
+  background-color: #e8f4fd !important;
+  color: #2196F3 !important;
+  border-color: #2196F3 !important;
   font-weight: 500;
-  color: #333333;
-  font-size: 14px;
-  /* color: #753333; */
+  border-left: 1px solid #2196F3 !important;
 }
 
-.outline2 thead th {
-  width: 130px !important;
-  color: #333333;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.outlineTd {
-  font-size: 13.5px;
-  color: #666666;
-  font-family: "Noto Sans KR"
-}
-
-.status-selection-container {
+.search-row {
   display: flex;
-  width: 250px;
-  height: 38px;
-  border: 1px solid #DEE2E6;
-  margin-left: 6px;
+  align-items: stretch;
+  min-height: 40px;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 0;
+  /* 하단 테두리 제거 */
 }
 
-.status-label-box {
-  width: 90px;
+/* 테두리 라운드 처리를 위한 스타일 */
+.search-row.top-row {
+  border-top: 2px solid #e0e0e0;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  overflow: hidden;
+}
+
+.search-row.bottom-row {
+  border-bottom: 2px solid #e0e0e0;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  overflow: hidden;
+}
+
+.search-row.bottom-row .search-col:first-child {
+  border-bottom-left-radius: 8px;
+}
+
+/* 마지막 열에 오른쪽 라운드 적용 */
+.search-row.top-row .search-col:last-child {
+  border-top-right-radius: 8px;
+}
+
+.search-row.bottom-row .search-col:last-child {
+  border-bottom-right-radius: 8px;
+}
+
+/* 전체 검색 영역에 그림자 효과 추가 (선택사항) */
+.search-row {
+  display: flex;
+  align-items: stretch;
+  min-height: 40px;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 0;
+  border-left: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+}
+
+
+/* 첫 번째 열에 왼쪽 라운드 적용 */
+.search-row.top-row .search-col:first-child {
+  border-top-left-radius: 8px;
+}
+
+.search-col {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border-left: 1px solid #e0e0e0;
+}
+
+.request-period,
+.product-category {
+  max-width: 550px;
+  flex-grow: 0;
+}
+
+/* 수정된 스타일 */
+.label-box {
+  width: 80px;
+  flex-shrink: 0;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #F8F9FA;
-  color: #4A5568;
   font-size: 14px;
-  border-right: 1px solid #DEE2E6;
   font-weight: 500;
-  border-radius: 0px;
+  color: #333333;
+  background-color: #e6eef8;
+  /* 그리드 헤더와 같은 색상으로 변경 */
+  white-space: nowrap;
+  padding: 0 4px;
+  border-right: 1px solid #eaeaea;
 }
 
-.status-select-box {
-  width: 150px;
-  font-size: 14px;
-  background-color: #FFFFFF;
-}
-
-.status-select :deep(.v-field) {
-  border-radius: 0px;
-  box-shadow: none !important;
-}
-
-.status-select :deep(.v-field__input) {
-  padding: 0 12px;
-  font-size: 14px;
+.input-container {
   display: flex;
   align-items: center;
+  flex: 1;
+  padding: 0 16px;
 }
 
-.action-btn {
-  width: 65px;
-  height: 40px;
-  text-transform: none;
-  font-size: 14px;
-  border-radius: 4px;
-  letter-spacing: 0;
-  background-color: #1867C0;
-  color: white;
-  box-shadow: none !important;
-  margin-left: 8px;
-}
-
-.gap-4 {
-  gap: 5px;
-}
-
-.comment-item {
-  margin-bottom: 16px;
-  border-bottom: 1px solid #eee;
-}
-
-.comment-header {
-  display: flex;
-  justify-content: space-between;
+/* 상단 버튼 행 스타일 */
+.top-button-row {
   margin-bottom: 8px;
 }
 
-.comment-user {
+.white-text {
+  color: white !important;
+}
+
+/* 테이블 스타일 */
+.table-container {
+  border: 1px solid #e0e0e0;
+  width: 100%;
+  position: relative;
+  border-radius: 10px;
+  /* 모서리 라운드 처리 */
+  overflow: hidden;
+  /* 내부 요소가 라운드 처리된 모서리를 벗어나지 않도록 함 */
+}
+
+/* 1페이지의 1행만 열 간격이 틀어지는 현상이 있어서 강제로 사이즈를 지정함 */
+.table-header,
+.table-row {
+  display: grid;
+  grid-template-columns: 60px 80px 100px 1fr 100px 90px 100px 90px 100px;
+}
+
+.table-header {
+  background-color: #D0DFF1;
   font-weight: 500;
-  color: #333;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-.comment-timestamp {
-  font-size: 12px;
-  color: #666;
+.table-row {
+  border-bottom: 1px solid #e0e0e0;
 }
 
-.comment-actions {
-  margin-top: 8px;
+.table-row:hover {
+  background-color: #f9f9f9;
+}
+
+.th-cell,
+.td-cell {
+  padding: 8px 12px;
+  border-right: 1px solid #e0e0e0;
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  font-size: 13px;
 }
 
-.comment-text {
-  color: #444;
+.th-cell {
+  justify-content: center;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/*
+.th-cell:last-child,
+.td-cell:last-child {
+  border-right: none;
+}
+*/
+
+.th-cell,
+.td-cell {
+  padding: 8px 12px;
+  border-right: none;
+  /* 오른쪽 테두리 제거 */
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+}
+
+.checkbox-cell {
+  flex: 0 0 60px;
+  justify-content: center;
+}
+
+.th-cell:nth-child(2),
+.td-cell:nth-child(2) {
+  flex: 0 0 80px;
+  justify-content: center;
+}
+
+/* 접수번호 */
+.th-cell:nth-child(3),
+.td-cell:nth-child(3) {
+  flex: 0 0 100px;
+  justify-content: center;
+}
+
+/* 요청일 */
+.th-cell:nth-child(4),
+.td-cell:nth-child(4) {
+  flex: 1;
+}
+
+/* 제목 */
+.th-cell:nth-child(5),
+.td-cell:nth-child(5) {
+  flex: 0 0 100px;
+  justify-content: center;
+}
+
+/* 사업부문 */
+.th-cell:nth-child(6),
+.td-cell:nth-child(6) {
+  flex: 0 0 90px;
+  justify-content: center;
+}
+
+/* 진행상태 */
+.th-cell:nth-child(7),
+.td-cell:nth-child(7) {
+  flex: 0 0 100px;
+  justify-content: center;
+}
+
+/* 완료일 */
+.th-cell:nth-child(8),
+.td-cell:nth-child(8) {
+  flex: 0 0 90px;
+  justify-content: center;
+}
+
+/* 담당자 */
+.th-cell:nth-child(9),
+.td-cell:nth-child(9) {
+  flex: 0 0 100px;
+  justify-content: center;
+}
+
+/* 소요시간 */
+/* .th-cell:nth-child(10), .td-cell:nth-child(10) { flex: 0 0 180px; }  */
+
+.header-with-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.header-divider {
+  height: 16px !important;
+}
+
+.title-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-left: 12px;
+}
+
+.title-link {
+  color: #1976d2;
+  text-decoration: none;
+}
+
+.title-link:hover {
+  text-decoration: underline;
+}
+
+.file-indicator {
+  color: #2196F3;
+  margin-left: 4px;
+}
+
+.text-error {
+  color: #f44336;
+}
+
+.text-info {
+  color: #2196F3;
+}
+
+.text-warning {
+  color: #FB8C00;
+}
+
+.text-success {
+  color: #4CAF50;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+}
+
+.no-data {
+  padding: 30px;
+  text-align: center;
+  color: #757575;
   font-size: 14px;
-  line-height: 1.5;
 }
 </style>

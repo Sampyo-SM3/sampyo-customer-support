@@ -45,13 +45,16 @@ export default {
     allComments: {
       type: Array,
       required: true
-    }
+    },
+    
   },
   data() {
     return {
       showReplyInput: false,  // 답글 입력창 표시 여부
       replyContent: "",        // 답글 입력 내용
-      replyParent: {}
+      replyParent: {},
+      userId: null,            // 사용자 ID 변수 추가
+      userName: null,            
     };
   },
   computed: {
@@ -62,18 +65,45 @@ export default {
       return {
         marginLeft: `${(this.comment.depth - 1) * 20}px`
       };
-    }
+    },        
+  },
+  created() {
+    // 컴포넌트가 생성될 때 로컬 스토리지에서 사용자 정보 가져오기
+    this.getUserInfoFromLocalStorage();
+  },
+  // 페이지 이동 시에도 사용자 정보를 가져오도록 설정
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.getUserInfoFromLocalStorage();
+    });
+  },
+  // 라우트가 업데이트될 때도 사용자 정보를 가져오도록 설정
+  beforeRouteUpdate(to, from, next) {
+    this.getUserInfoFromLocalStorage();
+    next();
   },
   methods: {
+    getUserInfoFromLocalStorage() {
+      // 로컬 스토리지에서 사용자 정보 가져와서 userId에 설정
+      this.userId = JSON.parse(localStorage.getItem("userInfo"))?.id || null;
+      this.userName = JSON.parse(localStorage.getItem("userInfo"))?.name || null;
+    },
     toggleReplyInput(cmt) {
       this.replyParent = cmt;
       this.showReplyInput = !this.showReplyInput;  // 클릭할 때마다 입력창 표시/숨김
-
-      console.log(this.userInfo);
+      
+      // 토글 시 최신 사용자 정보 다시 가져오기
+      this.getUserInfoFromLocalStorage();
     },
     async submitReply() {
       if (!this.replyContent.trim()) {
         alert("댓글을 입력해주세요.");
+        return;
+      }
+
+      // 사용자 ID가 없으면 알림
+      if (!this.userId) {
+        alert("로그인이 필요합니다.");
         return;
       }
 
@@ -84,7 +114,7 @@ export default {
       // DB에 저장할 댓글 데이터
       const commentData = {
         postId: this.replyParent.postId || 1,  // 게시글 ID
-        userId: "test_user",  // 유저 ID
+        userId: this.userName,  // 유저 ID 변경
         content: this.replyContent,  // 댓글 내용
         parentId: newParentId,  // 부모 댓글 ID (없으면 NULL)
         depth: newDepth,  // 대댓글이면 부모 depth + 1, 최상위 댓글이면 0
@@ -117,6 +147,9 @@ export default {
       return dateStr.split('.').join('-');
     },
     async deleteComment(commentId) {
+      // 사용자 ID 확인 (최신 정보로 갱신)
+      this.getUserInfoFromLocalStorage();
+      
       if (confirm("댓글을 삭제하시겠습니까?")) {
         try {
           await apiClient.post(`/api/deleteComment/${commentId}`);

@@ -1,5 +1,6 @@
 package com.example.connectBoard.controller;
 
+import com.example.connectBoard.dto.CommentDTO;
 import com.example.connectBoard.dto.RequireDTO;
 import com.example.connectBoard.dto.RequireSearchCriteria;
 import com.example.connectBoard.service.RequireService;
@@ -9,6 +10,8 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,12 +48,7 @@ public class RequireController {
     }
     
     @GetMapping("/require/search")
-    public ResponseEntity<?> searchRequires(@ModelAttribute RequireSearchCriteria criteria) {
-    	System.out.println("------searchRequires()-----");
-        System.out.println("Search Criteria: " + criteria);
-        System.out.println("startDate: " + criteria.getStartDate());
-        System.out.println("endDate: " + criteria.getEndDate());
-        System.out.println("requesterId: " + criteria.getRequesterId());
+    public ResponseEntity<?> searchRequires(@ModelAttribute RequireSearchCriteria criteria) {    	
         try {        	
             List<RequireDTO> requires = requireService.searchRequiresByCriteria(criteria);
             
@@ -63,6 +61,20 @@ public class RequireController {
             return ResponseEntity.status(500).body("서버 오류 발생_ /require/search\": " + e.getMessage());
         }
     }    
+    
+	/* 게시글 최초등록 */
+    @PostMapping("/require/insert")
+    public ResponseEntity<?> insertRequire(@RequestBody RequireDTO require) {
+    	System.out.println("--insertRequire--");
+        try {
+        	requireService.insertRequire(require);
+            return ResponseEntity.ok("게시글이 성공적으로 등록되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 오류 발생: " + e.getMessage());
+        }
+    }    
+    
+  
      
     
 }
