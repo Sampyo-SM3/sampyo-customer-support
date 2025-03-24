@@ -1,13 +1,13 @@
 <template>
-  <v-container fluid class="pr-5 pl-5 pt-7">    
-    
-    
+  <v-container fluid class="pr-5 pl-5 pt-7">
+
+
     <!-- <v-row>
       <div class="breadcrumb-div pl-3"> {{ savedMidMenu }} &nbsp; > &nbsp; {{ savedSubMenu }}</div>      
     </v-row> -->
 
     <v-row>
-      <v-col>        
+      <v-col>
         <div class="title-div">SR요청</div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
@@ -108,15 +108,16 @@
     <br>
     <br>
 
-    <div class="d-flex justify-center">      
+    <div class="d-flex justify-center">
       <!-- <v-btn variant="flat" class="select-btn d-flex align-center pl-3 pr-4" size="large" @click="fetchData()">
         <v-icon size="default" class="mr-1">mdi-account</v-icon>
         조회
       </v-btn> -->
-      <v-btn variant="flat" color="primary" class="custom-btn mr-2 white-text d-flex align-center" size="small" @click="fetchData()">
-          <v-icon size="default" class="mr-1">mdi-magnify</v-icon>
-          조회
-        </v-btn>      
+      <v-btn variant="flat" color="primary" class="custom-btn mr-2 white-text d-flex align-center" size="small"
+        @click="fetchData()">
+        <v-icon size="default" class="mr-1">mdi-magnify</v-icon>
+        조회
+      </v-btn>
     </div>
     <br>
     <br>
@@ -142,18 +143,14 @@
         </span>
 
         <v-spacer></v-spacer>
-        
-        <v-btn 
-          variant="flat" 
-          color="success" 
-          class="custom-btn white-text d-flex align-center" 
-          size="small" 
+
+        <v-btn variant="flat" color="success" class="custom-btn white-text d-flex align-center" size="small"
           @click="$router.push({ name: 'CA_PostCreateForm' })">
 
           <v-icon size="default" class="mr-1">mdi-pencil</v-icon>
           게시글 작성
         </v-btn>
-        
+
       </v-col>
     </v-row>
 
@@ -368,14 +365,14 @@ export default {
     this.checkLocalStorage();
   },
 
-  methods: {        
-      checkLocalStorage() {
+  methods: {
+    checkLocalStorage() {
       const midMenuFromStorage = localStorage.getItem('midMenu');
       const subMenuFromStorage = localStorage.getItem('subMenu');
-      
+
       this.savedMidMenu = midMenuFromStorage ? JSON.parse(midMenuFromStorage) : null;
       this.savedSubMenu = subMenuFromStorage ? JSON.parse(subMenuFromStorage) : null;
-      
+
       console.log('메뉴 클릭 후 midMenu:', this.savedMidMenu);
       console.log('메뉴 클릭 후 subMenu:', this.savedSubMenu);
     },
@@ -691,11 +688,11 @@ export default {
   }
 }</script>
 
-<style scoped>  
-  .breadcrumb-div {
-    font-size: 12px;
-    color: #A1A6A6;
-  }
+<style scoped>
+.breadcrumb-div {
+  font-size: 12px;
+  color: #A1A6A6;
+}
 
 .title-div {
   font-size: 25px;
@@ -728,12 +725,12 @@ export default {
 }
 
 /* 날짜 선택 관련 스타일 */
-.date-field-wrapper {  
+.date-field-wrapper {
   display: flex;
   align-items: center;
   cursor: pointer;
   width: 100%;
-  
+
 }
 
 .date-wrapper {
@@ -896,7 +893,8 @@ export default {
   font-size: 14px;
   font-weight: 500;
   color: #333333;
-  background-color: #e6eef8; /* 그리드 헤더와 같은 색상으로 변경 */
+  background-color: #e6eef8;
+  /* 그리드 헤더와 같은 색상으로 변경 */
   white-space: nowrap;
   padding: 0 4px;
   border-right: 1px solid #eaeaea;
@@ -923,8 +921,10 @@ export default {
   border: 1px solid #e0e0e0;
   width: 100%;
   position: relative;
-  border-radius: 10px; /* 모서리 라운드 처리 */
-  overflow: hidden; /* 내부 요소가 라운드 처리된 모서리를 벗어나지 않도록 함 */  
+  border-radius: 10px;
+  /* 모서리 라운드 처리 */
+  overflow: hidden;
+  /* 내부 요소가 라운드 처리된 모서리를 벗어나지 않도록 함 */
 }
 
 /* 1페이지의 1행만 열 간격이 틀어지는 현상이 있어서 강제로 사이즈를 지정함 */
@@ -973,7 +973,8 @@ export default {
 .th-cell,
 .td-cell {
   padding: 8px 12px;
-  border-right: none; /* 오른쪽 테두리 제거 */
+  border-right: none;
+  /* 오른쪽 테두리 제거 */
   display: flex;
   align-items: center;
   font-size: 13px;

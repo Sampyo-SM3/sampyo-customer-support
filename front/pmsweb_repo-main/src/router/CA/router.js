@@ -2,6 +2,8 @@ import CA1000_10 from '@/views/CA/CA1000_10.vue'
 import CA_PostCreateForm from '@/views/CA/CA_PostCreateForm.vue'
 import CA_PostDetailForm from '@/views/CA/CA_PostDetailForm.vue'
 
+import CA_PostDetailForm2 from '@/views/CA/CA_PostDetailForm2.vue'
+
 
 export const caRoutes = [
   {
@@ -21,6 +23,12 @@ export const caRoutes = [
     component: CA_PostCreateForm,    
   },     
   // 다른 라우트 정의...
+  {
+    path: '/CA_PostDetailForm2/:receivedSeq?', // receivedSeq 파라미터를 선택적으로 받음
+    name: 'CA_PostDetailForm2',
+    component: CA_PostDetailForm2,
+    props: true
+  },  
 ]
 
 export default caRoutes
