@@ -84,6 +84,16 @@
       </v-col>
     </v-row>
 
+    <v-row no-gutters class="search-row">
+      <v-col class="search-col title-category">
+        <div class="label-box">제목</div>
+
+        <v-text-field v-model="title" placeholder="제목을 입력을 입력하세요" clearable hide-details density="compact"
+          variant="outlined" class="title-search"></v-text-field>
+      </v-col>
+
+    </v-row> 
+
     <v-row no-gutters class="search-row bottom-row">
       <v-col class="search-col product-category">
         <div class="label-box">담당자</div>
@@ -93,6 +103,7 @@
       </v-col>
 
     </v-row>
+  
 
     <br>
     <br>
@@ -273,6 +284,7 @@ export default {
       startDateMenu: false,  // 시작일 날짜 선택기 메뉴 표시 여부
       endDateMenu: false,    // 종료일 날짜 선택기 메뉴 표시 여부
       requesterId: '',
+      title: '',
       dateRange: 'month',
       productType: 'test1',
       tableData: [],
@@ -540,9 +552,12 @@ export default {
           params: {
             startDate: this.startDate + ' 00:00:00',
             endDate: this.endDate + ' 23:59:59',
-            requesterId: this.requesterId
+            requesterId: this.requesterId,
+            projectName : this.title
           }
         });
+
+        console.log(response.data);
         
         // API 응답 데이터 처리
         if (response.data && Array.isArray(response.data)) {
@@ -686,11 +701,18 @@ export default {
   font-size: 25px;
 }
 
-.manager-search {
+.manager-search  {
   padding-block: 10px;
   padding-left: 10px;
   width: 800px;
   font-weight: 400;
+}
+
+.title-search{
+  padding-block: 10px;
+  padding-left: 10px;
+  width: 800px;
+  font-weight: 400;  
 }
 
 .select-btn {
@@ -857,7 +879,8 @@ export default {
 }
 
 .request-period,
-.product-category {
+.product-category,
+.title-category {
   max-width: 550px;
   flex-grow: 0;
 }

@@ -4,7 +4,77 @@
 
 <mapper namespace="com.example.connectBoard.repository.RequireRepository">
 	
-
+	
+	<!-- 검색 조건에 따른 요청 목록 조회 -->
+	<select id="searchRequiresByCriteria" parameterType="com.example.connectBoard.dto.RequireSearchCriteria" resultType="com.example.connectBoard.dto.RequireDTO">
+		SELECT
+		    b.seq,
+		    b.projectName,
+		    b.businessSector,
+		    b.projectOverview,
+		    b.requesterPosition,
+		    b.currentIssue,
+		    b.expectedEffect,
+		    b.finalDeliverables,
+		    b.requesterId,
+		    b.requesterEmail,
+		    b.requesterPhone,
+			<!-- b.processState, -->
+			c.codeName AS processState,	    
+		    b.insertDt,
+		    b.completeDt			    	   	
+		FROM board b inner join code_master c
+		on b.processState = c.codeId					
+	<where>
+	    <if test="requesterId != null and requesterId != ''">
+	        b.requesterId = #{requesterId}
+	    </if>
+	    <if test="startDate != null and startDate != ''">
+	        AND b.insertDt >= #{startDate}
+	    </if>
+	    <if test="endDate != null and endDate != ''">
+	        AND b.insertDt &lt;= #{endDate}
+	    </if>
+	    <if test="projectName != null and projectName != ''">
+	        AND b.projectName LIKE '%' + #{projectName} + '%'
+	        <!-- AND b.projectName LIKE '%' + ? + '%' COLLATE SQL_Latin1_General_CP1_CI_AS -->
+	    </if>	    
+	</where>
+		ORDER BY b.seq DESC
+	</select>
+	
+	<!-- 게시글 등록 -->
+	<insert id="insertRequire" parameterType="com.example.connectBoard.dto.RequireDTO">
+        INSERT INTO board (
+            projectName,
+            projectContent,
+            businessSector,
+            insertDt,
+            updateDt,
+            requesterId,
+            requesterName,
+            processState
+        ) VALUES (
+            #{projectName, jdbcType=VARCHAR},
+            #{projectContent, jdbcType=VARCHAR},
+            #{businessSector, jdbcType=VARCHAR},
+            GETDATE(),
+            GETDATE(),
+            #{requesterId, jdbcType=VARCHAR},
+            #{requesterName, jdbcType=VARCHAR},
+            #{processState, jdbcType=VARCHAR}        
+    	)
+    	
+    	
+    	
+	</insert>	
+	
+	
+	
+	
+	
+	
+	
 	<!-- ✅ 모든 데이터 조회1212 -->
 	<select id="getAllRequires" resultType="com.example.connectBoard.dto.RequireDTO">
 		select
@@ -60,66 +130,7 @@
 		from board
 		where seq = #{seq};
 	</select>
-	
-	
-	<!-- 검색 조건에 따른 요청 목록 조회 -->
-	<select id="searchRequiresByCriteria" parameterType="com.example.connectBoard.dto.RequireSearchCriteria" resultType="com.example.connectBoard.dto.RequireDTO">
-		SELECT
-		    seq,
-		    projectName,
-		    businessSector,
-		    projectOverview,
-		    requesterPosition,
-		    currentIssue,
-		    expectedEffect,
-		    finalDeliverables,
-		    requesterId,
-		    requesterEmail,
-		    requesterPhone,
-		    processState,
-		    insertDt,
-		    completeDt,
-		    completeDt
-		FROM board
-	<where>
-	    <if test="requesterId != null and requesterId != ''">
-	        requesterId = #{requesterId}
-	    </if>
-	    <if test="startDate != null and startDate != ''">
-	        AND insertDt >= #{startDate}
-	    </if>
-	    <if test="endDate != null and endDate != ''">
-	        AND insertDt &lt;= #{endDate}
-	    </if>
-	</where>
-		ORDER BY seq DESC
-	</select>
-	
-	<!-- 게시글 등록 -->
-	<insert id="insertRequire" parameterType="com.example.connectBoard.dto.RequireDTO">
-        INSERT INTO board (
-            projectName,
-            projectContent,
-            businessSector,
-            insertDt,
-            updateDt,
-            requesterId,
-            requesterName,
-            processState
-        ) VALUES (
-            #{projectName, jdbcType=VARCHAR},
-            #{projectContent, jdbcType=VARCHAR},
-            #{businessSector, jdbcType=VARCHAR},
-            GETDATE(),
-            GETDATE(),
-            #{requesterId, jdbcType=VARCHAR},
-            #{requesterName, jdbcType=VARCHAR},
-            #{processState, jdbcType=VARCHAR}        
-    	)
-    	
-    	
-    	
-	</insert>	
+		
 
 </mapper>
 
