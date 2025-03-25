@@ -45,92 +45,116 @@
 
     <v-row no-gutters class="search-row top-row">
       <v-col class="search-col product-category">
-        <div class="label-box">제목</div>
+        <div class="label-box colNm">제목</div>
         <div class="author-value">{{ userName }}</div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col request-period">
-        <div class="label-box">업무명</div>
+        <div class="label-box colNm">업무명</div>
         <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col request-period">
-        <div class="label-box">협조</div>
+        <div class="label-box colNm">협조</div>
         <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col request-period">
-        <div class="label-box">개발(변경) 필요성</div>
+        <div class="label-box colNm">개발(변경) 필요성</div>
         <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+      </v-col>
+    </v-row>
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col request-period">
+        <div class="label-box colNm">기대효과</div>
+        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row" style="height:200px;">
+      <v-col class="search-col request-period" style="border-right: 1px solid #e0e0e0;">
+        <div class="label-box colNm">개발(변경)<br />업무내용</div>
+      </v-col>
+
+      <v-col style="border-right: 1px solid #e0e0e0;">
+        <div>
+          <div class="sub-label">변경전</div>
+          <div class="author-value multiline-box">
+            {{ inquiry.PROJECT_NAME }}
+          </div>
+        </div>
+      </v-col>
+
+      <!-- 변경후 -->
+      <v-col>
+        <div>
+          <div class="sub-label">변경후</div>
+          <div class="author-value multiline-box">
+            {{ inquiry.PROJECT_NAME }}
+          </div>
+        </div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col request-period">
-        <div class="label-box">기대효과</div>
+        <div class="label-box colNm">개발(변경) 업무내용</div>
         <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
-      <v-col class="search-col request-period">
-        <div class="label-box">개발(변경)모듈</div>
+      <v-col cols="6" class="search-col d-flex align-center">
+        <div class="label-box colNm">사용부서</div>
+        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+      </v-col>
+
+      <v-col class="search-col d-flex align-center" style="max-width: 300px;">
+        <div class="label-box colNm">첨부문서</div>
         <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
-      <v-col class="search-col request-period">
-        <div class="label-box">개발(변경) 업무내용</div>
+      <v-col cols="6" class="search-col d-flex align-center">
+        <div class="label-box colNm">의뢰일자</div>
+        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+      </v-col>
+
+      <v-col class="search-col" style="max-width: 300px;">
+        <div class="label-box colNm">접수일자</div>
         <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
-      <v-col class="search-col" style="max-width: 200px;">
-        <div class="label-box">사용부서</div>
+      <v-col cols="6" class="search-col d-flex align-center">
+        <div class="label-box colNm">완료요청일자</div>
         <div class="author-value">{{ userName }}</div>
       </v-col>
 
       <v-col class="search-col" style="max-width: 300px;">
-        <div class="label-box">첨부문서</div>
+        <div class="label-box colNm">완료일자</div>
         <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
-      <v-col class="search-col" style="max-width: 200px;">
-        <div class="label-box">의뢰일자</div>
-        <div class="author-value">{{ userName }}</div>
-      </v-col>
-
-      <v-col class="search-col" style="max-width: 300px;">
-        <div class="label-box">접수일자</div>
-        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
-      </v-col>
-    </v-row>
-
-    <v-row no-gutters class="search-row middle-row">
-      <v-col class="search-col" style="max-width: 200px;">
-        <div class="label-box">완료요청일자</div>
-        <div class="author-value">{{ userName }}</div>
-      </v-col>
-
-      <v-col class="search-col" style="max-width: 300px;">
-        <div class="label-box">완료일자</div>
+      <v-col class="search-col request-period">
+        <div class="label-box colNm">기타</div>
         <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row bottom-row">
       <v-col class="search-col request-period">
-        <div class="label-box">기타</div>
+        <div class="label-box colNm">첨부목록</div>
         <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
       </v-col>
     </v-row>
@@ -603,14 +627,6 @@ export default {
   border-bottom-right-radius: 8px;
 }
 
-.label-box {
-  /* 색상 변경 */
-  color: #333333 !important;
-  /* 이전: #578ADB */
-  background-color: #e6eef8 !important;
-  /* 이전: #f5f5f5 */
-}
-
 .search-col {
   display: flex;
   align-items: center;
@@ -639,6 +655,8 @@ export default {
   padding: 0 4px;
   border-right: 1px solid #eaeaea;
   margin-bottom: 5px;
+  color: #333333 !important;
+  background-color: #e6eef8 !important;
 }
 
 .white-text {
@@ -688,12 +706,22 @@ export default {
   font-weight: 400;
 }
 
+.info-subtitle {
+  font-size: 16px;
+  line-height: 22px;
+  color: #666;
+  -webkit-text-size-adjust: none;
+  letter-spacing: -0.05em;
+  margin: 20px 0 6px;
+  font-weight: 500;
+}
+
 .info-title-after {
   content: "";
   display: inline-block;
   width: 6px;
   height: 17px;
-  background-color: #578ADB;
+  background-color: #B0CAE6;
   margin-right: 10px;
   margin-bottom: 3px;
   position: relative;
@@ -706,5 +734,43 @@ export default {
   box-shadow: none;
   border: 1px solid #ddd;
   padding-top: 0 !important;
+}
+
+.colNm {
+  width: 140px;
+}
+
+.vertical-label {
+  height: 100%;
+  background-color: #f1f5fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.5;
+  border-right: 1px solid #ddd;
+}
+
+.sub-label {
+  font-weight: 500;
+  font-size: 13.5px;
+  border-bottom: 1px solid #e0e0e0;
+  height: 35px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: #f5f5f5;
+  white-space: nowrap;
+  padding: 0 4px;
+  border-right: 1px solid #eaeaea;
+  margin-bottom: 5px;
+  color: #333333 !important;
+  background-color: #e6eef8 !important;
 }
 </style>
