@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.connectBoard.repository.kakao.KakaoRepository">
+
+   
+    <insert id="insertKakao" parameterType="com.example.connectBoard.dto.KakaoDTO">
+		 
+		        
+		INSERT INTO ATA_MMT_TRAN_SAMPYO2 (
+		   DATE_CLIENT_REQ,
+		   TEMPLATE_CODE,
+		   CONTENT,
+		   RECIPIENT_NUM,
+		   MSG_STATUS,
+		   SUBJECT,
+		   CALLBACK,
+		   SENDER_KEY,
+		   MSG_TYPE,
+		   TR_ETC1,
+		   TR_ETC2,
+		   TR_ETC3,
+		   TR_ETC4,
+		   TR_ETC5,
+		   TR_ETC6,
+		   TR_ETC7,
+		   ENT_DT
+		) VALUES (
+		   Getdate(),
+		   'ERR000001',       
+		   #{kakao.content},                         
+		   '01051042142',
+		   '1',
+		   '',
+		   '01051042142',
+		   '3eb660730e424d82081c19d62c818bc0fd45cd25',
+		   '1008',
+		   '',
+		   '',
+		   '',
+		   '',
+		   '',
+		   '',
+		   '',
+		   Getdate()
+		)
+
+            
+                    
+    </insert>
+
+
+</mapper>

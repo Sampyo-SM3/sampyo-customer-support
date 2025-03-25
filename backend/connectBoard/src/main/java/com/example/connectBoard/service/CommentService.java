@@ -2,12 +2,10 @@ package com.example.connectBoard.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.connectBoard.dto.CommentDTO;
 import com.example.connectBoard.repository.spc.CommentRepository;
-import com.example.connectBoard.repository.spc.RequireRepository;
 
 @Service
 public class CommentService {

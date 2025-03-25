@@ -1,6 +1,5 @@
 package com.example.connectBoard.controller;
 
-import com.example.connectBoard.dto.CommentDTO;
 import com.example.connectBoard.dto.RequireDTO;
 import com.example.connectBoard.dto.RequireSearchCriteria;
 import com.example.connectBoard.service.RequireService;
