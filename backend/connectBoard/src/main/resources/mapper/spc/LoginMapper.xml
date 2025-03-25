@@ -17,21 +17,7 @@
         WHERE 
             ID = #{id} 
             AND COMPANY_CD = #{companyCd}
-    </select>
-    
-    <!-- 사용자 ID와 회사코드로 사용자 정보 조회 조희재테스트-->
-    <select id="findBlueAccountById" resultType="com.example.connectBoard.dto.EmployeePreferenceDto">
-        SELECT 
-            COMPANY_CD as companyCd,
-            ID as id,
-            NAME as name,
-            ADMIN as admin,
-            PWD as pwd
-        FROM 
-            sys_empref 
-        WHERE 
-            ID = #{id} 
-    </select>    
+    </select>     
     
     <!-- 사용자 존재 여부 확인 -->
     <select id="isUserExists" resultType="boolean">
@@ -69,5 +55,12 @@
                   AND PWDCOMPARE(#{password}, PWD) = 1
             ) THEN 1 ELSE 0 END
     </select>
+    
+    <insert id="insertUser">
+        INSERT INTO sys_empref 
+            (COMPANY_CD, id, name, admin, pwd, smsyn) 
+        VALUES 
+            ('CEMENT', #{id}, #{name}, 0, PWDENCRYPT(#{password}), 1)
+    </insert>
 
 </mapper>

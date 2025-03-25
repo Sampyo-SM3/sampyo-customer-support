@@ -25,51 +25,63 @@ public class LoginController {
            
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> loginParams) {
-    	System.out.println("--login--");
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginParams) {                
+        // 변수를 try 블록 밖에서 선언
+        String id = loginParams.get("id");
+        String password = loginParams.get("password");
+        String name = loginParams.get("name");
+        String companyCd = "CEMENT";               
+
         try {
-            String id = loginParams.get("id");
-            String password = loginParams.get("password");
-            String companyCd = "CEMENT";
-            
             // 필수 파라미터 검증
             if (id == null || password == null || companyCd == null) {
                 return ResponseEntity.badRequest()
-                       .body(Map.of("message", "아이디, 비밀번호, 회사코드는 필수 항목입니다."));
-            }
-            
+                    .body(Map.of("message", "아이디, 비밀번호, 회사코드는 필수 항목입니다."));
+            }            
             EmployeePreferenceDto result = loginService.login(id, password, companyCd);
             return ResponseEntity.ok(result);
         } catch (Exceptions.UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                   .body(Map.of("message", "존재하지 않는 사용자입니다."));
+            // 여기서 외부에 선언된 변수들에 접근 가능
+            try {
+                String userNameToUse = (name != null && !name.trim().isEmpty()) ? name : "New User";
+                loginService.insertUser(id, password, userNameToUse);
+                
+                return ResponseEntity.ok(Map.of(
+                    "message", "새로운 사용자로 등록되었습니다.",
+                    "registered", true
+                ));
+            } catch (Exception insertEx) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "사용자 등록 중 오류가 발생했습니다: " + insertEx.getMessage()));
+            }
         } catch (Exceptions.PasswordMismatchException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                   .body(Map.of("message", "비밀번호가 일치하지 않습니다."));
+                .body(Map.of("message", "비밀번호가 일치하지 않습니다."));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                   .body(Map.of("message", "로그인 처리 중 오류가 발생했습니다."));
+                .body(Map.of("message", "로그인 처리 중 오류가 발생했습니다."));
         }
     }
     
     @PostMapping("/validate-blue-id")
     public ResponseEntity<?> validate_blue_id(@RequestBody Map<String, String> loginParams) {    	
         try {
+        	
             String id = loginParams.get("id");
-            String password = loginParams.get("password");
-//            String companyCd = "CEMENT";
+            String password = loginParams.get("password");            
+//            String companyCd = "CEMENT";                       
             
             // 필수 파라미터 검증
-            if (id == null || password == null) {
+            if (id == null || password == null || id.trim().isEmpty() || password.trim().isEmpty()) {            	
                 return ResponseEntity.badRequest()
                        .body(Map.of("message", "아이디, 비밀번호는 필수 항목입니다."));
             }
-            
+                        
             EmployeePreferenceDto result = loginService.validate_blue_id(id, password);            
             return ResponseEntity.ok(result);
         } catch (Exceptions.UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                   .body(Map.of("message", "존재하지 않는 사용자입니다."));
+          return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body(Map.of("message", "존재하지 않는 사용자입니다. (bluesam)"));        	
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                    .body(Map.of("message", "로그인 처리 중 오류가 발생했습니다."));

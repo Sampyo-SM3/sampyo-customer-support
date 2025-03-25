@@ -14,14 +14,15 @@ export const useAuthStore = defineStore("auth", {
   }),
   actions: {
     // 로그인 시도
-    async login(credentials) {
+    async login(credentials) {      
       try {
         this.isLoading = true;
         this.error = null;
-                
+              
         const response = await apiClient.post('/api/login', {
           id: credentials.username,
           password: credentials.password,          
+          name: credentials.name,
         });
 
         // 로그인 성공
@@ -57,6 +58,34 @@ export const useAuthStore = defineStore("auth", {
         this.isLoading = false;
       }
     },
+
+
+    async validate_blue_id(credentials) {      
+      try {
+        this.isLoading = true;
+        this.error = null;
+                
+        const response = await apiClient.post('/api/validate-blue-id', {
+          id: credentials.username,
+          password: credentials.password,          
+        });
+
+        // 로그인 성공
+        if (response.data) {
+          this.userId = response.data.id;
+          this.userInfo = response.data;                    
+                                
+          return response.data.name;
+        }
+        
+        return false;
+      } catch (error) {        
+        this.error = error.response?.data?.message || '로그인 중 오류가 발생했습니다';        
+        return false;
+      } finally {
+        this.isLoading = false;
+      }
+    },    
     
     // 로그아웃
     logout() {

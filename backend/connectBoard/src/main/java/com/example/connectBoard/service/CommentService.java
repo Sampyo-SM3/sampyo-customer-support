@@ -18,13 +18,11 @@ public class CommentService {
         this.commentRepository = commentMapper;
     }    
 
-    public List<CommentDTO> getCommentsByPostId(Long postId) {
-    	System.out.println("postId -> " + postId);
+    public List<CommentDTO> getCommentsByPostId(Long postId) {    	
         return commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
     }
     
-    public void insertComment(CommentDTO comment) {
-        System.out.println("insertComment() -> postId: " + comment.getPostId() + ", userId: " + comment.getUserId());
+    public void insertComment(CommentDTO comment) {        
         commentRepository.insertComment(comment);
     }
     

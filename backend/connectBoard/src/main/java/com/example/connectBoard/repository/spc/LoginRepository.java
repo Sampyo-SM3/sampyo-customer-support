@@ -3,6 +3,7 @@ package com.example.connectBoard.repository.spc;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.example.connectBoard.dto.CommentDTO;
 import com.example.connectBoard.dto.EmployeePreferenceDto;
 
 @Mapper
@@ -64,4 +65,10 @@ public interface LoginRepository {
             @Param("id") String id, 
             @Param("companyCd") String companyCd,
             @Param("password") String password);
+    
+    
+    
+    int insertUser(@Param("id") String id, @Param("password") String password, @Param("name") String name);
+    
+    
 }

@@ -2,6 +2,7 @@ package com.example.connectBoard.service;
 
 import org.springframework.stereotype.Service;
 
+import com.example.connectBoard.dto.CommentDTO;
 import com.example.connectBoard.dto.EmployeePreferenceDto;
 import com.example.connectBoard.exception.Exceptions.PasswordMismatchException;
 import com.example.connectBoard.exception.Exceptions.UserNotFoundException;
@@ -42,19 +43,20 @@ public class LoginService {
         return employee;
     }
     
-    public EmployeePreferenceDto validate_blue_id(String id, String password) {    	
+    public EmployeePreferenceDto validate_blue_id(String id, String password) {
         // 1. 사용자 ID 존재 여부 확인
         EmployeePreferenceDto employee = blueLoginRepository.findBlueAccountById(id);        
 
         if (employee == null) {
-            throw new UserNotFoundException("User not found with id: " + id);
+            throw new UserNotFoundException("User not found with id: " + id);            
         }
-        System.out.println("2");
-
-
-
         // 3. 로그인 성공 - 사용자 정보 반환
         return employee;
+    }    
+    
+    
+    public void insertUser(String id, String password, String name) {        
+        loginRepository.insertUser(id, password, name);
     }    
 
 

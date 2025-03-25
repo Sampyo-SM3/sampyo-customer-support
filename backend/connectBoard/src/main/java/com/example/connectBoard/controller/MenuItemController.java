@@ -18,10 +18,7 @@ public class MenuItemController {
 
     @GetMapping
     // test커밋 나는 세림세림
-    public MenuItemResponseDto getMenuItems(@RequestParam(required = false) String auth, @RequestParam String id) {
-    	System.out.println("------------getMenuItems-------------");
-    	System.out.println(auth);
-    	System.out.println(id);
+    public MenuItemResponseDto getMenuItems(@RequestParam(required = false) String auth, @RequestParam String id) {    	
         MenuItemRequestDto requestDto = new MenuItemRequestDto(auth, id);
                 
 		return menuitemService.getMenuItems(requestDto);
