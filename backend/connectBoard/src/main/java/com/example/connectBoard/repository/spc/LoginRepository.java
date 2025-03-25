@@ -1,4 +1,4 @@
-package com.example.connectBoard.repository;
+package com.example.connectBoard.repository.spc;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.example.connectBoard.dto.CommentDTO;
 import com.example.connectBoard.dto.RequireDTO;
 import com.example.connectBoard.dto.StatusDTO;
-import com.example.connectBoard.repository.StatusRepository;
+import com.example.connectBoard.repository.spc.StatusRepository;
 
 @Service
 public class StatusService {

@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.WebApplicationType;
 
 @SpringBootApplication
-@MapperScan("com.example.connectBoard.repository")  // ✅ MyBatis 매퍼 자동 스캔
+//@MapperScan("com.example.connectBoard.repository")  // ✅ MyBatis 매퍼 자동 스캔
 public class App {
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(App.class);

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import com.example.connectBoard.dto.CommentDTO;
 import com.example.connectBoard.dto.RequireDTO;
 import com.example.connectBoard.dto.RequireSearchCriteria;
-import com.example.connectBoard.repository.RequireRepository;
+import com.example.connectBoard.repository.spc.RequireRepository;
 
 @Service
 public class RequireService {

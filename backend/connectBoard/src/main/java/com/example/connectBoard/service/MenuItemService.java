@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.connectBoard.dto.request.MenuItemRequestDto;
 import com.example.connectBoard.dto.response.MenuItemResponseDto;
-import com.example.connectBoard.repository.MenuItemRepository;
+import com.example.connectBoard.repository.spc.MenuItemRepository;
 
 import java.util.ArrayList;
 import java.util.List;

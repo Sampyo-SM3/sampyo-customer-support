@@ -1,4 +1,4 @@
-package com.example.connectBoard.repository;
+package com.example.connectBoard.repository.blueaccount;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import com.example.connectBoard.dto.CommentDTO;
 
 @Mapper
-public interface CommentRepository {
+public interface CommentRepositoryTest {
     // 게시글 ID로 댓글 조회 (생성일 오름차순)
     List<CommentDTO> findByPostIdOrderByCreatedAtAsc(Long postId);
 
