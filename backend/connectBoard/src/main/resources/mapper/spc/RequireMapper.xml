@@ -65,15 +65,8 @@
             #{processState, jdbcType=VARCHAR}        
     	)
     	
-    	
-    	
 	</insert>	
-	
-	
-	
-	
-	
-	
+
 	
 	<!-- ✅ 모든 데이터 조회1212 -->
 	<select id="getAllRequires" resultType="com.example.connectBoard.dto.RequireDTO">
@@ -132,7 +125,6 @@
 		from board
 		where seq = #{seq};
 	</select>
-<<<<<<< HEAD:backend/connectBoard/src/main/resources/mapper/RequireMapper.xml
 	
 	
 	<!-- 검색 조건에 따른 요청 목록 조회 -->
@@ -194,9 +186,6 @@
     	
     	
 	</insert>	
-=======
-		
->>>>>>> da4758d4bf40208e1804c30a02b9e07d3610d27e:backend/connectBoard/src/main/resources/mapper/spc/RequireMapper.xml
 
 </mapper>
 
