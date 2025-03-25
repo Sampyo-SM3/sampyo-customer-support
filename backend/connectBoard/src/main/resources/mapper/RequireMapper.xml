@@ -10,6 +10,7 @@
 		select
 			seq,
 			projectName,
+			projectContent,
 			businessSector,
 			projectOverview,
 			requesterPosition,
@@ -38,6 +39,7 @@
 		select
 		    seq,
 		    projectName,
+		    projectContent,
 		    businessSector,
 		    projectOverview,
 		    requesterPosition,
@@ -67,6 +69,7 @@
 		SELECT
 		    seq,
 		    projectName,
+		    projectContent,
 		    businessSector,
 		    projectOverview,
 		    requesterPosition,

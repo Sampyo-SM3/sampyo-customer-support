@@ -1,6 +1,15 @@
 <template style="margin-top:-30px;">
-  <!-- <v-container class="ml-16 mr-16"> -->
   <v-container fluid class="pr-5 pl-5 pt-7">
+    <v-row>
+      <v-col>
+        <div class="title-div">SR 요청</div>
+        <div class="mt-2">
+          <v-divider thickness="3" color="#578ADB"></v-divider>
+        </div>
+      </v-col>
+    </v-row>
+
+    <br>
     <!-- 진행 상태 표시 바 -->
     <v-row justify="center" class="mb-6 pt-6">
       <v-col cols="12" class="d-flex align-center justify-center">
@@ -16,95 +25,116 @@
       </v-col>
     </v-row>
 
-    <!-- 접수 상태 버튼 -->
-    <v-row class="mt-10">
-      <v-col cols="auto" class="d-flex align-center">
-        <div class="status-selection-container">
-          <div class="status-label-box">
-            <span>접수상태</span>
-          </div>
-          <div class="status-select-box">
-            <v-select v-model="selectedStatus" :items="progressStatuses" item-title="text" item-value="value"
-              hide-details density="compact" variant="plain" class="status-select"></v-select>
-          </div>
-        </div>
-        <v-btn class=" action-btn save-btn" @click="saveStatus">
-          저장
-        </v-btn>
+    <!-- 전체 래퍼: 접수상태 박스 + 버튼을 나란히 배치 -->
+    <div class="d-flex align-center mb-4">
+      <!-- 접수상태 박스 -->
+      <v-row no-gutters class="search-row top-row bottom-row status-select-row"
+        style="width: 220px; min-width: 220px; max-width: 220px;">
+        <v-col class="search-col">
+          <div class="label-box">접수상태</div>
+          <v-select v-model="selectedStatus" :items="progressStatuses" item-title="text" item-value="value"
+            density="compact" variant="plain" hide-details class="status-select" />
+        </v-col>
+      </v-row>
+
+      <v-btn variant="flat" color="primary" size="small" class="save-status-btn ml-3" @click="saveStatus">
+        저장
+      </v-btn>
+    </div>
+
+
+    <v-row no-gutters class="search-row top-row">
+      <v-col class="search-col product-category">
+        <div class="label-box">제목</div>
+        <div class="author-value">{{ userName }}</div>
       </v-col>
     </v-row>
 
-    <v-row>
-      <v-col cols="12">
-        <!-- 상단: 요구사항 정의서 -->
-        <div>
-          <div class="section-title">
-            <div class="info-title-after"></div>요구사항 정의서
-          </div>
-
-          <v-card class="pa-4 mt- info-card">
-            <!-- 요청자 정보 -->
-            <div class="info-subtitle">&nbsp;요청자 정보</div>
-            <v-simple-table dense class="custom-table outline1">
-              <tbody>
-                <tr>
-                  <th class="table-header">요청자</th>
-                  <td class="outlineTd">{{ inquiry.REQUESTER_NAME }}</td>
-                  <th class="table-header">소속</th>
-                  <td class="outlineTd">{{ inquiry.REQUESTER_DEPT_NM }}</td>
-                  <th class="table-header">이메일</th>
-                  <td class="outlineTd">{{ inquiry.REQUESTER_EMAIL }}</td>
-                  <th class="table-header">연락처</th>
-                  <td class="outlineTd">{{ inquiry.REQUESTER_PHONE }}</td>
-                </tr>
-              </tbody>
-            </v-simple-table>
-
-            <!-- 개요 -->
-            <div class="info-subtitle pt-5">&nbsp;개요</div>
-            <v-simple-table dense class="custom-table outline1">
-              <tbody>
-                <tr>
-                  <th class="table-header">과제명</th>
-                  <td class="outlineTd">{{ inquiry.PROJECT_NAME }}</td>
-                  <th class="table-header">과제 개요</th>
-                  <td class="outlineTd">{{ inquiry.PROJECT_OVERVIEW }}</td>
-                  <th class="table-header">사업 부문</th>
-                  <td class="outlineTd">{{ inquiry.BUSINESS_SECTOR }}</td>
-                </tr>
-                <tr>
-                  <th class="table-header">기존 문제점</th>
-                  <td class="outlineTd">{{ inquiry.PAIN_POINT }}</td>
-                  <th class="table-header">기대 효과</th>
-                  <td class="outlineTd">{{ inquiry.EXPECTED_EFFECT }}</td>
-                  <th class="table-header">최종 산출물</th>
-                  <td class="outlineTd">{{ inquiry.DELIVERABLES }}</td>
-                </tr>
-              </tbody>
-            </v-simple-table>
-
-            <!-- 세부 요구사항 -->
-            <div class="info-subtitle pt-5">&nbsp;세부 요구사항</div>
-            <v-simple-table dense class="custom-table outline2">
-              <thead>
-                <tr>
-                  <th>세부 실행 과제</th>
-                  <th>내용</th>
-                  <th>IT 개발 요청</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="outlineTd">{{ inquiry.DETAIL_TASK }}</td>
-                  <td class="outlineTd">{{ inquiry.DETAIL_CONTENT }}</td>
-                  <td class="outlineTd">{{ inquiry.DETAIL_IT_DEV_REQUEST }}</td>
-                </tr>
-              </tbody>
-            </v-simple-table>
-          </v-card>
-        </div>
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col request-period">
+        <div class="label-box">업무명</div>
+        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
       </v-col>
     </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col request-period">
+        <div class="label-box">협조</div>
+        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col request-period">
+        <div class="label-box">개발(변경) 필요성</div>
+        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col request-period">
+        <div class="label-box">기대효과</div>
+        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col request-period">
+        <div class="label-box">개발(변경)모듈</div>
+        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col request-period">
+        <div class="label-box">개발(변경) 업무내용</div>
+        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col" style="max-width: 200px;">
+        <div class="label-box">사용부서</div>
+        <div class="author-value">{{ userName }}</div>
+      </v-col>
+
+      <v-col class="search-col" style="max-width: 300px;">
+        <div class="label-box">첨부문서</div>
+        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col" style="max-width: 200px;">
+        <div class="label-box">의뢰일자</div>
+        <div class="author-value">{{ userName }}</div>
+      </v-col>
+
+      <v-col class="search-col" style="max-width: 300px;">
+        <div class="label-box">접수일자</div>
+        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col" style="max-width: 200px;">
+        <div class="label-box">완료요청일자</div>
+        <div class="author-value">{{ userName }}</div>
+      </v-col>
+
+      <v-col class="search-col" style="max-width: 300px;">
+        <div class="label-box">완료일자</div>
+        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row bottom-row">
+      <v-col class="search-col request-period">
+        <div class="label-box">기타</div>
+        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+      </v-col>
+    </v-row>
+
 
 
     <!-- 하단: 댓글 섹션을 아래로 배치 -->
@@ -294,7 +324,7 @@ export default {
 
       // 백엔드로 보낼 데이터 객체
       const commentData = {
-        postId: Number(this.newComment.postId) || 1, // 게시글 ID
+        postId: this.receivedSeq, // 게시글 ID
         userId: this.userInfo.id || "", // 유저 ID
         content: this.newComment.content, // 댓글 내용
         parentId: newParentId, // 부모 댓글 ID (없으면 NULL)
@@ -487,26 +517,175 @@ export default {
   color: #1867C0;
 }
 
-.info-title {
-  color: black;
-  /* 파란색 강조 */
-  margin-right: 8px;
+/* 폼 디자인 */
+.product-category {
+  display: flex;
+  flex-direction: row;
+  /* 가로 방향으로 배치 */
+  align-items: center;
+  flex-wrap: nowrap;
+  /* 줄바꿈 방지 */
+  width: 100%;
+}
+
+.author-value {
+  font-size: 14px;
+  padding-left: 15px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.title-div {
+  font-size: 25px;
+}
+
+.manager-search,
+.content-textarea {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 15px;
+  width: 800px;
+  height: 450px;
+  font-size: 15px;
+  font-weight: 400;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.custom-btn {
+  font-size: 14px;
+  height: 35px;
+  border-radius: 10px;
+}
+
+.search-row {
+  display: flex;
+  align-items: stretch;
+  min-height: 40px;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 0;
+  border-left: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  /* 하단 테두리 제거 */
+}
+
+.search-row.top-row {
+  border-top: 3px solid #e0e0e0;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  overflow: hidden;
+}
+
+.search-row.bottom-row {
+  border-bottom: 2px solid #e0e0e0;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  overflow: hidden;
+}
+
+/* 새로 추가된 스타일 */
+.search-row.top-row .search-col:first-child {
+  border-top-left-radius: 8px;
+}
+
+.search-row.bottom-row .search-col:first-child {
+  border-bottom-left-radius: 8px;
+}
+
+.search-row.top-row .search-col:last-child {
+  border-top-right-radius: 8px;
+}
+
+.search-row.bottom-row .search-col:last-child {
+  border-bottom-right-radius: 8px;
+}
+
+.label-box {
+  /* 색상 변경 */
+  color: #333333 !important;
+  /* 이전: #578ADB */
+  background-color: #e6eef8 !important;
+  /* 이전: #f5f5f5 */
+}
+
+.search-col {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border-left: 1px solid #e0e0e0;
+}
+
+.request-period,
+.product-category {
+  max-width: 550px;
+  flex-grow: 0;
+}
+
+.label-box {
+  width: 80px;
+  flex-shrink: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #578ADB;
+  background-color: #f5f5f5;
+  white-space: nowrap;
+  padding: 0 4px;
+  border-right: 1px solid #eaeaea;
+  margin-bottom: 5px;
+}
+
+.white-text {
+  color: white !important;
+}
+
+.status-select-row {
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 15px;
+  height: 42px;
+}
+
+.status-select {
+  margin-left: 15px;
+  margin-bottom: 10px;
+}
+
+.status-select>>>.v-select__selection {
+  font-size: 14.5px !important;
+  margin-bottom: 2px;
+  /* 원하는 크기로 조정 */
+}
+
+.mdi-menu-down::before {
+  margin-right: 10px;
+}
+
+.status-select-row {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 45px;
+}
+
+.save-status-btn {
+  height: 42px;
+  min-width: 60px;
+  font-size: 14px;
+  border-radius: 6px;
+  margin-bottom: 15px;
 }
 
 .section-title {
-  font-size: 20px;
+  font-size: 17px;
   margin-bottom: 15px;
-  font-weight: 500;
-}
-
-.info-subtitle {
-  font-size: 16px;
-  line-height: 22px;
-  color: #666;
-  -webkit-text-size-adjust: none;
-  letter-spacing: -0.05em;
-  margin: 20px 0 6px;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .info-title-after {
@@ -514,7 +693,7 @@ export default {
   display: inline-block;
   width: 6px;
   height: 17px;
-  background-color: #1867C0;
+  background-color: #578ADB;
   margin-right: 10px;
   margin-bottom: 3px;
   position: relative;
@@ -527,276 +706,5 @@ export default {
   box-shadow: none;
   border: 1px solid #ddd;
   padding-top: 0 !important;
-}
-
-.custom-table {
-  width: 100%;
-  display: table !important;
-  border-collapse: collapse;
-}
-
-.custom-table th,
-.custom-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-
-.custom-table th {
-  background-color: #f1f1f1;
-  font-weight: bold;
-}
-
-.custom-table td {
-  background-color: white !important;
-}
-
-.dot {
-  color: #1867C0;
-  /* 파란색 점 */
-  font-weight: bold;
-  margin-right: 5px;
-}
-
-.separator {
-  color: #E1E1E1;
-  /* 색상 변경 */
-  margin-right: 5px;
-}
-
-.info-inner-card {
-  background-color: #ffffff;
-  border-radius: 0;
-  /* 내부 카드도 각지게 */
-  padding: 12px;
-  box-shadow: none !important;
-  border: 1px solid #E3E3E3;
-}
-
-.greyText {
-  color: #747470;
-}
-
-.info-title-after {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 17px;
-  background-color: #1867C0;
-  margin-right: 10px;
-  margin-bottom: 3px;
-  position: relative;
-  top: 4px;
-}
-
-#commentArea {
-  max-height: auto;
-  overflow-y: auto;
-  overflow-x: hidden;
-  border: 1px solid #E3E3E3;
-}
-
-.comment-item {
-  display: flex;
-  width: 100%;
-  padding: 10px;
-}
-
-.comment-content {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.comment-text {
-  text-align: left;
-  font-size: 16px;
-  margin-bottom: 5px;
-}
-
-.comment-timestamp {
-  text-align: right;
-  font-size: 12px;
-  color: gray;
-}
-
-.info-text::before {
-  content: "";
-  display: inline-block;
-  width: 1px;
-  height: 11px;
-  background-color: #e1e1e1;
-  margin-right: 10px;
-  margin-left: 20px;
-}
-
-.top-border {
-  width: 100%;
-  height: 2px;
-  background-color: #1867C0
-}
-
-/* 제목 박스 스타일 */
-.title-text {
-  font-size: 15px;
-  background-color: #f5f5f5;
-  padding: 10px;
-}
-
-/* 카드 스타일 수정 */
-.custom-card {
-  background-color: #ffffff;
-  border-radius: 0;
-  /* 모서리 각지게 */
-  border: 1px solid #ddd;
-  padding: 15px;
-}
-
-.leftForm {
-  width: 900px;
-  margin-top: 10px;
-}
-
-.rightForm {
-  width: 670px;
-  margin-top: 10px;
-  margin-left: 20px;
-}
-
-.custom-btn {
-  background-color: #1867C0;
-  color: white;
-  font-size: 13px;
-  border: none;
-  box-shadow: none;
-  border-radius: 0;
-  margin-top: -10px !important;
-}
-
-.comment-input-container {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.btn-container {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.mt-20 {
-  margin-top: 20px;
-}
-
-/* 개요테이블 제목 가로길이 */
-.outline1 .table-header {
-  width: 130px !important;
-  font-size: 14.5px;
-  font-weight: 500;
-  color: #333333;
-  font-size: 14px;
-  /* color: #753333; */
-}
-
-.outline2 thead th {
-  width: 130px !important;
-  color: #333333;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.outlineTd {
-  font-size: 13.5px;
-  color: #666666;
-  font-family: "Noto Sans KR"
-}
-
-.status-selection-container {
-  display: flex;
-  width: 250px;
-  height: 38px;
-  border: 1px solid #DEE2E6;
-  margin-left: 6px;
-}
-
-.status-label-box {
-  width: 90px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #F8F9FA;
-  color: #4A5568;
-  font-size: 14px;
-  border-right: 1px solid #DEE2E6;
-  font-weight: 500;
-  border-radius: 0px;
-}
-
-.status-select-box {
-  width: 150px;
-  font-size: 14px;
-  background-color: #FFFFFF;
-}
-
-.status-select :deep(.v-field) {
-  border-radius: 0px;
-  box-shadow: none !important;
-}
-
-.status-select :deep(.v-field__input) {
-  padding: 0 12px;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-}
-
-.action-btn {
-  width: 65px;
-  height: 40px;
-  text-transform: none;
-  font-size: 14px;
-  border-radius: 4px;
-  letter-spacing: 0;
-  background-color: #1867C0;
-  color: white;
-  box-shadow: none !important;
-  margin-left: 8px;
-}
-
-.gap-4 {
-  gap: 5px;
-}
-
-.comment-item {
-  margin-bottom: 16px;
-  border-bottom: 1px solid #eee;
-}
-
-.comment-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.comment-user {
-  font-weight: 500;
-  color: #333;
-}
-
-.comment-timestamp {
-  font-size: 12px;
-  color: #666;
-}
-
-.comment-actions {
-  margin-top: 8px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.comment-text {
-  color: #444;
-  font-size: 14px;
-  line-height: 1.5;
 }
 </style>
