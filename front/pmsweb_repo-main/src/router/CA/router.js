@@ -1,8 +1,8 @@
 import CA1000_10 from '@/views/CA/CA1000_10.vue'
 import CA_PostCreateForm from '@/views/CA/CA_PostCreateForm.vue'
 import CA_PostDetailForm from '@/views/CA/CA_PostDetailForm.vue'
-
 import CA_PostDetailForm2 from '@/views/CA/CA_PostDetailForm2.vue'
+import CA2000_10 from '@/views/CA/CA2000_10.vue'
 
 
 export const caRoutes = [
@@ -29,6 +29,11 @@ export const caRoutes = [
     component: CA_PostDetailForm2,
     props: true
   },  
+  {  
+    path: 'CA2000_10', 
+    name: 'CA2000_10',
+    component: CA2000_10,    
+  },     
 ]
 
 export default caRoutes
