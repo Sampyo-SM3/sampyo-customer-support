@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.connectBoard.repository.blueaccount.CommentRepository">
+
+    <!-- 게시글의 모든 댓글과 대댓글 조회 -->
+    <select id="findByPostIdOrderByCreatedAtAsc" parameterType="Long" resultType="com.example.connectBoard.dto.CommentDTO">   	
+		SELECT 
+		   c.*,
+		   CASE 
+		       WHEN c.depth = 0 THEN c.commentId
+		       ELSE c.parentId 
+		   END as groupId
+		FROM Comments c
+		WHERE c.postId = #{postId}
+		   AND c.deleteYn = 'N'
+		ORDER BY groupId, c.depth, c.createdAt;
+        
+    </select>
+
+	<insert id="insertComment" parameterType="com.example.connectBoard.dto.CommentDTO">
+    	INSERT INTO Comments (postId, userId, content, parentId, depth, createdAt, updatedAt, deleteYn)
+   		VALUES (
+        	#{postId}, 
+        	#{userId}, 
+        	#{content}, 
+        	#{parentId, jdbcType=INTEGER}, 
+        	CASE 
+            	WHEN #{parentId} IS NULL THEN 0 
+            	ELSE (SELECT depth FROM Comments WHERE commentId = #{parentId}) + 1 
+        	END, 
+        	GETDATE(), GETDATE(), 'N'
+    	)
+	</insert>
+	
+	<update id="deleteComment" parameterType="int">
+   		UPDATE Comments 
+    	SET deleteYn = 'Y'
+    	WHERE commentId = #{commentId} 
+       		OR parentId IN (
+           		SELECT commentId FROM Comments WHERE parentId = #{commentId}
+       			)
+	</update>
+</mapper>

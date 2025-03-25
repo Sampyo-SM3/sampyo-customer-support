@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.connectBoard.dto.CommentDTO;
-import com.example.connectBoard.repository.CommentRepository;
-import com.example.connectBoard.repository.RequireRepository;
+import com.example.connectBoard.repository.spc.CommentRepository;
+import com.example.connectBoard.repository.spc.RequireRepository;
 
 @Service
 public class CommentService {

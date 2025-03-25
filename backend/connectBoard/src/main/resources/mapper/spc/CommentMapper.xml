@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.connectBoard.repository.CommentRepository">
+<mapper namespace="com.example.connectBoard.repository.spc.CommentRepository">
 
     <!-- 게시글의 모든 댓글과 대댓글 조회 -->
     <select id="findByPostIdOrderByCreatedAtAsc" parameterType="Long" resultType="com.example.connectBoard.dto.CommentDTO">   	

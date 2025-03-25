@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import com.example.connectBoard.dto.EmployeePreferenceDto;
 import com.example.connectBoard.exception.Exceptions.PasswordMismatchException;
 import com.example.connectBoard.exception.Exceptions.UserNotFoundException;
-import com.example.connectBoard.repository.LoginRepository;
+import com.example.connectBoard.repository.spc.LoginRepository;
 
 @Service
 public class LoginService {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.connectBoard.repository.MenuItemRepository">
+<mapper namespace="com.example.connectBoard.repository.spc.MenuItemRepository">
 
     <resultMap id="menuItemResultMap" type="com.example.connectBoard.dto.response.MenuItemResponseDto$MenuItem">
         <result property="mCode" column="mCode"/>
