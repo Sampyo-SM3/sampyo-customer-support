@@ -40,15 +40,16 @@
 	
 	<!-- 게시글 등록 -->
 	<insert id="insertRequire" parameterType="com.example.connectBoard.dto.RequireDTO">
-        INSERT INTO board (
-            projectName,
-            projectContent,
-            businessSector,
-            insertDt,
-            updateDt,
-            requesterId,
-            requesterName,
-            processState
+        INSERT INTO board (            
+			sub, 
+			etc, 
+			division, 
+			insertDt, 
+			updateDt, 
+			writerId, 
+			manager, 
+			uId, 
+			processState
         ) VALUES (
             #{projectName, jdbcType=VARCHAR},
             #{projectContent, jdbcType=VARCHAR},
@@ -57,7 +58,8 @@
             GETDATE(),
             #{requesterId, jdbcType=VARCHAR},
             #{requesterName, jdbcType=VARCHAR},
-            #{processState, jdbcType=VARCHAR}        
+            #{requesterName, jdbcType=VARCHAR},
+            #{processState, jdbcType=VARCHAR}                  
     	)
     	
 	</insert>	

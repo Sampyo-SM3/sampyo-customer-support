@@ -30,7 +30,8 @@ public class RequireService {
         return requireRepositoy.searchRequiresByCriteria(criteria);
     }   
     
-    public void insertRequire(RequireDTO require) {        
+    public void insertRequire(RequireDTO require) {
+    	System.out.println("--insertRequire 서비스--");
     	requireRepositoy.insertRequire(require);
     }    
 

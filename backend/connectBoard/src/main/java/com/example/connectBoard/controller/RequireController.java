@@ -4,6 +4,8 @@ import com.example.connectBoard.dto.RequireDTO;
 import com.example.connectBoard.dto.RequireSearchCriteria;
 import com.example.connectBoard.service.RequireService;
 
+import ch.qos.logback.core.recovery.ResilientSyslogOutputStream;
+
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -63,11 +65,13 @@ public class RequireController {
     
 	/* 게시글 최초등록 */
     @PostMapping("/require/insert")
-    public ResponseEntity<?> insertRequire(@RequestBody RequireDTO require) {    	
+    public ResponseEntity<?> insertRequire(@RequestBody RequireDTO require) {
+    	System.out.println("--insertRequire--");
         try {
         	requireService.insertRequire(require);
             return ResponseEntity.ok("게시글이 성공적으로 등록되었습니다.");
         } catch (Exception e) {
+        	System.out.println("서버 오류 발생: " + e.getMessage());
             return ResponseEntity.status(500).body("서버 오류 발생: " + e.getMessage());
         }
     }    
