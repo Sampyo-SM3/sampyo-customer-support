@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="pr-5 pl-5 pt-7">
-    
+
 
     <!-- <v-row>
       <div class="breadcrumb-div pl-3"> {{ savedMidMenu }} &nbsp; > &nbsp; {{ savedSubMenu }}</div>      
@@ -8,7 +8,7 @@
 
     <v-row>
       <v-col>
-        <div class="title-div">SR요청</div>
+        <div class="title-div" @click="test()">SR요청</div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
@@ -84,15 +84,26 @@
       </v-col>
     </v-row>
 
+    <v-row no-gutters class="search-row">
+      <v-col class="search-col title-category">
+        <div class="label-box">제목</div>
+
+        <v-text-field v-model="sub" placeholder="제목을 입력을 입력하세요" clearable hide-details density="compact"
+          variant="outlined" class="title-search"></v-text-field>
+      </v-col>
+
+    </v-row>
+
     <v-row no-gutters class="search-row bottom-row">
       <v-col class="search-col product-category">
         <div class="label-box">담당자</div>
 
-        <v-text-field v-model="requesterId" placeholder="담당자명 입력을 입력하세요" clearable hide-details density="compact"
+        <v-text-field v-model="manager" placeholder="담당자명 입력을 입력하세요" clearable hide-details density="compact"
           variant="outlined" class="manager-search"></v-text-field>
       </v-col>
 
     </v-row>
+
 
     <br>
     <br>
@@ -169,16 +180,16 @@
               <v-checkbox hide-details density="compact" v-model="item.selected"></v-checkbox>
             </div>
             <div class="td-cell">{{ item.seq }}</div>
-            <div class="td-cell">{{ formatDate(item.insertDt) }}</div>
+            <div class="td-cell">{{ formatDate(item.requestDate) }}</div>
             <div class="td-cell title-cell">
               <router-link :to="{ name: 'CA_PostDetailForm2', params: { receivedSeq: item.seq } }" class="title-link">{{
-                item.projectName }}</router-link>
+                item.sub }}</router-link>
             </div>
-            <div class="td-cell">{{ item.businessSector }}</div>
+            <div class="td-cell">{{ item.division }}</div>
             <div class="td-cell" :class="getStatusClass(item.status)">{{ item.status }}</div>
-            <div class="td-cell">{{ formatDate(item.completeDt) }}</div>
+            <div class="td-cell">{{ formatDate(item.completeDate) }}</div>
             <div class="td-cell">{{ item.manager || '-' }}</div>
-            <div class="td-cell">{{ calculateDuration(item.insertDt, item.completeDt) }}</div>
+            <div class="td-cell">{{ calculateDuration(item.requestDate, item.completeDate) }}</div>
             <!-- <div class="td-cell">{{ item.memo || '-' }}</div> -->
           </div>
         </div>
@@ -269,7 +280,8 @@ export default {
       endDate: '',
       startDateMenu: false,  // 시작일 날짜 선택기 메뉴 표시 여부
       endDateMenu: false,    // 종료일 날짜 선택기 메뉴 표시 여부
-      requesterId: '',
+      manager: '',
+      sub: '',
       dateRange: 'month',
       productType: 'test1',
       tableData: [],
@@ -354,6 +366,40 @@ export default {
   },
 
   methods: {
+    test() {
+      console.log('--test--');
+
+      try {
+        // 폼 타입 결정
+        let formType = ''
+        formType = 'WF_FORM_LEGACY_FI_STATE_UNBAN'
+        // formType = 'WF_FO.RM_SR'
+        // formType = 'WF_FORM_SR_V0'
+
+        // URL 및 파라미터 설정
+        // const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
+        const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
+        const params = {
+          key: 1,
+          empno: 1,
+          legacy_form: formType,
+          datatype: 'xml',
+          ip: '127.0.0.1',
+          db: 'tttt'
+        }
+
+        // 쿼리 파라미터 문자열 생성
+        const queryString = new URLSearchParams(params).toString()
+        const fullUrl = `${baseUrl}?${queryString}`
+
+        // 새 창에서 URL 열기
+        window.open(fullUrl, '_blank')
+
+
+      } catch (error) {
+        console.error('상신 처리 중 오류 발생:', error)
+      }
+    },
     checkLocalStorage() {
       const midMenuFromStorage = localStorage.getItem('midMenu');
       const subMenuFromStorage = localStorage.getItem('subMenu');
@@ -537,9 +583,12 @@ export default {
           params: {
             startDate: this.startDate + ' 00:00:00',
             endDate: this.endDate + ' 23:59:59',
-            requesterId: this.requesterId
+            manager: this.manger,
+            sub: this.sub
           }
         });
+
+        console.log(response.data);
 
         // API 응답 데이터 처리
         if (response.data && Array.isArray(response.data)) {
@@ -550,7 +599,7 @@ export default {
             status: item.processState || this.getRandomStatus(),
 
             // 테이블에 표시할 데이터 매핑
-            manager: item.requesterId || '-',  // 담당자 필드가 없어서 임시로 요청자 ID 사용
+            manager: item.manager || '-',  // 담당자 필드가 없어서 임시로 요청자 ID 사용
             memo: item.currentIssue || '-'     // 메모 필드가 없어서 임시로 현재 이슈 사용
           }));
 
@@ -684,6 +733,13 @@ export default {
 }
 
 .manager-search {
+  padding-block: 10px;
+  padding-left: 10px;
+  width: 800px;
+  font-weight: 400;
+}
+
+.title-search {
   padding-block: 10px;
   padding-left: 10px;
   width: 800px;
@@ -854,7 +910,8 @@ export default {
 }
 
 .request-period,
-.product-category {
+.product-category,
+.title-category {
   max-width: 550px;
   flex-grow: 0;
 }

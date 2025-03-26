@@ -4,39 +4,34 @@
 
 <mapper namespace="com.example.connectBoard.repository.spc.RequireRepository">
 	
-	
 	<!-- 검색 조건에 따른 요청 목록 조회 -->
 	<select id="searchRequiresByCriteria" parameterType="com.example.connectBoard.dto.RequireSearchCriteria" resultType="com.example.connectBoard.dto.RequireDTO">
 		SELECT
 		    b.seq,
-		    b.projectName,
-		    b.businessSector,
-		    b.projectOverview,
-		    b.requesterPosition,
-		    b.currentIssue,
-		    b.expectedEffect,
-		    b.finalDeliverables,
-		    b.requesterId,
-		    b.requesterEmail,
-		    b.requesterPhone,
+		    b.sub,
+		    b.division,
+		    b.context,
+		    b.uId,
+		    b.usem,
 			<!-- b.processState, -->
 			c.codeName AS processState,	    
-		    b.insertDt,
-		    b.completeDt			    	   	
+			b.manager,
+		    b.requestDate,
+		    b.completeDate			    	   	
 		FROM board b inner join code_master c
-		on b.processState = c.codeId					
+		 on b.processState = c.codeId					
 	<where>
-	    <if test="requesterId != null and requesterId != ''">
-	        b.requesterId = #{requesterId}
+	    <if test="manager != null and manager != ''">
+	        b.manager LIKE '%' + #{manager} + '%'
 	    </if>
 	    <if test="startDate != null and startDate != ''">
-	        AND b.insertDt >= #{startDate}
+	        AND b.requestDate >= #{startDate}
 	    </if>
 	    <if test="endDate != null and endDate != ''">
-	        AND b.insertDt &lt;= #{endDate}
+	        AND b.requestDate &lt;= #{endDate}
 	    </if>
-	    <if test="projectName != null and projectName != ''">
-	        AND b.projectName LIKE '%' + #{projectName} + '%'
+	    <if test="sub != null and sub != ''">
+	        AND b.sub LIKE '%' + #{sub} + '%'
 	        <!-- AND b.projectName LIKE '%' + ? + '%' COLLATE SQL_Latin1_General_CP1_CI_AS -->
 	    </if>	    
 	</where>
@@ -57,7 +52,7 @@
         ) VALUES (
             #{projectName, jdbcType=VARCHAR},
             #{projectContent, jdbcType=VARCHAR},
-            #{businessSector, jdbcType=VARCHAR},
+            #{businessSector, jdbcType=VARCHAR}, 
             GETDATE(),
             GETDATE(),
             #{requesterId, jdbcType=VARCHAR},
@@ -72,24 +67,29 @@
 	<select id="getAllRequires" resultType="com.example.connectBoard.dto.RequireDTO">
 		select
 			seq,
-			projectName,
-			projectContent,
-			businessSector,
-			projectOverview,
-			requesterPosition,
-			currentIssue,
-			expectedEffect,
-			finalDeliverables,
-			detailTask,
-			detailContent,
-			detailItDevRequest,
+			sub,
+			context,
+			taskName,
+			help,
+			necessity,
+			effect,
+			module,
+			beforeTaskContent,
+			afterTaskContent,
+			useDept,
+			attachDoc,
+			requestDate,
+			acceptDate,
+			completeRequestDate,
+			completeDate,
+			etc,
+			uId,
+			usem,
+			dpId,
+			dpDn,
+			manager,
+			division,
 			processState,
-			requesterId,
-			requesterName,
-			requesterDeptCd,
-			requesterDeptNm,
-			requesterEmail,
-			requesterPhone,
 			insertDt,
 			updateDt,
 			completeDt
@@ -100,28 +100,33 @@
 	<!-- ✅ 특정 SEQ 데이터 조회 -->
 	<select id="getRequire" parameterType="int" resultType="com.example.connectBoard.dto.RequireDTO">
 		select
-		    seq,
-		    projectName,
-		    projectContent,
-		    businessSector,
-		    projectOverview,
-		    requesterPosition,
-		    currentIssue,
-		    expectedEffect,
-		    finalDeliverables,
-		    detailTask,
-		    detailContent,
-		    detailItDevRequest,
-		    processState,
-		    requesterId,
-		    requesterName,
-		    requesterDeptCd,
-		    requesterDeptNm,
-		    requesterEmail,
-		    requesterPhone,
-		    insertDt,
-		    updateDt,
-		    completeDt
+			seq,
+			sub,
+			context,
+			taskName,
+			help,
+			necessity,
+			effect,
+			module,
+			beforeTaskContent,
+			afterTaskContent,
+			useDept,
+			attachDoc,
+			requestDate,
+			acceptDate,
+			completeRequestDate,
+			completeDate,
+			etc,
+			uId,
+			usem,
+			dpId,
+			dpDn,
+			manager,
+			division,
+			processState,
+			insertDt,
+			updateDt,
+			completeDt
 		from board
 		where seq = #{seq};
 	</select>
