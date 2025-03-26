@@ -23,8 +23,8 @@
       <!-- 제목 필드 -->
       <v-col class="search-col request-period">
         <div class="label-box">제 목</div>
-        <v-text-field v-model="title" placeholder="제목을 입력하세요" clearable hide-details density="compact"
-          variant="outlined" class="manager-search"></v-text-field>
+        <v-text-field v-model="sub" placeholder="제목을 입력하세요" clearable hide-details density="compact" variant="outlined"
+          class="manager-search"></v-text-field>
       </v-col>
     </v-row>
 
@@ -79,7 +79,7 @@ export default {
       showError: false,
       userName: null,
       userId: null,
-      title: '',
+      sub: '',
       content: ''
     }
   },
@@ -108,7 +108,7 @@ export default {
       this.errorMessages = [];
 
       // 제목 검증
-      if (!this.title || this.title.trim() === '') {
+      if (!this.sub || this.sub.trim() === '') {
         this.errorMessages.push('제목을 입력해주세요.');
         this.showError = true;
         return false;
@@ -133,12 +133,12 @@ export default {
 
       try {
         const boardData = {
-          "projectName": this.title,
-          "projectContent": this.content,
-          "requesterId": this.userId,
-          "requesterName": this.userName,
+          "sub": this.sub,
+          "content": this.content,
+          "writerId": this.userId,
+          "uid": this.userName,
           "processState": "C",
-          "businessSector": "시멘트"
+          "division": "시멘트"
         };
 
         const response = await apiClient.post("/api/require/insert", boardData);

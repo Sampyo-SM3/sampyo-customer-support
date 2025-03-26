@@ -46,34 +46,41 @@
     <v-row no-gutters class="search-row top-row">
       <v-col class="search-col product-category">
         <div class="label-box colNm">제목</div>
-        <div class="author-value">{{ userName }}</div>
+        <div class="author-value">{{ inquiry.sub }}</div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col request-period">
         <div class="label-box colNm">업무명</div>
-        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+        <div class="author-value">{{ inquiry.taskName }}</div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col request-period">
         <div class="label-box colNm">협조</div>
-        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+        <div class="author-value">{{ inquiry.help }}</div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col request-period">
         <div class="label-box colNm">개발(변경) 필요성</div>
-        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+        <div class="author-value">{{ inquiry.necessity }}</div>
       </v-col>
     </v-row>
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col request-period">
         <div class="label-box colNm">기대효과</div>
-        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+        <div class="author-value">{{ inquiry.effect }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col request-period">
+        <div class="label-box colNm">개발(변경) 모듈</div>
+        <div class="author-value">{{ inquiry.module }}</div>
       </v-col>
     </v-row>
 
@@ -85,8 +92,8 @@
       <v-col style="border-right: 1px solid #e0e0e0;">
         <div>
           <div class="sub-label">변경전</div>
-          <div class="author-value multiline-box">
-            {{ inquiry.PROJECT_NAME }}
+          <div class="multiline-box">
+            {{ inquiry.beforeTaskContent }}
           </div>
         </div>
       </v-col>
@@ -95,67 +102,60 @@
       <v-col>
         <div>
           <div class="sub-label">변경후</div>
-          <div class="author-value multiline-box">
-            {{ inquiry.PROJECT_NAME }}
+          <div class="multiline-box">
+            {{ inquiry.afterTaskContent }}
           </div>
         </div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
-      <v-col class="search-col request-period">
-        <div class="label-box colNm">개발(변경) 업무내용</div>
-        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
-      </v-col>
-    </v-row>
-
-    <v-row no-gutters class="search-row middle-row">
       <v-col cols="6" class="search-col d-flex align-center">
         <div class="label-box colNm">사용부서</div>
-        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+        <div class="author-value">{{ inquiry.useDept }}</div>
       </v-col>
 
       <v-col class="search-col d-flex align-center" style="max-width: 300px;">
         <div class="label-box colNm">첨부문서</div>
-        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+        <div class="author-value">{{ inquiry.attachDoc }}</div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
       <v-col cols="6" class="search-col d-flex align-center">
         <div class="label-box colNm">의뢰일자</div>
-        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+        <div class="author-value">{{ inquiry.requestDate }}</div>
       </v-col>
 
       <v-col class="search-col" style="max-width: 300px;">
         <div class="label-box colNm">접수일자</div>
-        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+        <div class="author-value">{{ inquiry.acceptDate }}</div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
       <v-col cols="6" class="search-col d-flex align-center">
         <div class="label-box colNm">완료요청일자</div>
-        <div class="author-value">{{ userName }}</div>
+        <div class="author-value">{{ inquiry.completeRequestDate }}</div>
       </v-col>
 
       <v-col class="search-col" style="max-width: 300px;">
         <div class="label-box colNm">완료일자</div>
-        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+        <div class="author-value">{{ inquiry.completeDate }}</div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col request-period">
         <div class="label-box colNm">기타</div>
-        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+        <div class="author-value">{{ inquiry.etc }}</div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row bottom-row">
       <v-col class="search-col request-period">
         <div class="label-box colNm">첨부목록</div>
-        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+        <div class="author-value"></div>
       </v-col>
     </v-row>
 
@@ -218,35 +218,30 @@ export default {
       step: 1,
       selectedStatus: '', // 추가된 상태 변수
       inquiry: {
-        REQUESTER_NAME: "",
-        REQUESTER_DEPT_NM: "",
-        REQUESTER_EMAIL: "",
-        REQUESTER_PHONE: "",
-        PROJECT_NAME: "",
-        BUSINESS_SECTOR: "",
-        PROJECT_OVERVIEW: "",
-        PAIN_POINT: "",
-        EXPECTED_EFFECT: "",
-        DELIVERABLES: "",
-        DETAIL_TASK: "",
-        DETAIL_CONTENT: "",
-        DETAIL_IT_DEV_REQUEST: "",
-        REQUESTERID: "",
-        // 아래 데이터는 DETAIL_TASK, DETAIL_CONTENT, DETAIL_IT_DEV_REQUEST로 가져오고 있습니다.
-        // 추후 데이터를 한 줄 씩 보여주는 방식으로 변경하면 아래 주석 부분을 사용해야 합니다.
-        /////////////////////////////////////////////////////////////////////////////////
-        // DETAIL_REQUIREMENTS: [
-        //   {
-        //     taskName: "1-1 몰탈 문서발급 메뉴 생성",
-        //     description: "스마트 오더 홈페이지에 몰탈 제품 관련 문서 자료를 다운받을 수 있는 자료실 개설",
-        //     itRequest: "스마트 오더 '몰탈 문서발급' 메뉴 신설, 회원 및 사업자 로그인 후 접근 가능"
-        //   },
-        //   {
-        //     taskName: "1-2 삼표 스마트오더 홈페이지 접근성 개선",
-        //     description: "네이버, 구글 등 주요 포털 사이트에서 '삼표 몰탈', '삼표 문서', '삼표 스마트오더' 검색 시 상위 노출되도록 조정",
-        //     itRequest: "네이버 고객센터 등 연락하여 검색 로직 수정 요청"
-        //   }
-        // ]
+        sub: "",
+        context: "",
+        taskName: "",
+        help: "",
+        necessity: "",
+        effect: "",
+        module: "",
+        beforeTaskContent: "",
+        afterTaskContent: "",
+        useDept: "",
+        attachDoc: "",
+        requestDate: "",
+        acceptDate: "",
+        completeRequestDate: "",
+        completeDate: "",
+        etc: "",
+        uid: "",
+        usem: "",
+        dpId: "",
+        dpDn: "",
+        manager: "",
+        division: "",
+        processState: ""
+
       },
       management: {
         PROGRESS: ""
@@ -312,19 +307,30 @@ export default {
 
         // ✅ 받아온 데이터를 inquiry에 업데이트
         this.inquiry = {
-          REQUESTER_NAME: response.data?.requesterName || "",
-          REQUESTER_DEPT_NM: response.data?.requesterDeptNm || "",
-          REQUESTER_EMAIL: response.data?.requesterEmail || "",
-          REQUESTER_PHONE: response.data?.requesterPhone || "",
-          PROJECT_NAME: response.data?.projectName || "",
-          BUSINESS_SECTOR: response.data?.businessSector || "",
-          PROJECT_OVERVIEW: response.data?.projectOverview || "",
-          PAIN_POINT: response.data?.currentIssue || "",
-          EXPECTED_EFFECT: response.data?.expectedEffect || "",
-          DELIVERABLES: response.data?.finalDeliverables || "",
-          DETAIL_TASK: response.data?.detailTask || "",
-          DETAIL_CONTENT: response.data?.detailContent || "",
-          DETAIL_IT_DEV_REQUEST: response.data?.detailItDevRequest || "",
+
+          sub: response.data?.sub || "",
+          context: response.data?.context || "",
+          taskName: response.data?.taskName || "",
+          help: response.data?.help || "",
+          necessity: response.data?.necessity || "",
+          effect: response.data?.effect || "",
+          module: response.data?.module || "",
+          beforeTaskContent: response.data?.beforeTaskContent || "",
+          afterTaskContent: response.data?.afterTaskContent || "",
+          useDept: response.data?.useDept || "",
+          attachDoc: response.data?.attachDoc || "",
+          requestDate: response.data?.requestDate || "",
+          acceptDate: response.data?.acceptDate || "",
+          completeRequestDate: response.data?.completeRequestDate || "",
+          completeDate: response.data?.completeDate || "",
+          etc: response.data?.etc || "",
+          uid: response.data?.uid || "",
+          usem: response.data?.usem || "",
+          dpId: response.data?.dpId || "",
+          dpDn: response.data?.dpDn || "",
+          manager: response.data?.manager || "",
+          division: response.data?.division || "",
+          processState: response.data?.processState || "",
           management: {
             PROGRESS: processState
           }
@@ -579,12 +585,6 @@ export default {
   word-break: break-word;
 }
 
-.custom-btn {
-  font-size: 14px;
-  height: 35px;
-  border-radius: 10px;
-}
-
 .search-row {
   display: flex;
   align-items: stretch;
@@ -763,14 +763,43 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: 500;
-  background-color: #f5f5f5;
   white-space: nowrap;
   padding: 0 4px;
   border-right: 1px solid #eaeaea;
   margin-bottom: 5px;
   color: #333333 !important;
   background-color: #e6eef8 !important;
+}
+
+.custom-btn {
+  background-color: #1867C0;
+  color: white;
+  font-size: 13px;
+  border: none;
+  box-shadow: none;
+  border-radius: 6px;
+  margin-top: -10px !important;
+  margin-bottom: 15px;
+  min-width: 60px;
+}
+
+.comment-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.multiline-box {
+  font-size: 14px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+
+  padding: 10px;
 }
 </style>

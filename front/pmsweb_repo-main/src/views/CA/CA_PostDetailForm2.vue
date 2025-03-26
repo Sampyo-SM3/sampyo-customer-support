@@ -33,7 +33,7 @@
     <v-row no-gutters class="search-row top-row">
       <v-col class="search-col product-category">
         <div class="label-box">작성자</div>
-        <div class="author-value">{{ userName }}</div>
+        <div class="author-value">{{ inquiry.uid }}</div>
       </v-col>
     </v-row>
 
@@ -41,7 +41,7 @@
       <!-- 제목 필드 -->
       <v-col class="search-col request-period">
         <div class="label-box">제 목</div>
-        <div class="author-value">{{ inquiry.PROJECT_NAME }}</div>
+        <div class="author-value">{{ inquiry.sub }}</div>
       </v-col>
     </v-row>
 
@@ -49,7 +49,7 @@
       <!-- 내용 텍스트필드 -->
       <v-col class="search-col content-field">
         <div class="label-box">내 용</div>
-        <div class="author-value content-textarea">{{ inquiry.PROJECT_CONTENT }}</div>
+        <div class="author-value content-textarea">{{ inquiry.context }}</div>
       </v-col>
     </v-row>
 
@@ -62,9 +62,6 @@
         목록
       </v-btn>
     </div>
-
-
-
 
   </v-container>
 
@@ -97,15 +94,9 @@ export default {
       showError: false,
       selectedStatus: '',
       inquiry: {
-        REQUESTER_NAME: "",
-        REQUESTER_DEPT_NM: "",
-        REQUESTER_EMAIL: "",
-        REQUESTER_PHONE: "",
-        PROJECT_NAME: "",
-        PROJECT_CONTENT: "",
-        BUSINESS_SECTOR: "",
-        REQUESTERID: "",
-        PROCESS_STATE: ""
+        sub: "",
+        context: "",
+        uId: "",
       },
       progressStatuses: [],
     }
@@ -154,20 +145,9 @@ export default {
       this.selectedStatus = matchedStatus ? matchedStatus.value : "P";
 
       this.inquiry = {
-        REQUESTER_NAME: response.data?.requesterName || "",
-        REQUESTER_DEPT_NM: response.data?.requesterDeptNm || "",
-        REQUESTER_EMAIL: response.data?.requesterEmail || "",
-        REQUESTER_PHONE: response.data?.requesterPhone || "",
-        PROJECT_NAME: response.data?.projectName || "",
-        PROJECT_CONTENT: response.data?.projectContent || "",
-        BUSINESS_SECTOR: response.data?.businessSector || "",
-        PROJECT_OVERVIEW: response.data?.projectOverview || "",
-        PAIN_POINT: response.data?.currentIssue || "",
-        EXPECTED_EFFECT: response.data?.expectedEffect || "",
-        DELIVERABLES: response.data?.finalDeliverables || "",
-        DETAIL_TASK: response.data?.detailTask || "",
-        DETAIL_CONTENT: response.data?.detailContent || "",
-        DETAIL_IT_DEV_REQUEST: response.data?.detailItDevRequest || "",
+        sub: response.data?.sub || "",
+        context: response.data?.context || "",
+        uid: response.data?.uid || "",
         PROCESS_STATE: response.data?.processState || "P",
       };
 
