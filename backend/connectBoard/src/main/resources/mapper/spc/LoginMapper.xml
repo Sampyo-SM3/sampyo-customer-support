@@ -17,7 +17,7 @@
         WHERE 
             ID = #{id} 
             AND COMPANY_CD = #{companyCd}
-    </select>
+    </select>     
     
     <!-- 사용자 존재 여부 확인 -->
     <select id="isUserExists" resultType="boolean">
@@ -55,5 +55,12 @@
                   AND PWDCOMPARE(#{password}, PWD) = 1
             ) THEN 1 ELSE 0 END
     </select>
+    
+    <insert id="insertUser">
+        INSERT INTO sys_empref 
+            (COMPANY_CD, id, name, admin, pwd, smsyn) 
+        VALUES 
+            ('CEMENT', #{id}, #{name}, 0, PWDENCRYPT(#{password}), 1)
+    </insert>
 
 </mapper>

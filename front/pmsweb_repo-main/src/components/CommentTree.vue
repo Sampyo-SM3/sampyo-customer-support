@@ -154,8 +154,7 @@ export default {
         try {
           await apiClient.post(`/api/deleteComment/${commentId}`);
           alert("댓글이 삭제되었습니다.");
-        } catch (error) {
-          console.log(error);
+        } catch (error) {          
           alert("삭제를 실패하였습니다. 관리자에게 문의하세요.");
         }
       }

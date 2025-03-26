@@ -134,8 +134,7 @@ export default defineComponent({
             level3Map.get(parentCode).children.push(item)
           }
         }
-      })
-      // console.log('지금 테스트!! -> ', result)
+      })      
       return result
     })
     

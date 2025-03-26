@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,10 +28,7 @@ public class CommentController {
       
     
     @GetMapping("/comments")
-    public ResponseEntity<?> getCommentsByPostId(@RequestParam("postId") Long postId) {	
-       System.out.println("------getCommentsByPostId()-----");
-       System.out.println("Post ID: " + postId);
-
+    public ResponseEntity<?> getCommentsByPostId(@RequestParam("postId") Long postId) {	       
        try {
            List<CommentDTO> comments = commentService.getCommentsByPostId(postId);
 
@@ -47,10 +43,7 @@ public class CommentController {
     }      
     
     @GetMapping("/comments/{postId}")
-    public ResponseEntity<?> getCommentsByPostIdWithPath(@PathVariable("postId") Long postId) {	
-        System.out.println("------ getCommentsByPostIdWithPath() -----");
-        System.out.println("Post ID: " + postId);
-
+    public ResponseEntity<?> getCommentsByPostIdWithPath(@PathVariable("postId") Long postId) {	        
         try {
             List<CommentDTO> comments = commentService.getCommentsByPostId(postId);
             if (comments.isEmpty()) {

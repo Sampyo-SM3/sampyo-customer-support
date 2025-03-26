@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.connectBoard.dto.CommentDTO;
 import com.example.connectBoard.dto.RequireDTO;
 import com.example.connectBoard.dto.RequireSearchCriteria;
 import com.example.connectBoard.repository.spc.RequireRepository;

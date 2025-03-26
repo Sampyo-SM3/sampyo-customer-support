@@ -1,7 +1,6 @@
 package com.example.connectBoard.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.connectBoard.dto.request.MenuItemRequestDto;
@@ -18,10 +17,7 @@ public class MenuItemController {
 
     @GetMapping
     // test커밋 나는 세림세림
-    public MenuItemResponseDto getMenuItems(@RequestParam(required = false) String auth, @RequestParam String id) {
-    	System.out.println("------------getMenuItems-------------");
-    	System.out.println(auth);
-    	System.out.println(id);
+    public MenuItemResponseDto getMenuItems(@RequestParam(required = false) String auth, @RequestParam String id) {    	
         MenuItemRequestDto requestDto = new MenuItemRequestDto(auth, id);
                 
 		return menuitemService.getMenuItems(requestDto);

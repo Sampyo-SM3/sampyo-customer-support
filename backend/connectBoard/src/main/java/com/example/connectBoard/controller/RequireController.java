@@ -1,6 +1,5 @@
 package com.example.connectBoard.controller;
 
-import com.example.connectBoard.dto.CommentDTO;
 import com.example.connectBoard.dto.RequireDTO;
 import com.example.connectBoard.dto.RequireSearchCriteria;
 import com.example.connectBoard.service.RequireService;
@@ -64,8 +63,7 @@ public class RequireController {
     
 	/* 게시글 최초등록 */
     @PostMapping("/require/insert")
-    public ResponseEntity<?> insertRequire(@RequestBody RequireDTO require) {
-    	System.out.println("--insertRequire--");
+    public ResponseEntity<?> insertRequire(@RequestBody RequireDTO require) {    	
         try {
         	requireService.insertRequire(require);
             return ResponseEntity.ok("게시글이 성공적으로 등록되었습니다.");

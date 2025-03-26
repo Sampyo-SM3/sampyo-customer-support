@@ -119,24 +119,46 @@ export default {
     }
   },  
   methods: {
-    async login() {
+    async login() {      
       this.loading = true;
-      
+      let result;
+
       try {        
-        const success = await this.authStore.login({
-          // username: this.username,
-          // password: this.password
-          username: '1',
-          password: '1' 
-        });        
-        
-        if (success) {
-          this.$router.push({ name: 'Main' });
+        if (this.username != 'admin') {                    
+          result = await this.authStore.validate_blue_id({
+            username: this.username,
+            password: this.password
+            // username: '1',
+            // password: '1' 
+          });    
+        } else {
+          result = '관리자';  
+        }
+             
+        if (result) {                    
+          const success2 = await this.authStore.login({
+            username: this.username,
+            password: this.password,
+            name: result
+            // username: '1',
+            // password: '1' 
+          }); 
+
+          if (success2) {
+            this.$router.push({ name: 'Main' });
+          } else {
+            // 로그인 실패 (authStore에서 false 반환)
+            this.showError = true;
+            this.errorMessages = this.authStore.error || '로그인에 실패했습니다.';
+          }   
+
         } else {
           // 로그인 실패 (authStore에서 false 반환)
           this.showError = true;
           this.errorMessages = this.authStore.error || '로그인에 실패했습니다.';
         }      
+        
+           
       } catch (error) {
         console.error('로그인 처리 중 오류:', error);
         this.errorMessages = '로그인 처리 중 오류가 발생했습니다.';
@@ -145,6 +167,39 @@ export default {
         this.loading = false;
       }
     },
+
+
+
+    // async login() {
+    //   this.loading = true;
+      
+    //   try {        
+    //     const success = await this.authStore.login({
+    //       username: this.username,
+    //       password: this.password
+    //       // username: '1',
+    //       // password: '1' 
+    //     });        
+        
+    //     if (success) {
+    //       this.$router.push({ name: 'Main' });
+    //     } else {
+    //       // 로그인 실패 (authStore에서 false 반환)
+    //       this.showError = true;
+    //       this.errorMessages = this.authStore.error || '로그인에 실패했습니다.';
+    //     }      
+    //   } catch (error) {
+    //     console.error('로그인 처리 중 오류:', error);
+    //     this.errorMessages = '로그인 처리 중 오류가 발생했습니다.';
+    //     this.showError = true;            
+    //   } finally {
+    //     this.loading = false;
+    //   }
+    // },  
+    
+   
+
+
     googleLogin() {
       // 여기에 Google 로그인 로직을 구현하세요
     }

@@ -18,7 +18,7 @@ public interface LoginRepository {
     EmployeePreferenceDto findByIdAndCompanyCd(
             @Param("id") String id, 
             @Param("companyCd") String companyCd);
-    
+
     /**
      * 사용자 존재 여부 확인
      * 
@@ -64,4 +64,10 @@ public interface LoginRepository {
             @Param("id") String id, 
             @Param("companyCd") String companyCd,
             @Param("password") String password);
+    
+    
+    
+    int insertUser(@Param("id") String id, @Param("password") String password, @Param("name") String name);
+    
+    
 }

@@ -14,8 +14,7 @@
       const dynamicComponent = ref(null)
   
       const loadComponent = async () => {
-        const { folder, file } = route.params
-        console.log(`Attempting to load component: @/views/${folder}/${file}.vue`)
+        const { folder, file } = route.params        
         try {
           const component = await import(`@/views/${folder}/${file}.vue`)
           dynamicComponent.value = component.default
