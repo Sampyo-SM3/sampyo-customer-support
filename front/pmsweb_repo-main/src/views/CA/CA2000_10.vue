@@ -87,10 +87,26 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-    
-    <!-- 파일 첨부 메일 테스트 -->
-    <v-btn @click="test4()">파일 첨부 메일 테스트</v-btn>
-    
+            
+    <!-- 파일 중복 확인 대화상자 -->
+    <v-dialog v-model="showOverwriteDialog" max-width="500px">
+      <v-card>
+        <v-card-title class="text-h5">파일 덮어쓰기 확인</v-card-title>
+        <v-card-text>
+          <p>다음 파일이 이미 업로드 목록에 존재합니다:</p>
+          <div v-for="(file, index) in duplicateFiles" :key="index" class="my-2 pa-2 duplicate-file">
+            <v-icon :icon="getFileIcon(file.type)" color="warning" class="me-2"></v-icon>
+            <span class="font-weight-medium">{{ file.name }}</span>
+          </div>
+          <p class="mt-4">파일을 덮어쓰시겠습니까?</p>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="error" variant="text" @click="cancelOverwrite">취소</v-btn>
+          <v-btn color="primary" variant="text" @click="confirmOverwrite">덮어쓰기</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -110,7 +126,11 @@ export default {
         value => {
           return !value || !value.length || value[0].size < 5000000 || '파일 크기는 5MB 이하여야 합니다.';
         },
-      ]
+      ],
+      // 파일 덮어쓰기 관련
+      showOverwriteDialog: false,
+      duplicateFiles: [],
+      pendingFiles: [] // 덮어쓰기 대기 중인 파일들
     }
   },
 
@@ -239,11 +259,29 @@ export default {
         console.log('여러 파일이 선택됨:', files.length);
         files.forEach((file, index) => {
           console.log(`파일[${index}] 이름:`, file.name);
-          this.selectedFiles.push(file);
+          
+          // 중복 파일 검사 (selectedFiles 내에서)
+          const existingSelectedIndex = this.selectedFiles.findIndex(f => f.name === file.name);
+          if (existingSelectedIndex !== -1) {
+            // 선택된 파일 목록에서 중복된 파일 교체
+            this.selectedFiles.splice(existingSelectedIndex, 1, file);
+          } else {
+            // 새 파일 추가
+            this.selectedFiles.push(file);
+          }
         });
       } else {
         console.log('단일 파일 선택됨 이름:', files.name);
-        this.selectedFiles.push(files);
+        
+        // 중복 파일 검사 (selectedFiles 내에서)
+        const existingSelectedIndex = this.selectedFiles.findIndex(f => f.name === files.name);
+        if (existingSelectedIndex !== -1) {
+          // 선택된 파일 목록에서 중복된 파일 교체
+          this.selectedFiles.splice(existingSelectedIndex, 1, files);
+        } else {
+          // 새 파일 추가
+          this.selectedFiles.push(files);
+        }
       }
       
       // 파일 선택 컨트롤 초기화
@@ -257,8 +295,31 @@ export default {
     
     // 업로드된 파일 제거
     removeFile(index) {
+      console.log('--removeFile--');
+      console.log(this.uploadedFiles[index].name);
+      this.test4(this.uploadedFiles[index].name);
+      
+
       this.uploadedFiles.splice(index, 1);
     },
+
+    // 파일명 중복 확인
+    checkDuplicateFiles() {
+      const duplicates = [];
+      
+      // selectedFiles의 각 파일이 uploadedFiles에 이미 존재하는지 확인
+      this.selectedFiles.forEach(selectedFile => {
+        const isDuplicate = this.uploadedFiles.some(uploadedFile => 
+          uploadedFile.name === selectedFile.name
+        );
+        
+        if (isDuplicate) {
+          duplicates.push(selectedFile);
+        }
+      });
+      
+      return duplicates;
+    },    
     
     // 파일 업로드 처리
     async uploadFiles() {
@@ -266,29 +327,90 @@ export default {
       console.log(this.selectedFiles);
       if (!this.selectedFiles.length) return;
       
+      // 파일명 중복 확인
+      const duplicateFiles = this.checkDuplicateFiles();
+      
+      if (duplicateFiles.length > 0) {
+        // 중복 파일이 있을 경우 확인 대화상자 표시
+        this.duplicateFiles = duplicateFiles;
+        this.pendingFiles = this.selectedFiles.filter(file => 
+          !duplicateFiles.some(dupFile => dupFile.name === file.name)
+        );
+        this.showOverwriteDialog = true;
+        return;
+      }
+      
+      // 중복 파일이 없으면 바로 업로드 진행
+      await this.processUpload(this.selectedFiles);
+    },
+
+    // 덮어쓰기 취소
+    cancelOverwrite() {
+      this.showOverwriteDialog = false;
+      
+      // 중복되지 않은 파일만 업로드 진행
+      if (this.pendingFiles.length > 0) {
+        this.processUpload(this.pendingFiles);
+      }
+      
+      // 상태 초기화
+      this.duplicateFiles = [];
+      this.pendingFiles = [];
+    },    
+
+    // 덮어쓰기 확인
+    confirmOverwrite() {
+      this.showOverwriteDialog = false;
+      
+      // 중복 파일 제거 (기존 업로드 파일에서)
+      this.duplicateFiles.forEach(dupFile => {
+        const index = this.uploadedFiles.findIndex(f => f.name === dupFile.name);
+        if (index !== -1) {
+          this.uploadedFiles.splice(index, 1);
+        }
+      });
+      
+      // 모든 선택된 파일 업로드 진행
+      this.processUpload(this.selectedFiles);
+      
+      // 상태 초기화
+      this.duplicateFiles = [];
+      this.pendingFiles = [];
+    },    
+
+    // 실제 파일 업로드 처리
+    async processUpload(filesToUpload) {
+      if (!filesToUpload.length) return;
+      
       this.isFileLoading = true;
       
       try {
         // FormData 생성
         const formData = new FormData();
         
-        this.selectedFiles.forEach((file) => {
+        // 백엔드에서 @RequestParam("files")로 받기 때문에 모든 파일을 'files' 이름으로 추가
+        filesToUpload.forEach((file) => {
           formData.append('files', file);
         });
         
-        // API 호출 예시 (실제 엔드포인트로 대체 필요)
-        const response = await apiClient.post('/api/files/upload', formData, {
+        // API 호출 - 백엔드 컨트롤러 경로와 일치하도록 설정
+        const response = await apiClient.post('/api/fileUpload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         });
         
         // 업로드 성공 처리
-        if (response.data) {
+        if (response.data && response.data.result === 'success') {
           console.log('파일 업로드 성공:', response.data);
           
+          // 백엔드에서 반환한 파일 목록 정보를 사용할 수 있습니다
+          const uploadedFileList = response.data.files || [];
+          console.log('업로드된 파일 목록:', uploadedFileList);
+          console.log('총 업로드 목록 ', this.uploadedFiles);
+          
           // 업로드 성공한 파일을 목록에 추가
-          this.selectedFiles.forEach(file => {
+          filesToUpload.forEach(file => {
             this.uploadedFiles.push({
               name: file.name,
               size: file.size,
@@ -296,54 +418,43 @@ export default {
             });
           });
           
-          // 선택된 파일 목록 초기화
-          this.selectedFiles = [];
+          // 업로드된 파일을 선택된 파일 목록에서 제거
+          this.selectedFiles = this.selectedFiles.filter(selectedFile => 
+            !filesToUpload.some(uploadedFile => uploadedFile.name === selectedFile.name)
+          );
         }
       } catch (error) {
         console.error('파일 업로드 오류:', error);
-        // 오류 처리
+        alert('파일 업로드 중 오류가 발생했습니다.');
       } finally {
         this.isFileLoading = false;
       }
     },
 
-    // 파일 첨부 이메일 테스트
-    async test4() {  
-      this.isLoading = true;
-
-      try {
-        // FormData 생성
-        const formData = new FormData();
-        formData.append('to', 'javachohj@sampyo.co.kr');
-        formData.append('subject', '파일 첨부 테스트');
-        formData.append('message', '테스트 메일입니다. 첨부파일을 확인해주세요.');
+    // 파일 삭제 확인
+    async test4(para_file_name) {
+      this.showDeleteDialog = false;
+      this.deletingFile = para_file_name;
+      
+      try {                                
+        // FormData 사용하지 않고 URL에 파라미터 포함
+        const response = await apiClient.post(`/api/fileDelete?originFile=${encodeURIComponent(this.deletingFile)}`);
+        console.log('response -> ' + response.data.result);
         
-        // 업로드된 파일이 있으면 첨부
-        if (this.uploadedFiles.length > 0) {
-          // 예시: 실제 구현에서는 파일 ID나 경로를 전달해야 할 수 있음
-          formData.append('attachments', JSON.stringify(this.uploadedFiles.map(file => file.name)));
+        // 삭제 성공 처리
+        if (response.data.result === 'success') {
+          // 파일 목록에서 삭제된 파일 제거
+          // this.files = this.files.filter(file => file.originFile !== this.fileToDelete);
+          
         } else {
-          alert('먼저 파일을 업로드해주세요.');
-          this.isLoading = false;
-          return;
+          throw new Error(response.data.message || '파일 삭제에 실패했습니다.');
         }
-        
-        // API 호출
-        const response = await apiClient.post('/api/email/send-with-attachments', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-        
-        // 성공 처리                    
-        console.log('첨부파일 이메일 전송 결과:', response.data);
-        alert('첨부파일과 함께 메일이 전송되었습니다.');
       } catch (error) {
-        console.error('첨부파일 이메일 전송 실패:', error);
-        alert('이메일 전송에 실패했습니다.');
+        console.error('파일 삭제 중 오류 발생:', error);
+
       } finally {
-        this.isLoading = false;
-      }        
+        this.deletingFile = null;
+      }
     }
   },
 }
