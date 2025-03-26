@@ -2,7 +2,7 @@
     <v-container fluid class="pr-5 pl-5 pt-7">
   
       <!-- test -->
-      <v-btn @click="test1()">SR요청서 띄우기 테스트</v-btn>
+      <v-btn @click="test()">SR요청서 띄우기 테스트</v-btn>
       <br>
       <br>      
       <v-btn @click="test2()">알림톡테스트</v-btn>
@@ -37,8 +37,37 @@
     methods: {
       test () {
         console.log('--test--');
-  
-            
+
+        try {       
+          // 폼 타입 결정
+          let formType = ''
+          formType = 'WF_FORM_LEGACY_FI_STATE_UNBAN'
+          formType = 'WF_FORM_SR'
+          // formType = 'WF_FORM_SR_V0'
+          
+          // URL 및 파라미터 설정
+          // const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
+          const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'        
+          const params = {
+            key: 1,
+            empno: 1,
+            legacy_form: formType,
+            datatype: 'xml',
+            ip: '127.0.0.1',
+            db: 'tttt'
+          }
+          
+          // 쿼리 파라미터 문자열 생성
+          const queryString = new URLSearchParams(params).toString()
+          const fullUrl = `${baseUrl}?${queryString}`
+          
+          // 새 창에서 URL 열기
+          window.open(fullUrl, '_blank')
+          
+          
+        } catch (error) {
+          console.error('상신 처리 중 오류 발생:', error)
+        }      
       },
 
 
