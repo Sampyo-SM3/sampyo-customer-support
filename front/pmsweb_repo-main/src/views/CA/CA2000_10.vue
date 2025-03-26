@@ -67,47 +67,35 @@
       },      
 
       async test3() {  
-        // loading.value = true;
+        this.isLoading = true;
   
-        // try {
-        //   // FormData 생성 (파일 첨부를 위해)
-        //   const formData = new FormData();
-        //   formData.append('to', email.to);
-        //   formData.append('subject', email.subject);
-        //   formData.append('message', email.message);
+        try {
+          // FormData 생성
+          const formData = new FormData();
+          formData.append('to', 'javachohj@sampyo.co.kr');
+          formData.append('subject', 'test');
+          formData.append('message', 'test');
           
-        //   // 첨부 파일 추가
-        //   if (email.attachments.length > 0) {
-        //     email.attachments.forEach(file => {
-        //       formData.append('attachments', file);
-        //     });
-        //   }
+     
           
-        //   // API 호출
-        //   const response = await axios.post('/api/email/send', formData, {
-        //     headers: {
-        //       'Content-Type': 'multipart/form-data'
-        //     }
-        //   });
+          // API 호출
+          const response = await apiClient.post('/api/email/send', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
           
-        //   // 성공 처리
-        //   snackbar.text = '이메일이 성공적으로 전송되었습니다.';
-        //   snackbar.color = 'success';
-        //   snackbar.show = true;
+          // 성공 처리                    
+          console.log(response.data);
+                 
+  
           
-        //   // 폼 초기화
-        //   resetForm();
-          
-        // } catch (error) {
-        //   console.error('이메일 전송 실패:', error);
-          
-        //   // 오류 처리
-        //   snackbar.text = '이메일 전송에 실패했습니다. 다시 시도해주세요.';
-        //   snackbar.color = 'error';
-        //   snackbar.show = true;
-        // } finally {
-        //   loading.value = false;
-        // }           
+        } catch (error) {
+          console.error('이메일 전송 실패:', error);
+ 
+        } finally {
+          this.isLoading = false;
+        }        
       }
    
    
