@@ -57,8 +57,8 @@ export default {
       savedMidMenu.value = midMenuFromStorage ? JSON.parse(midMenuFromStorage) : null;
       savedSubMenu.value = subMenuFromStorage ? JSON.parse(subMenuFromStorage) : null;
       
-      console.log('메뉴 클릭 후 midMenu:', savedMidMenu.value);
-      console.log('메뉴 클릭 후 subMenu:', savedSubMenu.value);
+      // console.log('메뉴 클릭 후 midMenu:', savedMidMenu.value);
+      // console.log('메뉴 클릭 후 subMenu:', savedSubMenu.value);
     };
     
     // 초기 로드 시에도 값 확인

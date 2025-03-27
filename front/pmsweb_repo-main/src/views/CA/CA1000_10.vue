@@ -402,8 +402,8 @@ export default {
       this.savedMidMenu = midMenuFromStorage ? JSON.parse(midMenuFromStorage) : null;
       this.savedSubMenu = subMenuFromStorage ? JSON.parse(subMenuFromStorage) : null;
 
-      console.log('메뉴 클릭 후 midMenu:', this.savedMidMenu);
-      console.log('메뉴 클릭 후 subMenu:', this.savedSubMenu);
+      // console.log('메뉴 클릭 후 midMenu:', this.savedMidMenu);
+      // console.log('메뉴 클릭 후 subMenu:', this.savedSubMenu);
     },
 
     isValidDate(options = {}) {
