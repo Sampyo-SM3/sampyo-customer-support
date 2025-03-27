@@ -285,8 +285,6 @@ export default {
     },
     async fetchRequireDetail() {
       try {
-        console.log("🚀 fetchRequireDetail() 실행!");
-
         const response = await apiClient.get("/api/require/detail", {
           params: { seq: this.receivedSeq }
         });
@@ -338,9 +336,6 @@ export default {
       } catch (error) {
         console.error("❌ 오류 발생:", error);
       }
-    },
-    updateStep() {
-      this.step = this.progressStatuses.indexOf(this.management.PROGRESS) + 1;
     },
     async addComment() {
 
@@ -423,15 +418,10 @@ export default {
         // 상세정보 새로고침
         this.fetchRequireDetail();
 
-        //this.management.PROGRESS = this.selectedStatus;
-        //this.updateStep();
       } catch (error) {
         console.error("상태 저장 실패");
         this.fetchRequireDetail();
       }
-
-
-
     }
   },
   computed: {

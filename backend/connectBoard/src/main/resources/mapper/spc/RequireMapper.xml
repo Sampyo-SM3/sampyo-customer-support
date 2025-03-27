@@ -13,7 +13,7 @@
 		    b.context,
 		    b.uId,
 		    b.usem,
-			<!-- b.processState, -->
+			b.processState,
 			c.codeName AS processState,	    
 			b.manager,
 		    b.requestDate,
@@ -38,29 +38,27 @@
 		ORDER BY b.seq DESC
 	</select>
 	
-	<!-- 게시글 등록 -->
-	<!-- <insert id="insertRequire" parameterType="com.example.connectBoard.dto.RequireDTO"> -->	
-	<insert id="insertRequire" useGeneratedKeys="true" keyProperty="seq">
-        INSERT INTO board (            
-			sub, 
-			etc, 
-			division, 
-			insertDt, 
-			updateDt, 
-			writerId, 
-			manager, 
-			uId, 
-			processState
+
+	<!-- 게시글 등록2 -->
+	<insert id="insertRequire" parameterType="com.example.connectBoard.dto.RequireDTO">
+        INSERT INTO board (
+            sub,
+            etc,
+            division,
+            requestDate,
+            insertDt,
+            updateDt,
+            writerId,
+            uId
         ) VALUES (
-            #{projectName, jdbcType=VARCHAR},
-            #{projectContent, jdbcType=VARCHAR},
-            #{businessSector, jdbcType=VARCHAR}, 
+            #{sub, jdbcType=VARCHAR},
+            #{etc, jdbcType=VARCHAR},
+            #{division, jdbcType=VARCHAR}, 
             GETDATE(),
             GETDATE(),
-            #{requesterId, jdbcType=VARCHAR},
-            #{requesterName, jdbcType=VARCHAR},
-            #{requesterName, jdbcType=VARCHAR},
-            #{processState, jdbcType=VARCHAR}                  
+            GETDATE(),
+            #{writerId, jdbcType=VARCHAR},
+            #{uId, jdbcType=VARCHAR}
     	)
     	
 	</insert>	

@@ -29,6 +29,7 @@ public class RequireDTO {
 	private String usem;
 	private String dpId;
 	private String dpDn;
+	private String writerId;
 	private String manager;
 	private String division;
 	private String processState;
