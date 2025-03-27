@@ -32,8 +32,8 @@
       <!-- 내용 텍스트필드 -->
       <v-col class="search-col content-field">
         <div class="label-box">내 용</div>
-        <v-textarea v-model="content" placeholder="내용을 입력하세요" auto-grow rows="18" clearable hide-details
-          density="compact" variant="outlined" class="content-textarea">
+        <v-textarea v-model="etc" placeholder="내용을 입력하세요" auto-grow rows="18" clearable hide-details density="compact"
+          variant="outlined" class="content-textarea">
         </v-textarea>
       </v-col>
     </v-row>
@@ -80,7 +80,7 @@ export default {
       userName: null,
       userId: null,
       sub: '',
-      content: ''
+      etc: ''
     }
   },
 
@@ -115,7 +115,7 @@ export default {
       }
 
       // 내용 검증
-      if (!this.content || this.content.trim() === '') {
+      if (!this.etc || this.etc.trim() === '') {
         this.errorMessages.push('내용을 입력해주세요.');
         this.showError = true;
         return false;
@@ -134,7 +134,7 @@ export default {
       try {
         const boardData = {
           "sub": this.sub,
-          "content": this.content,
+          "etc": this.etc,
           "writerId": this.userId,
           "uid": this.userName,
           "processState": "C",

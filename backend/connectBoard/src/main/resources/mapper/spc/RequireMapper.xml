@@ -13,7 +13,7 @@
 		    b.context,
 		    b.uId,
 		    b.usem,
-			<!-- b.processState, -->
+			b.processState,
 			c.codeName AS processState,	    
 			b.manager,
 		    b.requestDate,
@@ -41,23 +41,23 @@
 	<!-- 게시글 등록 -->
 	<insert id="insertRequire" parameterType="com.example.connectBoard.dto.RequireDTO">
         INSERT INTO board (
-            projectName,
-            projectContent,
-            businessSector,
+            sub,
+            etc,
+            division,
+            requestDate,
             insertDt,
             updateDt,
-            requesterId,
-            requesterName,
-            processState
+            writerId,
+            uId
         ) VALUES (
-            #{projectName, jdbcType=VARCHAR},
-            #{projectContent, jdbcType=VARCHAR},
-            #{businessSector, jdbcType=VARCHAR}, 
+            #{sub, jdbcType=VARCHAR},
+            #{etc, jdbcType=VARCHAR},
+            #{division, jdbcType=VARCHAR}, 
             GETDATE(),
             GETDATE(),
-            #{requesterId, jdbcType=VARCHAR},
-            #{requesterName, jdbcType=VARCHAR},
-            #{processState, jdbcType=VARCHAR}        
+            GETDATE(),
+            #{writerId, jdbcType=VARCHAR},
+            #{uId, jdbcType=VARCHAR}
     	)
     	
 	</insert>	
