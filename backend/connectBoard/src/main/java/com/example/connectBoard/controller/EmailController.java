@@ -47,8 +47,7 @@ public class EmailController {
 
             mailSender.send(mimeMessage);
             return ResponseEntity.ok("이메일이 성공적으로 전송되었습니다.");
-        } catch (Exception e) {
-        	System.out.println("이메일 전송 실패: " + e.getMessage());
+        } catch (Exception e) {        	
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("이메일 전송 실패: " + e.getMessage());
         }

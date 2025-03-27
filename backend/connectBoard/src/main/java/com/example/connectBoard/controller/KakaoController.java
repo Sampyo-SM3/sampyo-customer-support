@@ -25,8 +25,7 @@ public class KakaoController {
     
 	/* 댓글 등록 */
     @PostMapping("/kakao")
-    public ResponseEntity<?> insertKakao(@RequestBody KakaoDTO kakao) {
-    	System.out.println("--컨트롤러 insertKakao--");
+    public ResponseEntity<?> insertKakao(@RequestBody KakaoDTO kakao) {    	
         try {
             kakaoService.insertKakao(kakao);
             return ResponseEntity.ok("카카오톡 전송 성공!");

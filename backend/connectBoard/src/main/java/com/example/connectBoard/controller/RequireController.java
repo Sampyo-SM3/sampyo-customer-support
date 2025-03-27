@@ -66,10 +66,12 @@ public class RequireController {
 	/* 게시글 최초등록 */
     @PostMapping("/require/insert")
     public ResponseEntity<?> insertRequire(@RequestBody RequireDTO require) {
-    	System.out.println("--insertRequire--");
+    	System.out.println("-- insertRequire 컨트롤러 --");
         try {
-        	requireService.insertRequire(require);
-            return ResponseEntity.ok("게시글이 성공적으로 등록되었습니다.");
+        	int seq = requireService.insertRequire(require);
+        	System.out.println(seq);
+        	return ResponseEntity.ok(seq);
+        	
         } catch (Exception e) {
         	System.out.println("서버 오류 발생: " + e.getMessage());
             return ResponseEntity.status(500).body("서버 오류 발생: " + e.getMessage());

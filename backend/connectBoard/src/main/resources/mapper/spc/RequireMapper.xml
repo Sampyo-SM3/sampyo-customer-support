@@ -38,6 +38,7 @@
 		ORDER BY b.seq DESC
 	</select>
 	
+
 	<!-- 게시글 등록2 -->
 	<insert id="insertRequire" parameterType="com.example.connectBoard.dto.RequireDTO">
         INSERT INTO board (
