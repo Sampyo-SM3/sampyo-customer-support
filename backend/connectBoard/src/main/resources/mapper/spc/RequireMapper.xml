@@ -39,7 +39,8 @@
 	</select>
 	
 	<!-- 게시글 등록 -->
-	<insert id="insertRequire" parameterType="com.example.connectBoard.dto.RequireDTO">
+	<!-- <insert id="insertRequire" parameterType="com.example.connectBoard.dto.RequireDTO"> -->	
+	<insert id="insertRequire" useGeneratedKeys="true" keyProperty="seq">
         INSERT INTO board (            
 			sub, 
 			etc, 

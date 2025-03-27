@@ -43,6 +43,7 @@
       <v-col class="select-files request-period d-flex align-center">
         <div class="label-box">첨부파일</div>
         <v-file-input
+          style="display: none;"
           ref="fileInput"
           class="manager-search flex-grow-1"
           v-model="newFiles"
@@ -56,16 +57,22 @@
           :loading="isFileLoading"
           hide-details
           @change="handleFileChange"          
-        ></v-file-input>        
+        ></v-file-input> 
+
+        <v-btn variant="flat" color="green" class="custom-btn mt-2 mb-2 ml-2 mr-2 white-text d-flex align-center" size="small"
+          @click="openFileSelector">
+          <v-icon size="default" class="mr-1">mdi-file-upload</v-icon>
+          첨부
+        </v-btn>        
         
         <!-- 별도의 아이콘을 클릭하면 파일 선택 창 오픈 -->
-        <v-icon 
+        <!-- <v-icon 
           size="default" 
           class="ml-4 cursor-pointer"
           @click="openFileSelector"
         >
           mdi-magnify
-        </v-icon>
+        </v-icon> -->
       </v-col>    
 
       <!-- 선택된 파일 목록 (아직 업로드되지 않은 파일) -->

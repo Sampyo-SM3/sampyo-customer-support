@@ -30,9 +30,15 @@ public class RequireService {
         return requireRepositoy.searchRequiresByCriteria(criteria);
     }   
     
-    public void insertRequire(RequireDTO require) {
-    	System.out.println("--insertRequire 서비스--");
+    public int insertRequire(RequireDTO require) {
+    	System.out.println("서비스단");
+    	
     	requireRepositoy.insertRequire(require);
+    	System.out.println("!11");
+    	System.out.println(require.getSeq());
+                
+        // MyBatis에서 자동 생성된 seq 반환
+        return require.getSeq();    	
     }    
 
 }
