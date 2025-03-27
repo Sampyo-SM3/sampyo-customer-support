@@ -169,7 +169,7 @@
         </div>
         <!-- 댓글 섹션 -->
         <!-- <div class="info-subtitle">댓글 {{ commentTextLength }}</div> -->
-        <div class="pa-3 mb-3" v-if="commentTextLength > 0">
+        <div class="pa-3 mb-3" v-if="commentTextLength > 0" style="margin-top:-20px;">
           <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
             :all-comments="comments" @refresh="fetchComments" />
         </div>

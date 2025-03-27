@@ -84,7 +84,7 @@
         </div>
         <!-- 댓글 섹션 -->
         <!-- <div class="info-subtitle">댓글 {{ commentTextLength }}</div> -->
-        <div class="pa-3 mb-3" v-if="commentTextLength > 0">
+        <div class="pa-3 mb-3" v-if="commentTextLength > 0" style="margin-top:-20px;">
           <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
             :all-comments="comments" @refresh="fetchComments" />
         </div>
@@ -443,10 +443,21 @@ export default {
   word-break: break-word;
 }
 
+.btn-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .custom-btn {
-  font-size: 14px;
-  height: 35px;
-  border-radius: 10px;
+  background-color: #1867C0;
+  color: white;
+  font-size: 13px;
+  border: none;
+  box-shadow: none;
+  border-radius: 6px;
+  margin-top: -10px !important;
+  margin-bottom: 15px;
+  min-width: 60px;
 }
 
 .search-row {
