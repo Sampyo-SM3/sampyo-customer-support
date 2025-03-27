@@ -39,11 +39,11 @@
         </v-col>
       </v-row>
 
-      <v-btn variant="flat" color="primary" size="small" class="save-status-btn ml-3" @click="saveStatus">
+      <v-btn variant="outlined" color="primary" size="small" class="save-status-btn ml-3" @click="saveStatus">
         저장
       </v-btn>
 
-      <v-btn variant="flat" color="primary" class="save-status-btn ml-3" size="small" @click="goBack">
+      <v-btn variant="outlined" color="primary" class="save-status-btn ml-auto mr-2" size="small" @click="goBack">
         목록
       </v-btn>
     </div>
@@ -82,27 +82,22 @@
         <div class="section-title">
           <div class="info-title-after"></div>답변 내용
         </div>
-
         <!-- 댓글 섹션 -->
-        <div v-if="commentTextLength > 0" class="mt-3">
-          <!-- <div class="info-subtitle">댓글 {{ commentTextLength }}</div> -->
-          <v-card id="commentArea" class="pa-3 mb-3 info-inner-card">
-            <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
-              :all-comments="comments" @refresh="fetchComments" />
-          </v-card>
+        <!-- <div class="info-subtitle">댓글 {{ commentTextLength }}</div> -->
+        <div class="pa-3 mb-3" v-if="commentTextLength > 0" style="margin-top:-20px;">
+          <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
+            :all-comments="comments" @refresh="fetchComments" />
         </div>
 
         <!-- 댓글 입력 -->
         <div class="comment-input-container" :class="{ 'mt-20': commentTextLength === 0 }">
-          <v-textarea v-model="newComment.content" :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"
-            class="custom-textarea"></v-textarea>
+          <v-textarea v-model="newComment.content"
+            :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"></v-textarea>
           <div class="btn-container">
             <v-btn v-if="replyTo" text @click="cancelReply" class="mr-2">답글 취소</v-btn>
             <v-btn class="custom-btn" @click="addComment()">등록</v-btn>
           </div>
         </div>
-
-
       </v-col>
     </v-row>
   </v-container>
@@ -448,10 +443,21 @@ export default {
   word-break: break-word;
 }
 
+.btn-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .custom-btn {
-  font-size: 14px;
-  height: 35px;
-  border-radius: 10px;
+  background-color: #1867C0;
+  color: white;
+  font-size: 13px;
+  border: none;
+  box-shadow: none;
+  border-radius: 6px;
+  margin-top: -10px !important;
+  margin-bottom: 15px;
+  min-width: 60px;
 }
 
 .search-row {
@@ -575,10 +581,6 @@ export default {
   margin-bottom: 15px;
 }
 
-.info-inner-card {
-  background-color: #F0F4F8;
-}
-
 .info-title-after {
   content: "";
   display: inline-block;
@@ -589,5 +591,11 @@ export default {
   margin-bottom: 3px;
   position: relative;
   top: 4px;
+}
+
+.section-title {
+  font-size: 17px;
+  margin-bottom: 15px;
+  font-weight: 400;
 }
 </style>

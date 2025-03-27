@@ -9,11 +9,40 @@
           <span class="comment-user">{{ comment.userId }}</span>
           <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
         </div>
-        <div class="comment-text">{{ comment.content }}</div>
-        <v-btn text class="reply-btn" @click="toggleReplyInput(comment)">답글</v-btn>
-        <v-btn text class="reply-btn" @click="deleteComment(comment.commentId)">삭제</v-btn>
+        <!-- 수정모드가 아닐때 -->
+        <div v-if="!isEditing" class="comment-text">{{ comment.content }}</div>
 
-        <!-- ✅ 답글 입력창을 댓글과 같은 div 안에 배치 -->
+        <!-- 수정 모드일 때 -->
+        <div v-else class="comment-edit-container">
+          <v-textarea v-model="editedContent" label="댓글 수정" class="edit-textarea"></v-textarea>
+          <div class="edit-btn-container" style="margin-top: -10px">
+            <v-btn text class="reply-sub-btn" @click="saveEditedComment(comment)">
+              저장
+            </v-btn>
+            <v-btn text class="reply-sub-btn" @click="cancelEdit">
+              취소
+            </v-btn>
+          </div>
+        </div>
+
+        <div class="comment-actions" v-if="comment.userId === this.userId">
+          <v-menu>
+            <template v-slot:activator="{ isActive, props }">
+              <v-icon v-bind="props" :color="isActive ? 'primary' : 'default'" size="20">
+                mdi-dots-vertical
+              </v-icon>
+            </template>
+
+            <v-list class="more-actions-list">
+              <v-list-item @click="onEdit" title="수정" class="more-actions-item text-center" />
+              <v-list-item @click="deleteComment(comment.commentId)" title="삭제" class="more-actions-item text-center" />
+            </v-list>
+          </v-menu>
+        </div>
+
+        <v-btn v-if="!isEditing" text class="reply-btn" @click="toggleReplyInput(comment)">답글</v-btn>
+        <!--<v-btn text class="reply-btn" @click="deleteComment(comment.commentId)">삭제</v-btn> -->
+
         <div v-if="showReplyInput" class="reply-input-container">
           <v-textarea v-model="replyContent" label="답글 입력" class="reply-textarea"></v-textarea>
           <div class="reply-btn-container">
@@ -46,7 +75,7 @@ export default {
       type: Array,
       required: true
     },
-    
+
   },
   data() {
     return {
@@ -54,7 +83,9 @@ export default {
       replyContent: "",        // 답글 입력 내용
       replyParent: {},
       userId: null,            // 사용자 ID 변수 추가
-      userName: null,            
+      userName: null,
+      isEditing: false,
+      editedContent: '',
     };
   },
   computed: {
@@ -65,7 +96,7 @@ export default {
       return {
         marginLeft: `${(this.comment.depth - 1) * 20}px`
       };
-    },        
+    },
   },
   created() {
     // 컴포넌트가 생성될 때 로컬 스토리지에서 사용자 정보 가져오기
@@ -91,7 +122,7 @@ export default {
     toggleReplyInput(cmt) {
       this.replyParent = cmt;
       this.showReplyInput = !this.showReplyInput;  // 클릭할 때마다 입력창 표시/숨김
-      
+
       // 토글 시 최신 사용자 정보 다시 가져오기
       this.getUserInfoFromLocalStorage();
     },
@@ -114,7 +145,7 @@ export default {
       // DB에 저장할 댓글 데이터
       const commentData = {
         postId: this.replyParent.postId || 1,  // 게시글 ID
-        userId: this.userName,  // 유저 ID 변경
+        userId: this.userId,  // 유저 ID 변경
         content: this.replyContent,  // 댓글 내용
         parentId: newParentId,  // 부모 댓글 ID (없으면 NULL)
         depth: newDepth,  // 대댓글이면 부모 depth + 1, 최상위 댓글이면 0
@@ -132,7 +163,7 @@ export default {
         alert("댓글 등록 실패!");
 
       } finally {
-        // ✅ 입력 필드 초기화 & 대댓글 입력창 닫기
+        // 입력 필드 초기화 & 대댓글 입력창 닫기
         this.$emit("refresh");
         this.replyContent = "";
         this.showReplyInput = false;
@@ -149,31 +180,74 @@ export default {
     async deleteComment(commentId) {
       // 사용자 ID 확인 (최신 정보로 갱신)
       this.getUserInfoFromLocalStorage();
-      
+
       if (confirm("댓글을 삭제하시겠습니까?")) {
         try {
           await apiClient.post(`/api/deleteComment/${commentId}`);
           alert("댓글이 삭제되었습니다.");
-        } catch (error) {          
+        } catch (error) {
           alert("삭제를 실패하였습니다. 관리자에게 문의하세요.");
         }
       }
       this.$emit("refresh");
-    }
+    },
+    onEdit() {
+      this.isEditing = true;
+      this.editedContent = this.comment.content;
+    },
+    cancelEdit() {
+      this.isEditing = false;
+      this.editedContent = this.comment.content;
+    },
+    async saveEditedComment(obj) {
+      if (!obj.content.trim()) {
+        alert("댓글을 입력해주세요.");
+        return;
+      }
+
+      obj.content = this.editedContent;
+
+      const commentData = {
+        commentId: obj.commentId,  // 게시글 ID
+        userId: this.userName,  // 유저 ID 변경
+        content: obj.content  // 댓글 내용
+      };
+
+      console.log(commentData);
+
+      try {
+        await apiClient.post("api/updateComment", commentData);
+        alert("댓글을 수정하였습니다.");
+
+      } catch (error) {
+        alert("오류가 발생하였습니다. 관리자에게 문의해주세요.");
+
+      } finally {
+        // ✅ 입력 필드 초기화 & 대댓글 입력창 닫기
+        this.$emit("refresh");
+        this.replyContent = "";
+        this.showReplyInput = false;
+        this.replyParent = null;
+      }
+
+      this.isEditing = false;
+    },
   }
 };
 </script>
 
-<style scoped>
+<style>
 .comment-wrapper {
   margin-bottom: 5px;
 }
 
 .comment-item {
-  padding: 15px;
-  border-bottom: 1px solid #e0e0e0;
+  position: relative;
+  /* 이게 중요함! */
   display: flex;
-  align-items: flex-start;
+  flex-direction: row;
+  padding: 16px;
+  border-bottom: 1px solid #eee;
 }
 
 .comment-item.has-reply-input {
@@ -275,5 +349,61 @@ export default {
 
 .replies-container {
   width: 100%;
+}
+
+.comment-actions {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+}
+
+.more-actions-list {
+  min-width: 80px;
+}
+
+.more-actions-item {
+  cursor: pointer;
+  padding: 10px 16px;
+  transition: background-color 0.3s;
+}
+
+.more-actions-item:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+/* 기존 스타일에 추가 */
+.reply-count-btn {
+  text-transform: none !important;
+  min-width: 80px !important;
+  height: 28px !important;
+  font-size: 12px !important;
+  color: #666 !important;
+  margin-top: 5px;
+  margin-left: 5px;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+  display: flex;
+  align-items: center;
+}
+
+.comment-footer {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.edit-textarea {
+  width: 100%;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.edit-btn-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+  gap: 10px;
 }
 </style>

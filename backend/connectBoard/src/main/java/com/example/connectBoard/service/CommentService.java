@@ -23,6 +23,10 @@ public class CommentService {
     public void insertComment(CommentDTO comment) {        
         commentRepository.insertComment(comment);
     }
+
+    public void updateComment(CommentDTO comment) {
+        commentRepository.updateComment(comment);
+    }
     
     public void deleteComment(Integer commentId) {
         commentRepository.deleteComment(commentId);

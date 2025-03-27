@@ -33,7 +33,13 @@
         	GETDATE(), GETDATE(), 'N'
     	)
 	</insert>
-	
+
+	<update id="updateComment" parameterType="com.example.connectBoard.dto.CommentDTO">
+   		UPDATE Comments 
+    	SET content = #{content}, updatedAt = GETDATE()
+    	WHERE commentId = #{commentId}
+	</update>
+		
 	<update id="deleteComment" parameterType="int">
    		UPDATE Comments 
     	SET deleteYn = 'Y'
