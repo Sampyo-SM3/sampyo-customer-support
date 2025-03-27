@@ -39,11 +39,11 @@
         </v-col>
       </v-row>
 
-      <v-btn variant="flat" color="primary" size="small" class="save-status-btn ml-3" @click="saveStatus">
+      <v-btn variant="outlined" color="primary" size="small" class="save-status-btn ml-3" @click="saveStatus">
         저장
       </v-btn>
 
-      <v-btn variant="flat" color="primary" class="save-status-btn ml-3" size="small" @click="goBack">
+      <v-btn variant="outlined" color="primary" class="save-status-btn ml-auto mr-2" size="small" @click="goBack">
         목록
       </v-btn>
     </div>

@@ -37,7 +37,7 @@
         </v-col>
       </v-row>
 
-      <v-btn variant="flat" color="primary" size="small" class="save-status-btn ml-3" @click="saveStatus">
+      <v-btn variant="outlined" color="primary" size="small" class="save-status-btn ml-3" @click="saveStatus">
         저장
       </v-btn>
     </div>
