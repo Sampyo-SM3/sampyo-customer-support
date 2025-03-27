@@ -13,5 +13,7 @@ public interface CommentRepository {
 
     void insertComment(CommentDTO comment);
     
+    void updateComment(CommentDTO comment);
+    
     void deleteComment(Integer commentId);
 }

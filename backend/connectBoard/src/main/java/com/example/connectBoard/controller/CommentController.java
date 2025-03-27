@@ -65,6 +65,17 @@ public class CommentController {
             return ResponseEntity.status(500).body("서버 오류 발생: " + e.getMessage());
         }
     }
+
+	/* 댓글 수정 */
+    @PostMapping("/updateComment")
+    public ResponseEntity<?> updateComment(@RequestBody CommentDTO comment) {
+        try {
+            commentService.updateComment(comment);
+            return ResponseEntity.ok("댓글이 성공적으로 수정되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 오류 발생: " + e.getMessage());
+        }
+    }
     
 	/* 댓글 삭제 */
     @PostMapping("/deleteComment/{commentId}")

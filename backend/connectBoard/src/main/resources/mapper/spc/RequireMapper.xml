@@ -49,7 +49,6 @@
             updateDt,
             writerId,
             uId
-			processState
         ) VALUES (
             #{sub, jdbcType=VARCHAR},
             #{etc, jdbcType=VARCHAR},

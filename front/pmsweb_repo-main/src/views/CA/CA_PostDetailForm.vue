@@ -164,31 +164,25 @@
     <!-- 하단: 댓글 섹션을 아래로 배치 -->
     <v-row>
       <v-col cols="12">
-        <div class="section-title">
+        <div class="section-title mt-4">
           <div class="info-title-after"></div>답변 내용
         </div>
+        <!-- 댓글 섹션 -->
+        <!-- <div class="info-subtitle">댓글 {{ commentTextLength }}</div> -->
+        <div class="pa-3 mb-3" v-if="commentTextLength > 0">
+          <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
+            :all-comments="comments" @refresh="fetchComments" />
+        </div>
 
-        <v-card class="pa-4 info-card">
-          <!-- 댓글 섹션 -->
-          <div v-if="commentTextLength > 0">
-            <div class="info-subtitle">댓글 {{ commentTextLength }}</div>
-            <v-card id="commentArea" class="pa-3 mb-3 info-inner-card">
-              <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
-                :all-comments="comments" @refresh="fetchComments" />
-            </v-card>
+        <!-- 댓글 입력 -->
+        <div class="comment-input-container" :class="{ 'mt-20': commentTextLength === 0 }">
+          <v-textarea v-model="newComment.content"
+            :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"></v-textarea>
+          <div class="btn-container">
+            <v-btn v-if="replyTo" text @click="cancelReply" class="mr-2">답글 취소</v-btn>
+            <v-btn class="custom-btn" @click="addComment()">등록</v-btn>
           </div>
-
-          <!-- 댓글 입력 -->
-          <div class="comment-input-container" :class="{ 'mt-20': commentTextLength === 0 }">
-            <v-textarea v-model="newComment.content" :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"
-              class="custom-textarea"></v-textarea>
-            <div class="btn-container">
-              <v-btn v-if="replyTo" text @click="cancelReply" class="mr-2">답글 취소</v-btn>
-              <v-btn class="custom-btn" @click="addComment()">등록</v-btn>
-            </div>
-          </div>
-
-        </v-card>
+        </div>
       </v-col>
     </v-row>
   </v-container>
@@ -771,12 +765,6 @@ export default {
   margin-top: -10px !important;
   margin-bottom: 15px;
   min-width: 60px;
-}
-
-.comment-input-container {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
 }
 
 .btn-container {
