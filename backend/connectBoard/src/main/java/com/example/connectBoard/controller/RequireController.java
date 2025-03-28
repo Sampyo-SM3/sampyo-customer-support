@@ -65,11 +65,9 @@ public class RequireController {
     
 	/* 게시글 최초등록 */
     @PostMapping("/require/insert")
-    public ResponseEntity<?> insertRequire(@RequestBody RequireDTO require) {
-    	System.out.println("-- insertRequire 컨트롤러 --");
+    public ResponseEntity<?> insertRequire(@RequestBody RequireDTO require) {    	
         try {
-        	int seq = requireService.insertRequire(require);
-        	System.out.println(seq);
+        	int seq = requireService.insertRequire(require);        	
         	return ResponseEntity.ok(seq);
         	
         } catch (Exception e) {

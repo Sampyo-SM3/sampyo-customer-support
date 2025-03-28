@@ -3,7 +3,7 @@
 
     <v-row>
       <v-col>
-        <div class="title-div">간단 폼 입력</div>
+        <div class="title-div" @click="test()">간단 폼 입력</div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
@@ -174,6 +174,10 @@ export default {
   },
 
   methods: {
+    test() {
+      console.log('--test--');
+      console.log(this.etc);
+    },
     // 파일 타입에 따른 아이콘 반환
     getFileIcon(fileType) {
       if (fileType.includes('image')) {
@@ -197,24 +201,16 @@ export default {
     },
 
     // 파일 선택 변경 처리
-    handleFileChange(event) {
-      console.log('--handleFileChange--');
-      console.log('이벤트 객체:', event);
-
+    handleFileChange() {      
       // 파일은 v-model에 바인딩된 newFiles에서 가져옵니다
-      const files = this.newFiles;
-      console.log('newFiles:', files);
+      const files = this.newFiles;      
 
-      if (!files || (Array.isArray(files) && files.length === 0)) {
-        console.log('선택된 파일 없음');
+      if (!files || (Array.isArray(files) && files.length === 0)) {        
         return;
       }
 
-      if (Array.isArray(files)) {
-        console.log('여러 파일이 선택됨:', files.length);
-        files.forEach((file, index) => {
-          console.log(`파일[${index}] 이름:`, file.name);
-
+      if (Array.isArray(files)) {        
+        files.forEach((file) => {          
           // 중복 파일 검사 (selectedFiles 내에서)
           const existingSelectedIndex = this.selectedFiles.findIndex(f => f.name === file.name);
           if (existingSelectedIndex !== -1) {
@@ -225,9 +221,7 @@ export default {
             this.selectedFiles.push(file);
           }
         });
-      } else {
-        console.log('단일 파일 선택됨 이름:', files.name);
-
+      } else {        
         // 중복 파일 검사 (selectedFiles 내에서)
         const existingSelectedIndex = this.selectedFiles.findIndex(f => f.name === files.name);
         if (existingSelectedIndex !== -1) {
@@ -241,8 +235,6 @@ export default {
 
       // 파일 선택 컨트롤 초기화
       this.newFiles = [];
-
-      // await this.uploadFiles();
     },
 
     // 선택된 파일 제거 (아직 업로드되지 않은 파일)
@@ -253,11 +245,8 @@ export default {
     },
 
     // 업로드된 파일 제거
-    removeFile(index) {
-      console.log('--removeFile--');
-      console.log(this.uploadedFiles[index].name);
+    removeFile(index) {      
       this.test4(this.uploadedFiles[index].name);
-
 
       this.uploadedFiles.splice(index, 1);
     },
@@ -281,26 +270,26 @@ export default {
     },
 
     // 파일 업로드 처리
-    async uploadFiles() {
-      console.log('--uploadFiles--');
-      console.log(this.selectedFiles);
-      if (!this.selectedFiles.length) return;
+    async uploadFiles() {            
+      // 파일 없으면 false 리턴
+      if (!this.selectedFiles || this.selectedFiles.length === 0) {        
+        return false;
+      }
 
       // 파일명 중복 확인
       const duplicateFiles = this.checkDuplicateFiles();
 
-      if (duplicateFiles.length > 0) {
-        // 중복 파일이 있을 경우 확인 대화상자 표시
-        this.duplicateFiles = duplicateFiles;
-        this.pendingFiles = this.selectedFiles.filter(file =>
-          !duplicateFiles.some(dupFile => dupFile.name === file.name)
-        );
-        this.showOverwriteDialog = true;
-        return;
+      if (duplicateFiles.length > 0) {        
+        return false;
       }
 
       // 중복 파일이 없으면 바로 업로드 진행
-      await this.processUpload(this.selectedFiles);
+      try {        
+        await this.processUpload(this.selectedFiles);        
+        return true; // 성공 시 true 리턴
+      } catch (error) {        
+        return false; // 실패 시 false 리턴
+      }
     },
 
     // 덮어쓰기 취소
@@ -339,8 +328,8 @@ export default {
 
 
     // 실제 파일 업로드 처리
-    async processUpload(filesToUpload) {
-      if (!filesToUpload.length) return;
+    async processUpload(filesToUpload) {      
+      if (!filesToUpload.length) throw new Error('업로드할 파일이 없습니다.');
 
       this.isFileLoading = true;
 
@@ -348,12 +337,12 @@ export default {
         // FormData 생성
         const formData = new FormData();
 
-        // 백엔드에서 @RequestParam("files")로 받기 때문에 모든 파일을 'files' 이름으로 추가
+        // 모든 파일을 'files' 이름으로 추가
         filesToUpload.forEach((file) => {
           formData.append('files', file);
         });
 
-        // API 호출 - 백엔드 컨트롤러 경로와 일치하도록 설정
+        // API 호출
         const response = await apiClient.post('/api/fileUpload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -364,11 +353,6 @@ export default {
         if (response.data && response.data.result === 'success') {
           console.log('파일 업로드 성공:', response.data);
 
-          // 백엔드에서 반환한 파일 목록 정보를 사용할 수 있습니다
-          const uploadedFileList = response.data.files || [];
-          console.log('업로드된 파일 목록:', uploadedFileList);
-          console.log('총 업로드 목록 ', this.uploadedFiles);
-
           // 업로드 성공한 파일을 목록에 추가
           filesToUpload.forEach(file => {
             this.uploadedFiles.push({
@@ -378,14 +362,13 @@ export default {
             });
           });
 
-          // 업로드된 파일을 선택된 파일 목록에서 제거
-          // this.selectedFiles = this.selectedFiles.filter(selectedFile => 
-          //   !filesToUpload.some(uploadedFile => uploadedFile.name === selectedFile.name)
-          // );
+          return true;
+        } else {
+          throw new Error('파일 업로드 실패');
         }
       } catch (error) {
         console.error('파일 업로드 오류:', error);
-        alert('파일 업로드 중 오류가 발생했습니다.');
+        throw error; // 호출한 곳으로 에러 전파
       } finally {
         this.isFileLoading = false;
       }
@@ -399,8 +382,7 @@ export default {
       try {
         // FormData 사용하지 않고 URL에 파라미터 포함
         const response = await apiClient.post(`/api/fileDelete?originFile=${encodeURIComponent(this.deletingFile)}`);
-        console.log('response -> ' + response.data.result);
-
+        
         // 삭제 성공 처리
         if (response.data.result === 'success') {
           // 파일 목록에서 삭제된 파일 제거
@@ -443,55 +425,18 @@ export default {
       return true;
     },
 
-    async insertBoard() {
-      this.showError = false;
-
-      if (!this.validateBoard()) {
-        return; // 검증 실패 시 함수 종료
-      }
-
+    async insertBoard() {      
       try {
-        this.loading = true;
+        this.showError = false;
 
-        // // 파일 업로드 먼저 진행
-        // const uploadResult = await this.uploadFiles();
+        if (!this.validateBoard()) {
+          return; // 검증 실패 시 함수 종료
+        }     
 
-        // // 파일 업로드 실패 시 중단
-        // if (!uploadResult) {
-        //   throw new Error('파일 업로드에 실패했습니다.');
-        // }                
+        this.loading = true;        
 
         const boardData = {
-          "sub": this.sub,
-          "content": this.content,
-          "writerId": this.userId,
-          "uid": this.userName,
-          "processState": "C",
-          "division": "시멘트"
-        };
-
-        const response = await apiClient.post("/api/require/insert", boardData);
-
-        console.log("게시글이 성공적으로 등록되었습니다.", response.data);
-        // 여기에 성공 후 처리할 로직 추가 (예: 목록 페이지로 이동, 알림 표시 등)
-        this.$router.push({ name: 'CA1000_10' });
-
-
-      } catch (error) {
-        // 에러 처리
-        console.error("게시글 등록 중 오류가 발생했습니다.", error);
-
-        // 스낵바에 오류 메시지 표시
-        this.errorMessages = ["게시글 등록 중 오류가 발생했습니다."];
-        this.showError = true;
-      } finally {
-        this.loading = false;
-      }
-
-
-      try {
-        const boardData = {
-          "sub": this.sub,
+          "sub": this.sub,          
           "etc": this.etc,
           "writerId": this.userId,
           "uid": this.userName,
@@ -499,20 +444,75 @@ export default {
           "division": "시멘트"
         };
 
+        // 게시글 등록 및 seq 값 반환
         const response = await apiClient.post("/api/require/insert", boardData);
+        const boardSeq = response.data; // 등록된 게시글의 seq
 
-        console.log("게시글이 성공적으로 등록되었습니다.", response.data);
-        // 여기에 성공 후 처리할 로직 추가 (예: 목록 페이지로 이동, 알림 표시 등)
+        console.log('게시글 등록 성공!' + boardSeq);
+
+        // selectedFiles 배열의 각 파일에 대해 반복
+        const fileAttachPromises = this.selectedFiles.map(async (file) => {
+          try {            
+            // 파일명은 게시물 기준으로 중복 관리함
+            const fileName = `${boardSeq}_${file.name}`;
+            
+            // 원본 파일 객체의 이름 변경
+            const modifiedFile = new File([file], fileName, {
+              type: file.type,
+              lastModified: file.lastModified
+            });
+
+            const fileAttachData = {
+              boardSeq: boardSeq,
+              fileName: fileName,
+              fileSize: modifiedFile.size,
+              fileType: modifiedFile.type,
+            };
+                          
+            // FileAttach 테이블 INSERT API 호출
+            const attachResponse = await apiClient.post('/api/file-attach/insert', fileAttachData);
+            
+            // 파일서버 업로드 API 호출
+            const additionalResponse = await this.processUpload([modifiedFile]);
+            
+            
+            return {
+              fileName: file.name,
+              status: 'success',
+              attachResponse,
+              additionalResponse
+            };
+          } catch (error) {
+              console.error(`파일 ${file.name} 처리 중 오류:`, error);
+            return {
+              fileName: file.name,
+              status: 'error',
+              error: error.message
+            };
+          }
+        });
+
+        // 모든 파일 첨부 및 추가 API 호출을 동시에 실행
+        const responses = await Promise.all(fileAttachPromises);
+        
+        // 결과 분석
+        // const successFiles = responses.filter(response => response.status === 'success');
+        const errorFiles = responses.filter(response => response.status === 'error');
+                        
+        // 실패한 파일이 있으면 사용자에게 알림
+        if (errorFiles.length > 0) {
+          this.errorMessages = errorFiles.map(file => `${file.fileName}: ${file.error}`);
+          this.showError = true;
+        }
+
+        // 모든 성공 시 페이지 이동 또는 추가 로직
         this.$router.push({ name: 'CA1000_10' });
-
-
+        
       } catch (error) {
-        // 에러 처리
-        console.error("게시글 등록 중 오류가 발생했습니다.", error);
-
-        // 스낵바에 오류 메시지 표시
-        this.errorMessages = ["게시글 등록 중 오류가 발생했습니다."];
-        this.showError = true;
+        // 전역 에러 처리
+        this.handleError(error);
+      } finally {
+        this.loading = false;
       }
     },
 
@@ -523,8 +523,8 @@ export default {
       this.savedMidMenu = midMenuFromStorage ? JSON.parse(midMenuFromStorage) : null;
       this.savedSubMenu = subMenuFromStorage ? JSON.parse(subMenuFromStorage) : null;
 
-      console.log('메뉴 클릭 후 midMenu:', this.savedMidMenu);
-      console.log('메뉴 클릭 후 subMenu:', this.savedSubMenu);
+      // console.log('메뉴 클릭 후 midMenu:', this.savedMidMenu);
+      // console.log('메뉴 클릭 후 subMenu:', this.savedSubMenu);
     },
 
     getUserInfo() {

@@ -11,31 +11,27 @@ import com.example.connectBoard.repository.spc.RequireRepository;
 @Service
 public class RequireService {
 
-    private final RequireRepository requireRepositoy;
+    private final RequireRepository requireRepository;
     
     public RequireService(RequireRepository requireMapper) {
-        this.requireRepositoy = requireMapper;
+        this.requireRepository = requireMapper;
     }
 
     public List<RequireDTO> getAllRequires() {
-        return requireRepositoy.getAllRequires();
+        return requireRepository.getAllRequires();
     }
     
     public RequireDTO getRequire(int seq) {
-        return requireRepositoy.getRequire(seq);
+        return requireRepository.getRequire(seq);
     }
     
     public List<RequireDTO> searchRequiresByCriteria(RequireSearchCriteria criteria) {
         // 매퍼를 통해 검색 조건으로 데이터 조회
-        return requireRepositoy.searchRequiresByCriteria(criteria);
+        return requireRepository.searchRequiresByCriteria(criteria);
     }   
     
     public int insertRequire(RequireDTO require) {
-    	System.out.println("서비스단");
-    	
-    	requireRepositoy.insertRequire(require);
-    	System.out.println("!11");
-    	System.out.println(require.getSeq());
+    	requireRepository.insertRequire(require);    	
                 
         // MyBatis에서 자동 생성된 seq 반환
         return require.getSeq();    	

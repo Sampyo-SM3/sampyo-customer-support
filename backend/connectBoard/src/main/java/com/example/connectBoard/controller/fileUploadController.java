@@ -42,8 +42,7 @@ public class fileUploadController {
     @PostMapping("/fileUpload")
     public ResponseEntity<Map<String, Object>> handleFileUpload(@RequestParam("files") MultipartFile[] files) {
         Map<String, Object> response = new HashMap<>();
-        List<Map<String, String>> fileList = new ArrayList<>();
-
+        List<Map<String, String>> fileList = new ArrayList<>();        
         try {
             // 업로드 디렉터리 경로 확인
             File dir = new File(uploadLogisticsDir);
