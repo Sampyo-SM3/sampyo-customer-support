@@ -3,7 +3,7 @@
 
     <v-row>
       <v-col>
-        <div class="title-div" @click="test()">SR요청</div>
+        <div class="title-div">SR요청</div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
@@ -363,40 +363,6 @@ export default {
   },
 
   methods: {
-    test() {
-      console.log('--test--');
-
-      try {
-        // 폼 타입 결정
-        let formType = ''
-        formType = 'WF_FORM_LEGACY_FI_STATE_UNBAN'
-        // formType = 'WF_FO.RM_SR'
-        // formType = 'WF_FORM_SR_V0'
-
-        // URL 및 파라미터 설정
-        // const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
-        const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
-        const params = {
-          key: 1,
-          empno: 1,
-          legacy_form: formType,
-          datatype: 'xml',
-          ip: '127.0.0.1',
-          db: 'tttt'
-        }
-
-        // 쿼리 파라미터 문자열 생성
-        const queryString = new URLSearchParams(params).toString()
-        const fullUrl = `${baseUrl}?${queryString}`
-
-        // 새 창에서 URL 열기
-        window.open(fullUrl, '_blank')
-
-
-      } catch (error) {
-        console.error('상신 처리 중 오류 발생:', error)
-      }
-    },
     checkLocalStorage() {
       const midMenuFromStorage = localStorage.getItem('midMenu');
       const subMenuFromStorage = localStorage.getItem('subMenu');
