@@ -14,10 +14,11 @@
 		    b.uId,
 		    b.usem,
 			b.processState,
-			c.codeName AS processState,	    
+			c.codeName AS statusNm,	    
 			b.manager,
 		    b.requestDate,
-		    b.completeDate			    	   	
+		    b.completeDate,
+		    b.srFlag			    	   	
 		FROM board b inner join code_master c
 		 on b.processState = c.codeId					
 	<where>
@@ -95,6 +96,7 @@
 			manager,
 			division,
 			processState,
+			srFlag,
 			insertDt,
 			updateDt,
 			completeDt
@@ -129,6 +131,7 @@
 			manager,
 			division,
 			processState,
+			srFlag,
 			insertDt,
 			updateDt,
 			completeDt

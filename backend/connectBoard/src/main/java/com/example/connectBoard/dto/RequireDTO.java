@@ -32,7 +32,9 @@ public class RequireDTO {
 	private String writerId;
 	private String manager;
 	private String division;
+	private String srFlag;
 	private String processState;
+	private String statusNm;
 	private LocalDate insertDt;
 	private LocalDate updateDt;
 	private LocalDate completeDt;
