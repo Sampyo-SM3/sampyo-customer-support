@@ -14,15 +14,21 @@ export const useAuthStore = defineStore("auth", {
   }),
   actions: {
     // 로그인 시도
-    async login(credentials) {      
+    async login(credentials) {   
+      console.log('--login--');
       try {
         this.isLoading = true;
         this.error = null;
+
+        // 전화번호에서 하이픈(-) 제거
+        const phoneWithoutHyphens = credentials.phone ? credentials.phone.replace(/-/g, '') : credentials.phone;        
               
         const response = await apiClient.post('/api/login', {
           id: credentials.username,
           password: credentials.password,          
           name: credentials.name,
+          phone: phoneWithoutHyphens,
+          email: credentials.email,
         });
 
         // 로그인 성공
@@ -60,7 +66,8 @@ export const useAuthStore = defineStore("auth", {
     },
 
 
-    async validate_blue_id(credentials) {      
+    async validate_blue_id(credentials) {     
+      // console.log('-- validate_blue_id --');       
       try {
         this.isLoading = true;
         this.error = null;
@@ -70,18 +77,33 @@ export const useAuthStore = defineStore("auth", {
           password: credentials.password,          
         });
 
-        // 로그인 성공
-        if (response.data) {
-          this.userId = response.data.id;
-          this.userInfo = response.data;                    
-                                
-          return response.data.name;
-        }
-        
-        return false;
+        this.userId = response.data.id;
+        this.userInfo = response.data;      
+                                                   
+        const responseData = {
+          ...response.data,
+          bool: true // boolean 필드 추가
+        };        
+
+        return responseData;        
       } catch (error) {        
-        this.error = error.response?.data?.message || '로그인 중 오류가 발생했습니다';        
-        return false;
+        if (error.response) {
+          // console.log('error-1');                              
+          this.error = error.response.data.message;
+          // console.log(this.error);
+        } else if (error.request) {
+          // console.log('error-2');          
+          this.error = error.response.data.message;
+        } else {          
+          // console.log('error-3');          
+          this.error = error.response.data.message;
+        }
+                 
+        return {
+          bool: false,
+          data: this.error
+        };
+
       } finally {
         this.isLoading = false;
       }

@@ -119,12 +119,14 @@ export default {
     }
   },  
   methods: {
-    async login() {      
+    async login() {    
+      // console.log('--로그인페이지 로그인버튼 클릭--')  
       this.loading = true;
       let result;
 
       try {        
-        if (this.username != 'admin') {                    
+        if (this.username != 'admin') {     
+          // 블루샘 계정테이블에 있는 아이디인지 먼저 확인
           result = await this.authStore.validate_blue_id({
             username: this.username,
             password: this.password
@@ -134,12 +136,26 @@ export default {
         } else {
           result = '관리자';  
         }
-             
-        if (result) {                    
+
+        if (!result.bool) {
+          // console.log('validate_blue_id 에러발생');
+          this.showError = true;  
+          this.errorMessages = result.data;
+          
+          return;
+        }
+          
+        // 블루샘 아이디 존재여부 통과
+        if (Object.keys(result).length > 0) {
+          console.log('-- 블루샘 아이디 존재여부 통과 --');
+          // 우리쪽 계정테이블에 데이터 없으면 insert후 로그인
+          // 있으면 비밀번호 검증 후 로그인
           const success2 = await this.authStore.login({
             username: this.username,
             password: this.password,
-            name: result
+            name: result.name,
+            phone: result.phone,
+            email: result.email,
             // username: '1',
             // password: '1' 
           }); 
@@ -149,13 +165,13 @@ export default {
           } else {
             // 로그인 실패 (authStore에서 false 반환)
             this.showError = true;
-            this.errorMessages = this.authStore.error || '로그인에 실패했습니다.';
+            this.errorMessages = this.authStore.error || '로그인에 실패했습니다.-2';
           }   
 
         } else {
           // 로그인 실패 (authStore에서 false 반환)
           this.showError = true;
-          this.errorMessages = this.authStore.error || '로그인에 실패했습니다.';
+          this.errorMessages = this.authStore.error || '로그인에 실패했습니다.-3';
         }      
         
            
