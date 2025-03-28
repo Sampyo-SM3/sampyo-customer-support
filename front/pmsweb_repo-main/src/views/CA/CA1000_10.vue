@@ -177,8 +177,10 @@
             <div class="td-cell">{{ item.seq }}</div>
             <div class="td-cell">{{ formatDate(item.requestDate) }}</div>
             <div class="td-cell title-cell">
-              <router-link :to="{ name: 'CA_PostDetailForm', params: { receivedSeq: item.seq } }" class="title-link">{{
-                item.sub }}</router-link>
+              <router-link
+                :to="{ name: item.srFlag === 'Y' ? 'CA_PostDetailForm' : 'CA_PostDetailForm2', params: { receivedSeq: item.seq } }"
+                class="title-link">{{
+                  item.sub }}</router-link>
             </div>
             <div class="td-cell">{{ item.division }}</div>
             <div class="td-cell" :class="getStatusClass(item.status)">{{ item.status }}</div>
@@ -578,7 +580,7 @@ export default {
           params: {
             startDate: this.startDate + ' 00:00:00',
             endDate: this.endDate + ' 23:59:59',
-            manager: this.manger,
+            manager: this.manager,
             sub: this.sub
           }
         });
@@ -591,7 +593,7 @@ export default {
             ...item,
             selected: false,
             // API에서 진행상태가 오지 않으면 임의로 설정
-            status: item.processState || this.getRandomStatus(),
+            status: item.statusNm || this.getRandomStatus(),
 
             // 테이블에 표시할 데이터 매핑
             manager: item.manager || '-',  // 담당자 필드가 없어서 임시로 요청자 ID 사용

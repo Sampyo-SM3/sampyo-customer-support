@@ -3,7 +3,13 @@
 
     <v-row>
       <v-col>
-        <div class="title-div">문의 상세보기</div>
+        <div class="d-flex align-center">
+          <div class="title-div">문의 상세보기</div>
+          <v-btn variant="outlined" color="primary" class="goBack-btn ml-auto mr-2" size="small" @click="goBack">
+            목록
+          </v-btn>
+        </div>
+
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
@@ -42,10 +48,11 @@
       <v-btn variant="outlined" color="primary" size="small" class="save-status-btn ml-3" @click="saveStatus">
         저장
       </v-btn>
-
-      <v-btn variant="outlined" color="primary" class="save-status-btn ml-auto mr-2" size="small" @click="goBack">
-        목록
+      <v-btn variant="outlined" color="green darken-2" class="save-status-btn ml-auto mr-2" size="small"
+        @click="goBack">
+        SR요청서
       </v-btn>
+
     </div>
 
 
@@ -579,6 +586,14 @@ export default {
   font-size: 14px;
   border-radius: 6px;
   margin-bottom: 15px;
+}
+
+.goBack-btn {
+  height: 35px;
+  min-width: 55px;
+  font-size: 14px;
+  border-radius: 6px;
+  margin-bottom: 10px;
 }
 
 .info-title-after {
