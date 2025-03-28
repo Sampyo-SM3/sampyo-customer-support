@@ -124,7 +124,8 @@ export default {
       let result;
 
       try {        
-        if (this.username != 'admin') {                    
+        if (this.username != 'admin') {     
+          // 블루샘 계정테이블에 있는 아이디인지 먼저 확인
           result = await this.authStore.validate_blue_id({
             username: this.username,
             password: this.password
@@ -135,7 +136,9 @@ export default {
           result = '관리자';  
         }
              
-        if (result) {                    
+        if (result) {    
+          // 우리쪽 계정테이블에 데이터 없으면 insert후 로그인
+          // 있으면 비밀번호 검증 후 로그인
           const success2 = await this.authStore.login({
             username: this.username,
             password: this.password,

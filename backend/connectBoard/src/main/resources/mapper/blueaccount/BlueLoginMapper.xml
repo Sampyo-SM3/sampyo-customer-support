@@ -10,8 +10,10 @@
     
         SELECT 
         	TOP 1             
-            USR_ID as id,
-            NAME as name
+            USR_ID AS id,
+            NAME AS name,
+            EMAIL_ADDR AS email, 
+            HAND_TEL_NO AS phone
         FROM 
             CRM_USER_MASTER 
         WHERE 
