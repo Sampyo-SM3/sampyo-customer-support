@@ -58,9 +58,14 @@
     
     <insert id="insertUser">
         INSERT INTO sys_empref 
-            (COMPANY_CD, id, name, admin, pwd, smsyn) 
+            (COMPANY_CD, id, name, admin, pwd, phone, email, smsyn) 
         VALUES 
-            ('CEMENT', #{id}, #{name}, 0, PWDENCRYPT(#{password}), 1)
+            ('CEMENT', #{id}, #{name}, 0, PWDENCRYPT(#{password}), #{phone}, #{email}, 1)
     </insert>
+    
+    
+    		
+    		
+    		    
 
 </mapper>

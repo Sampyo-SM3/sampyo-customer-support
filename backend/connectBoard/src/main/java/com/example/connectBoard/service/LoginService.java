@@ -21,7 +21,7 @@ public class LoginService {
         this.blueLoginRepository = blueLoginRepository;
     }
 
-    public EmployeePreferenceDto login(String id, String password, String companyCd) {
+    public EmployeePreferenceDto login(String id, String password, String companyCd, String phone, String email) {
         // 1. 사용자 ID 존재 여부 확인
         EmployeePreferenceDto employee = loginRepository.findByIdAndCompanyCd(id, companyCd);
 
@@ -55,8 +55,9 @@ public class LoginService {
     }    
     
     
-    public void insertUser(String id, String password, String name) {        
-        loginRepository.insertUser(id, password, name);
+    public void insertUser(String id, String password, String name, String phone, String email) {        
+        loginRepository.insertUser(id, name, password, phone, email);
+        
     }    
 
 
