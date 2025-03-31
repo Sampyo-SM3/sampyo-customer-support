@@ -49,10 +49,11 @@
       <v-btn variant="outlined" color="primary" size="small" class="save-status-btn ml-3" @click="saveStatus">
         저장
       </v-btn>
-      <v-btn variant="outlined" color="green darken-2" class="save-status-btn ml-auto mr-2" size="small" @click="$router.push({
-        name: 'CA_PostCreateSrForm',
-        params: { receivedSeq: this.receivedSeq }
-      })">
+      <v-btn v-if="inquiry.processState === 'S'" variant="outlined" color="green darken-2"
+        class="save-status-btn ml-auto mr-2" size="small" @click="$router.push({
+          name: 'CA_PostCreateSrForm',
+          params: { receivedSeq: this.receivedSeq }
+        })">
         SR요청서
       </v-btn>
 
@@ -149,6 +150,7 @@ export default {
         sub: "",
         context: "",
         uId: "",
+        srFlag: ""
       },
       progressStatuses: [],
       comments: [],
@@ -210,6 +212,7 @@ export default {
         sub: response.data?.sub || "",
         etc: response.data?.etc || "",
         uid: response.data?.uid || "",
+        srFlag: response.data?.srFlag || "",
         processState: response.data?.processState || "P",
       };
 
