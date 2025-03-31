@@ -182,7 +182,7 @@
             <div class="td-cell">{{ item.seq }}</div>
             <div class="td-cell">{{ formatDate(item.requestDate) }}</div>
             <div class="td-cell title-cell">
-              <router-link :to="{ name: 'CA_PostDetailForm2', params: { receivedSeq: item.seq } }" class="title-link">{{
+              <router-link :to="{ name: 'CA_PostDetailForm', params: { receivedSeq: item.seq } }" class="title-link">{{
                 item.sub }}</router-link>
             </div>
             <div class="td-cell">{{ item.division }}</div>
