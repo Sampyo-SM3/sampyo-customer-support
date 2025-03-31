@@ -1,16 +1,14 @@
-<template>
+<template style="margin-top:-30px;">
   <v-container fluid class="pr-5 pl-5 pt-7">
-
     <v-row>
       <v-col>
         <div class="d-flex align-center">
-          <div class="title-div">문의 상세보기</div>
+          <div class="title-div">SR 요청</div>
           <v-btn variant="outlined" color="primary" class="goBack-btn ml-auto mr-2" size="small"
             @click="$router.push('/views/CA/CA1000_10')">
             목록
           </v-btn>
         </div>
-
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
@@ -18,7 +16,6 @@
     </v-row>
 
     <br>
-
     <!-- 진행 상태 표시 바 -->
     <v-row justify="center" class="mb-6 pt-6">
       <v-col cols="12" class="d-flex align-center justify-center">
@@ -49,47 +46,131 @@
       <v-btn variant="outlined" color="primary" size="small" class="save-status-btn ml-3" @click="saveStatus">
         저장
       </v-btn>
-      <v-btn variant="outlined" color="green darken-2" class="save-status-btn ml-auto mr-2" size="small" @click="$router.push({
-        name: 'CA_PostCreateSrForm',
-        params: { receivedSeq: this.receivedSeq }
-      })">
-        SR요청서
-      </v-btn>
-
     </div>
 
 
     <v-row no-gutters class="search-row top-row">
       <v-col class="search-col product-category">
-        <div class="label-box">작성자</div>
-        <div class="author-value">{{ inquiry.uid }}</div>
-      </v-col>
-    </v-row>
-
-    <v-row no-gutters class="search-row middle-row">
-      <!-- 제목 필드 -->
-      <v-col class="search-col request-period">
-        <div class="label-box">제 목</div>
+        <div class="label-box colNm">제목</div>
         <div class="author-value">{{ inquiry.sub }}</div>
       </v-col>
     </v-row>
 
-    <v-row no-gutters class="search-row bottom-row">
-      <!-- 내용 텍스트필드 -->
-      <v-col class="search-col content-field">
-        <div class="label-box">내 용</div>
-        <div class="author-value content-textarea">{{ inquiry.etc }}</div>
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col request-period">
+        <div class="label-box colNm">업무명</div>
+        <div class="author-value">{{ inquiry.taskName }}</div>
       </v-col>
     </v-row>
 
-    <br>
-    <br>
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col request-period">
+        <div class="label-box colNm">협조</div>
+        <div class="author-value">{{ inquiry.help }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col request-period">
+        <div class="label-box colNm">개발(변경) 필요성</div>
+        <div class="author-value">{{ inquiry.necessity }}</div>
+      </v-col>
+    </v-row>
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col request-period">
+        <div class="label-box colNm">기대효과</div>
+        <div class="author-value">{{ inquiry.effect }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col request-period">
+        <div class="label-box colNm">개발(변경) 모듈</div>
+        <div class="author-value">{{ inquiry.module }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row" style="height:200px;">
+      <v-col class="search-col request-period" style="border-right: 1px solid #e0e0e0;">
+        <div class="label-box colNm">개발(변경)<br />업무내용</div>
+      </v-col>
+
+      <v-col style="border-right: 1px solid #e0e0e0;">
+        <div>
+          <div class="sub-label">변경전</div>
+          <div class="multiline-box">
+            {{ inquiry.beforeTaskContent }}
+          </div>
+        </div>
+      </v-col>
+
+      <!-- 변경후 -->
+      <v-col>
+        <div>
+          <div class="sub-label">변경후</div>
+          <div class="multiline-box">
+            {{ inquiry.afterTaskContent }}
+          </div>
+        </div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col cols="6" class="search-col d-flex align-center">
+        <div class="label-box colNm">사용부서</div>
+        <div class="author-value">{{ inquiry.useDept }}</div>
+      </v-col>
+
+      <v-col class="search-col d-flex align-center" style="max-width: 300px;">
+        <div class="label-box colNm">첨부문서</div>
+        <div class="author-value">{{ inquiry.attachDoc }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col cols="6" class="search-col d-flex align-center">
+        <div class="label-box colNm">의뢰일자</div>
+        <div class="author-value">{{ inquiry.requestDate }}</div>
+      </v-col>
+
+      <v-col class="search-col" style="max-width: 300px;">
+        <div class="label-box colNm">접수일자</div>
+        <div class="author-value">{{ inquiry.acceptDate }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col cols="6" class="search-col d-flex align-center">
+        <div class="label-box colNm">완료요청일자</div>
+        <div class="author-value">{{ inquiry.completeRequestDate }}</div>
+      </v-col>
+
+      <v-col class="search-col" style="max-width: 300px;">
+        <div class="label-box colNm">완료일자</div>
+        <div class="author-value">{{ inquiry.completeDate }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col request-period">
+        <div class="label-box colNm">기타</div>
+        <div class="author-value">{{ inquiry.etc }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row bottom-row">
+      <v-col class="search-col request-period">
+        <div class="label-box colNm">첨부목록</div>
+        <div class="author-value"></div>
+      </v-col>
+    </v-row>
+
 
 
     <!-- 하단: 댓글 섹션을 아래로 배치 -->
     <v-row>
       <v-col cols="12">
-        <div class="section-title">
+        <div class="section-title mt-4">
           <div class="info-title-after"></div>답변 내용
         </div>
         <!-- 댓글 섹션 -->
@@ -111,46 +192,61 @@
       </v-col>
     </v-row>
   </v-container>
-
-  <!-- 스낵바로 오류 메시지 표시 -->
-  <v-snackbar v-model="showError" color="warning" timeout="5000" location="center" elevation="8" variant="elevated">
-    {{ errorMessages[0] }}
-
-    <template v-slot:actions>
-      <v-btn variant="text" @click="showError = false">
-        닫기
-      </v-btn>
-    </template>
-  </v-snackbar>
 </template>
+
 
 <script>
 import apiClient from '@/api';
 import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포넌트 import
 
 export default {
+  // props 정의 추가
   props: {
     receivedSeq: {
       type: [Number, String],
       required: false
     },
+    userId: JSON.parse(localStorage.getItem("userInfo"))?.id || null
   },
   components: {
     CommentTree
   },
   data() {
     return {
+      userInfo: null,       //사용자 ID
+
       step: 1,
-      loading: false,
-      errorMessages: [],
-      showError: false,
-      selectedStatus: '',
+      selectedStatus: '', // 추가된 상태 변수
       inquiry: {
         sub: "",
         context: "",
-        uId: "",
+        taskName: "",
+        help: "",
+        necessity: "",
+        effect: "",
+        module: "",
+        beforeTaskContent: "",
+        afterTaskContent: "",
+        useDept: "",
+        attachDoc: "",
+        requestDate: "",
+        acceptDate: "",
+        completeRequestDate: "",
+        completeDate: "",
+        etc: "",
+        uid: "",
+        usem: "",
+        dpId: "",
+        dpDn: "",
+        manager: "",
+        division: "",
+        processState: ""
+
       },
-      progressStatuses: [],
+      management: {
+        PROGRESS: ""
+      },
+      answer: "",
       comments: [],
       newComment: {
         content: "", // 댓글 내용
@@ -159,62 +255,14 @@ export default {
         parentId: null // 부모 댓글 ID
       },
       replyTo: null,
-    }
-  },
-  computed: {
-    topLevelComments() {
-      return Array.isArray(this.comments) ? this.comments.filter(comment => !comment.parentId) : [];
-    },
-    commentTextLength() {
-      return Array.isArray(this.comments) ? this.comments.length : 0;
-    }
-  },
-  watch: {
-    receivedSeq: {
-      immediate: true  // 컴포넌트 생성 시점에도 즉시 실행
-    },
-    selectedStatus(newVal, oldVal) {
-      console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
-    }
-  },
+      sectors: ["시멘트", "분체", "골재", "몰탈", "레미콘", "기타"],
+      progressStatuses: [],
+      qaTypes: ["제품/기술문의", "배차문의", "불편사항", "자료요청", "1:1문의"],
+      receiptPaths: ["WEB", "KAKAO", "CALL", "CRM", "SIDP"],
 
-  mounted() {
-    this.checkLocalStorage();
-    this.getUserInfo();
-    this.getStatus();
-    this.getDetailInquiry();
-    this.fetchComments();
-  },
-  created() {
-    // localStorage에서 사용자 정보 불러오기
-    this.getUserInfo();
+    };
   },
   methods: {
-    async getDetailInquiry() {
-      const response = await apiClient.get("/api/require/detail", {
-        params: { seq: this.receivedSeq }
-      });
-
-      console.log(response);
-
-      const processState = response.data?.processState || "P"; // 기본값 설정
-
-      // 상태 매핑 체크 후 기본값 설정
-      this.step = this.statusMapping?.[processState] ?? 1;
-
-      // 선택된 상태 반영
-      const matchedStatus = this.progressStatuses.find(status => status.value === processState);
-      this.selectedStatus = matchedStatus ? matchedStatus.value : "P";
-
-      this.inquiry = {
-        sub: response.data?.sub || "",
-        etc: response.data?.etc || "",
-        uid: response.data?.uid || "",
-        processState: response.data?.processState || "P",
-      };
-
-      this.selectedStatus = this.inquiry.processState;
-    },
     async getStatus() {
       try {
         const statusList = await apiClient.get("/api/status/list");
@@ -235,43 +283,58 @@ export default {
         console.error("❌ 오류 발생:", error);
       }
     },
-
-    checkLocalStorage() {
-      const midMenuFromStorage = localStorage.getItem('midMenu');
-      const subMenuFromStorage = localStorage.getItem('subMenu');
-
-      this.savedMidMenu = midMenuFromStorage ? JSON.parse(midMenuFromStorage) : null;
-      this.savedSubMenu = subMenuFromStorage ? JSON.parse(subMenuFromStorage) : null;
-    },
-
-    getUserInfo() {
-      // localStorage에서 userInfo를 가져와서 userName에 할당
-      this.userName = JSON.parse(localStorage.getItem("userInfo"))?.name || null;
-      this.userId = JSON.parse(localStorage.getItem("userInfo"))?.id || null;
-    },
-
-    goBack() {
-      // 브라우저 히스토리에서 뒤로가기
-      this.$router.go(-1);
-    },
-    async saveStatus() {
+    async fetchRequireDetail() {
       try {
-        const statusData = {
-          seq: this.receivedSeq,
-          processState: this.selectedStatus
+        const response = await apiClient.get("/api/require/detail", {
+          params: { seq: this.receivedSeq }
+        });
+
+        // ✅ response.data 또는 processState가 존재하는지 확인 후 할당
+        if (!response.data || !response.data.processState) {
+          console.warn("⚠ processState 값이 없습니다. 기본값(P)로 설정합니다.");
+        }
+
+        const processState = response.data?.processState || "P"; // 기본값 설정
+
+        // ✅ 상태 매핑 체크 후 기본값 설정
+        this.step = this.statusMapping?.[processState] ?? 1;
+
+        // ✅ 선택된 상태 반영
+        const matchedStatus = this.progressStatuses.find(status => status.value === processState);
+        this.selectedStatus = matchedStatus ? matchedStatus.value : "P";
+
+        // ✅ 받아온 데이터를 inquiry에 업데이트
+        this.inquiry = {
+
+          sub: response.data?.sub || "",
+          context: response.data?.context || "",
+          taskName: response.data?.taskName || "",
+          help: response.data?.help || "",
+          necessity: response.data?.necessity || "",
+          effect: response.data?.effect || "",
+          module: response.data?.module || "",
+          beforeTaskContent: response.data?.beforeTaskContent || "",
+          afterTaskContent: response.data?.afterTaskContent || "",
+          useDept: response.data?.useDept || "",
+          attachDoc: response.data?.attachDoc || "",
+          requestDate: response.data?.requestDate || "",
+          acceptDate: response.data?.acceptDate || "",
+          completeRequestDate: response.data?.completeRequestDate || "",
+          completeDate: response.data?.completeDate || "",
+          etc: response.data?.etc || "",
+          uid: response.data?.uid || "",
+          usem: response.data?.usem || "",
+          dpId: response.data?.dpId || "",
+          dpDn: response.data?.dpDn || "",
+          manager: response.data?.manager || "",
+          division: response.data?.division || "",
+          processState: response.data?.processState || "",
+          management: {
+            PROGRESS: processState
+          }
         };
-
-        // API 요청: 댓글 DB에 저장
-        await apiClient.post("/api/updateStatus", statusData);
-        alert("접수상태가 저장되었습니다.");
-
-        // 상세정보 새로고침
-        this.getDetailInquiry();
-
-        //this.management.PROGRESS = this.selectedStatus;
       } catch (error) {
-        console.error("상태 저장 실패");
-        this.getDetailInquiry();
+        console.error("❌ 오류 발생:", error);
       }
     },
     async addComment() {
@@ -287,7 +350,7 @@ export default {
       // 백엔드로 보낼 데이터 객체
       const commentData = {
         postId: this.receivedSeq, // 게시글 ID
-        userId: this.userId || "", // 유저 ID
+        userId: this.userInfo.id || "", // 유저 ID
         content: this.newComment.content, // 댓글 내용
         parentId: newParentId, // 부모 댓글 ID (없으면 NULL)
         depth: this.replyTo ? Number(this.replyTo.depth) + 1 : 0, // 대댓글이면 +1, 최상위 댓글이면 0
@@ -340,45 +403,68 @@ export default {
       this.replyTo = null;
       this.newComment.newComment = '';
     },
-    test() {
-      console.log('--test--');
-
+    // 추가된 메서드
+    async saveStatus() {
       try {
-        // 폼 타입 결정
-        let formType = ''
-        formType = 'WF_FORM_LEGACY_FI_STATE_UNBAN'
-        // formType = 'WF_FO.RM_SR'
-        // formType = 'WF_FORM_SR_V0'
+        const statusData = {
+          seq: this.receivedSeq,
+          processState: this.selectedStatus
+        };
 
-        // URL 및 파라미터 설정
-        // const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
-        const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
-        const params = {
-          key: 1,
-          empno: 1,
-          legacy_form: formType,
-          datatype: 'xml',
-          ip: '127.0.0.1',
-          db: 'tttt'
-        }
+        // API 요청: 댓글 DB에 저장
+        await apiClient.post("/api/updateStatus", statusData);
+        alert("접수상태가 저장되었습니다.");
 
-        // 쿼리 파라미터 문자열 생성
-        const queryString = new URLSearchParams(params).toString()
-        const fullUrl = `${baseUrl}?${queryString}`
-
-        // 새 창에서 URL 열기
-        window.open(fullUrl, '_blank')
-
+        // 상세정보 새로고침
+        this.fetchRequireDetail();
 
       } catch (error) {
-        console.error('상신 처리 중 오류 발생:', error)
+        console.error("상태 저장 실패");
+        this.fetchRequireDetail();
       }
+    }
+  },
+  computed: {
+    topLevelComments() {
+      return Array.isArray(this.comments) ? this.comments.filter(comment => !comment.parentId) : [];
     },
+    commentTextLength() {
+      return Array.isArray(this.comments) ? this.comments.length : 0;
+    }
+  },
+  created() {
+    // 초기화 시 현재 상태 설정
+    this.selectedStatus = this.management.PROGRESS;
+
+    this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  },
+  mounted() {
+    //미처리 리스트 가져오기
+    this.getStatus();
+
+    // 요구사항 정의서 데이터 가져오기
+    this.fetchRequireDetail(); // API 호출
+
+    // 댓글 데이터 가져오기
+    this.fetchComments();
+
+  },
+  watch: {
+    receivedSeq: {
+      immediate: true  // 컴포넌트 생성 시점에도 즉시 실행
+    },
+    selectedStatus(newVal, oldVal) {
+      console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
+    }
   }
-}
+};
 </script>
 
 <style scoped>
+.template {
+  font-family: "Noto Sans KR", sans-serif;
+}
+
 .stepper-container {
   display: flex;
   align-items: center;
@@ -437,6 +523,7 @@ export default {
   /* 색상 변경 애니메이션 */
 }
 
+/* ✅ 진행된 상태일 때 파란색으로 변경 */
 .step-line-active {
   background-color: #5B9BD5;
 }
@@ -450,6 +537,7 @@ export default {
   color: #1867C0;
 }
 
+/* 폼 디자인 */
 .product-category {
   display: flex;
   flex-direction: row;
@@ -485,23 +573,6 @@ export default {
   overflow-y: auto;
   white-space: pre-wrap;
   word-break: break-word;
-}
-
-.btn-container {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.custom-btn {
-  background-color: #1867C0;
-  color: white;
-  font-size: 13px;
-  border: none;
-  box-shadow: none;
-  border-radius: 6px;
-  margin-top: -10px !important;
-  margin-bottom: 15px;
-  min-width: 60px;
 }
 
 .search-row {
@@ -546,14 +617,6 @@ export default {
   border-bottom-right-radius: 8px;
 }
 
-.label-box {
-  /* 색상 변경 */
-  color: #333333 !important;
-  /* 이전: #578ADB */
-  background-color: #e6eef8 !important;
-  /* 이전: #f5f5f5 */
-}
-
 .search-col {
   display: flex;
   align-items: center;
@@ -582,6 +645,8 @@ export default {
   padding: 0 4px;
   border-right: 1px solid #eaeaea;
   margin-bottom: 5px;
+  color: #333333 !important;
+  background-color: #e6eef8 !important;
 }
 
 .white-text {
@@ -625,12 +690,20 @@ export default {
   margin-bottom: 15px;
 }
 
-.goBack-btn {
-  height: 35px;
-  min-width: 55px;
-  font-size: 14px;
-  border-radius: 6px;
-  margin-bottom: 10px;
+.section-title {
+  font-size: 17px;
+  margin-bottom: 15px;
+  font-weight: 400;
+}
+
+.info-subtitle {
+  font-size: 16px;
+  line-height: 22px;
+  color: #666;
+  -webkit-text-size-adjust: none;
+  letter-spacing: -0.05em;
+  margin: 20px 0 6px;
+  font-weight: 500;
 }
 
 .info-title-after {
@@ -645,9 +718,80 @@ export default {
   top: 4px;
 }
 
-.section-title {
-  font-size: 17px;
+.info-card {
+  background-color: #f9f9f9;
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid #ddd;
+  padding-top: 0 !important;
+}
+
+.colNm {
+  width: 140px;
+}
+
+.vertical-label {
+  height: 100%;
+  background-color: #f1f5fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.5;
+  border-right: 1px solid #ddd;
+}
+
+.sub-label {
+  font-weight: 500;
+  font-size: 13.5px;
+  border-bottom: 1px solid #e0e0e0;
+  height: 35px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 0 4px;
+  border-right: 1px solid #eaeaea;
+  margin-bottom: 5px;
+  color: #333333 !important;
+  background-color: #e6eef8 !important;
+}
+
+.custom-btn {
+  background-color: #1867C0;
+  color: white;
+  font-size: 13px;
+  border: none;
+  box-shadow: none;
+  border-radius: 6px;
+  margin-top: -10px !important;
   margin-bottom: 15px;
-  font-weight: 400;
+  min-width: 60px;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.multiline-box {
+  font-size: 14px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+
+  padding: 10px;
+}
+
+.goBack-btn {
+  height: 35px;
+  min-width: 55px;
+  font-size: 14px;
+  border-radius: 6px;
+  margin-bottom: 10px;
 }
 </style>
