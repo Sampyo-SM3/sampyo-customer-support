@@ -5,7 +5,11 @@
       <v-col>
         <div class="d-flex align-center">
           <div class="title-div">문의 상세보기</div>
-          <v-btn variant="outlined" color="primary" class="goBack-btn ml-auto mr-2" size="small"
+          <v-btn 
+            variant="outlined" 
+            color="primary" 
+            class="goBack-btn ml-auto mr-2" 
+            size="small"
             @click="$router.push('/views/CA/CA1000_10')">
             목록
           </v-btn>
@@ -37,12 +41,19 @@
     <!-- 전체 래퍼: 접수상태 박스 + 버튼을 나란히 배치 -->
     <div class="d-flex align-center mb-4">
       <!-- 접수상태 박스 -->
-      <v-row no-gutters class="search-row top-row bottom-row status-select-row"
+      <v-row no-gutters class="status-row top-row bottom-row status-select-row"
         style="width: 220px; min-width: 220px; max-width: 220px;">
         <v-col class="search-col">
           <div class="label-box">접수상태</div>
-          <v-select v-model="selectedStatus" :items="progressStatuses" item-title="text" item-value="value"
-            density="compact" variant="plain" hide-details class="status-select" />
+          <v-select 
+            v-model="selectedStatus" 
+            :items="progressStatuses" 
+            item-title="text" 
+            item-value="value"
+            density="compact" 
+            variant="plain" 
+            hide-details 
+            class="status-select" />
         </v-col>
       </v-row>
 
@@ -515,6 +526,10 @@ export default {
   /* 하단 테두리 제거 */
 }
 
+.status-row.top-row, status-row.bottom-row{
+  overflow: hidden;
+}
+
 .search-row.top-row {
   border-top: 3px solid #e0e0e0;
   border-top-left-radius: 8px;
@@ -588,12 +603,7 @@ export default {
   color: white !important;
 }
 
-.status-select-row {
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 15px;
-  height: 42px;
-}
+
 
 .status-select {
   margin-left: 15px;
@@ -615,7 +625,10 @@ export default {
   border-radius: 8px;
   overflow: hidden;
   height: 45px;
+  margin-bottom: 15px;
+  height: 42px;  
 }
+
 
 .save-status-btn {
   height: 42px;

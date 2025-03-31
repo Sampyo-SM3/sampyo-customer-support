@@ -21,16 +21,22 @@
 
     <v-row no-gutters class="search-row middle-row">
       <!-- 제목 필드 -->
-      <v-col class="search-col request-period">
+      <v-col class="search-col">
         <div class="label-box">제 목</div>
-        <v-text-field v-model="sub" placeholder="제목을 입력하세요" clearable hide-details density="compact"
+        <v-text-field 
+          class="sub-text-field" 
+          v-model="sub" 
+          placeholder="제목을 입력하세요" 
+          clearable 
+          hide-details 
+          density="compact"
           variant="outlined"></v-text-field>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
       <!-- 내용 텍스트필드 -->
-      <v-col class="search-col content-field">
+      <v-col class="search-col">
         <div class="label-box">내 용</div>
         <v-textarea v-model="etc" placeholder="내용을 입력하세요" auto-grow rows="18" clearable hide-details density="compact"
           variant="outlined" class="content-textarea">
@@ -40,7 +46,7 @@
 
     <!-- 첨부파일 -->
     <v-row no-gutters class="search-row bottom-row">
-      <v-col class="select-files request-period d-flex align-center">
+      <v-col class="select-files file-attach d-flex align-center">
         <div class="label-box">첨부파일</div>
         <v-file-input style="display: none;" ref="fileInput" class="manager-search flex-grow-1" v-model="newFiles"
           :rules="fileRules" accept="image/png, image/jpeg, application/pdf" label="파일을 선택하세요" density="compact"
@@ -566,17 +572,6 @@ export default {
 }
 
 
-
-.product-category {
-  display: flex;
-  flex-direction: row;
-  /* 가로 방향으로 배치 */
-  align-items: center;
-  flex-wrap: nowrap;
-  /* 줄바꿈 방지 */
-  width: 100%;
-}
-
 .author-value {
   font-size: 14px;
   padding-left: 15px;
@@ -587,14 +582,6 @@ export default {
 
 .title-div {
   font-size: 25px;
-}
-
-.manager-search,
-.content-textarea {
-  padding-block: 10px;
-  padding-left: 10px;
-  width: 800px;
-  font-weight: 400;
 }
 
 .custom-btn {
@@ -668,11 +655,45 @@ export default {
   width: 290px;
 }
 
-.request-period,
-.product-category {
+.sub-text-field {
+  padding-block: 10px;
+  padding-inline : 10px; 
+  
+}
+
+.manager-search {
+  padding-block: 10px;
+  padding-inline : 10px;
+  width: 800px;
+  font-weight: 400;
+}
+
+.content-textarea {
+  padding-block: 10px;
+  padding-inline : 10px;  
+  width: 100px !important;
+  font-weight: 400;
+}
+
+.file-attach {
   max-width: 550px;
   flex-grow: 0;
+  
 }
+
+.product-category {
+  max-width: 550px;
+  flex-grow: 0;  
+  display: flex;
+  flex-direction: row;
+  /* 가로 방향으로 배치 */
+  align-items: center;
+  flex-wrap: nowrap;
+  /* 줄바꿈 방지 */
+  width: 100%;
+}
+
+
 
 .label-box {
   width: 80px;
