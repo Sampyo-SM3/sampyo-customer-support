@@ -5,7 +5,8 @@
       <v-col>
         <div class="d-flex align-center">
           <div class="title-div">문의 상세보기</div>
-          <v-btn variant="outlined" color="primary" class="goBack-btn ml-auto mr-2" size="small" @click="goBack">
+          <v-btn variant="outlined" color="primary" class="goBack-btn ml-auto mr-2" size="small"
+            @click="$router.push('/views/CA/CA1000_10')">
             목록
           </v-btn>
         </div>
@@ -48,8 +49,10 @@
       <v-btn variant="outlined" color="primary" size="small" class="save-status-btn ml-3" @click="saveStatus">
         저장
       </v-btn>
-      <v-btn variant="outlined" color="green darken-2" class="save-status-btn ml-auto mr-2" size="small"
-        @click="goBack">
+      <v-btn variant="outlined" color="green darken-2" class="save-status-btn ml-auto mr-2" size="small" @click="$router.push({
+        name: 'CA_PostCreateSrForm',
+        params: { receivedSeq: this.receivedSeq }
+      })">
         SR요청서
       </v-btn>
 
@@ -102,7 +105,7 @@
             :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"></v-textarea>
           <div class="btn-container">
             <v-btn v-if="replyTo" text @click="cancelReply" class="mr-2">답글 취소</v-btn>
-            <v-btn class="custom-btn" @click="addComment()">등록</v-btn>
+            <v-btn variant="outlined" color="primary" @click="addComment()">등록</v-btn>
           </div>
         </div>
       </v-col>
@@ -336,6 +339,40 @@ export default {
     cancelReply() {
       this.replyTo = null;
       this.newComment.newComment = '';
+    },
+    test() {
+      console.log('--test--');
+
+      try {
+        // 폼 타입 결정
+        let formType = ''
+        formType = 'WF_FORM_LEGACY_FI_STATE_UNBAN'
+        // formType = 'WF_FO.RM_SR'
+        // formType = 'WF_FORM_SR_V0'
+
+        // URL 및 파라미터 설정
+        // const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
+        const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
+        const params = {
+          key: 1,
+          empno: 1,
+          legacy_form: formType,
+          datatype: 'xml',
+          ip: '127.0.0.1',
+          db: 'tttt'
+        }
+
+        // 쿼리 파라미터 문자열 생성
+        const queryString = new URLSearchParams(params).toString()
+        const fullUrl = `${baseUrl}?${queryString}`
+
+        // 새 창에서 URL 열기
+        window.open(fullUrl, '_blank')
+
+
+      } catch (error) {
+        console.error('상신 처리 중 오류 발생:', error)
+      }
     },
   }
 }

@@ -2,7 +2,13 @@
   <v-container fluid class="pr-5 pl-5 pt-7">
     <v-row>
       <v-col>
-        <div class="title-div">SR 요청</div>
+        <div class="d-flex align-center">
+          <div class="title-div">SR 요청</div>
+          <v-btn variant="outlined" color="primary" class="goBack-btn ml-auto mr-2" size="small"
+            @click="$router.push('/views/CA/CA1000_10')">
+            목록
+          </v-btn>
+        </div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
@@ -180,7 +186,7 @@
             :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"></v-textarea>
           <div class="btn-container">
             <v-btn v-if="replyTo" text @click="cancelReply" class="mr-2">답글 취소</v-btn>
-            <v-btn class="custom-btn" @click="addComment()">등록</v-btn>
+            <v-btn variant="outlined" color="primary" @click="addComment()">등록</v-btn>
           </div>
         </div>
       </v-col>
@@ -779,5 +785,13 @@ export default {
   align-items: center;
 
   padding: 10px;
+}
+
+.goBack-btn {
+  height: 35px;
+  min-width: 55px;
+  font-size: 14px;
+  border-radius: 6px;
+  margin-bottom: 10px;
 }
 </style>
