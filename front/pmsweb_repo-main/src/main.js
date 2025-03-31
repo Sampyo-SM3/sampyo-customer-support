@@ -7,6 +7,7 @@ import { loadFonts } from './plugins/webfontloader'
 import { createPinia } from 'pinia'
 import '@mdi/font/css/materialdesignicons.css'
 
+
 loadFonts()
 
 const app = createApp(App)
@@ -17,3 +18,4 @@ app.use(pinia)
 app.use(router)
 app.config.globalProperties.$axios = axios // 전역 프로퍼티로 추가
 app.mount('#app')
+

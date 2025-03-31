@@ -6,7 +6,7 @@
           <div class="title-div">SR 요청서 작성</div>
           <v-btn variant="outlined" color="primary" class="goBack-btn ml-auto mr-2" size="small"
             @click="$router.push('/views/CA/CA1000_10')">
-            목록
+            상신
           </v-btn>
         </div>
         <div class="mt-2">
@@ -73,7 +73,7 @@
         <div>
           <div class="sub-label">변경전</div>
           <v-textarea v-model="inquiry.beforeTaskContent" variant="outlined" density="compact" hide-details
-            class="multiline-input" style="width: 100%;"></v-textarea>
+            class="input-area-L"></v-textarea>
         </div>
       </v-col>
 
@@ -82,7 +82,7 @@
         <div>
           <div class="sub-label">변경후</div>
           <v-textarea v-model="inquiry.afterTaskContent" variant="outlined" density="compact" hide-details
-            class="multiline-input" style="width: 100%;"></v-textarea>
+            class="input-area-L"></v-textarea>
         </div>
       </v-col>
     </v-row>
@@ -201,6 +201,13 @@
 
 <script>
 import apiClient from '@/api';
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.tz.setDefault('Asia/Seoul')  // KST 기준 설정
 
 export default {
   // props 정의 추가
@@ -278,10 +285,10 @@ export default {
           afterTaskContent: data?.afterTaskContent || "",
           useDept: data?.useDept || "",
           attachDoc: data?.attachDoc || "",
-          requestDate: data?.requestDate || null,
-          acceptDate: data?.acceptDate || null,
-          completeRequestDate: data?.completeRequestDate || null,
-          completeDate: data?.completeDate || null,
+          requestDate: data?.requestDate ? new Date(data.requestDate) : null,
+          acceptDate: data?.acceptDate ? new Date(data.acceptDate) : null,
+          completeRequestDate: data?.completeRequestDate ? new Date(data.completeRequestDate) : null,
+          completeDate: data?.completeDate ? new Date(data.completeDate) : null,
           etc: data?.etc || "",
           uid: data?.uid || "",
           usem: data?.usem || "",
@@ -302,48 +309,58 @@ export default {
   computed: {
     formattedRequestDate: {
       get() {
-        return this.inquiry.requestDate || '';
+        if (!this.inquiry.requestDate) return '';
+        return dayjs(this.inquiry.requestDate).tz().format('YYYY-MM-DD');
       },
       set(val) {
-        this.inquiry.requestDate = val || null;
+        if (!val) {
+          this.inquiry.requestDate = null;
+        } else {
+          // 여기가 핵심: 문자열로 직접 저장 금지!
+          const parsed = dayjs.tz(val, 'Asia/Seoul').toDate();
+          this.inquiry.requestDate = isNaN(parsed.getTime()) ? null : parsed;
+        }
       }
     },
     formattedAcceptDate: {
       get() {
         if (!this.inquiry.acceptDate) return '';
-        const date = new Date(this.inquiry.acceptDate);
-        if (isNaN(date)) return '';
-        return date.toISOString().slice(0, 10); // YYYY-MM-DD
+        return dayjs(this.inquiry.acceptDate).tz().format('YYYY-MM-DD');
       },
       set(val) {
-        const parsed = new Date(val);
-        this.inquiry.acceptDate = isNaN(parsed) ? null : parsed;
+        if (!val) {
+          this.inquiry.acceptDate = null;
+        } else {
+          this.inquiry.acceptDate = dayjs.tz(val, 'Asia/Seoul').toDate();
+        }
       }
     },
     formattedCompleteRequestDate: {
       get() {
         if (!this.inquiry.completeRequestDate) return '';
-        const date = new Date(this.inquiry.completeRequestDate);
-        if (isNaN(date)) return '';
-        return date.toISOString().slice(0, 10); // YYYY-MM-DD
+        return dayjs(this.inquiry.completeRequestDate).tz().format('YYYY-MM-DD');
       },
       set(val) {
-        const parsed = new Date(val);
-        this.inquiry.completeRequestDate = isNaN(parsed) ? null : parsed;
+        if (!val) {
+          this.inquiry.completeRequestDate = null;
+        } else {
+          this.inquiry.completeRequestDate = dayjs.tz(val, 'Asia/Seoul').toDate();
+        }
       }
     },
     formattedCompleteDate: {
       get() {
         if (!this.inquiry.completeDate) return '';
-        const date = new Date(this.inquiry.completeDate);
-        if (isNaN(date)) return '';
-        return date.toISOString().slice(0, 10); // YYYY-MM-DD
+        return dayjs(this.inquiry.completeDate).tz().format('YYYY-MM-DD');
       },
       set(val) {
-        const parsed = new Date(val);
-        this.inquiry.completeDate = isNaN(parsed) ? null : parsed;
+        if (!val) {
+          this.inquiry.completeDate = null;
+        } else {
+          this.inquiry.completeDate = dayjs.tz(val, 'Asia/Seoul').toDate();
+        }
       }
-    }
+    },
   },
   created() {
     this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -531,11 +548,6 @@ export default {
   padding: 10px;
 }
 
-.multiline-input {
-  width: 100%;
-  height: 150px;
-}
-
 .goBack-btn {
   height: 35px;
   min-width: 55px;
@@ -550,6 +562,23 @@ export default {
 
 .input-width-half {
   max-width: 797px;
+}
+
+.input-area-L {
+  margin-left: 5px;
+  margin-right: 5px;
+  font-size: 13px !important;
+}
+
+::v-deep(.input-area-L .v-field) {
+  width: 715px;
+  height: 152px !important;
+  font-size: 13px !important;
+}
+
+::v-deep(.input-area-L input) {
+  padding: 0 10px !important;
+  font-size: 13px !important;
 }
 
 ::v-deep(.date-input .v-field) {
