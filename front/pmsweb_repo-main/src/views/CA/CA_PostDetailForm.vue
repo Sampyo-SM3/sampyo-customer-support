@@ -41,8 +41,12 @@
     <!-- 전체 래퍼: 접수상태 박스 + 버튼을 나란히 배치 -->
     <div class="d-flex align-center mb-4">
       <!-- 접수상태 박스 -->
-      <v-row no-gutters class="status-row status-select-row"
-        style="width: 220px; min-width: 220px; max-width: 220px;">
+      <v-row 
+        no-gutters 
+        class="status-row status-select-row"
+        style="width: 220px; 
+        min-width: 220px; 
+        max-width: 220px;">
         <v-col class="search-col">
           <div class="label-box">접수상태</div>
           <v-select 
@@ -610,10 +614,6 @@ export default {
 .mdi-menu-down::before {
   margin-right: 10px;
 }
-
-/* .status-row.top-row, status-row.bottom-row{
-  overflow: hidden;
-} */
 
 .status-row {
   overflow: hidden;
