@@ -23,8 +23,8 @@
       <!-- 제목 필드 -->
       <v-col class="search-col request-period">
         <div class="label-box">제 목</div>
-        <v-text-field v-model="sub" placeholder="제목을 입력하세요" clearable hide-details density="compact" variant="outlined"
-          class="manager-search"></v-text-field>
+        <v-text-field v-model="sub" placeholder="제목을 입력하세요" clearable hide-details density="compact"
+          variant="outlined"></v-text-field>
       </v-col>
     </v-row>
 
@@ -42,29 +42,17 @@
     <v-row no-gutters class="search-row bottom-row">
       <v-col class="select-files request-period d-flex align-center">
         <div class="label-box">첨부파일</div>
-        <v-file-input
-          style="display: none;"
-          ref="fileInput"
-          class="manager-search flex-grow-1"
-          v-model="newFiles"
-          :rules="fileRules"
-          accept="image/png, image/jpeg, application/pdf"
-          label="파일을 선택하세요"          
-          density="compact"
-          variant="outlined"
-          prepend-icon=""
-          multiple
-          :loading="isFileLoading"
-          hide-details
-          @change="handleFileChange"          
-        ></v-file-input> 
+        <v-file-input style="display: none;" ref="fileInput" class="manager-search flex-grow-1" v-model="newFiles"
+          :rules="fileRules" accept="image/png, image/jpeg, application/pdf" label="파일을 선택하세요" density="compact"
+          variant="outlined" prepend-icon="" multiple :loading="isFileLoading" hide-details
+          @change="handleFileChange"></v-file-input>
 
-        <v-btn variant="flat" color="green" class="custom-btn mt-2 mb-2 ml-2 mr-2 white-text d-flex align-center" size="small"
-          @click="openFileSelector">
+        <v-btn variant="flat" color="green" class="custom-btn mt-2 mb-2 ml-2 mr-2 white-text d-flex align-center"
+          size="small" @click="openFileSelector">
           <v-icon size="default" class="mr-1">mdi-file-upload</v-icon>
           첨부
-        </v-btn>        
-        
+        </v-btn>
+
         <!-- 별도의 아이콘을 클릭하면 파일 선택 창 오픈 -->
         <!-- <v-icon 
           size="default" 
@@ -73,7 +61,7 @@
         >
           mdi-magnify
         </v-icon> -->
-      </v-col>    
+      </v-col>
 
       <!-- 선택된 파일 목록 (아직 업로드되지 않은 파일) -->
       <div v-if="selectedFiles.length > 0" class="selected-files ml-5 mt-2 mb-2">
@@ -201,16 +189,16 @@ export default {
     },
 
     // 파일 선택 변경 처리
-    handleFileChange() {      
+    handleFileChange() {
       // 파일은 v-model에 바인딩된 newFiles에서 가져옵니다
-      const files = this.newFiles;      
+      const files = this.newFiles;
 
-      if (!files || (Array.isArray(files) && files.length === 0)) {        
+      if (!files || (Array.isArray(files) && files.length === 0)) {
         return;
       }
 
-      if (Array.isArray(files)) {        
-        files.forEach((file) => {          
+      if (Array.isArray(files)) {
+        files.forEach((file) => {
           // 중복 파일 검사 (selectedFiles 내에서)
           const existingSelectedIndex = this.selectedFiles.findIndex(f => f.name === file.name);
           if (existingSelectedIndex !== -1) {
@@ -221,7 +209,7 @@ export default {
             this.selectedFiles.push(file);
           }
         });
-      } else {        
+      } else {
         // 중복 파일 검사 (selectedFiles 내에서)
         const existingSelectedIndex = this.selectedFiles.findIndex(f => f.name === files.name);
         if (existingSelectedIndex !== -1) {
@@ -245,7 +233,7 @@ export default {
     },
 
     // 업로드된 파일 제거
-    removeFile(index) {      
+    removeFile(index) {
       this.test4(this.uploadedFiles[index].name);
 
       this.uploadedFiles.splice(index, 1);
@@ -270,24 +258,24 @@ export default {
     },
 
     // 파일 업로드 처리
-    async uploadFiles() {            
+    async uploadFiles() {
       // 파일 없으면 false 리턴
-      if (!this.selectedFiles || this.selectedFiles.length === 0) {        
+      if (!this.selectedFiles || this.selectedFiles.length === 0) {
         return false;
       }
 
       // 파일명 중복 확인
       const duplicateFiles = this.checkDuplicateFiles();
 
-      if (duplicateFiles.length > 0) {        
+      if (duplicateFiles.length > 0) {
         return false;
       }
 
       // 중복 파일이 없으면 바로 업로드 진행
-      try {        
-        await this.processUpload(this.selectedFiles);        
+      try {
+        await this.processUpload(this.selectedFiles);
         return true; // 성공 시 true 리턴
-      } catch (error) {        
+      } catch (error) {
         return false; // 실패 시 false 리턴
       }
     },
@@ -328,7 +316,7 @@ export default {
 
 
     // 실제 파일 업로드 처리
-    async processUpload(filesToUpload) {      
+    async processUpload(filesToUpload) {
       if (!filesToUpload.length) throw new Error('업로드할 파일이 없습니다.');
 
       this.isFileLoading = true;
@@ -382,7 +370,7 @@ export default {
       try {
         // FormData 사용하지 않고 URL에 파라미터 포함
         const response = await apiClient.post(`/api/fileDelete?originFile=${encodeURIComponent(this.deletingFile)}`);
-        
+
         // 삭제 성공 처리
         if (response.data.result === 'success') {
           // 파일 목록에서 삭제된 파일 제거
@@ -425,18 +413,18 @@ export default {
       return true;
     },
 
-    async insertBoard() {      
+    async insertBoard() {
       try {
         this.showError = false;
 
         if (!this.validateBoard()) {
           return; // 검증 실패 시 함수 종료
-        }     
+        }
 
-        this.loading = true;        
+        this.loading = true;
 
         const boardData = {
-          "sub": this.sub,          
+          "sub": this.sub,
           "etc": this.etc,
           "writerId": this.userId,
           "uid": this.userName,
@@ -452,10 +440,10 @@ export default {
 
         // selectedFiles 배열의 각 파일에 대해 반복
         const fileAttachPromises = this.selectedFiles.map(async (file) => {
-          try {            
+          try {
             // 파일명은 게시물 기준으로 중복 관리함
             const fileName = `${boardSeq}_${file.name}`;
-            
+
             // 원본 파일 객체의 이름 변경
             const modifiedFile = new File([file], fileName, {
               type: file.type,
@@ -468,14 +456,14 @@ export default {
               fileSize: modifiedFile.size,
               fileType: modifiedFile.type,
             };
-                          
+
             // FileAttach 테이블 INSERT API 호출
             const attachResponse = await apiClient.post('/api/file-attach/insert', fileAttachData);
-            
+
             // 파일서버 업로드 API 호출
             const additionalResponse = await this.processUpload([modifiedFile]);
-            
-            
+
+
             return {
               fileName: file.name,
               status: 'success',
@@ -483,7 +471,7 @@ export default {
               additionalResponse
             };
           } catch (error) {
-              console.error(`파일 ${file.name} 처리 중 오류:`, error);
+            console.error(`파일 ${file.name} 처리 중 오류:`, error);
             return {
               fileName: file.name,
               status: 'error',
@@ -494,11 +482,11 @@ export default {
 
         // 모든 파일 첨부 및 추가 API 호출을 동시에 실행
         const responses = await Promise.all(fileAttachPromises);
-        
+
         // 결과 분석
         // const successFiles = responses.filter(response => response.status === 'success');
         const errorFiles = responses.filter(response => response.status === 'error');
-                        
+
         // 실패한 파일이 있으면 사용자에게 알림
         if (errorFiles.length > 0) {
           this.errorMessages = errorFiles.map(file => `${file.fileName}: ${file.error}`);
@@ -507,7 +495,7 @@ export default {
 
         // 모든 성공 시 페이지 이동 또는 추가 로직
         this.$router.push({ name: 'CA1000_10' });
-        
+
       } catch (error) {
         // 전역 에러 처리
         this.handleError(error);

@@ -17,43 +17,50 @@
 
     <br>
     <v-row no-gutters class="search-row top-row">
-      <v-col class="search-col product-category">
+      <v-col class="search-col input-width">
         <div class="label-box colNm">제목</div>
-        <div class="author-value">{{ inquiry.sub }}</div>
+        <v-text-field v-model="inquiry.sub" variant="outlined" density="compact" hide-details
+          class="input-area title-field" />
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
-      <v-col class="search-col request-period">
+      <v-col class="search-col input-width">
         <div class="label-box colNm">업무명</div>
-        <div class="author-value">{{ inquiry.taskName }}</div>
+        <v-text-field v-model="inquiry.taskName" variant="outlined" density="compact" hide-details
+          class="input-area"></v-text-field>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
-      <v-col class="search-col request-period">
+      <v-col class="search-col input-width">
         <div class="label-box colNm">협조</div>
-        <div class="author-value">{{ inquiry.help }}</div>
+        <v-text-field v-model="inquiry.help" variant="outlined" density="compact" hide-details
+          class="input-area"></v-text-field>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
-      <v-col class="search-col request-period">
+      <v-col class="search-col input-width">
         <div class="label-box colNm">개발(변경) 필요성</div>
-        <div class="author-value">{{ inquiry.necessity }}</div>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="search-row middle-row">
-      <v-col class="search-col request-period">
-        <div class="label-box colNm">기대효과</div>
-        <div class="author-value">{{ inquiry.effect }}</div>
+        <v-text-field v-model="inquiry.necessity" variant="outlined" density="compact" hide-details
+          class="input-area"></v-text-field>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
-      <v-col class="search-col request-period">
+      <v-col class="search-col input-width">
+        <div class="label-box colNm">기대효과</div>
+        <v-text-field v-model="inquiry.effect" variant="outlined" density="compact" hide-details
+          class="input-area"></v-text-field>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col input-width">
         <div class="label-box colNm">개발(변경) 모듈</div>
-        <div class="author-value">{{ inquiry.module }}</div>
+        <v-text-field v-model="inquiry.module" variant="outlined" density="compact" hide-details
+          class="input-area"></v-text-field>
       </v-col>
     </v-row>
 
@@ -65,9 +72,8 @@
       <v-col style="border-right: 1px solid #e0e0e0;">
         <div>
           <div class="sub-label">변경전</div>
-          <div class="multiline-box">
-            {{ inquiry.beforeTaskContent }}
-          </div>
+          <v-textarea v-model="inquiry.beforeTaskContent" variant="outlined" density="compact" hide-details
+            class="multiline-input" style="width: 100%;"></v-textarea>
         </div>
       </v-col>
 
@@ -75,65 +81,123 @@
       <v-col>
         <div>
           <div class="sub-label">변경후</div>
-          <div class="multiline-box">
-            {{ inquiry.afterTaskContent }}
-          </div>
+          <v-textarea v-model="inquiry.afterTaskContent" variant="outlined" density="compact" hide-details
+            class="multiline-input" style="width: 100%;"></v-textarea>
         </div>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
-      <v-col cols="6" class="search-col d-flex align-center">
+      <v-col class="search-col input-width-half">
         <div class="label-box colNm">사용부서</div>
-        <div class="author-value">{{ inquiry.useDept }}</div>
+        <v-text-field v-model="inquiry.useDept" variant="outlined" density="compact" hide-details class="input-area"
+          style="width: 100%;"></v-text-field>
       </v-col>
 
-      <v-col class="search-col d-flex align-center" style="max-width: 300px;">
+      <v-col class="search-col input-width-half">
         <div class="label-box colNm">첨부문서</div>
-        <div class="author-value">{{ inquiry.attachDoc }}</div>
+        <v-text-field v-model="inquiry.attachDoc" variant="outlined" density="compact" hide-details class="input-area"
+          style="width: 100%;"></v-text-field>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
-      <v-col cols="6" class="search-col d-flex align-center">
+      <v-col class="search-col input-width-half">
         <div class="label-box colNm">의뢰일자</div>
-        <div class="author-value">{{ inquiry.requestDate }}</div>
+        <v-menu v-model="requestDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
+          min-width="auto">
+          <template v-slot:activator="{ props }">
+            <div class="date-field-wrapper" v-bind="props"
+              style="display: flex; align-items: center; gap: 4px; width: 200px; ">
+              <v-text-field v-model="formattedRequestDate" class="input-area" density="compact" hide-details readonly
+                variant="outlined" />
+              <v-icon size="23" color="#7A7A7A">mdi-calendar-search</v-icon>
+            </div>
+          </template>
+
+          <v-date-picker v-model="inquiry.requestDate" @update:model-value="requestDateMenu = false" locale="ko-KR"
+            elevation="1" color="blue" width="310" first-day-of-week="1" show-adjacent-months scrollable
+            :allowed-dates="allowedDates" />
+        </v-menu>
       </v-col>
 
-      <v-col class="search-col" style="max-width: 300px;">
+
+      <v-col class="search-col input-width-half">
         <div class="label-box colNm">접수일자</div>
-        <div class="author-value">{{ inquiry.acceptDate }}</div>
+        <v-menu v-model="acceptDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
+          min-width="auto">
+          <template v-slot:activator="{ props }">
+            <div class="date-field-wrapper" v-bind="props"
+              style="display: flex; align-items: center; gap: 4px; width: 200px; ">
+              <v-text-field v-model="formattedAcceptDate" class="input-area" density="compact" hide-details readonly
+                variant="outlined" />
+              <v-icon size="23" color="#7A7A7A">mdi-calendar-search</v-icon>
+            </div>
+          </template>
+
+          <v-date-picker v-model="inquiry.acceptDate" @update:model-value="acceptDateMenu = false" locale="ko-KR"
+            elevation="1" color="blue" width="300" first-day-of-week="1" show-adjacent-months scrollable
+            :allowed-dates="allowedDates" />
+        </v-menu>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
-      <v-col cols="6" class="search-col d-flex align-center">
+      <v-col class="search-col input-width-half">
         <div class="label-box colNm">완료요청일자</div>
-        <div class="author-value">{{ inquiry.completeRequestDate }}</div>
+        <v-menu v-model="completeRequestDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
+          min-width="auto">
+          <template v-slot:activator="{ props }">
+            <div class="date-field-wrapper" v-bind="props"
+              style="display: flex; align-items: center; gap: 4px; width: 200px; ">
+              <v-text-field v-model="formattedCompleteRequestDate" class="input-area" density="compact" hide-details
+                readonly variant="outlined" />
+              <v-icon size="23" color="#7A7A7A">mdi-calendar-search</v-icon>
+            </div>
+          </template>
+
+          <v-date-picker v-model="inquiry.completeRequestDate" @update:model-value="completeRequestDateMenu = false"
+            locale="ko-KR" elevation="1" color="blue" width="300" first-day-of-week="1" show-adjacent-months scrollable
+            :allowed-dates="allowedDates" />
+        </v-menu>
       </v-col>
 
-      <v-col class="search-col" style="max-width: 300px;">
+      <v-col class="search-col" style="max-width:600px;">
         <div class="label-box colNm">완료일자</div>
-        <div class="author-value">{{ inquiry.completeDate }}</div>
+        <v-menu v-model="completeDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
+          min-width="auto">
+          <template v-slot:activator="{ props }">
+            <div class="date-field-wrapper" v-bind="props"
+              style="display: flex; align-items: center; gap: 4px; width: 200px; ">
+              <v-text-field v-model="formattedCompleteDate" class="input-area" density="compact" hide-details readonly
+                variant="outlined" />
+              <v-icon size="23" color="#7A7A7A">mdi-calendar-search</v-icon>
+            </div>
+          </template>
+
+          <v-date-picker v-model="inquiry.completeDate" @update:model-value="completeDateMenu = false" locale="ko-KR"
+            elevation="1" color="blue" width="300" first-day-of-week="1" show-adjacent-months scrollable
+            :allowed-dates="allowedDates" />
+        </v-menu>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
-      <v-col class="search-col request-period">
+      <v-col class="search-col input-width">
         <div class="label-box colNm">기타</div>
-        <div class="author-value">{{ inquiry.etc }}</div>
+        <v-text-field v-model="inquiry.etc" variant="outlined" density="compact" hide-details
+          class="input-area"></v-text-field>
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row bottom-row">
-      <v-col class="search-col request-period">
+      <v-col class="search-col input-width">
         <div class="label-box colNm">첨부목록</div>
-        <div class="author-value"></div>
+        <v-text-field variant="outlined" density="compact" hide-details class="input-area"></v-text-field>
       </v-col>
     </v-row>
   </v-container>
 </template>
-
 
 <script>
 import apiClient from '@/api';
@@ -150,7 +214,10 @@ export default {
   data() {
     return {
       userInfo: null,       //사용자 ID
-
+      requestDateMenu: false,
+      acceptDateMenu: false,
+      completeRequestDateMenu: false,
+      completeDateMenu: false,
       step: 1,
       selectedStatus: '', // 추가된 상태 변수
       inquiry: {
@@ -165,10 +232,10 @@ export default {
         afterTaskContent: "",
         useDept: "",
         attachDoc: "",
-        requestDate: "",
-        acceptDate: "",
-        completeRequestDate: "",
-        completeDate: "",
+        requestDate: null,
+        acceptDate: null,
+        completeRequestDate: null,
+        completeDate: null,
         etc: "",
         uid: "",
         usem: "",
@@ -177,16 +244,11 @@ export default {
         manager: "",
         division: "",
         processState: ""
-
       },
       management: {
         PROGRESS: ""
       },
-      answer: "",
-      sectors: ["시멘트", "분체", "골재", "몰탈", "레미콘", "기타"],
-      progressStatuses: [],
-      qaTypes: ["제품/기술문의", "배차문의", "불편사항", "자료요청", "1:1문의"],
-      receiptPaths: ["WEB", "KAKAO", "CALL", "CRM", "SIDP"],
+      progressStatuses: []
 
     };
   },
@@ -197,63 +259,93 @@ export default {
           params: { seq: this.receivedSeq }
         });
 
-        // ✅ response.data 또는 processState가 존재하는지 확인 후 할당
-        if (!response.data || !response.data.processState) {
-          console.warn("⚠ processState 값이 없습니다. 기본값(P)로 설정합니다.");
+        const data = response.data;
+
+        if (!data) {
+          console.warn("❗ 불러온 데이터 없음");
+          return;
         }
 
-        const processState = response.data?.processState || "P"; // 기본값 설정
+        // ✅ inquiry 값 덮어쓰기 (필드 유지)
+        Object.assign(this.inquiry, {
+          sub: data?.sub || "",
+          taskName: data?.taskName || "",
+          help: data?.help || "",
+          necessity: data?.necessity || "",
+          effect: data?.effect || "",
+          module: data?.module || "",
+          beforeTaskContent: data?.beforeTaskContent || "",
+          afterTaskContent: data?.afterTaskContent || "",
+          useDept: data?.useDept || "",
+          attachDoc: data?.attachDoc || "",
+          requestDate: data?.requestDate || null,
+          acceptDate: data?.acceptDate || null,
+          completeRequestDate: data?.completeRequestDate || null,
+          completeDate: data?.completeDate || null,
+          etc: data?.etc || "",
+          uid: data?.uid || "",
+          usem: data?.usem || "",
+          dpId: data?.dpId || "",
+          dpDn: data?.dpDn || "",
+          manager: data?.manager || "",
+          division: data?.division || "",
+          processState: data?.processState || ""
+        });
 
-        // ✅ 상태 매핑 체크 후 기본값 설정
-        this.step = this.statusMapping?.[processState] ?? 1;
-
-        // ✅ 선택된 상태 반영
-        const matchedStatus = this.progressStatuses.find(status => status.value === processState);
-        this.selectedStatus = matchedStatus ? matchedStatus.value : "P";
-
-        // ✅ 받아온 데이터를 inquiry에 업데이트
-        this.inquiry = {
-
-          sub: response.data?.sub || "",
-          context: response.data?.context || "",
-          taskName: response.data?.taskName || "",
-          help: response.data?.help || "",
-          necessity: response.data?.necessity || "",
-          effect: response.data?.effect || "",
-          module: response.data?.module || "",
-          beforeTaskContent: response.data?.beforeTaskContent || "",
-          afterTaskContent: response.data?.afterTaskContent || "",
-          useDept: response.data?.useDept || "",
-          attachDoc: response.data?.attachDoc || "",
-          requestDate: response.data?.requestDate || "",
-          acceptDate: response.data?.acceptDate || "",
-          completeRequestDate: response.data?.completeRequestDate || "",
-          completeDate: response.data?.completeDate || "",
-          etc: response.data?.etc || "",
-          uid: response.data?.uid || "",
-          usem: response.data?.usem || "",
-          dpId: response.data?.dpId || "",
-          dpDn: response.data?.dpDn || "",
-          manager: response.data?.manager || "",
-          division: response.data?.division || "",
-          processState: response.data?.processState || "",
-          management: {
-            PROGRESS: processState
-          }
-        };
       } catch (error) {
-        console.error("❌ 오류 발생:", error);
+        console.error("❌ 요구사항 불러오기 오류:", error);
       }
     },
 
+
   },
   computed: {
-
+    formattedRequestDate: {
+      get() {
+        return this.inquiry.requestDate || '';
+      },
+      set(val) {
+        this.inquiry.requestDate = val || null;
+      }
+    },
+    formattedAcceptDate: {
+      get() {
+        if (!this.inquiry.acceptDate) return '';
+        const date = new Date(this.inquiry.acceptDate);
+        if (isNaN(date)) return '';
+        return date.toISOString().slice(0, 10); // YYYY-MM-DD
+      },
+      set(val) {
+        const parsed = new Date(val);
+        this.inquiry.acceptDate = isNaN(parsed) ? null : parsed;
+      }
+    },
+    formattedCompleteRequestDate: {
+      get() {
+        if (!this.inquiry.completeRequestDate) return '';
+        const date = new Date(this.inquiry.completeRequestDate);
+        if (isNaN(date)) return '';
+        return date.toISOString().slice(0, 10); // YYYY-MM-DD
+      },
+      set(val) {
+        const parsed = new Date(val);
+        this.inquiry.completeRequestDate = isNaN(parsed) ? null : parsed;
+      }
+    },
+    formattedCompleteDate: {
+      get() {
+        if (!this.inquiry.completeDate) return '';
+        const date = new Date(this.inquiry.completeDate);
+        if (isNaN(date)) return '';
+        return date.toISOString().slice(0, 10); // YYYY-MM-DD
+      },
+      set(val) {
+        const parsed = new Date(val);
+        this.inquiry.completeDate = isNaN(parsed) ? null : parsed;
+      }
+    }
   },
   created() {
-    // 초기화 시 현재 상태 설정
-    this.selectedStatus = this.management.PROGRESS;
-
     this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
   },
   mounted() {
@@ -264,9 +356,6 @@ export default {
     receivedSeq: {
       immediate: true  // 컴포넌트 생성 시점에도 즉시 실행
     },
-    selectedStatus(newVal, oldVal) {
-      console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
-    }
   }
 };
 </script>
@@ -439,8 +528,12 @@ export default {
   white-space: nowrap;
   display: flex;
   align-items: center;
-
   padding: 10px;
+}
+
+.multiline-input {
+  width: 100%;
+  height: 150px;
 }
 
 .goBack-btn {
@@ -449,5 +542,32 @@ export default {
   font-size: 14px;
   border-radius: 6px;
   margin-bottom: 10px;
+}
+
+.input-width {
+  max-width: 1600px;
+}
+
+.input-width-half {
+  max-width: 797px;
+}
+
+::v-deep(.date-input .v-field) {
+  margin-left: 5px;
+  margin-right: 5px;
+  height: 33px !important;
+  font-size: 15px !important;
+}
+
+::v-deep(.input-area .v-field) {
+  margin-left: 5px;
+  margin-right: 5px;
+  height: 33px !important;
+  font-size: 15px !important;
+}
+
+::v-deep(.input-area input) {
+  padding: 0 10px !important;
+  font-size: 13px !important;
 }
 </style>
