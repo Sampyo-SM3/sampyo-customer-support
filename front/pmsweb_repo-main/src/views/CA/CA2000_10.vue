@@ -142,20 +142,34 @@ export default {
         // 폼 타입 결정
         let formType = ''
         formType = 'WF_FORM_LEGACY_FI_STATE_UNBAN'
-        formType = 'WF_FORM_SR'
-        // formType = 'WF_FORM_SR_V0'
+        // formType = 'WF_FORM_SR'
+        // formType = 'WF_FORM_SR_V1'
+        formType = 'WF_FORM_SRTEST'
+        
         
         // URL 및 파라미터 설정
         // const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
+        // const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'        
+        // const params = {
+        //   key: 1,
+        //   empno: 1,
+        //   legacy_form: formType,
+        //   datatype: 'xml',
+        //   ip: '127.0.0.1',
+        //   db: 'tttt'
+        // }
+
+        // const baseUrl = 'http://bluedev.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'        
         const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'        
         const params = {
-          key: 1,
-          empno: 1,
+          key: 100,
+          empno: 'SPH220007',
           legacy_form: formType,
           datatype: 'xml',
-          ip: '127.0.0.1',
-          db: 'tttt'
+          ip: '10.20.20.90',
+          db: 'COVI_FLOW_SI'
         }
+
         
         // 쿼리 파라미터 문자열 생성
         const queryString = new URLSearchParams(params).toString()
