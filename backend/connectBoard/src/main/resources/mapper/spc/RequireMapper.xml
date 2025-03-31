@@ -139,5 +139,24 @@
 		where seq = #{seq};
 	</select>
 
+	<update id="updateSrForm" parameterType="com.example.connectBoard.dto.RequireDTO">
+   		UPDATE board 
+    	SET sub = #{sub},
+    		taskName = #{taskName},
+    		help = #{help},
+    		necessity = #{necessity},
+    		effect = #{effect},
+    		module = #{module},
+    		beforeTaskContent = #{beforeTaskContent},
+    		afterTaskContent = #{afterTaskContent},
+    		useDept = #{useDept},
+    		attachDoc = #{attachDoc},
+    		requestDate = #{requestDate},
+    		acceptDate = #{acceptDate},
+    		completeRequestDate = #{completeRequestDate},
+    		completeDate = #{completeDate},
+    		etc = #{etc}
+    	WHERE seq = #{seq};
+	</update>
 </mapper>
 

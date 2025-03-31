@@ -76,7 +76,16 @@ public class RequireController {
         }
     }    
     
-  
+	// SR요청서 작성
+    @PostMapping("/require/updateSrForm")
+    public ResponseEntity<?> updateSrForm(@RequestBody RequireDTO require) {
+        try {
+        	requireService.updateSrForm(require);
+            return ResponseEntity.ok("접수상태가 변경되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 오류 발생: " + e.getMessage());
+        }
+    }
      
     
 }

@@ -213,8 +213,6 @@ export default {
         content: obj.content  // 댓글 내용
       };
 
-      console.log(commentData);
-
       try {
         await apiClient.post("api/updateComment", commentData);
         alert("댓글을 수정하였습니다.");

@@ -35,6 +35,10 @@ public class RequireService {
                 
         // MyBatis에서 자동 생성된 seq 반환
         return require.getSeq();    	
-    }    
+    }   
+    
+    public void updateSrForm(RequireDTO require) {
+    	requireRepository.updateSrForm(require);    	
+    }   
 
 }

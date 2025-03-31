@@ -46,6 +46,7 @@
       <v-btn variant="outlined" color="primary" size="small" class="save-status-btn ml-3" @click="saveStatus">
         저장
       </v-btn>
+
     </div>
 
 
@@ -220,6 +221,7 @@ export default {
       inquiry: {
         sub: "",
         context: "",
+        uId: "",
         taskName: "",
         help: "",
         necessity: "",

@@ -289,6 +289,7 @@ export default {
       itemsPerPage: 10,
       // 상태값 목록 (실제 API에서 받아올 수 있음)
       statusList: ['미처리', '진행중', '보류중', '종결'],
+      processState: '',
       errorMessages: [],
       showError: false,
       savedMidMenu: '',
@@ -550,8 +551,6 @@ export default {
             sub: this.sub
           }
         });
-
-        console.log(response.data);
 
         // API 응답 데이터 처리
         if (response.data && Array.isArray(response.data)) {

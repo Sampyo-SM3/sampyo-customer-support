@@ -5,7 +5,7 @@
         <div class="d-flex align-center">
           <div class="title-div">SR 요청서 작성</div>
           <v-btn variant="outlined" color="primary" class="goBack-btn ml-auto mr-2" size="small"
-            @click="$router.push('/views/CA/CA1000_10')">
+            @click="submitRequest()">
             상신
           </v-btn>
         </div>
@@ -303,8 +303,38 @@ export default {
         console.error("❌ 요구사항 불러오기 오류:", error);
       }
     },
+    async submitRequest() {
+      if (confirm("상신하시겠습니까?")) {
+        try {
+          const param = {
+            seq: this.receivedSeq,
+            sub: this.inquiry.sub,                        //제목
+            taskName: this.inquiry.taskName,              //업무명
+            help: this.inquiry.help,              //협조
+            necessity: this.inquiry.necessity,    //개발(변경) 필요성
+            effect: this.inquiry.effect,          //기대효과
+            module: this.inquiry.module,          //개발(변경) 모듈
+            beforeTaskContent: this.inquiry.beforeTaskContent,    //개발(변경) 업무내용 - 변경전
+            afterTaskContent: this.inquiry.afterTaskContent,    //개발(변경) 업무내용 - 변경후
+            useDept: this.inquiry.useDept,        //사용부서
+            attachDoc: this.inquiry.attachDoc,    //첨부문서
+            requestDate: this.inquiry.requestDate,//의뢰일자
+            acceptDate: this.inquiry.acceptDate,  //접수일자
+            completeRequestDate: this.inquiry.completeRequestDate,    //완료요청일자
+            completeDate: this.inquiry.completeDate,                  //완료일자
+            etc: this.inquiry.etc,                  //기타
+          };
 
+          // API 요청: 댓글 DB에 저장
+          await apiClient.post("/api/require/updateSrForm", param);
+          alert("상신하였습니다.");
 
+          this.fetchRequireDetail();
+        } catch (error) {
+          alert("상신을 실패하였습니다. 관리자에게 문의하세요.");
+        }
+      }
+    },
   },
   computed: {
     formattedRequestDate: {

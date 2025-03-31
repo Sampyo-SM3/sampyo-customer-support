@@ -21,8 +21,10 @@
 
 	<update id="updateStatus" parameterType="com.example.connectBoard.dto.RequireDTO">
    		UPDATE board 
-    	SET processState = #{processState}
+    	SET processState = #{processState},
+    		srFlag = 'Y'
     	WHERE seq = #{seq} 
+    	
 	</update>
 </mapper>
 
