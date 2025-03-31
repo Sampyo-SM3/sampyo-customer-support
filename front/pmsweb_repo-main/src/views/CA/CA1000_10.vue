@@ -178,7 +178,7 @@
             <div class="td-cell">{{ formatDate(item.requestDate) }}</div>
             <div class="td-cell title-cell">
               <router-link
-                :to="{ name: item.srFlag === 'Y' ? 'CA_PostDetailForm' : 'CA_PostDetailForm2', params: { receivedSeq: item.seq } }"
+                :to="{ name: item.processState === 'S' ? 'CA_PostDetailForm' : 'CA_PostDetailForm2', params: { receivedSeq: item.seq } }"
                 class="title-link">{{
                   item.sub }}</router-link>
             </div>
@@ -289,6 +289,7 @@ export default {
       itemsPerPage: 10,
       // 상태값 목록 (실제 API에서 받아올 수 있음)
       statusList: ['미처리', '진행중', '보류중', '종결'],
+      processState: '',
       errorMessages: [],
       showError: false,
       savedMidMenu: '',
@@ -550,8 +551,6 @@ export default {
             sub: this.sub
           }
         });
-
-        console.log(response.data);
 
         // API 응답 데이터 처리
         if (response.data && Array.isArray(response.data)) {

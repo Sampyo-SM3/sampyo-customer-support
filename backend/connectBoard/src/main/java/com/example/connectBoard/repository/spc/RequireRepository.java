@@ -17,5 +17,7 @@ public interface RequireRepository {
 	List<RequireDTO> searchRequiresByCriteria(RequireSearchCriteria criteria);
 	
 	void insertRequire(RequireDTO require);
+	
+	void updateSrForm(RequireDTO require);
 
 }
