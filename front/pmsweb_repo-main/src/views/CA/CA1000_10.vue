@@ -671,10 +671,12 @@ export default {
       switch (status) {
         case '미처리':
           return 'text-error';
-        case '진행중':
+        case '진행':
           return 'text-info';
         case '보류중':
           return 'text-warning';
+        case 'SR':
+          return 'text-SR';
         case '종결':
           return 'text-success';
         default:
