@@ -41,8 +41,12 @@
     <!-- 전체 래퍼: 접수상태 박스 + 버튼을 나란히 배치 -->
     <div class="d-flex align-center mb-4">
       <!-- 접수상태 박스 -->
-      <v-row no-gutters class="status-row top-row bottom-row status-select-row"
-        style="width: 220px; min-width: 220px; max-width: 220px;">
+      <v-row 
+        no-gutters 
+        class="status-row status-select-row"
+        style="width: 220px; 
+        min-width: 220px; 
+        max-width: 220px;">
         <v-col class="search-col">
           <div class="label-box">접수상태</div>
           <v-select 
@@ -529,10 +533,6 @@ export default {
   /* 하단 테두리 제거 */
 }
 
-.status-row.top-row, status-row.bottom-row{
-  overflow: hidden;
-}
-
 .search-row.top-row {
   border-top: 3px solid #e0e0e0;
   border-top-left-radius: 8px;
@@ -564,17 +564,11 @@ export default {
   border-bottom-right-radius: 8px;
 }
 
-.label-box {
-  /* 색상 변경 */
-  color: #333333 !important;
-  /* 이전: #578ADB */
-  background-color: #e6eef8 !important;
-  /* 이전: #f5f5f5 */
-}
+
 
 .search-col {
   display: flex;
-  align-items: center;
+  /* align-items: center; */
   padding: 0;
   border-left: 1px solid #e0e0e0;
 }
@@ -593,20 +587,18 @@ export default {
   align-items: center;
   justify-content: center;
   font-size: 14px;
-  font-weight: 500;
-  color: #578ADB;
-  background-color: #f5f5f5;
+  font-weight: 500;  
+  background-color: #e6eef8 !important;
+  color: #333333 !important;
   white-space: nowrap;
   padding: 0 4px;
   border-right: 1px solid #eaeaea;
-  margin-bottom: 5px;
+  /* margin-bottom: 5px; */
 }
 
 .white-text {
   color: white !important;
 }
-
-
 
 .status-select {
   margin-left: 15px;
@@ -623,13 +615,18 @@ export default {
   margin-right: 10px;
 }
 
+.status-row {
+  overflow: hidden;
+}
+
+
 .status-select-row {
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   overflow: hidden;
-  height: 45px;
+  /* height: 45px; */
   margin-bottom: 15px;
-  height: 42px;  
+  /* height: 42px;   */
 }
 
 

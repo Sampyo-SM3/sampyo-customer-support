@@ -139,46 +139,25 @@ export default {
       console.log('--test--');
 
       try {       
-        // 폼 타입 결정
-        let formType = ''
-        formType = 'WF_FORM_LEGACY_FI_STATE_UNBAN'
-        // formType = 'WF_FORM_SR'
-        // formType = 'WF_FORM_SR_V1'
-        formType = 'WF_FORM_SRTEST'
-        
-        
-        // URL 및 파라미터 설정
-        // const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
-        // const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'        
-        // const params = {
-        //   key: 1,
-        //   empno: 1,
-        //   legacy_form: formType,
-        //   datatype: 'xml',
-        //   ip: '127.0.0.1',
-        //   db: 'tttt'
-        // }
-
-        // const baseUrl = 'http://bluedev.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'        
+        // 폼 타입 결정        
         const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'        
         const params = {
-          key: 100,
-          empno: 'SPH220007',
-          legacy_form: formType,
-          datatype: 'xml',
-          ip: '10.20.20.90',
-          db: 'COVI_FLOW_SI'
-        }
-
+          key: '111',  // board seq번호
+          empno: 'SPH221342320005', // 사원번호
+          legacy_form: 'WF_FORM_SRTEST',
+          datatype: 'xml',  // 데이터 타입          
+          // seq: '111', // 프로시저 호출되는 ip          
+          // DATE_TEST: '111',  // board seq번호
+          ip: '10.50.20.71', // 프로시저 호출되는 ip          
+          db: 'SPC_TEST'     // 프로시저 호출되는 db
+        };        
         
         // 쿼리 파라미터 문자열 생성
         const queryString = new URLSearchParams(params).toString()
         const fullUrl = `${baseUrl}?${queryString}`
         
         // 새 창에서 URL 열기
-        window.open(fullUrl, '_blank')
-        
-        
+        window.open(fullUrl, '_blank')                
       } catch (error) {
         console.error('상신 처리 중 오류 발생:', error)
       }      

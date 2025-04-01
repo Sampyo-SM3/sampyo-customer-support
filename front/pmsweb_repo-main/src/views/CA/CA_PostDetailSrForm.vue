@@ -34,8 +34,13 @@
     <!-- 전체 래퍼: 접수상태 박스 + 버튼을 나란히 배치 -->
     <div class="d-flex align-center mb-4">
       <!-- 접수상태 박스 -->
-      <v-row no-gutters class="search-row top-row bottom-row status-select-row"
-        style="width: 220px; min-width: 220px; max-width: 220px;">
+      <!-- <v-row no-gutters class="search-row top-row bottom-row status-select-row"       -->
+        <v-row 
+        no-gutters 
+        class="status-row status-select-row"
+        style="width: 220px; 
+        min-width: 220px; 
+        max-width: 220px;">
         <v-col class="search-col">
           <div class="label-box">접수상태</div>
           <v-select v-model="selectedStatus" :items="progressStatuses" item-title="text" item-value="value"
@@ -463,6 +468,19 @@ export default {
 </script>
 
 <style scoped>
+.status-row {
+  overflow: hidden;
+}
+
+.status-select-row {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  /* height: 45px; */
+  margin-bottom: 15px;
+  /* height: 42px;   */
+}
+
 .template {
   font-family: "Noto Sans KR", sans-serif;
 }
@@ -621,7 +639,7 @@ export default {
 
 .search-col {
   display: flex;
-  align-items: center;
+  /* align-items: center; */
   padding: 0;
   border-left: 1px solid #e0e0e0;
 }
@@ -646,7 +664,7 @@ export default {
   white-space: nowrap;
   padding: 0 4px;
   border-right: 1px solid #eaeaea;
-  margin-bottom: 5px;
+  /* margin-bottom: 5px; */
   color: #333333 !important;
   background-color: #e6eef8 !important;
 }
@@ -655,16 +673,16 @@ export default {
   color: white !important;
 }
 
-.status-select-row {
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 15px;
-  height: 42px;
-}
-
 .status-select {
   margin-left: 15px;
   margin-bottom: 10px;
+}
+
+.status-select-row {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 45px;
 }
 
 .status-select>>>.v-select__selection {
@@ -677,12 +695,7 @@ export default {
   margin-right: 10px;
 }
 
-.status-select-row {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  overflow: hidden;
-  height: 45px;
-}
+
 
 .save-status-btn {
   height: 42px;
