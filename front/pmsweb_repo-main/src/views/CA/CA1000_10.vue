@@ -558,11 +558,13 @@ export default {
             ...item,
             selected: false,
             // API에서 진행상태가 오지 않으면 임의로 설정
-            status: item.statusNm || this.getRandomStatus(),
+            status: item.processState === 'S'
+              ? (item.statusNm + ' (' + item.srFlag + ')' || this.getRandomStatus())
+              : (item.statusNm || this.getRandomStatus()),
 
             // 테이블에 표시할 데이터 매핑
             manager: item.manager || '-',  // 담당자 필드가 없어서 임시로 요청자 ID 사용
-            memo: item.currentIssue || '-'     // 메모 필드가 없어서 임시로 현재 이슈 사용
+            memo: item.currentIssue || '-'     // 메모 필드가 없어서 임시로 현재 이슈 사용          
           }));
 
           // 서버 측 페이징 구현시 전체 개수 설정 (API 응답에서 받아야 함)
