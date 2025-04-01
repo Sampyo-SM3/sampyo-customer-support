@@ -23,8 +23,7 @@
    		UPDATE board 
     	SET processState = #{processState},
     		srFlag = 'Y'
-    	WHERE seq = #{seq} 
-    	
+    	WHERE seq = #{seq} 	
 	</update>
 </mapper>
 

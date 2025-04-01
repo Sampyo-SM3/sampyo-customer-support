@@ -3,7 +3,7 @@
 
     <v-row>
       <v-col>
-        <div class="title-div" @click="test()">간단 폼 입력</div>
+        <div class="title-div">문의 내용 작성</div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
@@ -20,17 +20,20 @@
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col" style="max-width:350px;">
+        <div class="label-box">담당자</div>
+        <v-text-field class="sub-text-field input-manager" v-model="manager" readonly hide-details density="compact"
+          variant="outlined" append-icon="mdi-magnify" @click="showUserPopup = true">
+        </v-text-field>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
       <!-- 제목 필드 -->
       <v-col class="search-col">
         <div class="label-box">제 목</div>
-        <v-text-field 
-          class="sub-text-field" 
-          v-model="sub" 
-          placeholder="제목을 입력하세요" 
-          clearable 
-          hide-details 
-          density="compact"
-          variant="outlined"></v-text-field>
+        <v-text-field class="sub-text-field" v-model="sub" placeholder="제목을 입력하세요" clearable hide-details
+          density="compact" variant="outlined"></v-text-field>
       </v-col>
     </v-row>
 
@@ -114,22 +117,32 @@
       </v-btn>
     </template>
   </v-snackbar>
+
+  <!-- 관리자 추가하기 팝업 -->
+  <user-popup :show="showUserPopup" @manager-selected="onAdminAdded" @close="showUserPopup = false" />
 </template>
 
 <script>
 import apiClient from '@/api';
+import userPopup from '@/components/userPopup.vue';
 
 export default {
+  components: {
+    userPopup
+  },
   data() {
     return {
       loading: false,
       errorMessages: [],
       showError: false,
+      showUserPopup: false,
       userName: null,
+      manager: '',
       userId: null,
       sub: '',
       etc: '',
       content: '',
+      selectedManager: null,
       fileAttach: '',
 
       // 파일 업로드 관련 데이터
@@ -145,7 +158,7 @@ export default {
       // 파일 덮어쓰기 관련
       showOverwriteDialog: false,
       duplicateFiles: [],
-      pendingFiles: [] // 덮어쓰기 대기 중인 파일들      
+      pendingFiles: [] // 덮어쓰기 대기 중인 파일들  
     }
   },
 
@@ -168,10 +181,6 @@ export default {
   },
 
   methods: {
-    test() {
-      console.log('--test--');
-      console.log(this.etc);
-    },
     // 파일 타입에 따른 아이콘 반환
     getFileIcon(fileType) {
       if (fileType.includes('image')) {
@@ -530,6 +539,11 @@ export default {
     goBack() {
       // 브라우저 히스토리에서 뒤로가기
       this.$router.go(-1);
+    },
+    onAdminAdded(selectedManager) {
+      this.manager = selectedManager.name;
+      this.selectedManager = selectedManager;
+      console.log(selectedManager);
     }
   }
 }
@@ -657,20 +671,20 @@ export default {
 
 .sub-text-field {
   padding-block: 10px;
-  padding-inline : 10px; 
-  
+  padding-inline: 10px;
+
 }
 
 .manager-search {
   padding-block: 10px;
-  padding-inline : 10px;
+  padding-inline: 10px;
   width: 800px;
   font-weight: 400;
 }
 
 .content-textarea {
   padding-block: 10px;
-  padding-inline : 10px;  
+  padding-inline: 10px;
   width: 100px !important;
   font-weight: 400;
 }
@@ -678,12 +692,12 @@ export default {
 .file-attach {
   max-width: 550px;
   flex-grow: 0;
-  
+
 }
 
 .product-category {
   max-width: 550px;
-  flex-grow: 0;  
+  flex-grow: 0;
   display: flex;
   flex-direction: row;
   /* 가로 방향으로 배치 */
@@ -692,8 +706,6 @@ export default {
   /* 줄바꿈 방지 */
   width: 100%;
 }
-
-
 
 .label-box {
   width: 80px;
@@ -713,5 +725,11 @@ export default {
 
 .white-text {
   color: white !important;
+}
+
+::v-deep(.input-manager .v-field) {
+  width: 740px;
+  height: 40px !important;
+  font-size: 13px !important;
 }
 </style>
