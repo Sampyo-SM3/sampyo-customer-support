@@ -301,7 +301,35 @@ export default {
 
       } catch (error) {
         console.error("❌ 요구사항 불러오기 오류:", error);
+        return;
       }
+
+      // SR요청서 연동해서 폼 열기
+      // try {       
+      //   // 폼 타입 결정        
+      //   const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'        
+      //   const params = {
+      //     key: '111',  // board seq번호
+      //     empno: 'SPH221342320005', // 사원번호
+      //     legacy_form: 'WF_FORM_SRTEST',
+      //     datatype: 'xml',  // 데이터 타입                    
+      //     ip: '10.50.20.71', // 프로시저 호출되는 ip          
+      //     db: 'SPC_TEST'     // 프로시저 호출되는 db
+      //   };        
+        
+      //   // 쿼리 파라미터 문자열 생성
+      //   const queryString = new URLSearchParams(params).toString()
+      //   const fullUrl = `${baseUrl}?${queryString}`
+        
+      //   // 새 창에서 URL 열기
+      //   window.open(fullUrl, '_blank')                
+      // } catch (error) {
+      //   console.error('상신 처리 중 오류 발생:', error)
+      // }            
+
+
+
+      // this.receivedSeq
     },
     async submitRequest() {
       if (confirm("상신하시겠습니까?")) {
