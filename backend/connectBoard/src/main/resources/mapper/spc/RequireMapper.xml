@@ -155,7 +155,7 @@
     		acceptDate = #{acceptDate},
     		completeRequestDate = #{completeRequestDate},
     		completeDate = #{completeDate},
-    		srFlag = 'Y'
+    		srFlag = 'Y',
     		etc = #{etc}
     	WHERE seq = #{seq};
 	</update>

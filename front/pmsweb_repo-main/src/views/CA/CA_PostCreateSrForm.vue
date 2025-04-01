@@ -361,7 +361,33 @@ export default {
         } catch (error) {
           alert("상신을 실패하였습니다. 관리자에게 문의하세요.");
         }
+
+        // SR요청서 연동해서 폼 열기
+        try {       
+          // 폼 타입 결정        
+          const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'        
+          const params = {
+            key: this.receivedSeq,  // board seq번호
+            empno: 'SPH221342320005', // 사원번호
+            legacy_form: 'WF_FORM_SRTEST',
+            datatype: 'xml',  // 데이터 타입                    
+            templatemode: 'WRITE',
+            ip: '10.50.20.71', // 프로시저 호출되는 ip          
+            db: 'SPC_TEST'     // 프로시저 호출되는 db
+          };        
+          
+          // 쿼리 파라미터 문자열 생성
+          const queryString = new URLSearchParams(params).toString()
+          const fullUrl = `${baseUrl}?${queryString}`
+          
+          // 새 창에서 URL 열기
+          window.open(fullUrl, '_blank')                
+        } catch (error) {
+          console.error('상신 처리 중 오류 발생:', error)
+        }        
       }
+
+           
     },
   },
   computed: {
