@@ -4,10 +4,6 @@
       <v-col>
         <div class="d-flex align-center">
           <div class="title-div">SR 요청서 작성</div>
-          <v-btn variant="outlined" color="primary" class="goBack-btn ml-auto mr-2" size="small"
-            @click="submitRequest()">
-            저장
-          </v-btn>
         </div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
@@ -196,6 +192,20 @@
         <v-text-field variant="outlined" density="compact" hide-details class="input-area"></v-text-field>
       </v-col>
     </v-row>
+
+    <v-row class="mt-5">
+      <v-col cols="12" class="d-flex justify-center">
+        <v-btn variant="outlined" color="green darken-2" class="custom-btn mx-2" size="large" @click="goBack">
+          <v-icon size="default" class="mr-1">mdi-close</v-icon>
+          취소
+        </v-btn>
+        <v-btn variant="outlined" color="primary" class="custom-btn mx-2" size="large" @click="submitRequest">
+          <v-icon size="default" class="mr-1">mdi-check</v-icon>
+          저장
+        </v-btn>
+      </v-col>
+    </v-row>
+
   </v-container>
 </template>
 
@@ -316,11 +326,11 @@ export default {
       //     ip: '10.50.20.71', // 프로시저 호출되는 ip          
       //     db: 'SPC_TEST'     // 프로시저 호출되는 db
       //   };        
-        
+
       //   // 쿼리 파라미터 문자열 생성
       //   const queryString = new URLSearchParams(params).toString()
       //   const fullUrl = `${baseUrl}?${queryString}`
-        
+
       //   // 새 창에서 URL 열기
       //   window.open(fullUrl, '_blank')                
       // } catch (error) {
@@ -363,9 +373,9 @@ export default {
         }
 
         // SR요청서 연동해서 폼 열기
-        try {       
+        try {
           // 폼 타입 결정        
-          const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'        
+          const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
           const params = {
             key: this.receivedSeq,  // board seq번호
             empno: 'SPH221342320005', // 사원번호
@@ -374,20 +384,22 @@ export default {
             templatemode: 'WRITE',
             ip: '10.50.20.71', // 프로시저 호출되는 ip          
             db: 'SPC_TEST'     // 프로시저 호출되는 db
-          };        
-          
+          };
+
           // 쿼리 파라미터 문자열 생성
           const queryString = new URLSearchParams(params).toString()
           const fullUrl = `${baseUrl}?${queryString}`
-          
+
           // 새 창에서 URL 열기
-          window.open(fullUrl, '_blank')                
+          window.open(fullUrl, '_blank')
         } catch (error) {
           console.error('상신 처리 중 오류 발생:', error)
-        }        
+        }
       }
-
-           
+    },
+    goBack() {
+      // 브라우저 히스토리에서 뒤로가기
+      this.$router.go(-1);
     },
   },
   computed: {
@@ -608,10 +620,7 @@ export default {
 }
 
 .custom-btn {
-  background-color: #1867C0;
-  color: white;
   font-size: 13px;
-  border: none;
   box-shadow: none;
   border-radius: 6px;
   margin-top: -10px !important;

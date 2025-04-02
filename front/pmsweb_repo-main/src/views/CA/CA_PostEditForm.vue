@@ -3,7 +3,7 @@
 
     <v-row>
       <v-col>
-        <div class="title-div">문의 내용 작성</div>
+        <div class="title-div">문의 내용 수정</div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
@@ -60,7 +60,7 @@
           variant="outlined" prepend-icon="" multiple :loading="isFileLoading" hide-details
           @change="handleFileChange"></v-file-input>
 
-        <v-btn variant="flat" color="green" class="custom-btn mt-2 mb-2 ml-2 mr-2 white-text d-flex align-center"
+        <v-btn variant="flat" color="green" class="file-btn mt-2 mb-2 ml-2 mr-2 white-text d-flex align-center"
           size="small" @click="openFileSelector">
           <v-icon size="default" class="mr-1">mdi-file-upload</v-icon>
           첨부
@@ -94,16 +94,15 @@
     </v-row>
 
     <br>
-    <br>
 
     <div class="d-flex justify-center">
-      <v-btn variant="flat" color="secondary" class="custom-btn mr-2 white-text d-flex align-center" size="large"
+      <v-btn variant="outlined" color="green darken-2" class="mr-2 d-flex align-center custom-btn-size " size="large"
         @click="goBack">
         <v-icon size="default" class="mr-1">mdi-close</v-icon>
         취소
       </v-btn>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <v-btn variant="flat" color="primary" class="custom-btn mr-2 white-text d-flex align-center" size="large"
+      <v-btn variant="outlined" color="primary" class="mr-2 d-flex align-center custom-btn-size " size="large"
         @click="updateBoard()">
         <v-icon size="default" class="mr-1">mdi-check</v-icon>
         수정
@@ -650,7 +649,7 @@ export default {
   font-size: 25px;
 }
 
-.custom-btn {
+.file-btn {
   font-size: 14px;
   height: 35px;
   border-radius: 10px;
@@ -724,7 +723,6 @@ export default {
 .sub-text-field {
   padding-block: 10px;
   padding-inline: 10px;
-
 }
 
 .manager-search {
@@ -777,6 +775,23 @@ export default {
 
 .white-text {
   color: white !important;
+}
+
+.custom-btn-size {
+  font-size: 13px;
+  box-shadow: none;
+  border-radius: 6px;
+  margin-top: -10px !important;
+  margin-bottom: 15px;
+  min-width: 60px;
+}
+
+::v-deep(.sub-text-field .v-field) {
+  font-size: 13px !important;
+}
+
+::v-deep(.content-textarea .v-field) {
+  font-size: 14px !important;
 }
 
 ::v-deep(.input-manager .v-field) {

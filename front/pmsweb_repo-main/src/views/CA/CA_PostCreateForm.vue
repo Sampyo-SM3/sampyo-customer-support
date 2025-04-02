@@ -94,21 +94,21 @@
     </v-row>
 
     <br>
-    <br>
 
     <div class="d-flex justify-center">
-      <v-btn variant="flat" color="secondary" class="custom-btn mr-2 white-text d-flex align-center" size="large"
+      <v-btn variant="outlined" color="green darken-2" class="mr-2 d-flex align-center custom-btn-size " size="large"
         @click="goBack">
         <v-icon size="default" class="mr-1">mdi-close</v-icon>
         취소
       </v-btn>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <v-btn variant="flat" color="primary" class="custom-btn mr-2 white-text d-flex align-center" size="large"
+      <v-btn variant="outlined" color="primary" class="mr-2 d-flex align-center custom-btn-size " size="large"
         @click="insertBoard()">
         <v-icon size="default" class="mr-1">mdi-check</v-icon>
         접수
       </v-btn>
     </div>
+
   </v-container>
 
   <!-- 스낵바로 오류 메시지 표시 -->
@@ -740,6 +740,15 @@ export default {
 
 .white-text {
   color: white !important;
+}
+
+.custom-btn-size {
+  font-size: 13px;
+  box-shadow: none;
+  border-radius: 6px;
+  margin-top: -10px !important;
+  margin-bottom: 15px;
+  min-width: 60px;
 }
 
 ::v-deep(.input-manager .v-field) {

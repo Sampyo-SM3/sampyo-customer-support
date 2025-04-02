@@ -3,14 +3,7 @@
     <v-row>
       <v-col>
         <div class="d-flex align-center">
-          <div class="title-div">SR 요청서 작성</div>
-          <v-btn variant="outlined" color="primary" class="goBack-btn ml-auto mr-2" size="small"
-            @click="submitRequest()">
-            저장
-          </v-btn>
-          <v-btn variant="outlined" color="green darken-2" class="goBack-btn mr-2" size="small" @click="moveSrDetail">
-            취소
-          </v-btn>
+          <div class="title-div">SR 요청서 수정</div>
         </div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
@@ -199,8 +192,23 @@
         <v-text-field variant="outlined" density="compact" hide-details class="input-area"></v-text-field>
       </v-col>
     </v-row>
+
+    <v-row class="mt-5">
+      <v-col cols="12" class="d-flex justify-center">
+        <v-btn variant="outlined" color="green darken-2" class="custom-btn mx-2" size="large" @click="moveSrDetail">
+          <v-icon size="default" class="mr-1">mdi-close</v-icon>
+          취소
+        </v-btn>
+        <v-btn variant="outlined" color="primary" class="custom-btn mx-2" size="large" @click="submitRequest">
+          <v-icon size="default" class="mr-1">mdi-check</v-icon>
+          수정
+        </v-btn>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
+
+
 
 <script>
 import apiClient from '@/api';
@@ -569,10 +577,7 @@ export default {
 }
 
 .custom-btn {
-  background-color: #1867C0;
-  color: white;
   font-size: 13px;
-  border: none;
   box-shadow: none;
   border-radius: 6px;
   margin-top: -10px !important;
@@ -593,14 +598,6 @@ export default {
   padding: 10px;
 }
 
-.goBack-btn {
-  height: 35px;
-  min-width: 55px;
-  font-size: 14px;
-  border-radius: 6px;
-  margin-bottom: 10px;
-}
-
 .input-width {
   max-width: 1600px;
 }
@@ -613,6 +610,15 @@ export default {
   margin-left: 5px;
   margin-right: 5px;
   font-size: 13px !important;
+}
+
+.bottom-buttons-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 0 15px;
 }
 
 ::v-deep(.input-area-L .v-field) {
