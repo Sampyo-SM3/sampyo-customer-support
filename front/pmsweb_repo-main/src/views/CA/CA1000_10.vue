@@ -178,7 +178,7 @@
             <div class="td-cell">{{ formatDate(item.requestDate) }}</div>
             <div class="td-cell title-cell">
               <router-link
-                :to="{ name: item.srFlag === 'Y' ? 'CA_PostDetailSrForm' : 'CA_PostDetailForm', params: { receivedSeq: item.seq } }"
+                :to="{ name: item.saveFlag === 'Y' ? 'CA_PostDetailSrForm' : 'CA_PostDetailForm', params: { receivedSeq: item.seq } }"
                 class="title-link">{{
                   item.sub }}</router-link>
             </div>

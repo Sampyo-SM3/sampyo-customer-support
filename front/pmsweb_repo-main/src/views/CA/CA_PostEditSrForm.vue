@@ -8,6 +8,9 @@
             @click="submitRequest()">
             저장
           </v-btn>
+          <v-btn variant="outlined" color="green darken-2" class="goBack-btn mr-2" size="small" @click="moveSrDetail">
+            취소
+          </v-btn>
         </div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
@@ -329,10 +332,22 @@ export default {
           await apiClient.post("/api/require/updateSrForm", param);
           alert("저장하였습니다.");
 
-          this.fetchRequireDetail();
+          this.$router.push({
+            name: 'CA_PostDetailSrForm',
+            params: { receivedSeq: this.receivedSeq }
+          })
+
         } catch (error) {
           alert("저장에 실패하였습니다. 관리자에게 문의하세요.");
         }
+      }
+    },
+    moveSrDetail() {
+      if (confirm("수정을 취소하시겠습니까?")) {
+        this.$router.push({
+          name: 'CA_PostDetailSrForm',
+          params: { receivedSeq: this.receivedSeq }
+        })
       }
     },
   },

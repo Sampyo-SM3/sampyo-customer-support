@@ -1,6 +1,8 @@
 import CA1000_10 from '@/views/CA/CA1000_10.vue'
 import CA_PostCreateForm from '@/views/CA/CA_PostCreateForm.vue'
 import CA_PostCreateSrForm from '@/views/CA/CA_PostCreateSrForm.vue'
+import CA_PostEditForm from '@/views/CA/CA_PostEditForm.vue'
+import CA_PostEditSrForm from '@/views/CA/CA_PostEditSrForm.vue'
 import CA_PostDetailSrForm from '@/views/CA/CA_PostDetailSrForm.vue'
 import CA_PostDetailForm from '@/views/CA/CA_PostDetailForm.vue'
 import CA2000_10 from '@/views/CA/CA2000_10.vue'
@@ -29,8 +31,12 @@ export const caRoutes = [
     name: 'CA_PostCreateForm',
     component: CA_PostCreateForm,    
   },     
-  // 다른 라우트 정의...
-
+  {  
+    path: '/CA_PostEditForm/:receivedSeq?', 
+    name: 'CA_PostEditForm',
+    component: CA_PostEditForm,    
+    props: true
+  },  
   {  
     path: 'CA2000_10', 
     name: 'CA2000_10',
@@ -40,6 +46,12 @@ export const caRoutes = [
     path: '/CA_PostCreateSrForm/:receivedSeq?', 
     name: 'CA_PostCreateSrForm',
     component: CA_PostCreateSrForm,    
+    props: true
+  }, 
+  {  
+    path: '/CA_PostEditSrForm/:receivedSeq?', 
+    name: 'CA_PostEditSrForm',
+    component: CA_PostEditSrForm,    
     props: true
   },    
   

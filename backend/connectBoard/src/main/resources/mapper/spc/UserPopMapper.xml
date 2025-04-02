@@ -10,7 +10,9 @@
       	   	   DEPT_NM as deptNm,
       	   	   NAME as name,
        	   	   ROLL_PSTN_NM as rollPstnNm,
-         	   USR_ID as usrId
+         	   USR_ID as usrId,
+         	   EMAIL_ADDR as emailAddr,
+         	   HAND_TEL_NO as handTelNo
     	FROM [UNIERP80].SPG.DBO.CRM_USER_MASTER
     	WHERE NAME LIKE CONCAT('%', #{name}, '%')
     </select>

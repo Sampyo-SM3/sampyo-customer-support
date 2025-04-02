@@ -5,11 +5,7 @@
       <v-col>
         <div class="d-flex align-center">
           <div class="title-div">문의 상세보기</div>
-          <v-btn 
-            variant="outlined" 
-            color="primary" 
-            class="goBack-btn ml-auto mr-2" 
-            size="small"
+          <v-btn variant="outlined" color="primary" class="goBack-btn ml-auto mr-2" size="small"
             @click="$router.push('/views/CA/CA1000_10')">
             목록
           </v-btn>
@@ -41,31 +37,29 @@
     <!-- 전체 래퍼: 접수상태 박스 + 버튼을 나란히 배치 -->
     <div class="d-flex align-center mb-4">
       <!-- 접수상태 박스 -->
-      <v-row 
-        no-gutters 
-        class="status-row status-select-row"
-        style="width: 220px; 
+      <v-row no-gutters class="status-row status-select-row" style="width: 220px; 
         min-width: 220px; 
         max-width: 220px;">
         <v-col class="search-col">
           <div class="label-box">접수상태</div>
-          <v-select 
-            v-model="selectedStatus" 
-            :items="progressStatuses" 
-            item-title="text" 
-            item-value="value"
-            density="compact" 
-            variant="plain" 
-            hide-details 
-            class="status-select" />
+          <v-select v-model="selectedStatus" :items="progressStatuses" item-title="text" item-value="value"
+            density="compact" variant="plain" hide-details class="status-select" />
         </v-col>
       </v-row>
 
       <v-btn variant="outlined" color="primary" size="small" class="save-status-btn ml-3" @click="saveStatus">
         저장
       </v-btn>
+
       <v-btn v-if="inquiry.processState === 'S'" variant="outlined" color="green darken-2"
         class="save-status-btn ml-auto mr-2" size="small" @click="$router.push({
+          name: 'CA_PostEditForm',
+          params: { receivedSeq: this.receivedSeq }
+        })">
+        수정
+      </v-btn>
+      <v-btn v-if="inquiry.processState === 'S'" variant="outlined" color="orange darken-2" class="save-status-btn mr-2"
+        size="small" @click="$router.push({
           name: 'CA_PostCreateSrForm',
           params: { receivedSeq: this.receivedSeq }
         })">
@@ -79,6 +73,13 @@
       <v-col class="search-col product-category">
         <div class="label-box">작성자</div>
         <div class="author-value">{{ inquiry.uid }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col product-category">
+        <div class="label-box">담당자</div>
+        <div class="author-value">{{ inquiry.manager }}</div>
       </v-col>
     </v-row>
 
@@ -165,6 +166,7 @@ export default {
         sub: "",
         context: "",
         uId: "",
+        manager: "",
         srFlag: ""
       },
       progressStatuses: [],
@@ -227,6 +229,7 @@ export default {
         sub: response.data?.sub || "",
         etc: response.data?.etc || "",
         uid: response.data?.uid || "",
+        manager: response.data?.manager || "",
         srFlag: response.data?.srFlag || "",
         processState: response.data?.processState || "P",
       };
@@ -587,7 +590,7 @@ export default {
   align-items: center;
   justify-content: center;
   font-size: 14px;
-  font-weight: 500;  
+  font-weight: 500;
   background-color: #e6eef8 !important;
   color: #333333 !important;
   white-space: nowrap;

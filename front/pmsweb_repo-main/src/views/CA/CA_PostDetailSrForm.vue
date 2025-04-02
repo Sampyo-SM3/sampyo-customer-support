@@ -35,10 +35,7 @@
     <div class="d-flex align-center mb-4">
       <!-- 접수상태 박스 -->
       <!-- <v-row no-gutters class="search-row top-row bottom-row status-select-row"       -->
-        <v-row 
-        no-gutters 
-        class="status-row status-select-row"
-        style="width: 220px; 
+      <v-row no-gutters class="status-row status-select-row" style="width: 220px; 
         min-width: 220px; 
         max-width: 220px;">
         <v-col class="search-col">
@@ -52,6 +49,17 @@
         저장
       </v-btn>
 
+      <template v-if="inquiry.srFlag === 'N'">
+        <v-btn variant="outlined" color="green darken-2" class="save-status-btn ml-auto mr-2" size="small" @click="$router.push({
+          name: 'CA_PostEditSrForm',
+          params: { receivedSeq: this.receivedSeq }
+        })">
+          수정
+        </v-btn>
+        <v-btn variant="outlined" color="orange darken-2" class="save-status-btn mr-2" size="small">
+          상신
+        </v-btn>
+      </template>
     </div>
 
 
@@ -247,7 +255,8 @@ export default {
         dpDn: "",
         manager: "",
         division: "",
-        processState: ""
+        processState: "",
+        srFlag: ""
 
       },
       management: {
@@ -336,6 +345,7 @@ export default {
           manager: response.data?.manager || "",
           division: response.data?.division || "",
           processState: response.data?.processState || "",
+          srFlag: response.data?.srFlag || "",
           management: {
             PROGRESS: processState
           }

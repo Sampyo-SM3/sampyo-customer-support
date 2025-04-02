@@ -18,6 +18,8 @@ public interface RequireRepository {
 	
 	void insertRequire(RequireDTO require);
 	
+	void updateForm(RequireDTO require);
+	
 	void updateSrForm(RequireDTO require);
 
 }

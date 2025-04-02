@@ -13,4 +13,6 @@ public class UserPopDTO {
 	private String name;
 	private String rollPstnNm;
 	private String usrId;
+	private String emailAddr;
+	private String handTelNo;
 }

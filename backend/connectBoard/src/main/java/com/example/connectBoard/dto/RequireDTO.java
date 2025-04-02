@@ -31,7 +31,11 @@ public class RequireDTO {
 	private String dpDn;
 	private String writerId;
 	private String manager;
+	private String managerId;
+	private String managerTel;
+	private String managerEmail;
 	private String division;
+	private String saveFlag;
 	private String srFlag;
 	private String processState;
 	private String statusNm;

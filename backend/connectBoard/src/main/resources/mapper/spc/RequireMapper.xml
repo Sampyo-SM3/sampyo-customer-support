@@ -16,9 +16,13 @@
 			b.processState,
 			c.codeName AS statusNm,	    
 			b.manager,
+			b.managerId,
+			b.managerTel,
+			b.managerEmail,
 		    b.requestDate,
 		    b.completeDate,
-		    b.srFlag			    	   	
+		    b.srFlag,
+		    b.saveFlag	    	   	
 		FROM board b inner join code_master c
 		 on b.processState = c.codeId					
 	<where>
@@ -54,7 +58,11 @@
             insertDt,
             updateDt,
             writerId,
-            uId
+            uId,
+            manager,
+            managerId,
+            managerTel,
+            managerEmail
         ) VALUES (
             #{sub, jdbcType=VARCHAR},
             #{etc, jdbcType=VARCHAR},
@@ -63,7 +71,11 @@
             GETDATE(),
             GETDATE(),
             #{writerId, jdbcType=VARCHAR},
-            #{uId, jdbcType=VARCHAR}
+            #{uId, jdbcType=VARCHAR},
+            #{manager, jdbcType=VARCHAR},
+            #{managerId, jdbcType=VARCHAR},
+            #{managerTel, jdbcType=VARCHAR},
+            #{managerEmail, jdbcType=VARCHAR}
     	)
     	
 	</insert>	
@@ -94,8 +106,12 @@
 			dpId,
 			dpDn,
 			manager,
+			managerId,
+			managerTel,
+			managerEmail,
 			division,
 			processState,
+			saveFlag,
 			srFlag,
 			insertDt,
 			updateDt,
@@ -129,8 +145,12 @@
 			dpId,
 			dpDn,
 			manager,
+			managerId,
+			managerTel,
+			managerEmail,
 			division,
 			processState,
+			saveFlag,
 			srFlag,
 			insertDt,
 			updateDt,
@@ -139,6 +159,17 @@
 		where seq = #{seq};
 	</select>
 
+	<update id="updateForm" parameterType="com.example.connectBoard.dto.RequireDTO">
+   		UPDATE board 
+    	SET sub = #{sub},
+    		etc = #{etc},
+    		manager = #{manager},
+    		managerId = #{managerId},
+    		managerEmail = #{managerEmail},
+    		managerTel = #{managerTel}
+    	WHERE seq = #{seq};
+	</update>
+	
 	<update id="updateSrForm" parameterType="com.example.connectBoard.dto.RequireDTO">
    		UPDATE board 
     	SET sub = #{sub},
@@ -155,7 +186,7 @@
     		acceptDate = #{acceptDate},
     		completeRequestDate = #{completeRequestDate},
     		completeDate = #{completeDate},
-    		srFlag = 'Y'
+    		saveFlag = 'Y',
     		etc = #{etc}
     	WHERE seq = #{seq};
 	</update>

@@ -104,9 +104,9 @@
       </v-btn>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <v-btn variant="flat" color="primary" class="custom-btn mr-2 white-text d-flex align-center" size="large"
-        @click="insertBoard()">
+        @click="updateBoard()">
         <v-icon size="default" class="mr-1">mdi-check</v-icon>
-        접수
+        수정
       </v-btn>
     </div>
   </v-container>
@@ -131,6 +131,12 @@ import apiClient from '@/api';
 import userPopup from '@/components/userPopup.vue';
 
 export default {
+  props: {
+    receivedSeq: {
+      type: [Number, String],
+      required: false
+    },
+  },
   components: {
     userPopup
   },
@@ -174,6 +180,9 @@ export default {
   },
 
   watch: {
+    receivedSeq: {
+      immediate: true  // 컴포넌트 생성 시점에도 즉시 실행
+    },
 
   },
 
@@ -185,9 +194,34 @@ export default {
   created() {
     // localStorage에서 사용자 정보 불러오기
     this.getUserInfo();
+    this.fetchRequireDetail();
   },
 
   methods: {
+    async fetchRequireDetail() {
+      try {
+        const response = await apiClient.get("/api/require/detail", {
+          params: { seq: this.receivedSeq }
+        });
+
+        const data = response.data;
+
+        if (!data) {
+          console.warn("❗ 불러온 데이터 없음");
+          return;
+        }
+
+        this.sub = data?.sub || '';
+        this.etc = data?.etc || '';
+        this.manager = data?.manager || '';
+        this.managerId = data?.managerId || '';
+        this.managerEmail = data?.managerEmail || '';
+        this.managerTel = data?.managerTel || '';
+
+      } catch (error) {
+        console.error("❌ 요구사항 불러오기 오류:", error);
+      }
+    },
     // 파일 타입에 따른 아이콘 반환
     getFileIcon(fileType) {
       if (fileType.includes('image')) {
@@ -435,7 +469,12 @@ export default {
       return true;
     },
 
-    async insertBoard() {
+    async updateBoard() {
+
+      if (!confirm('수정하시겠습니까?')) {
+        return;
+      }
+
       try {
         this.showError = false;
 
@@ -446,23 +485,18 @@ export default {
         this.loading = true;
 
         const boardData = {
+          "seq": this.receivedSeq,
           "sub": this.sub,
           "etc": this.etc,
-          "writerId": this.userId,
-          "uid": this.userName,
           "manager": this.manager,
           "managerId": this.managerId,
           "managerTel": this.managerTel,
-          "managerEmail": this.managerEmail,
-          "processState": "C",
-          "division": "시멘트"
+          "managerEmail": this.managerEmail
         };
 
         // 게시글 등록 및 seq 값 반환
-        const response = await apiClient.post("/api/require/insert", boardData);
-        const boardSeq = response.data; // 등록된 게시글의 seq
-
-        console.log('게시글 등록 성공!' + boardSeq);
+        await apiClient.post("/api/require/updateForm", boardData);
+        const boardSeq = this.receivedSeq; // 등록된 게시글의 seq
 
         // selectedFiles 배열의 각 파일에 대해 반복
         const fileAttachPromises = this.selectedFiles.map(async (file) => {
@@ -519,12 +553,15 @@ export default {
           this.showError = true;
         }
 
-        // 모든 성공 시 페이지 이동 또는 추가 로직
-        this.$router.push({ name: 'CA1000_10' });
+        this.$router.push({
+          name: 'CA_PostDetailForm',
+          params: { receivedSeq: this.receivedSeq }
+        })
 
       } catch (error) {
-        // 전역 에러 처리
-        this.handleError(error);
+        console.error("게시글 수정 중 오류:", error);
+        this.errorMessages = [error.message || "게시글 수정 중 오류가 발생했습니다."];
+        this.showError = true;
       } finally {
         this.loading = false;
       }
