@@ -38,6 +38,10 @@
 	    <if test="sub != null and sub != ''">
 	        AND b.sub LIKE '%' + #{sub} + '%'
 	        <!-- AND b.projectName LIKE '%' + ? + '%' COLLATE SQL_Latin1_General_CP1_CI_AS -->
+	    </if>	
+	    <if test="status != null and status != ''">
+	        AND b.processState LIKE '%' + #{status} + '%'
+	        <!-- AND b.projectName LIKE '%' + ? + '%' COLLATE SQL_Latin1_General_CP1_CI_AS -->
 	    </if>	    
 	</where>
 		ORDER BY b.seq DESC

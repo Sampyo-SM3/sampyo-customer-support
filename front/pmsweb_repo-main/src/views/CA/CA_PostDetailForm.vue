@@ -51,11 +51,8 @@
         저장
       </v-btn>
 
-      <v-btn v-if="inquiry.processState === 'S'" variant="outlined" color="green darken-2"
-        class="save-status-btn ml-auto mr-2" size="small" @click="$router.push({
-          name: 'CA_PostEditForm',
-          params: { receivedSeq: this.receivedSeq }
-        })">
+      <v-btn variant="outlined" color="green darken-2" class="save-status-btn ml-auto mr-2" size="small"
+        @click="moveEdit">
         수정
       </v-btn>
       <v-btn v-if="inquiry.processState === 'S'" variant="outlined" color="orange darken-2" class="save-status-btn mr-2"
@@ -196,7 +193,6 @@ export default {
       console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
     }
   },
-
   mounted() {
     this.checkLocalStorage();
     this.getUserInfo();
@@ -361,39 +357,17 @@ export default {
       this.replyTo = null;
       this.newComment.newComment = '';
     },
-    test() {
-      console.log('--test--');
-
-      try {
-        // 폼 타입 결정
-        let formType = ''
-        formType = 'WF_FORM_LEGACY_FI_STATE_UNBAN'
-        // formType = 'WF_FO.RM_SR'
-        // formType = 'WF_FORM_SR_V0'
-
-        // URL 및 파라미터 설정
-        // const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
-        const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
-        const params = {
-          key: 1,
-          empno: 1,
-          legacy_form: formType,
-          datatype: 'xml',
-          ip: '127.0.0.1',
-          db: 'tttt'
-        }
-
-        // 쿼리 파라미터 문자열 생성
-        const queryString = new URLSearchParams(params).toString()
-        const fullUrl = `${baseUrl}?${queryString}`
-
-        // 새 창에서 URL 열기
-        window.open(fullUrl, '_blank')
-
-
-      } catch (error) {
-        console.error('상신 처리 중 오류 발생:', error)
+    moveEdit() {
+      if (this.selectedStatus != 'P') {
+        alert('미처리 상태만 수정이 가능합니다.');
+        return;
       }
+
+      this.$router.push({
+        name: 'CA_PostEditForm',
+        params: { receivedSeq: this.receivedSeq }
+      })
+
     },
   }
 }

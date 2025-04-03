@@ -12,113 +12,104 @@
 
     <br>
 
-    <v-row no-gutters class="search-row top-row">
+
+    <v-row dense align="center" class="flex-wrap rounded-border sky-bg" style="gap: 12px;">
+
       <!-- 요청기간 -->
-      <v-col class="search-col request-period">
-        <div class="label-box">요청기간</div>
-        <div class="input-container pt-2 pb-2">
-          <div class="date-wrapper">
-            <!-- 시작일 입력 필드 -->
-            <v-menu v-model="startDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
-              min-width="auto">
-              <template v-slot:activator="{ props }">
-                <div class="date-field-wrapper" v-bind="props">
-                  <v-text-field v-model="startDate" class="date-input" density="compact" hide-details readonly
-                    variant="plain"></v-text-field>
-                  <div class="calendar-icon-container">
-                    <v-btn icon class="calendar-btn">
-                      <v-icon size="small" color="#7A7A7A">mdi-calendar-search</v-icon>
-                    </v-btn>
-                  </div>
+      <v-col cols="auto" class="d-flex align-center filter-col ml-2">
+        <span class="filter-label">요청기간<span class="label-divider"></span></span>
+        <div class="date-wrapper">
+          <!-- 시작일 입력 필드 -->
+          <v-menu v-model="startDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
+            min-width="auto">
+            <template v-slot:activator="{ props }">
+              <div class="date-field-wrapper" v-bind="props">
+                <v-text-field v-model="startDate" class="date-input" density="compact" hide-details readonly
+                  variant="plain"></v-text-field>
+                <div class="calendar-icon-container">
+                  <v-btn icon class="calendar-btn">
+                    <v-icon size="small" color="#7A7A7A">mdi-calendar-search</v-icon>
+                  </v-btn>
                 </div>
-              </template>
-              <v-date-picker v-model="Date_startDate" @update:model-value="startDateMenu = false" locale="ko-KR"
-                elevation="1" color="blue" width="290" first-day-of-week="1" show-adjacent-months scrollable
-                :allowed-dates="allowedDates"></v-date-picker>
-            </v-menu>
-          </div>
+              </div>
+            </template>
+            <v-date-picker v-model="Date_startDate" @update:model-value="startDateMenu = false" locale="ko-KR"
+              elevation="1" color="blue" width="290" first-day-of-week="1" show-adjacent-months scrollable
+              :allowed-dates="allowedDates"></v-date-picker>
+          </v-menu>
+        </div>
+        <span class="date-separator">~</span>
 
-          <span class="date-separator">~</span>
-
-          <div class="date-wrapper">
-            <!-- 종료일 입력 필드 -->
-            <v-menu v-model="endDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
-              min-width="auto">
-              <template v-slot:activator="{ props }">
-                <div class="date-field-wrapper" v-bind="props">
-                  <v-text-field v-model="endDate" class="date-input" density="compact" hide-details readonly
-                    variant="plain"></v-text-field>
-                  <div class="calendar-icon-container">
-                    <v-btn icon class="calendar-btn">
-                      <v-icon size="small" color="#7A7A7A">mdi-calendar-search</v-icon>
-                    </v-btn>
-                  </div>
+        <div class="date-wrapper">
+          <!-- 종료일 입력 필드 -->
+          <v-menu v-model="endDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
+            min-width="auto">
+            <template v-slot:activator="{ props }">
+              <div class="date-field-wrapper" v-bind="props">
+                <v-text-field v-model="endDate" class="date-input" density="compact" hide-details readonly
+                  variant="plain"></v-text-field>
+                <div class="calendar-icon-container">
+                  <v-btn icon class="calendar-btn">
+                    <v-icon size="small" color="#7A7A7A">mdi-calendar-search</v-icon>
+                  </v-btn>
                 </div>
-              </template>
-              <v-date-picker v-model="Date_endDate" @update:model-value="endDateMenu = false" locale="ko-KR"
-                elevation="1" color="blue" width="290" first-day-of-week="1" show-adjacent-months scrollable
-                :allowed-dates="allowedDates"></v-date-picker>
-            </v-menu>
-          </div>
+              </div>
+            </template>
+            <v-date-picker v-model="Date_endDate" @update:model-value="endDateMenu = false" locale="ko-KR" elevation="1"
+              color="blue" width="290" first-day-of-week="1" show-adjacent-months scrollable
+              :allowed-dates="allowedDates"></v-date-picker>
+          </v-menu>
+        </div>
 
-          <div class="date-buttons">
-            <div class="date-btn-container">
-              <v-btn value="today" class="date-btn" :class="{ 'active-date-btn': dateRange === 'today' }"
-                @click="setDateRange('today')">오늘</v-btn>
-              <v-btn value="week" class="date-btn" :class="{ 'active-date-btn': dateRange === 'week' }"
-                @click="setDateRange('week')">1주일</v-btn>
-              <v-btn value="15days" class="date-btn" :class="{ 'active-date-btn': dateRange === '15days' }"
-                @click="setDateRange('15days')">15일</v-btn>
-              <v-btn value="month" class="date-btn" :class="{ 'active-date-btn': dateRange === 'month' }"
-                @click="setDateRange('month')">1개월</v-btn>
-              <v-btn value="3months" class="date-btn" :class="{ 'active-date-btn': dateRange === '3months' }"
-                @click="setDateRange('3months')">3개월</v-btn>
-            </div>
+
+        <!-- 날짜 버튼 -->
+        <div class="date-buttons mr-2">
+          <div class="date-btn-container">
+            <v-btn value="today" class="date-btn" :class="{ 'active-date-btn': dateRange === 'today' }"
+              @click="setDateRange('today')">오늘</v-btn>
+            <v-btn value="week" class="date-btn" :class="{ 'active-date-btn': dateRange === 'week' }"
+              @click="setDateRange('week')">1주일</v-btn>
+            <v-btn value="15days" class="date-btn" :class="{ 'active-date-btn': dateRange === '15days' }"
+              @click="setDateRange('15days')">15일</v-btn>
+            <v-btn value="month" class="date-btn" :class="{ 'active-date-btn': dateRange === 'month' }"
+              @click="setDateRange('month')">1개월</v-btn>
+            <v-btn value="3months" class="date-btn" :class="{ 'active-date-btn': dateRange === '3months' }"
+              @click="setDateRange('3months')">3개월</v-btn>
           </div>
         </div>
       </v-col>
-    </v-row>
 
-    <v-row no-gutters class="search-row">
-      <v-col class="search-col title-category">
-        <div class="label-box">제목</div>
+      <!-- 접수상태 -->
+      <v-col cols="auto" class="d-flex align-center filter-col">
+        <span class="filter-label">접수상태<span class="label-divider"></span></span>
+        <v-select v-model="selectedStatus" :items="progressStatuses" item-title="text" item-value="value"
+          variant="outlined" density="compact" hide-details class="filter-input" />
+      </v-col>
 
-        <v-text-field v-model="sub" placeholder="제목을 입력을 입력하세요" clearable hide-details density="compact"
-          variant="outlined" class="title-search"></v-text-field>
+      <!-- 담당자 -->
+      <v-col cols="auto" class="d-flex align-center filter-col">
+        <span class="filter-label">담당자<span class="label-divider"></span></span>
+        <v-text-field v-model="manager" variant="outlined" density="compact" hide-details class="filter-input" />
+      </v-col>
+
+      <!-- 제목 -->
+      <v-col cols="auto" class="d-flex align-center filter-col">
+        <span class="filter-label">제목<span class="label-divider"></span></span>
+        <v-text-field v-model="sub" variant="outlined" density="compact" hide-details class="filter-input-sub" />
+      </v-col>
+
+      <!-- 검색 버튼 -->
+      <v-col cols="auto">
+        <v-btn variant="flat" color="primary" class="custom-btn mr-2 d-flex align-center" size="small"
+          @click="fetchData()">
+          <v-icon size="default" class="mr-1">mdi-magnify</v-icon>
+          조회
+        </v-btn>
       </v-col>
 
     </v-row>
 
-    <v-row no-gutters class="search-row bottom-row">
-      <v-col class="search-col product-category">
-        <div class="label-box">담당자</div>
-
-        <v-text-field v-model="manager" placeholder="담당자명 입력을 입력하세요" clearable hide-details density="compact"
-          variant="outlined" class="manager-search"></v-text-field>
-      </v-col>
-
-    </v-row>
-
-
     <br>
-    <br>
-
-    <div class="d-flex justify-center">
-      <!-- <v-btn variant="flat" class="select-btn d-flex align-center pl-3 pr-4" size="large" @click="fetchData()">
-        <v-icon size="default" class="mr-1">mdi-account</v-icon>
-        조회
-      </v-btn> -->
-      <v-btn variant="flat" color="primary" class="custom-btn mr-2 white-text d-flex align-center" size="small"
-        @click="fetchData()">
-        <v-icon size="default" class="mr-1">mdi-magnify</v-icon>
-        조회
-      </v-btn>
-    </div>
-    <br>
-    <br>
-
-    <br>
-    <!-- <v-divider></v-divider> -->
     <br>
 
     <!-- 데이터 테이블 상단 버튼 영역 -->
@@ -277,6 +268,8 @@ export default {
       endDate: '',
       startDateMenu: false,  // 시작일 날짜 선택기 메뉴 표시 여부
       endDateMenu: false,    // 종료일 날짜 선택기 메뉴 표시 여부
+      selectedStatus: '',
+      progressStatuses: [],
       manager: '',
       sub: '',
       dateRange: 'month',
@@ -288,7 +281,7 @@ export default {
       currentPage: 1,
       itemsPerPage: 10,
       // 상태값 목록 (실제 API에서 받아올 수 있음)
-      statusList: ['미처리', '진행중', '보류중', '종결'],
+      //statusList: ['미처리', '진행중', '보류중', '종결'],
       processState: '',
       errorMessages: [],
       showError: false,
@@ -351,15 +344,16 @@ export default {
       } else {
         this.endDate = '';
       }
+    },
+    selectedStatus(newVal, oldVal) {
+      console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
     }
   },
 
   mounted() {
-    // 컴포넌트 마운트 시 기본 날짜 범위 설정
     this.setDateRange('month');
-    // 데이터 로드
+    this.getStatus();
     this.fetchData();
-
     this.checkLocalStorage();
   },
 
@@ -370,13 +364,9 @@ export default {
 
       this.savedMidMenu = midMenuFromStorage ? JSON.parse(midMenuFromStorage) : null;
       this.savedSubMenu = subMenuFromStorage ? JSON.parse(subMenuFromStorage) : null;
-
-      // console.log('메뉴 클릭 후 midMenu:', this.savedMidMenu);
-      // console.log('메뉴 클릭 후 subMenu:', this.savedSubMenu);
     },
 
     isValidDate(options = {}) {
-      // console.log('--isValidDate--')
       const errors = [];
 
       // 기본 옵션 설정
@@ -548,7 +538,8 @@ export default {
             startDate: this.startDate + ' 00:00:00',
             endDate: this.endDate + ' 23:59:59',
             manager: this.manager,
-            sub: this.sub
+            sub: this.sub,
+            status: this.selectedStatus
           }
         });
 
@@ -684,7 +675,25 @@ export default {
         default:
           return '';
       }
-    }
+    },
+    async getStatus() {
+      try {
+        const statusList = await apiClient.get("/api/status/list");
+
+        // 상태 이름 리스트 저장
+        this.progressStatuses = statusList.data.map(status => ({
+          text: status.codeName,
+          value: status.codeId
+        }));
+
+        this.progressStatuses.unshift({ text: '전체', value: '%' });
+
+        this.selectedStatus = '%';
+
+      } catch (error) {
+        console.error("❌ 오류 발생:", error);
+      }
+    },
   }
 }</script>
 
@@ -719,9 +728,8 @@ export default {
 
 .custom-btn {
   font-size: 14px;
-  height: 35px;
+  height: 45px;
   border-radius: 10px;
-
 }
 
 /* 날짜 선택 관련 스타일 */
@@ -816,56 +824,15 @@ export default {
 
 .search-row {
   display: flex;
-  align-items: stretch;
-  min-height: 40px;
-  border-top: 1px solid #e0e0e0;
-  border-bottom: 0;
-  /* 하단 테두리 제거 */
-}
-
-/* 테두리 라운드 처리를 위한 스타일 */
-.search-row.top-row {
-  border-top: 2px solid #e0e0e0;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  overflow: hidden;
-}
-
-.search-row.bottom-row {
-  border-bottom: 2px solid #e0e0e0;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-  overflow: hidden;
-}
-
-.search-row.bottom-row .search-col:first-child {
-  border-bottom-left-radius: 8px;
-}
-
-/* 마지막 열에 오른쪽 라운드 적용 */
-.search-row.top-row .search-col:last-child {
-  border-top-right-radius: 8px;
-}
-
-.search-row.bottom-row .search-col:last-child {
-  border-bottom-right-radius: 8px;
-}
-
-/* 전체 검색 영역에 그림자 효과 추가 (선택사항) */
-.search-row {
-  display: flex;
-  align-items: stretch;
-  min-height: 40px;
-  border-top: 1px solid #e0e0e0;
-  border-bottom: 0;
-  border-left: 1px solid #e0e0e0;
-  border-right: 1px solid #e0e0e0;
-}
-
-
-/* 첫 번째 열에 왼쪽 라운드 적용 */
-.search-row.top-row .search-col:first-child {
-  border-top-left-radius: 8px;
+  flex-direction: column;
+  /* 세로 정렬 */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  padding: 12px;
+  /* 여백 주기 */
+  gap: 12px;
+  /* 두 줄 사이 간격 */
 }
 
 .search-col {
@@ -882,22 +849,22 @@ export default {
   flex-grow: 0;
 }
 
-/* 수정된 스타일 */
 .label-box {
-  width: 80px;
-  flex-shrink: 0;
-  height: 100%;
+  height: 40px;
+  min-width: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  background-color: #e3ecf8;
   font-weight: 500;
-  color: #333333;
-  background-color: #e6eef8;
-  /* 그리드 헤더와 같은 색상으로 변경 */
+  padding: 0 12px;
   white-space: nowrap;
-  padding: 0 4px;
-  border-right: 1px solid #eaeaea;
+  border-right: 1px solid #ccc;
+}
+
+.v-col.pa-0 {
+  height: 100%;
+  /* v-col도 확실하게 높이 채우기 */
 }
 
 .input-container {
@@ -963,13 +930,6 @@ export default {
   white-space: nowrap;
 }
 
-/*
-.th-cell:last-child,
-.td-cell:last-child {
-  border-right: none;
-}
-*/
-
 .th-cell,
 .td-cell {
   padding: 8px 12px;
@@ -1025,7 +985,6 @@ export default {
   justify-content: center;
 }
 
-/* 완료일 */
 .th-cell:nth-child(8),
 .td-cell:nth-child(8) {
   flex: 0 0 90px;
@@ -1115,5 +1074,104 @@ export default {
   text-align: center;
   color: #757575;
   font-size: 14px;
+}
+
+
+.filter-label {
+  font-size: 14.5px;
+  min-width: 45px;
+  font-weight: 500;
+  color: #005bac;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+
+.filter-label::after {
+  content: "";
+  height: 16px;
+  width: 1px;
+  background: #ddd;
+  margin-top: 13px;
+  margin-left: 11px;
+}
+
+.filter-input {
+  width: 120px;
+  margin-right: 6px;
+  color: #5271C1;
+}
+
+.filter-input-sub {
+  width: 220px;
+  margin-right: 6px;
+  color: #5271C1;
+}
+
+.date-btn {
+  font-size: 12px;
+  height: 32px;
+  min-width: 56px;
+}
+
+.search-btn {
+  color: white;
+  font-weight: 500;
+  height: 36px;
+  min-width: 64px;
+}
+
+.v-text-field.filter-input :deep(.v-input__control) {
+  min-height: 36px;
+  padding-top: 0;
+  padding-bottom: 0;
+  align-items: center;
+}
+
+.v-select.filter-input :deep(.v-input__control) {
+  min-height: 36px;
+  padding-top: 0;
+  padding-bottom: 0;
+  align-items: center;
+}
+
+.v-btn.date-btn {
+  margin-top: 2px;
+  /* 버튼 살짝 내려서 정렬 */
+  padding: 0 8px;
+  font-size: 13px;
+}
+
+.v-btn.search-btn {
+  margin-top: 2px;
+  /* 검색 버튼도 아래 요소와 정렬 */
+}
+
+.filter-col {
+  height: 50px;
+  border: 1px solid #D0DFF1;
+  border-radius: 8px;
+  background-color: white;
+}
+
+.rounded-border {
+  height: 70px;
+  border: 1px solid #D0DFF1;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: rgba(208, 223, 241, 0.5);
+}
+
+.label-divider {
+  display: inline-block;
+  height: 18px;
+  width: 1px;
+  background-color: #bbb;
+  margin-left: 10px;
+  margin-bottom: 2px;
+  border-radius: 1px;
+  vertical-align: middle;
+  width: 2px;
+  background-color: #B0CAE6;
 }
 </style>

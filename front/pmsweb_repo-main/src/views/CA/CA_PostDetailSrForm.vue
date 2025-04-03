@@ -49,17 +49,17 @@
         저장
       </v-btn>
 
-      <template v-if="inquiry.srFlag === 'N'">
-        <v-btn variant="outlined" color="green darken-2" class="save-status-btn ml-auto mr-2" size="small" @click="$router.push({
+      <v-btn v-if="inquiry.srFlag === 'N'" variant="outlined" color="green darken-2"
+        class="save-status-btn ml-auto mr-2" size="small" @click="$router.push({
           name: 'CA_PostEditSrForm',
           params: { receivedSeq: this.receivedSeq }
         })">
-          수정
-        </v-btn>
-        <v-btn variant="outlined" color="orange darken-2" class="save-status-btn mr-2" size="small">
-          상신
-        </v-btn>
-      </template>
+        수정
+      </v-btn>
+      <v-btn v-if="inquiry.srFlag === 'N'" variant="outlined" color="orange darken-2" class="save-status-btn mr-2"
+        size="small">
+        상신
+      </v-btn>
     </div>
 
 

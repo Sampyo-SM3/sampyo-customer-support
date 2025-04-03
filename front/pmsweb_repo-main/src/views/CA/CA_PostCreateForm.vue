@@ -174,7 +174,6 @@ export default {
   },
 
   watch: {
-
   },
 
   mounted() {

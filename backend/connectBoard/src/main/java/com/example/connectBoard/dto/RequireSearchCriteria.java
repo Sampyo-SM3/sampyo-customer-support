@@ -14,7 +14,7 @@ public class RequireSearchCriteria {
     private String manager;
     private String productType;
     private String sub;
-    
+    private String status;
     // Getters and Setters
     // ...
 }
