@@ -16,11 +16,14 @@
 
                 <div class="table-scroll-wrapper">
                     <v-data-table :headers="headers" :items="users" :items-per-page="-1" hide-default-footer
-                        class="mt-4 elevation-0" item-value="usrId">
+                        class="mt-4 elevation-0" item-value="usrId" v-model="selectedUsers" @click:row="rowClick">
                         <template #[`item.select`]="{ item }">
-                            <v-checkbox v-model="selectedUsers" :value="item" hide-details density="compact"
-                                @change="handleSelection(item)" />
+                            <v-checkbox v-model="selectedUsers" :value="item.usrId" hide-details density="compact"
+                                @click.stop @change="handleSelection(item)" />
                         </template>
+
+                        <!-- 다른 셀 템플릿은 제거합니다 -->
+
                         <template #no-data>
                             <div class="d-flex justify-center align-center pa-4 text-subtitle-1" style="color:#155A9E">
                                 <v-icon class="mr-2">mdi-alert-circle-outline</v-icon>
@@ -92,8 +95,6 @@ export default {
             }
         },
         addUser() {
-            console.log('추가된 관리자:', this.selectedUser);
-
             this.$emit('manager-selected', this.selectedUser);
             this.closeDialog();
         },
@@ -132,6 +133,20 @@ export default {
                 console.error('데이터 로드 중 오류 발생:', error);
             } finally {
                 this.loading = false;
+            }
+        },
+        rowClick(event, { item }) {
+            // 체크박스 상태 전환
+            const index = this.selectedUsers.indexOf(item.usrId);
+
+            // 모든 선택 해제
+            this.selectedUsers = [];
+            this.selectedUser = null;
+
+            // 현재 항목 선택
+            if (index === -1) {
+                this.selectedUsers.push(item.usrId);
+                this.selectedUser = item;
             }
         },
     },

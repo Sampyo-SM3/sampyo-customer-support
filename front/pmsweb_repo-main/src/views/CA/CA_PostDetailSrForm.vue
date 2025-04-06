@@ -49,11 +49,8 @@
         저장
       </v-btn>
 
-      <v-btn v-if="inquiry.srFlag === 'N'" variant="outlined" color="green darken-2"
-        class="save-status-btn ml-auto mr-2" size="small" @click="$router.push({
-          name: 'CA_PostEditSrForm',
-          params: { receivedSeq: this.receivedSeq }
-        })">
+      <v-btn variant="outlined" color="green darken-2" class="save-status-btn ml-auto mr-2" size="small"
+        @click="moveEidtSr">
         수정
       </v-btn>
       <v-btn v-if="inquiry.srFlag === 'N'" variant="outlined" color="orange darken-2" class="save-status-btn mr-2"
@@ -172,10 +169,20 @@
       </v-col>
     </v-row>
 
+    <!-- 첨부파일 -->
     <v-row no-gutters class="search-row bottom-row">
-      <v-col class="search-col request-period">
-        <div class="label-box colNm">첨부목록</div>
-        <div class="author-value"></div>
+      <v-col class="select-files file-attach d-flex align-center">
+        <div class="label-box colNm">첨부파일</div>
+
+        <div v-if="fetchedFiles.length > 0" class="ml-2 mt-2 mb-2" style="flex: 1;">
+          <div class="d-flex flex-wrap" style="gap: 8px;">
+            <div v-for="(file) in fetchedFiles" :key="file.seq" class="file-chip d-flex align-center px-3 py-2 fileBox"
+              @click="downloadFile(file)">
+              <span class="text-body-2" style="color:#1A5CA8">{{ file.fileName }}</span>
+              <v-icon class="ml-2" size="20" style="color:#1A5CA8">mdi-download</v-icon>
+            </div>
+          </div>
+        </div>
       </v-col>
     </v-row>
 
@@ -275,7 +282,7 @@ export default {
       progressStatuses: [],
       qaTypes: ["제품/기술문의", "배차문의", "불편사항", "자료요청", "1:1문의"],
       receiptPaths: ["WEB", "KAKAO", "CALL", "CRM", "SIDP"],
-
+      fetchedFiles: [],
     };
   },
   methods: {
@@ -350,6 +357,20 @@ export default {
             PROGRESS: processState
           }
         };
+      } catch (error) {
+        console.error("❌ 오류 발생:", error);
+      }
+
+      //첨부파일 리스트 불러오기
+      try {
+        const fileList = await apiClient.get("/api/file-attach/fileList", {
+          params: { seq: this.receivedSeq }
+        });
+
+        this.fetchedFiles = Array.isArray(fileList.data)
+          ? fileList.data.filter(file => file && file.fileName)
+          : [];
+
       } catch (error) {
         console.error("❌ 오류 발생:", error);
       }
@@ -438,6 +459,39 @@ export default {
       } catch (error) {
         console.error("상태 저장 실패");
         this.fetchRequireDetail();
+      }
+    },
+    moveEidtSr() {
+      if (this.inquiry.srFlag === 'Y') {
+        alert('상신 후에는 수정을 할 수 없습니다.');
+        return;
+      }
+
+      this.$router.push({
+        name: 'CA_PostEditSrForm',
+        params: { receivedSeq: this.receivedSeq }
+      })
+    },
+    async downloadFile(file) {
+      try {
+        console.log(file);
+
+        const response = await apiClient.get("/api/download", {
+          params: { filename: file.fileName },
+          responseType: 'blob',
+        });
+
+        const blob = new Blob([response.data]);
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", file.fileName);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error("파일 다운로드 중 오류:", error);
       }
     }
   },
@@ -818,5 +872,12 @@ export default {
   font-size: 14px;
   border-radius: 6px;
   margin-bottom: 10px;
+}
+
+.fileBox {
+  background-color: rgba(26, 92, 168, 0.08);
+  border: 1px solid #d0dff1;
+  border-radius: 6px;
+  cursor: pointer;
 }
 </style>

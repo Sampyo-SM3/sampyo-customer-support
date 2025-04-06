@@ -57,7 +57,7 @@
       </v-btn>
       <v-btn v-if="inquiry.processState === 'S'" variant="outlined" color="orange darken-2" class="save-status-btn mr-2"
         size="small" @click="$router.push({
-          name: 'CA_PostCreateSrForm',
+          name: 'CA_PostEditSrForm',
           params: { receivedSeq: this.receivedSeq }
         })">
         SR요청서
@@ -88,13 +88,31 @@
       </v-col>
     </v-row>
 
-    <v-row no-gutters class="search-row bottom-row">
+    <v-row no-gutters class="search-row middle-row">
       <!-- 내용 텍스트필드 -->
       <v-col class="search-col content-field">
         <div class="label-box">내 용</div>
         <div class="author-value content-textarea">{{ inquiry.etc }}</div>
       </v-col>
     </v-row>
+
+    <!-- 첨부파일 -->
+    <v-row no-gutters class="search-row bottom-row">
+      <v-col class="select-files file-attach d-flex align-center">
+        <div class="label-box">첨부파일</div>
+
+        <div v-if="fetchedFiles.length > 0" class="ml-2 mt-2 mb-2" style="flex: 1;">
+          <div class="d-flex flex-wrap" style="gap: 8px;">
+            <div v-for="(file) in fetchedFiles" :key="file.seq" class="file-chip d-flex align-center px-3 py-2 fileBox"
+              @click="downloadFile(file)">
+              <span class="text-body-2" style="color:#1A5CA8">{{ file.fileName }}</span>
+              <v-icon class="ml-2" size="20" style="color:#1A5CA8">mdi-download</v-icon>
+            </div>
+          </div>
+        </div>
+      </v-col>
+    </v-row>
+
 
     <br>
     <br>
@@ -157,6 +175,7 @@ export default {
       step: 1,
       loading: false,
       errorMessages: [],
+      fetchedFiles: [],
       showError: false,
       selectedStatus: '',
       inquiry: {
@@ -210,8 +229,6 @@ export default {
         params: { seq: this.receivedSeq }
       });
 
-      console.log(response);
-
       const processState = response.data?.processState || "P"; // 기본값 설정
 
       // 상태 매핑 체크 후 기본값 설정
@@ -231,6 +248,20 @@ export default {
       };
 
       this.selectedStatus = this.inquiry.processState;
+
+      //첨부파일 리스트 불러오기
+      try {
+        const fileList = await apiClient.get("/api/file-attach/fileList", {
+          params: { seq: this.receivedSeq }
+        });
+
+        this.fetchedFiles = Array.isArray(fileList.data)
+          ? fileList.data.filter(file => file && file.fileName)
+          : [];
+
+      } catch (error) {
+        console.error("❌ 오류 발생:", error);
+      }
     },
     async getStatus() {
       try {
@@ -369,6 +400,28 @@ export default {
       })
 
     },
+    async downloadFile(file) {
+      try {
+        console.log(file);
+
+        const response = await apiClient.get("/api/download", {
+          params: { filename: file.fileName },
+          responseType: 'blob',
+        });
+
+        const blob = new Blob([response.data]);
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", file.fileName);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error("파일 다운로드 중 오류:", error);
+      }
+    }
   }
 }
 </script>
@@ -639,5 +692,12 @@ export default {
   font-size: 17px;
   margin-bottom: 15px;
   font-weight: 400;
+}
+
+.fileBox {
+  border: 1px solid #B0CAE6;
+  border-radius: 6px;
+  background-color: rgba(231, 239, 248, 0.6);
+  cursor: pointer;
 }
 </style>

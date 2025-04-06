@@ -60,20 +60,11 @@
           variant="outlined" prepend-icon="" multiple :loading="isFileLoading" hide-details
           @change="handleFileChange"></v-file-input>
 
-        <v-btn variant="flat" color="green" class="file-btn mt-2 mb-2 ml-2 mr-2 white-text d-flex align-center"
+        <v-btn variant="flat" color="orange" class="file-btn mt-2 mb-2 ml-2 mr-2 white-text d-flex align-center"
           size="small" @click="openFileSelector">
           <v-icon size="default" class="mr-1">mdi-file-upload</v-icon>
           첨부
         </v-btn>
-
-        <!-- 별도의 아이콘을 클릭하면 파일 선택 창 오픈 -->
-        <!-- <v-icon 
-          size="default" 
-          class="ml-4 cursor-pointer"
-          @click="openFileSelector"
-        >
-          mdi-magnify
-        </v-icon> -->
       </v-col>
 
       <!-- 선택된 파일 목록 (아직 업로드되지 않은 파일) -->
@@ -90,7 +81,19 @@
         </div>
       </div>
 
-
+      <!-- 업로드된 파일 -->
+      <div v-if="uploadedFiles.length > 0" class="selected-files ml-5 mt-2 mb-2">
+        <div class="selected-files-container">
+          <div v-for="(file, index) in uploadedFiles" :key="index" class="selected-files-item">
+            <div class="file-info">
+              <div class="file-name text-body-1">{{ file.name }}</div>
+              <div class="file-size text-body-2 text-grey">{{ formatFileSize(file.size) }}</div>
+            </div>
+            <v-btn class="ml-3" icon="mdi-delete" variant="text" color="error" density="compact"
+              @click="removeFile(index, file)"></v-btn>
+          </div>
+        </div>
+      </div>
     </v-row>
 
     <br>
@@ -156,7 +159,6 @@ export default {
       content: '',
       selectedManager: null,
       fileAttach: '',
-
       // 파일 업로드 관련 데이터
       newFiles: [], // 새로 선택한 파일 (v-file-input에 연결됨)
       selectedFiles: [], // 업로드 대기 중인 파일들
@@ -219,6 +221,28 @@ export default {
 
       } catch (error) {
         console.error("❌ 요구사항 불러오기 오류:", error);
+      }
+
+      //첨부파일 리스트 불러오기
+      try {
+        const fileList = await apiClient.get("/api/file-attach/fileList", {
+          params: { seq: this.receivedSeq }
+        });
+
+        this.uploadedFiles = Array.isArray(fileList.data)
+          ? fileList.data
+            .filter(file => file && file.fileName)
+            .map(file => ({
+              name: file.fileName,
+              size: file.fileSize,
+              type: file.fileType || '',
+              seq: file.seq
+            }))
+          : [];
+
+
+      } catch (error) {
+        console.error("❌ 오류 발생:", error);
       }
     },
     // 파일 타입에 따른 아이콘 반환
@@ -283,14 +307,19 @@ export default {
     // 선택된 파일 제거 (아직 업로드되지 않은 파일)
     removeSelectedFile(index) {
       this.selectedFiles.splice(index, 1);
-
-      // this.removeFile(index);
     },
 
     // 업로드된 파일 제거
-    removeFile(index) {
-      this.test4(this.uploadedFiles[index].name);
+    async removeFile(index, file) {
+      await apiClient.post("/api/file-attach/deleteFile", {
+        params: {
+          seq: file.seq
+          , boardSeq: this.receivedSeq
+          , fileName: file.name
+        }
+      });
 
+      this.fileDelete(this.uploadedFiles[index].name);
       this.uploadedFiles.splice(index, 1);
     },
 
@@ -418,7 +447,7 @@ export default {
     },
 
     // 파일 삭제 확인
-    async test4(para_file_name) {
+    async fileDelete(para_file_name) {
       this.showDeleteDialog = false;
       this.deletingFile = para_file_name;
 
@@ -443,7 +472,6 @@ export default {
     },
 
     openFileSelector() {
-      // ref를 사용하여 파일 input 트리거
       this.$refs.fileInput.$el.querySelector('input[type="file"]').click();
     },
 
@@ -572,9 +600,6 @@ export default {
 
       this.savedMidMenu = midMenuFromStorage ? JSON.parse(midMenuFromStorage) : null;
       this.savedSubMenu = subMenuFromStorage ? JSON.parse(subMenuFromStorage) : null;
-
-      // console.log('메뉴 클릭 후 midMenu:', this.savedMidMenu);
-      // console.log('메뉴 클릭 후 subMenu:', this.savedSubMenu);
     },
 
     getUserInfo() {
@@ -592,9 +617,7 @@ export default {
       this.managerId = selectedManager.usrId;
       this.managerTel = selectedManager.handTelNo;
       this.managerEmail = selectedManager.emailAddr;
-
       this.selectedManager = selectedManager;
-      console.log(selectedManager);
     }
   }
 }

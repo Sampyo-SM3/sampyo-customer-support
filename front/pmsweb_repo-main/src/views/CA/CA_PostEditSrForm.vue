@@ -189,8 +189,46 @@
     <v-row no-gutters class="search-row bottom-row">
       <v-col class="search-col input-width">
         <div class="label-box colNm">첨부목록</div>
-        <v-text-field variant="outlined" density="compact" hide-details class="input-area"></v-text-field>
+        <v-file-input style="display: none;" ref="fileInput" class="manager-search flex-grow-1" v-model="newFiles"
+          :rules="fileRules" accept="image/png, image/jpeg, application/pdf" label="파일을 선택하세요" density="compact"
+          variant="outlined" prepend-icon="" multiple :loading="isFileLoading" hide-details
+          @change="handleFileChange"></v-file-input>
+
+        <v-btn variant="flat" color="orange" class="file-btn mt-2 mb-2 ml-2 mr-2 white-text d-flex align-center"
+          size="small" @click="openFileSelector">
+          <v-icon size="default" class="mr-1">mdi-file-upload</v-icon>
+          첨부
+        </v-btn>
+
+        <!-- 선택된 파일 목록 (아직 업로드되지 않은 파일) -->
+        <div v-if="selectedFiles.length > 0" class="selected-files ml-5 mt-2 mb-2">
+          <div class="selected-files-container">
+            <div v-for="(file, index) in selectedFiles" :key="index" class="selected-files-item">
+              <div class="file-info">
+                <div class="file-name text-body-1">{{ file.name }}</div>
+                <div class="file-size text-body-2 text-grey">{{ formatFileSize(file.size) }}</div>
+              </div>
+              <v-btn class="ml-3" icon="mdi-delete" variant="text" color="error" density="compact"
+                @click="removeSelectedFile(index)"></v-btn>
+            </div>
+          </div>
+        </div>
+
+        <!-- 업로드된 파일 -->
+        <div v-if="uploadedFiles.length > 0" class="selected-files ml-5 mt-2 mb-2">
+          <div class="selected-files-container">
+            <div v-for="(file, index) in uploadedFiles" :key="index" class="selected-files-item">
+              <div class="file-info">
+                <div class="file-name text-body-1">{{ file.name }}</div>
+                <div class="file-size text-body-2 text-grey">{{ formatFileSize(file.size) }}</div>
+              </div>
+              <v-btn class="ml-3" icon="mdi-delete" variant="text" color="error" density="compact"
+                @click="removeFile(index, file)"></v-btn>
+            </div>
+          </div>
+        </div>
       </v-col>
+
     </v-row>
 
     <v-row class="mt-5">
@@ -266,7 +304,18 @@ export default {
       management: {
         PROGRESS: ""
       },
-      progressStatuses: []
+      progressStatuses: [],
+      newFiles: [],
+      selectedFiles: [],
+      uploadedFiles: [],
+      showOverwriteDialog: false,
+      duplicateFiles: [],
+      pendingFiles: [],
+      fileRules: [
+        value => {
+          return !value || !value.length || value[0].size < 5000000 || '파일 크기는 5MB 이하여야 합니다.';
+        },
+      ],
 
     };
   },
@@ -307,8 +356,30 @@ export default {
           dpDn: data?.dpDn || "",
           manager: data?.manager || "",
           division: data?.division || "",
-          processState: data?.processState || ""
+          processState: data?.processState || "",
         });
+
+        //첨부파일 리스트 불러오기
+        try {
+          const fileList = await apiClient.get("/api/file-attach/fileList", {
+            params: { seq: this.receivedSeq }
+          });
+
+          this.uploadedFiles = Array.isArray(fileList.data)
+            ? fileList.data
+              .filter(file => file && file.fileName)
+              .map(file => ({
+                name: file.fileName,
+                size: file.fileSize,
+                type: file.fileType || '',
+                seq: file.seq
+              }))
+            : [];
+
+
+        } catch (error) {
+          console.error("오류 발생:", error);
+        }
 
       } catch (error) {
         console.error("❌ 요구사항 불러오기 오류:", error);
@@ -336,6 +407,62 @@ export default {
             etc: this.inquiry.etc,                  //기타
           };
 
+          const boardSeq = this.receivedSeq; // 등록된 게시글의 seq
+
+          const fileAttachPromises = this.selectedFiles.map(async (file) => {
+            try {
+              // 파일명은 게시물 기준으로 중복 관리함
+              const fileName = `${boardSeq}_${file.name}`;
+
+              // 원본 파일 객체의 이름 변경
+              const modifiedFile = new File([file], fileName, {
+                type: file.type,
+                lastModified: file.lastModified
+              });
+
+              const fileAttachData = {
+                boardSeq: boardSeq,
+                fileName: fileName,
+                fileSize: modifiedFile.size,
+                fileType: modifiedFile.type,
+              };
+
+              // FileAttach 테이블 INSERT API 호출
+              const attachResponse = await apiClient.post('/api/file-attach/insert', fileAttachData);
+
+              // 파일서버 업로드 API 호출
+              const additionalResponse = await this.processUpload([modifiedFile]);
+
+
+              return {
+                fileName: file.name,
+                status: 'success',
+                attachResponse,
+                additionalResponse
+              };
+            } catch (error) {
+              console.error(`파일 ${file.name} 처리 중 오류:`, error);
+              return {
+                fileName: file.name,
+                status: 'error',
+                error: error.message
+              };
+            }
+          });
+
+          // 모든 파일 첨부 및 추가 API 호출을 동시에 실행
+          const responses = await Promise.all(fileAttachPromises);
+
+          // 결과 분석
+          // const successFiles = responses.filter(response => response.status === 'success');
+          const errorFiles = responses.filter(response => response.status === 'error');
+
+          // 실패한 파일이 있으면 사용자에게 알림
+          if (errorFiles.length > 0) {
+            this.errorMessages = errorFiles.map(file => `${file.fileName}: ${file.error}`);
+            this.showError = true;
+          }
+
           // API 요청: 댓글 DB에 저장
           await apiClient.post("/api/require/updateSrForm", param);
           alert("저장하였습니다.");
@@ -357,6 +484,234 @@ export default {
           params: { receivedSeq: this.receivedSeq }
         })
       }
+    },
+    // 파일 타입에 따른 아이콘 반환
+    getFileIcon(fileType) {
+      if (fileType.includes('image')) {
+        return 'mdi-file-image';
+      } else if (fileType.includes('pdf')) {
+        return 'mdi-file-pdf';
+      } else {
+        return 'mdi-file-document';
+      }
+    },
+
+    // 파일 크기 포맷
+    formatFileSize(size) {
+      if (size < 1024) {
+        return size + ' B';
+      } else if (size < 1024 * 1024) {
+        return (size / 1024).toFixed(2) + ' KB';
+      } else {
+        return (size / (1024 * 1024)).toFixed(2) + ' MB';
+      }
+    },
+
+    // 파일 선택 변경 처리
+    handleFileChange() {
+      // 파일은 v-model에 바인딩된 newFiles에서 가져옵니다
+      const files = this.newFiles;
+
+      if (!files || (Array.isArray(files) && files.length === 0)) {
+        return;
+      }
+
+      if (Array.isArray(files)) {
+        files.forEach((file) => {
+          // 중복 파일 검사 (selectedFiles 내에서)
+          const existingSelectedIndex = this.selectedFiles.findIndex(f => f.name === file.name);
+          if (existingSelectedIndex !== -1) {
+            // 선택된 파일 목록에서 중복된 파일 교체
+            this.selectedFiles.splice(existingSelectedIndex, 1, file);
+          } else {
+            // 새 파일 추가
+            this.selectedFiles.push(file);
+          }
+        });
+      } else {
+        // 중복 파일 검사 (selectedFiles 내에서)
+        const existingSelectedIndex = this.selectedFiles.findIndex(f => f.name === files.name);
+        if (existingSelectedIndex !== -1) {
+          // 선택된 파일 목록에서 중복된 파일 교체
+          this.selectedFiles.splice(existingSelectedIndex, 1, files);
+        } else {
+          // 새 파일 추가
+          this.selectedFiles.push(files);
+        }
+      }
+
+      // 파일 선택 컨트롤 초기화
+      this.newFiles = [];
+    },
+
+    // 선택된 파일 제거 (아직 업로드되지 않은 파일)
+    removeSelectedFile(index) {
+      this.selectedFiles.splice(index, 1);
+    },
+
+    // 업로드된 파일 제거
+    async removeFile(index, file) {
+      await apiClient.post("/api/file-attach/deleteFile", {
+        params: {
+          seq: file.seq
+          , boardSeq: this.receivedSeq
+          , fileName: file.name
+        }
+      });
+
+      this.fileDelete(this.uploadedFiles[index].name);
+      this.uploadedFiles.splice(index, 1);
+    },
+
+    // 파일명 중복 확인
+    checkDuplicateFiles() {
+      const duplicates = [];
+
+      // selectedFiles의 각 파일이 uploadedFiles에 이미 존재하는지 확인
+      this.selectedFiles.forEach(selectedFile => {
+        const isDuplicate = this.uploadedFiles.some(uploadedFile =>
+          uploadedFile.name === selectedFile.name
+        );
+
+        if (isDuplicate) {
+          duplicates.push(selectedFile);
+        }
+      });
+
+      return duplicates;
+    },
+
+    // 파일 업로드 처리
+    async uploadFiles() {
+      // 파일 없으면 false 리턴
+      if (!this.selectedFiles || this.selectedFiles.length === 0) {
+        return false;
+      }
+
+      // 파일명 중복 확인
+      const duplicateFiles = this.checkDuplicateFiles();
+
+      if (duplicateFiles.length > 0) {
+        return false;
+      }
+
+      // 중복 파일이 없으면 바로 업로드 진행
+      try {
+        await this.processUpload(this.selectedFiles);
+        return true; // 성공 시 true 리턴
+      } catch (error) {
+        return false; // 실패 시 false 리턴
+      }
+    },
+
+    // 덮어쓰기 취소
+    cancelOverwrite() {
+      this.showOverwriteDialog = false;
+
+      // 중복되지 않은 파일만 업로드 진행
+      if (this.pendingFiles.length > 0) {
+        this.processUpload(this.pendingFiles);
+      }
+
+      // 상태 초기화
+      this.duplicateFiles = [];
+      this.pendingFiles = [];
+    },
+
+    // 덮어쓰기 확인
+    confirmOverwrite() {
+      this.showOverwriteDialog = false;
+
+      // 중복 파일 제거 (기존 업로드 파일에서)
+      this.duplicateFiles.forEach(dupFile => {
+        const index = this.uploadedFiles.findIndex(f => f.name === dupFile.name);
+        if (index !== -1) {
+          this.uploadedFiles.splice(index, 1);
+        }
+      });
+
+      // 모든 선택된 파일 업로드 진행
+      this.processUpload(this.selectedFiles);
+
+      // 상태 초기화
+      this.duplicateFiles = [];
+      this.pendingFiles = [];
+    },
+
+
+    // 실제 파일 업로드 처리
+    async processUpload(filesToUpload) {
+      if (!filesToUpload.length) throw new Error('업로드할 파일이 없습니다.');
+
+      this.isFileLoading = true;
+
+      try {
+        // FormData 생성
+        const formData = new FormData();
+
+        // 모든 파일을 'files' 이름으로 추가
+        filesToUpload.forEach((file) => {
+          formData.append('files', file);
+        });
+
+        // API 호출
+        const response = await apiClient.post('/api/fileUpload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        // 업로드 성공 처리
+        if (response.data && response.data.result === 'success') {
+          console.log('파일 업로드 성공:', response.data);
+
+          // 업로드 성공한 파일을 목록에 추가
+          filesToUpload.forEach(file => {
+            this.uploadedFiles.push({
+              name: file.name,
+              size: file.size,
+              type: file.type
+            });
+          });
+
+          return true;
+        } else {
+          throw new Error('파일 업로드 실패');
+        }
+      } catch (error) {
+        console.error('파일 업로드 오류:', error);
+        throw error; // 호출한 곳으로 에러 전파
+      } finally {
+        this.isFileLoading = false;
+      }
+    },
+
+    // 파일 삭제 확인
+    async fileDelete(para_file_name) {
+      this.showDeleteDialog = false;
+      this.deletingFile = para_file_name;
+
+      try {
+        // FormData 사용하지 않고 URL에 파라미터 포함
+        const response = await apiClient.post(`/api/fileDelete?originFile=${encodeURIComponent(this.deletingFile)}`);
+
+        // 삭제 성공 처리
+        if (response.data.result === 'success') {
+          // 파일 목록에서 삭제된 파일 제거
+          // this.files = this.files.filter(file => file.originFile !== this.fileToDelete);
+
+        } else {
+          throw new Error(response.data.message || '파일 삭제에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('파일 삭제 중 오류 발생:', error);
+
+      } finally {
+        this.deletingFile = null;
+      }
+    },
+    openFileSelector() {
+      this.$refs.fileInput.$el.querySelector('input[type="file"]').click();
     },
   },
   computed: {
@@ -649,5 +1004,51 @@ export default {
 ::v-deep(.input-area input) {
   padding: 0 10px !important;
   font-size: 13px !important;
+}
+
+/* 첨부파일 관련 css */
+.white-text {
+  color: white !important;
+}
+
+.file-btn {
+  font-size: 14px;
+  height: 35px;
+  border-radius: 10px;
+}
+
+.selected-files-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  /* 아이템 사이 간격 */
+}
+
+.selected-files-item {
+  display: flex;
+  align-items: center;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 8px 12px;
+  max-width: 250px;
+  /* 원하는 너비로 조정 */
+}
+
+.file-info {
+  flex-grow: 1;
+  min-width: 0;
+  /* 텍스트 자르기 위해 필요 */
+}
+
+.file-name {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-size {
+  color: #757575;
+  font-size: 0.85rem;
 }
 </style>

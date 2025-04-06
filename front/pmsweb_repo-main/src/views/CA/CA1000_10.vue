@@ -124,7 +124,15 @@
           <span class="text-subtitle-2 font-weight-bold">{{ totalItems }}</span>
           <!-- <span class="text-subtitle-2 text-grey">건</span> -->
           <span class="text-subtitle-2 text-grey"> / 미처리: </span>
-          <span class="text-subtitle-2 font-weight-bold text-red">{{ getUnprocessedCount() }}</span>
+          <span class="text-subtitle-2 font-weight-bold text-red">{{ getUnprocessedCount('P') }}</span>
+          <span class="text-subtitle-2 text-grey ml-2"> 진행: </span>
+          <span class="text-subtitle-2 font-weight-bold text-blue">{{ getUnprocessedCount('I') }}</span>
+          <span class="text-subtitle-2 text-grey ml-2"> 보류: </span>
+          <span class="text-subtitle-2 font-weight-bold text-blue">{{ getUnprocessedCount('H') }}</span>
+          <span class="text-subtitle-2 text-grey ml-2"> SR: </span>
+          <span class="text-subtitle-2 font-weight-bold text-blue">{{ getUnprocessedCount('S') }}</span>
+          <span class="text-subtitle-2 text-grey ml-2"> 완료: </span>
+          <span class="text-subtitle-2 font-weight-bold">{{ getUnprocessedCount('C') }}</span>
 
         </span>
 
@@ -287,6 +295,7 @@ export default {
       showError: false,
       savedMidMenu: '',
       savedSubMenu: '',
+      countStatus: []
     }
   },
 
@@ -514,22 +523,6 @@ export default {
     // API 호출하여 데이터 가져오기
     async fetchData() {
 
-      // 날짜 유효성 검사
-      const validation = this.isValidDate({
-        maxDays: 60,                    // 최대 90일까지만 선택 가능
-        allowFutureDates: false,        // 미래 날짜 불허용
-        minDate: '2025-01-01',          // 최소 날짜
-        maxDate: '2025-12-31',          // 최대 날짜        
-      });
-
-      if (!validation.isValid) {
-        // 오류 메시지 표시
-        this.errorMessages = validation.errors;
-        this.showError = true;
-        return;
-      }
-
-
       this.loading = true;
       try {
         // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
@@ -641,9 +634,10 @@ export default {
       return `${diffDays}일 ${diffHours}시간`;
     },
 
-    // 미처리 건수 계산
-    getUnprocessedCount() {
-      return this.tableData.filter(item => item.status === '미처리').length;
+    // 건수 계산
+    getUnprocessedCount(statusCnt) {
+      this.countStatus[statusCnt] = this.tableData.filter(item => item.processState === statusCnt).length;
+      return this.countStatus[statusCnt];
     },
 
     // 전체 선택/해제 토글
@@ -746,7 +740,7 @@ export default {
   display: flex;
   align-items: center;
   width: 125px;
-  color: #7A5344;
+  color: #737577;
 }
 
 .date-input {
@@ -777,7 +771,7 @@ export default {
 .date-separator {
   margin: 0 10px;
   font-size: 16px;
-  color: #757575;
+  color: #7A7A7A;
 }
 
 .date-buttons {
@@ -796,7 +790,7 @@ export default {
   border: 1px solid #eaeaea;
   border-radius: 0;
   background-color: #ffffff;
-  color: #7A5344;
+  color: #7A7A7A;
   box-shadow: none;
   margin: 0;
 }
@@ -909,6 +903,7 @@ export default {
 
 .table-row {
   border-bottom: 1px solid #e0e0e0;
+  height: 50px;
 }
 
 .table-row:hover {
@@ -1149,7 +1144,7 @@ export default {
 
 .filter-col {
   height: 50px;
-  border: 1px solid #D0DFF1;
+  border: 1.5px solid #D0DFF1;
   border-radius: 8px;
   background-color: white;
 }

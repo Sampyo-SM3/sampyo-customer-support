@@ -1,6 +1,5 @@
 import CA1000_10 from '@/views/CA/CA1000_10.vue'
 import CA_PostCreateForm from '@/views/CA/CA_PostCreateForm.vue'
-import CA_PostCreateSrForm from '@/views/CA/CA_PostCreateSrForm.vue'
 import CA_PostEditForm from '@/views/CA/CA_PostEditForm.vue'
 import CA_PostEditSrForm from '@/views/CA/CA_PostEditSrForm.vue'
 import CA_PostDetailSrForm from '@/views/CA/CA_PostDetailSrForm.vue'
@@ -41,12 +40,6 @@ export const caRoutes = [
     path: 'CA2000_10', 
     name: 'CA2000_10',
     component: CA2000_10,    
-  }, 
-  {  
-    path: '/CA_PostCreateSrForm/:receivedSeq?', 
-    name: 'CA_PostCreateSrForm',
-    component: CA_PostCreateSrForm,    
-    props: true
   }, 
   {  
     path: '/CA_PostEditSrForm/:receivedSeq?', 

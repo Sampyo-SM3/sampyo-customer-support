@@ -6,7 +6,6 @@
 
 
 	<insert id="insertFileAttach" parameterType="com.example.connectBoard.dto.FileAttachDTO">
-    	  
        INSERT INTO file_attachment (
            boardSeq,
            fileName,
@@ -21,8 +20,24 @@
            #{fileType},
            GETDATE(),
            GETDATE()
-       )
-       
+       )  
    </insert>
+   
+   	<delete id="deleteFileAttach" parameterType="com.example.connectBoard.dto.FileAttachDTO">
+    	DELETE FROM file_attachment
+    	WHERE seq = #{seq} 
+    	  AND boardSeq = #{boardSeq} 
+    	  AND fileName = #{fileName};
+   </delete>
+
+    <select id="getFileList"  parameterType="Long" resultType="com.example.connectBoard.dto.FileAttachDTO">   	
+    	SELECT seq,
+    		   fileName,
+    		   fileSize,
+    		   fileType,
+    		   boardSeq
+    	FROM file_attachment
+    	WHERE boardSeq = #{seq};
+    </select>
 
 </mapper>

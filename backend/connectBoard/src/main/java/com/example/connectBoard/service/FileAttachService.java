@@ -1,5 +1,7 @@
 package com.example.connectBoard.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.example.connectBoard.dto.FileAttachDTO;
@@ -18,6 +20,12 @@ public class FileAttachService {
     	fileattachRepository.insertFileAttach(fileattach);
     }
     
- 
+    public void deleteFileAttach(FileAttachDTO fileattach) {        
+    	fileattachRepository.deleteFileAttach(fileattach);
+    }
+    
+    public List<FileAttachDTO> getFileList(Long seq) {    	
+        return fileattachRepository.getFileList(seq);
+    }
     
 }

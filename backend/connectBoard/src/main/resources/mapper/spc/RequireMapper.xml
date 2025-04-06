@@ -170,7 +170,8 @@
     		manager = #{manager},
     		managerId = #{managerId},
     		managerEmail = #{managerEmail},
-    		managerTel = #{managerTel}
+    		managerTel = #{managerTel},
+    		saveFlag = 'Y'
     	WHERE seq = #{seq};
 	</update>
 	
