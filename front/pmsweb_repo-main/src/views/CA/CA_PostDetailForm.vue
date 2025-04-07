@@ -47,19 +47,17 @@
         </v-col>
       </v-row>
 
-      <v-btn variant="outlined" color="primary" size="small" class="save-status-btn ml-3" @click="saveStatus">
+      <v-btn variant="flat" color="#3A70B1" size="small" class="save-status-btn ml-3" @click="saveStatus">
         저장
       </v-btn>
 
-      <v-btn variant="outlined" color="green darken-2" class="save-status-btn ml-auto mr-2" size="small"
-        @click="moveEdit">
+      <v-btn variant="flat" color="green darken-2" class="save-status-btn ml-auto mr-2" size="small" @click="moveEdit">
         수정
       </v-btn>
-      <v-btn v-if="inquiry.processState === 'S'" variant="outlined" color="orange darken-2" class="save-status-btn mr-2"
-        size="small" @click="$router.push({
-          name: 'CA_PostEditSrForm',
-          params: { receivedSeq: this.receivedSeq }
-        })">
+      <v-btn variant="flat" color="#F7A000" class="save-status-btn mr-2 white-text" size="small" @click="$router.push({
+        name: 'CA_PostEditSrForm',
+        params: { receivedSeq: this.receivedSeq }
+      })">
         SR요청서
       </v-btn>
 
@@ -137,7 +135,8 @@
             :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"></v-textarea>
           <div class="btn-container">
             <v-btn v-if="replyTo" text @click="cancelReply" class="mr-2">답글 취소</v-btn>
-            <v-btn variant="outlined" color="primary" @click="addComment()">등록</v-btn>
+            <v-btn variant="flat" style="background-color: rgba(236, 236, 236, 0.5); color: #000;" class="commentBtn"
+              @click="addComment()">댓글 등록</v-btn>
           </div>
         </div>
       </v-col>
@@ -666,6 +665,7 @@ export default {
   font-size: 14px;
   border-radius: 6px;
   margin-bottom: 15px;
+  border-width: 1.5px;
 }
 
 .goBack-btn {
@@ -699,5 +699,13 @@ export default {
   border-radius: 6px;
   background-color: rgba(231, 239, 248, 0.6);
   cursor: pointer;
+}
+
+.commentBtn {
+  border: 1px solid #888A8D !important;
+  color: #5A5C5F !important;
+  border-radius: 4px;
+  padding: 4px 12px;
+  background-color: white;
 }
 </style>

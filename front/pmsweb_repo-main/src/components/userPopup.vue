@@ -18,8 +18,8 @@
                     <v-data-table :headers="headers" :items="users" :items-per-page="-1" hide-default-footer
                         class="mt-4 elevation-0" item-value="usrId" v-model="selectedUsers" @click:row="rowClick">
                         <template #[`item.select`]="{ item }">
-                            <v-checkbox v-model="selectedUsers" :value="item.usrId" hide-details density="compact"
-                                @click.stop @change="handleSelection(item)" />
+                            <v-checkbox :model-value="selectedUsers.includes(item.usrId)" hide-details density="compact"
+                                @click.stop @change="toggleSelection(item)" />
                         </template>
 
                         <!-- 다른 셀 템플릿은 제거합니다 -->
@@ -149,6 +149,20 @@ export default {
                 this.selectedUser = item;
             }
         },
+        toggleSelection(item) {
+            // 이미 선택된 항목인지 확인
+            const index = this.selectedUsers.indexOf(item.usrId);
+
+            // 모든 선택 해제
+            this.selectedUsers = [];
+            this.selectedUser = null;
+
+            // 선택되지 않은 상태였다면 선택
+            if (index === -1) {
+                this.selectedUsers.push(item.usrId);
+                this.selectedUser = item;
+            }
+        }
     },
     created() {
         this.dialogVisible = this.show;
@@ -181,5 +195,10 @@ export default {
 .table-scroll-wrapper {
     height: 480px;
     overflow-y: auto;
+}
+
+:deep(.v-data-table) {
+    user-select: none;
+    cursor: pointer;
 }
 </style>

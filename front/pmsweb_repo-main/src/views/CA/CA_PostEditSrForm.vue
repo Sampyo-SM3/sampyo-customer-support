@@ -194,7 +194,7 @@
           variant="outlined" prepend-icon="" multiple :loading="isFileLoading" hide-details
           @change="handleFileChange"></v-file-input>
 
-        <v-btn variant="flat" color="orange" class="file-btn mt-2 mb-2 ml-2 mr-2 white-text d-flex align-center"
+        <v-btn variant="flat" color="#3A70B1" class="file-btn mt-2 mb-2 ml-2 mr-2 white-text d-flex align-center"
           size="small" @click="openFileSelector">
           <v-icon size="default" class="mr-1">mdi-file-upload</v-icon>
           첨부
@@ -208,7 +208,7 @@
                 <div class="file-name text-body-1">{{ file.name }}</div>
                 <div class="file-size text-body-2 text-grey">{{ formatFileSize(file.size) }}</div>
               </div>
-              <v-btn class="ml-3" icon="mdi-delete" variant="text" color="error" density="compact"
+              <v-btn class="ml-3" icon="mdi-delete" variant="text" color="#E44532" density="compact"
                 @click="removeSelectedFile(index)"></v-btn>
             </div>
           </div>
@@ -222,7 +222,7 @@
                 <div class="file-name text-body-1">{{ file.name }}</div>
                 <div class="file-size text-body-2 text-grey">{{ formatFileSize(file.size) }}</div>
               </div>
-              <v-btn class="ml-3" icon="mdi-delete" variant="text" color="error" density="compact"
+              <v-btn class="ml-3" icon="mdi-delete" variant="text" color="#E44532" density="compact"
                 @click="removeFile(index, file)"></v-btn>
             </div>
           </div>
@@ -233,11 +233,11 @@
 
     <v-row class="mt-5">
       <v-col cols="12" class="d-flex justify-center">
-        <v-btn variant="outlined" color="green darken-2" class="custom-btn mx-2" size="large" @click="moveSrDetail">
+        <v-btn variant="flat" color="grey darken-2" class="custom-btn mx-2" size="large" @click="moveSrDetail">
           <v-icon size="default" class="mr-1">mdi-close</v-icon>
           취소
         </v-btn>
-        <v-btn variant="outlined" color="primary" class="custom-btn mx-2" size="large" @click="submitRequest">
+        <v-btn variant="flat" color="primary" class="custom-btn mx-2" size="large" @click="submitRequest">
           <v-icon size="default" class="mr-1">mdi-check</v-icon>
           수정
         </v-btn>

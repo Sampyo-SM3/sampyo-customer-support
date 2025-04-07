@@ -60,7 +60,7 @@
           variant="outlined" prepend-icon="" multiple :loading="isFileLoading" hide-details
           @change="handleFileChange"></v-file-input>
 
-        <v-btn variant="flat" color="orange" class="file-btn mt-2 mb-2 ml-2 mr-2 white-text d-flex align-center"
+        <v-btn variant="flat" color="#3A70B1" class="file-btn mt-2 mb-2 ml-2 mr-2 white-text d-flex align-center"
           size="small" @click="openFileSelector">
           <v-icon size="default" class="mr-1">mdi-file-upload</v-icon>
           첨부
@@ -75,7 +75,7 @@
               <div class="file-name text-body-1">{{ file.name }}</div>
               <div class="file-size text-body-2 text-grey">{{ formatFileSize(file.size) }}</div>
             </div>
-            <v-btn class="ml-3" icon="mdi-delete" variant="text" color="error" density="compact"
+            <v-btn class="ml-3" icon="mdi-delete" variant="text" color="#E44532" density="compact"
               @click="removeSelectedFile(index)"></v-btn>
           </div>
         </div>
@@ -89,7 +89,7 @@
               <div class="file-name text-body-1">{{ file.name }}</div>
               <div class="file-size text-body-2 text-grey">{{ formatFileSize(file.size) }}</div>
             </div>
-            <v-btn class="ml-3" icon="mdi-delete" variant="text" color="error" density="compact"
+            <v-btn class="ml-3" icon="mdi-delete" variant="text" color="#E44532" density="compact"
               @click="removeFile(index, file)"></v-btn>
           </div>
         </div>
@@ -99,13 +99,13 @@
     <br>
 
     <div class="d-flex justify-center">
-      <v-btn variant="outlined" color="green darken-2" class="mr-2 d-flex align-center custom-btn-size " size="large"
+      <v-btn variant="flat" color="grey darken-2" class="mr-2 d-flex align-center custom-btn-size " size="large"
         @click="goBack">
         <v-icon size="default" class="mr-1">mdi-close</v-icon>
         취소
       </v-btn>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <v-btn variant="outlined" color="primary" class="mr-2 d-flex align-center custom-btn-size " size="large"
+      <v-btn variant="flat" color="primary" class="mr-2 d-flex align-center custom-btn-size " size="large"
         @click="updateBoard()">
         <v-icon size="default" class="mr-1">mdi-check</v-icon>
         수정
@@ -805,7 +805,6 @@ export default {
   box-shadow: none;
   border-radius: 6px;
   margin-top: -10px !important;
-  margin-bottom: 15px;
   min-width: 60px;
 }
 

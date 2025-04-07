@@ -45,16 +45,16 @@
         </v-col>
       </v-row>
 
-      <v-btn variant="outlined" color="primary" size="small" class="save-status-btn ml-3" @click="saveStatus">
+      <v-btn variant="flat" color="#3A70B1" size="small" class="save-status-btn ml-3" @click="saveStatus">
         저장
       </v-btn>
 
-      <v-btn variant="outlined" color="green darken-2" class="save-status-btn ml-auto mr-2" size="small"
+      <v-btn variant="flat" color="green darken-2" class="save-status-btn ml-auto mr-2" size="small"
         @click="moveEidtSr">
         수정
       </v-btn>
-      <v-btn v-if="inquiry.srFlag === 'N'" variant="outlined" color="orange darken-2" class="save-status-btn mr-2"
-        size="small">
+      <v-btn v-if="inquiry.srFlag === 'N'" variant="flat" color="#F7A000" class="save-status-btn mr-2 white-text"
+        size="small" @click="approvalBtn">
         상신
       </v-btn>
     </div>
@@ -207,7 +207,8 @@
             :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"></v-textarea>
           <div class="btn-container">
             <v-btn v-if="replyTo" text @click="cancelReply" class="mr-2">답글 취소</v-btn>
-            <v-btn variant="outlined" color="primary" @click="addComment()">등록</v-btn>
+            <v-btn variant="flat" style="background-color: rgba(236, 236, 236, 0.5); color: #000;" class="commentBtn"
+              @click="addComment()">댓글등록</v-btn>
           </div>
         </div>
       </v-col>
@@ -493,7 +494,32 @@ export default {
       } catch (error) {
         console.error("파일 다운로드 중 오류:", error);
       }
-    }
+    },
+    approvalBtn() {
+      try {
+        // 폼 타입 결정        
+        const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
+        const params = {
+          key: this.receivedSeq,  // board seq번호
+          empno: 'SPH221342320005', // 사원번호
+          legacy_form: 'WF_FORM_SRTEST',
+          datatype: 'xml',  // 데이터 타입          
+          // seq: '111', // 프로시저 호출되는 ip          
+          // DATE_TEST: '111',  // board seq번호
+          ip: '10.50.20.71', // 프로시저 호출되는 ip          
+          db: 'SPC_TEST',     // 프로시저 호출되는 db
+        };
+
+        // 쿼리 파라미터 문자열 생성
+        const queryString = new URLSearchParams(params).toString()
+        const fullUrl = `${baseUrl}?${queryString}`
+
+        // 새 창에서 URL 열기
+        window.open(fullUrl, '_blank')
+      } catch (error) {
+        console.error('상신 처리 중 오류 발생:', error)
+      }
+    },
   },
   computed: {
     topLevelComments() {
@@ -879,5 +905,13 @@ export default {
   border: 1px solid #d0dff1;
   border-radius: 6px;
   cursor: pointer;
+}
+
+.commentBtn {
+  border: 1px solid #888A8D !important;
+  color: #5A5C5F !important;
+  border-radius: 4px;
+  padding: 4px 12px;
+  background-color: white;
 }
 </style>

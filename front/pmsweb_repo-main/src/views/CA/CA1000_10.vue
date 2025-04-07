@@ -131,14 +131,14 @@
           <span class="text-subtitle-2 font-weight-bold text-blue">{{ getUnprocessedCount('H') }}</span>
           <span class="text-subtitle-2 text-grey ml-2"> SR: </span>
           <span class="text-subtitle-2 font-weight-bold text-blue">{{ getUnprocessedCount('S') }}</span>
-          <span class="text-subtitle-2 text-grey ml-2"> 완료: </span>
+          <span class="text-subtitle-2 text-grey ml-2"> 종결: </span>
           <span class="text-subtitle-2 font-weight-bold">{{ getUnprocessedCount('C') }}</span>
 
         </span>
 
         <v-spacer></v-spacer>
 
-        <v-btn variant="flat" color="success" class="custom-btn white-text d-flex align-center" size="small"
+        <v-btn variant="flat" color="green darken-2" class="custom-btn white-text d-flex align-center" size="small"
           @click="$router.push({ name: 'CA_PostCreateForm' })">
 
           <v-icon size="default" class="mr-1">mdi-pencil</v-icon>
@@ -182,7 +182,7 @@
                   item.sub }}</router-link>
             </div>
             <div class="td-cell">{{ item.division }}</div>
-            <div class="td-cell" :class="getStatusClass(item.status)">{{ item.status }}</div>
+            <div class="td-cell" :class="getStatusClass(item.processState)">{{ item.status }}</div>
             <div class="td-cell">{{ formatDate(item.completeDate) }}</div>
             <div class="td-cell">{{ item.manager || '-' }}</div>
             <div class="td-cell">{{ calculateDuration(item.requestDate, item.completeDate) }}</div>
@@ -655,16 +655,18 @@ export default {
 
     // 상태에 따른 클래스 반환
     getStatusClass(status) {
+      console.log(status);
+
       switch (status) {
-        case '미처리':
+        case 'P':
           return 'text-error';
-        case '진행':
+        case 'I':
           return 'text-info';
-        case '보류중':
+        case 'H':
           return 'text-warning';
-        case 'SR':
-          return 'text-SR';
-        case '종결':
+        case 'S':
+          return 'text-info';
+        case 'C':
           return 'text-success';
         default:
           return '';
@@ -722,7 +724,7 @@ export default {
 
 .custom-btn {
   font-size: 14px;
-  height: 45px;
+  height: 40px;
   border-radius: 10px;
 }
 
@@ -904,6 +906,7 @@ export default {
 .table-row {
   border-bottom: 1px solid #e0e0e0;
   height: 50px;
+  color: #5B5D60;
 }
 
 .table-row:hover {
@@ -1029,7 +1032,7 @@ export default {
 }
 
 .text-error {
-  color: #f44336;
+  color: #E6373A;
 }
 
 .text-info {
