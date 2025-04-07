@@ -156,12 +156,9 @@ export default {
       try {
         // API 요청: 댓글 DB에 저장
         await apiClient.post("api/insertComment", commentData);
-        alert("댓글 등록 성공!");
 
       } catch (error) {
-        console.error("❌ 댓글 등록 실패");
-        alert("댓글 등록 실패!");
-
+        alert("오류가 발생했습니다. 관리자에게 문의해주세요.");
       } finally {
         // 입력 필드 초기화 & 대댓글 입력창 닫기
         this.$emit("refresh");
@@ -184,9 +181,8 @@ export default {
       if (confirm("댓글을 삭제하시겠습니까?")) {
         try {
           await apiClient.post(`/api/deleteComment/${commentId}`);
-          alert("댓글이 삭제되었습니다.");
         } catch (error) {
-          alert("삭제를 실패하였습니다. 관리자에게 문의하세요.");
+          alert("오류가 발생했습니다. 관리자에게 문의해주세요.");
         }
       }
       this.$emit("refresh");
@@ -215,8 +211,6 @@ export default {
 
       try {
         await apiClient.post("api/updateComment", commentData);
-        alert("댓글을 수정하였습니다.");
-
       } catch (error) {
         alert("오류가 발생하였습니다. 관리자에게 문의해주세요.");
 

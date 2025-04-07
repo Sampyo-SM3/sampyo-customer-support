@@ -345,7 +345,6 @@ export default {
       try {
         // API 요청: 댓글 DB에 저장
         await apiClient.post("/api/insertComment", commentData);
-        alert("댓글이 저장되었습니다.");
 
         // 입력 필드 초기화
         this.newComment.content = "";
