@@ -176,10 +176,11 @@
             <div class="td-cell">{{ item.seq }}</div>
             <div class="td-cell">{{ formatDate(item.requestDate) }}</div>
             <div class="td-cell title-cell">
-              <router-link
-                :to="{ name: item.saveFlag === 'Y' ? 'CA_PostDetailSrForm' : 'CA_PostDetailForm', params: { receivedSeq: item.seq } }"
-                class="title-link">{{
-                  item.sub }}</router-link>
+              <router-link :to="{
+                name: (item.saveFlag === 'Y' && item.processState === 'S')
+                  ? 'CA_PostDetailSrForm' : 'CA_PostDetailForm', params: { receivedSeq: item.seq }
+              }"
+                class="title-link">{{ item.sub }}</router-link>
             </div>
             <div class="td-cell">{{ item.division }}</div>
             <div class="td-cell" :class="getStatusClass(item.processState)">{{ item.status }}</div>
@@ -655,8 +656,6 @@ export default {
 
     // 상태에 따른 클래스 반환
     getStatusClass(status) {
-      console.log(status);
-
       switch (status) {
         case 'P':
           return 'text-error';

@@ -3,7 +3,7 @@
     <v-row>
       <v-col>
         <div class="d-flex align-center">
-          <div class="title-div">SR 요청서 수정</div>
+          <div class="title-div">SR 요청서 작성</div>
         </div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
@@ -14,7 +14,7 @@
     <br>
     <v-row no-gutters class="search-row top-row">
       <v-col class="search-col input-width">
-        <div class="label-box colNm">제목</div>
+        <div class="label-box colNm"><span class="required-star">*</span> 제목</div>
         <v-text-field v-model="inquiry.sub" variant="outlined" density="compact" hide-details
           class="input-area title-field" />
       </v-col>
@@ -22,7 +22,7 @@
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col input-width">
-        <div class="label-box colNm">업무명</div>
+        <div class="label-box colNm"><span class="required-star">*</span>업무명</div>
         <v-text-field v-model="inquiry.taskName" variant="outlined" density="compact" hide-details
           class="input-area"></v-text-field>
       </v-col>
@@ -30,7 +30,7 @@
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col input-width">
-        <div class="label-box colNm">협조</div>
+        <div class="label-box colNm"><span class="required-star">*</span>협조</div>
         <v-text-field v-model="inquiry.help" variant="outlined" density="compact" hide-details
           class="input-area"></v-text-field>
       </v-col>
@@ -38,7 +38,7 @@
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col input-width">
-        <div class="label-box colNm">개발(변경) 필요성</div>
+        <div class="label-box colNm"><span class="required-star">*</span>개발(변경) 필요성</div>
         <v-text-field v-model="inquiry.necessity" variant="outlined" density="compact" hide-details
           class="input-area"></v-text-field>
       </v-col>
@@ -46,7 +46,7 @@
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col input-width">
-        <div class="label-box colNm">기대효과</div>
+        <div class="label-box colNm"><span class="required-star">*</span>기대효과</div>
         <v-text-field v-model="inquiry.effect" variant="outlined" density="compact" hide-details
           class="input-area"></v-text-field>
       </v-col>
@@ -54,7 +54,7 @@
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col input-width">
-        <div class="label-box colNm">개발(변경) 모듈</div>
+        <div class="label-box colNm"><span class="required-star">*</span>개발(변경) 모듈</div>
         <v-text-field v-model="inquiry.module" variant="outlined" density="compact" hide-details
           class="input-area"></v-text-field>
       </v-col>
@@ -62,7 +62,7 @@
 
     <v-row no-gutters class="search-row middle-row" style="height:200px;">
       <v-col class="search-col request-period" style="border-right: 1px solid #e0e0e0;">
-        <div class="label-box colNm">개발(변경)<br />업무내용</div>
+        <div class="label-box colNm"><span class="required-star">*</span>개발(변경)<br />업무내용</div>
       </v-col>
 
       <v-col style="border-right: 1px solid #e0e0e0;">
@@ -85,7 +85,7 @@
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col input-width-half">
-        <div class="label-box colNm">사용부서</div>
+        <div class="label-box colNm"><span class="required-star">*</span>사용부서</div>
         <v-text-field v-model="inquiry.useDept" variant="outlined" density="compact" hide-details class="input-area"
           style="width: 100%;"></v-text-field>
       </v-col>
@@ -99,7 +99,7 @@
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col input-width-half">
-        <div class="label-box colNm">의뢰일자</div>
+        <div class="label-box colNm"><span class="required-star">*</span>의뢰일자</div>
         <v-menu v-model="requestDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
           min-width="auto">
           <template v-slot:activator="{ props }">
@@ -140,7 +140,7 @@
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col input-width-half">
-        <div class="label-box colNm">완료요청일자</div>
+        <div class="label-box colNm"><span class="required-star">*</span>완료요청일자</div>
         <v-menu v-model="completeRequestDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
           min-width="auto">
           <template v-slot:activator="{ props }">
@@ -239,7 +239,7 @@
         </v-btn>
         <v-btn variant="flat" color="primary" class="custom-btn mx-2" size="large" @click="submitRequest">
           <v-icon size="default" class="mr-1">mdi-check</v-icon>
-          수정
+          저장
         </v-btn>
       </v-col>
     </v-row>
@@ -387,6 +387,50 @@ export default {
     },
     async submitRequest() {
       if (confirm("저장하시겠습니까?")) {
+
+        if (!this.inquiry.sub || this.inquiry.sub.trim() === '') {
+          alert("제목은 필수 항목입니다.");
+          return;
+        }
+        if (!this.inquiry.taskName || this.inquiry.taskName.trim() === '') {
+          alert("업무명은 필수 항목입니다.");
+          return;
+        }
+        if (!this.inquiry.help || this.inquiry.help.trim() === '') {
+          alert("협조는 필수 항목입니다.");
+          return;
+        }
+        if (!this.inquiry.necessity || this.inquiry.necessity.trim() === '') {
+          alert("개발(변경) 필요성은 필수 항목입니다.");
+          return;
+        }
+        if (!this.inquiry.effect || this.inquiry.effect.trim() === '') {
+          alert("기대효과는 필수 항목입니다.");
+          return;
+        }
+        if (!this.inquiry.module || this.inquiry.module.trim() === '') {
+          alert("개발(변경) 모듈은 필수 항목입니다.");
+          return;
+        }
+        if (!this.inquiry.beforeTaskContent || this.inquiry.beforeTaskContent.trim() === '' || !this.inquiry.afterTaskContent || this.inquiry.afterTaskContent.trim() === '') {
+          alert("개발(변경) 업무내용은 필수 항목입니다.");
+          return;
+        }
+        if (!this.inquiry.useDept || this.inquiry.useDept.trim() === '') {
+          alert("사용부서는 필수 항목입니다.");
+          return;
+        }
+        if (!this.inquiry.requestDate) {
+          alert("의뢰일자는 필수 항목입니다.");
+          return;
+        }
+        if (!this.inquiry.completeRequestDate) {
+          alert("완료요청일자는 필수 항목입니다.");
+          return;
+        }
+
+
+
         try {
           const param = {
             seq: this.receivedSeq,
@@ -1050,5 +1094,11 @@ export default {
 .file-size {
   color: #757575;
   font-size: 0.85rem;
+}
+
+.required-star {
+  color: #FF0000;
+  margin-right: 2px;
+  font-weight: bold;
 }
 </style>

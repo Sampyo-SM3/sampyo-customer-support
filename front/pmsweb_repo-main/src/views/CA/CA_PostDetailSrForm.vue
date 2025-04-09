@@ -49,8 +49,8 @@
         저장
       </v-btn>
 
-      <v-btn variant="flat" color="green darken-2" class="save-status-btn ml-auto mr-2" size="small"
-        @click="moveEidtSr">
+      <v-btn v-if="inquiry.srFlag === 'N'" variant="flat" color="green darken-2" class="save-status-btn ml-auto mr-2"
+        size="small" @click="moveEidtSr">
         수정
       </v-btn>
       <v-btn v-if="inquiry.srFlag === 'N'" variant="flat" color="#F7A000" class="save-status-btn mr-2 white-text"
@@ -87,6 +87,7 @@
         <div class="author-value">{{ inquiry.necessity }}</div>
       </v-col>
     </v-row>
+
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col request-period">
         <div class="label-box colNm">기대효과</div>
@@ -496,6 +497,12 @@ export default {
       }
     },
     approvalBtn() {
+
+
+      if (!confirm('상신 후에는 수정을 할 수 없습니다.')) {
+        return;
+      }
+
       try {
         // 폼 타입 결정        
         const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
@@ -905,6 +912,7 @@ export default {
   border: 1px solid #d0dff1;
   border-radius: 6px;
   cursor: pointer;
+  user-select: none;
 }
 
 .commentBtn {

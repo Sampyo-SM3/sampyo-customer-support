@@ -51,13 +51,15 @@
         저장
       </v-btn>
 
-      <v-btn variant="flat" color="green darken-2" class="save-status-btn ml-auto mr-2" size="small" @click="moveEdit">
+      <v-btn v-if="this.inquiry.processState != 'C'" variant="flat" color="green darken-2"
+        class="save-status-btn ml-auto mr-2" size="small" @click="moveEdit">
         수정
       </v-btn>
-      <v-btn variant="flat" color="#F7A000" class="save-status-btn mr-2 white-text" size="small" @click="$router.push({
-        name: 'CA_PostEditSrForm',
-        params: { receivedSeq: this.receivedSeq }
-      })">
+      <v-btn v-if="this.inquiry.processState === 'S'" variant="flat" color="#F7A000"
+        class="save-status-btn mr-2 white-text" size="small" @click="$router.push({
+          name: 'CA_PostEditSrForm',
+          params: { receivedSeq: this.receivedSeq }
+        })">
         SR요청서
       </v-btn>
 
@@ -698,6 +700,7 @@ export default {
   border-radius: 6px;
   background-color: rgba(231, 239, 248, 0.6);
   cursor: pointer;
+  user-select: none;
 }
 
 .commentBtn {

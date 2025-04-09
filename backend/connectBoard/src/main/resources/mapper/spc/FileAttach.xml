@@ -4,24 +4,26 @@
 
 <mapper namespace="com.example.connectBoard.repository.spc.FileAttachRepository">
 
-
 	<insert id="insertFileAttach" parameterType="com.example.connectBoard.dto.FileAttachDTO">
-       INSERT INTO file_attachment (
-           boardSeq,
-           fileName,
-           fileSize,
-           fileType,
-           insertDt,
-           updateDt
-       ) VALUES (
-           #{boardSeq},
-           #{fileName},
-           #{fileSize},
-           #{fileType},
-           GETDATE(),
-           GETDATE()
-       )  
-   </insert>
+	INSERT INTO file_attachment (
+		boardSeq,
+		fileName,
+		fileSize,
+		fileType,
+		filePath,
+		insertDt,
+		updateDt
+	) VALUES (
+		#{boardSeq},
+		#{fileName},
+		#{fileSize},
+		#{fileType},
+		'\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spc_file\\WEB\\' + #{fileName},
+		GETDATE(),
+		GETDATE()
+	)
+	</insert>
+
    
    	<delete id="deleteFileAttach" parameterType="com.example.connectBoard.dto.FileAttachDTO">
     	DELETE FROM file_attachment
