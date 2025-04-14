@@ -1,6 +1,6 @@
 <template>
     <v-dialog v-model="dialogVisible" width="900px" persistent>
-        <v-card>
+        <v-card style="background-color: white;">
             <v-card-title class="primary-bg white--text d-flex justify-space-between align-center">
                 <span class="title-custom">담당자 검색</span>
                 <v-icon @click="closeDialog" color="#155A9E">mdi-close</v-icon>
@@ -21,8 +21,6 @@
                             <v-checkbox :model-value="selectedUsers.includes(item.usrId)" hide-details density="compact"
                                 @click.stop @change="toggleSelection(item)" />
                         </template>
-
-                        <!-- 다른 셀 템플릿은 제거합니다 -->
 
                         <template #no-data>
                             <div class="d-flex justify-center align-center pa-4 text-subtitle-1" style="color:#155A9E">
@@ -110,10 +108,6 @@ export default {
             this.searchText = '';
         },
         async fetchData() {
-            if (!this.searchText) {
-                alert('이름을 검색해주세요.');
-                return;
-            }
 
             try {
                 // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
@@ -166,7 +160,10 @@ export default {
     },
     created() {
         this.dialogVisible = this.show;
-    }
+    },
+    mounted() {
+        this.fetchData();
+    },
 }
 </script>
 

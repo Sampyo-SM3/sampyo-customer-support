@@ -322,6 +322,7 @@ export default {
         console.error("상태 저장 실패");
         this.getDetailInquiry();
       }
+
     },
     async addComment() {
 

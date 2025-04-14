@@ -15,6 +15,7 @@
          	   HAND_TEL_NO as handTelNo
     	FROM [UNIERP80].SPG.DBO.CRM_USER_MASTER
     	WHERE NAME LIKE CONCAT('%', #{name}, '%')
+    	  AND DEPT_CD = 'SPH220007'		<!-- SM3팀만 보여줌 -->
     </select>
 
 </mapper>

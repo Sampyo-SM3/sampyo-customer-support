@@ -57,6 +57,10 @@
         size="small" @click="approvalBtn">
         상신
       </v-btn>
+      <v-btn v-if="inquiry.srFlag === 'Y'" variant="flat" color="#F7A000"
+        class="save-status-btn ml-auto mr-2 white-text" size="small" @click="showSrBtn">
+        SR요청서 보기
+      </v-btn>
     </div>
 
 
@@ -265,8 +269,8 @@ export default {
         manager: "",
         division: "",
         processState: "",
-        srFlag: ""
-
+        srFlag: "",
+        docNum: ""
       },
       management: {
         PROGRESS: ""
@@ -355,6 +359,7 @@ export default {
           division: response.data?.division || "",
           processState: response.data?.processState || "",
           srFlag: response.data?.srFlag || "",
+          docNum: response.data?.docNum || "",
           management: {
             PROGRESS: processState
           }
@@ -497,8 +502,6 @@ export default {
       }
     },
     approvalBtn() {
-
-
       if (!confirm('상신 후에는 수정을 할 수 없습니다.')) {
         return;
       }
@@ -527,6 +530,27 @@ export default {
         console.error('상신 처리 중 오류 발생:', error)
       }
     },
+    showSrBtn() {
+      try {
+        // 폼 타입 결정        
+        const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/Form.aspx'
+        const params = {
+          mode: '',  // board seq번호
+          piid: this.inquiry.docNum
+        };
+
+        console.log(this.inquiry.docNum);
+
+        // 쿼리 파라미터 문자열 생성
+        const queryString = new URLSearchParams(params).toString()
+        const fullUrl = `${baseUrl}?${queryString}`
+
+        // 새 창에서 URL 열기
+        window.open(fullUrl, '_blank')
+      } catch (error) {
+        console.error('상신 처리 중 오류 발생:', error)
+      }
+    }
   },
   computed: {
     topLevelComments() {

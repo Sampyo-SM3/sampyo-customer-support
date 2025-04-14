@@ -22,7 +22,7 @@
 		    b.requestDate,
 		    b.completeDate,
 		    b.srFlag,
-		    b.saveFlag	    	   	
+		    b.saveFlag	   	
 		FROM board b inner join code_master c
 		 on b.processState = c.codeId					
 	<where>
@@ -117,6 +117,7 @@
 			processState,
 			saveFlag,
 			srFlag,
+			docNum,
 			insertDt,
 			updateDt,
 			completeDt
@@ -156,6 +157,7 @@
 			processState,
 			saveFlag,
 			srFlag,
+			docNum,
 			insertDt,
 			updateDt,
 			completeDt
