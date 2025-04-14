@@ -539,8 +539,6 @@ export default {
           piid: this.inquiry.docNum
         };
 
-        console.log(this.inquiry.docNum);
-
         // 쿼리 파라미터 문자열 생성
         const queryString = new URLSearchParams(params).toString()
         const fullUrl = `${baseUrl}?${queryString}`
