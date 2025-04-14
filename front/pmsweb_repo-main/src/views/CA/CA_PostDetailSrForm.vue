@@ -524,8 +524,23 @@ export default {
         const queryString = new URLSearchParams(params).toString()
         const fullUrl = `${baseUrl}?${queryString}`
 
+        const popupWidth = 800;
+        const popupHeight = 900;
+
+        // 현재 브라우저 창 기준 (멀티모니터에서도 정확히 뜸)
+        const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+        const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
+
+        const windowWidth = window.innerWidth || document.documentElement.clientWidth || screen.width;
+        const windowHeight = window.innerHeight || document.documentElement.clientHeight || screen.height;
+
+        const left = dualScreenLeft + (windowWidth - popupWidth) / 2;
+        const top = dualScreenTop + (windowHeight - popupHeight) / 2;
+
+        const options = `width=${popupWidth},height=${popupHeight},top=${top},left=${left},location=no`;
+
         // 새 창에서 URL 열기
-        window.open(fullUrl, '_blank')
+        window.open(fullUrl, '_blank', options)
       } catch (error) {
         console.error('상신 처리 중 오류 발생:', error)
       }
@@ -539,12 +554,26 @@ export default {
           piid: this.inquiry.docNum
         };
 
-        // 쿼리 파라미터 문자열 생성
         const queryString = new URLSearchParams(params).toString()
         const fullUrl = `${baseUrl}?${queryString}`
 
+        const popupWidth = 800;
+        const popupHeight = 900;
+
+        // 현재 브라우저 창 기준 (멀티모니터에서도 정확히 뜸)
+        const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+        const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
+
+        const windowWidth = window.innerWidth || document.documentElement.clientWidth || screen.width;
+        const windowHeight = window.innerHeight || document.documentElement.clientHeight || screen.height;
+
+        const left = dualScreenLeft + (windowWidth - popupWidth) / 2;
+        const top = dualScreenTop + (windowHeight - popupHeight) / 2;
+
+        const options = `width=${popupWidth},height=${popupHeight},top=${top},left=${left},location=no`;
+
         // 새 창에서 URL 열기
-        window.open(fullUrl, '_blank')
+        window.open(fullUrl, '_blank', options)
       } catch (error) {
         console.error('상신 처리 중 오류 발생:', error)
       }
