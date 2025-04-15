@@ -216,8 +216,12 @@ export default {
   mounted() {
     this.checkLocalStorage();
     this.getUserInfo();
-    this.getStatus();
-    this.getDetailInquiry();
+
+    //접수상태 리스트 가져오기
+    this.getStatus().then(() => {
+      this.getDetailInquiry();  // 상세 데이터 호출
+    });
+
     this.fetchComments();
   },
   created() {
@@ -231,13 +235,18 @@ export default {
       });
 
       const processState = response.data?.processState || "P"; // 기본값 설정
+      this.selectedStatus = processState;
+      this.step = this.statusMapping?.[this.selectedStatus] ?? 1;
 
-      // 상태 매핑 체크 후 기본값 설정
-      this.step = this.statusMapping?.[processState] ?? 1;
-
-      // 선택된 상태 반영
-      const matchedStatus = this.progressStatuses.find(status => status.value === processState);
-      this.selectedStatus = matchedStatus ? matchedStatus.value : "P";
+      // 3. 나머지 데이터 매핑
+      this.inquiry = {
+        sub: response.data?.sub || "",
+        etc: response.data?.etc || "",
+        uid: response.data?.uid || "",
+        manager: response.data?.manager || "",
+        srFlag: response.data?.srFlag || "",
+        processState: processState,
+      };
 
       this.inquiry = {
         sub: response.data?.sub || "",

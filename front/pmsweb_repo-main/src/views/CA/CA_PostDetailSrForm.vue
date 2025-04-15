@@ -478,6 +478,8 @@ export default {
         name: 'CA_PostEditSrForm',
         params: { receivedSeq: this.receivedSeq }
       })
+
+      this.fetchRequireDetail();
     },
     async downloadFile(file) {
       try {
@@ -594,11 +596,11 @@ export default {
     this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
   },
   mounted() {
-    //미처리 리스트 가져오기
-    this.getStatus();
 
-    // 요구사항 정의서 데이터 가져오기
-    this.fetchRequireDetail(); // API 호출
+    //접수상태 리스트 가져오기
+    this.getStatus().then(() => {
+      this.fetchRequireDetail();  // 상세 데이터 호출
+    });
 
     // 댓글 데이터 가져오기
     this.fetchComments();
