@@ -3,7 +3,7 @@
 
     <v-row>
       <v-col>
-        <div class="title-div">SR요청</div>
+        <div class="title-div">작업요청</div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
