@@ -551,9 +551,11 @@ export default {
       try {
         // 폼 타입 결정        
         const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/Form.aspx'
+
         const params = {
           mode: '',  // board seq번호
-          piid: this.inquiry.docNum
+          piid: this.inquiry.docNum,
+          usid: '&usid=srbyeon@sampyo.co.kr'
         };
 
         const queryString = new URLSearchParams(params).toString()
@@ -577,7 +579,7 @@ export default {
         // 새 창에서 URL 열기
         window.open(fullUrl, '_blank', options)
       } catch (error) {
-        console.error('상신 처리 중 오류 발생:', error)
+        console.error('오류 발생:', error)
       }
     }
   },
