@@ -3,7 +3,7 @@
 
     <v-row>
       <v-col>
-        <div class="title-div">SR요청</div>
+        <div class="title-div">작업요청</div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
@@ -904,7 +904,7 @@ export default {
 
 .table-row {
   border-bottom: 1px solid #e0e0e0;
-  height: 50px;
+  height: 54px;  
   color: #5B5D60;
 }
 
