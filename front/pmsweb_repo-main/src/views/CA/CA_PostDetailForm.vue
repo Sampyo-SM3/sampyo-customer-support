@@ -160,6 +160,7 @@
 <script>
 import apiClient from '@/api';
 import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포넌트 import
+import { useKakao } from '@/store/kakao';
 
 export default {
   props: {
@@ -168,6 +169,15 @@ export default {
       required: false
     },
   },
+  setup() {
+    // 스토어 초기화
+    const kakaoStore = useKakao();
+    
+    // 이 컴포넌트의 다른 메서드에서 사용할 수 있도록 반환
+    return {
+      kakaoStore
+    }
+  },  
   components: {
     CommentTree
   },
@@ -322,6 +332,9 @@ export default {
         // API 요청: 댓글 DB에 저장
         await apiClient.post("/api/updateStatus", statusData);
         alert("접수상태가 저장되었습니다.");
+
+        // 상태변경
+        kakaoStore.sendAlimtalk();
 
         // 상세정보 새로고침
         this.getDetailInquiry();

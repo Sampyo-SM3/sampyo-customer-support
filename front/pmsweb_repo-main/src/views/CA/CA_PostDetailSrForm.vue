@@ -449,7 +449,7 @@ export default {
       this.newComment.newComment = '';
     },
     // 추가된 메서드
-    async saveStatus() {
+    async saveStatus() {              
       try {
         const statusData = {
           seq: this.receivedSeq,
@@ -459,10 +459,12 @@ export default {
         // API 요청: 댓글 DB에 저장
         await apiClient.post("/api/updateStatus", statusData);
         alert("접수상태가 저장되었습니다.");
-
+        
+        // 상태변경 알림톡 전송
+        await this.sendAlimtalk();
+        
         // 상세정보 새로고침
-        this.fetchRequireDetail();
-
+        this.fetchRequireDetail();        
       } catch (error) {
         console.error("상태 저장 실패");
         this.fetchRequireDetail();
