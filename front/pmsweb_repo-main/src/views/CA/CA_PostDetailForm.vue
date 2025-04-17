@@ -98,7 +98,7 @@
 
     <!-- 첨부파일 -->
     <v-row no-gutters class="search-row bottom-row">
-      <v-col class="select-files file-attach d-flex align-center">
+      <v-col class="search-col d-flex align-center">
         <div class="label-box">첨부파일</div>
 
         <div v-if="fetchedFiles.length > 0" class="ml-2 mt-2 mb-2" style="flex: 1;">

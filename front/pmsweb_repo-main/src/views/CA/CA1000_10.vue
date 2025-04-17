@@ -904,7 +904,7 @@ export default {
 
 .table-row {
   border-bottom: 1px solid #e0e0e0;
-  height: 50px;
+  height: 54px;  
   color: #5B5D60;
 }
 

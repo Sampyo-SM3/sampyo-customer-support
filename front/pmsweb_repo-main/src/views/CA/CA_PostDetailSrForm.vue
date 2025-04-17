@@ -107,7 +107,7 @@
     </v-row>
 
     <v-row no-gutters class="search-row middle-row" style="height:200px;">
-      <v-col class="search-col request-period" style="border-right: 1px solid #e0e0e0;">
+      <v-col class="search-col request-period">
         <div class="label-box colNm">개발(변경)<br />업무내용</div>
       </v-col>
 
@@ -176,7 +176,7 @@
 
     <!-- 첨부파일 -->
     <v-row no-gutters class="search-row bottom-row">
-      <v-col class="select-files file-attach d-flex align-center">
+      <v-col class="search-col select-files file-attach d-flex align-center">
         <div class="label-box colNm">첨부파일</div>
 
         <div v-if="fetchedFiles.length > 0" class="ml-2 mt-2 mb-2" style="flex: 1;">

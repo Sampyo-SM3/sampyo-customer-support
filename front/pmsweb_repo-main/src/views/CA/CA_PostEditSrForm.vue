@@ -14,8 +14,14 @@
     <br>
     <v-row no-gutters class="search-row top-row">
       <v-col class="search-col input-width">
-        <div class="label-box colNm"><span class="required-star">*</span> 제목</div>
-        <v-text-field v-model="inquiry.sub" variant="outlined" density="compact" hide-details
+        <div class="label-box colNm">
+          <span class="required-star">*</span> 제목
+        </div>
+        <v-text-field 
+          v-model="inquiry.sub" 
+          variant="outlined" 
+          density="compact" 
+          hide-details
           class="input-area title-field" />
       </v-col>
     </v-row>
@@ -61,7 +67,7 @@
     </v-row>
 
     <v-row no-gutters class="search-row middle-row" style="height:200px;">
-      <v-col class="search-col request-period" style="border-right: 1px solid #e0e0e0;">
+      <v-col class="search-col request-period" >
         <div class="label-box colNm"><span class="required-star">*</span>개발(변경)<br />업무내용</div>
       </v-col>
 
@@ -85,9 +91,17 @@
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col input-width-half">
-        <div class="label-box colNm"><span class="required-star">*</span>사용부서</div>
-        <v-text-field v-model="inquiry.useDept" variant="outlined" density="compact" hide-details class="input-area"
-          style="width: 100%;"></v-text-field>
+        <div class="label-box colNm">
+          <span class="required-star">*</span>사용부서
+        </div>
+        <v-text-field 
+          v-model="inquiry.useDept" 
+          variant="outlined" 
+          density="compact" 
+          hide-details 
+          class="input-area"
+          style="width: 100%;">
+        </v-text-field>
       </v-col>
 
       <v-col class="search-col input-width-half">
@@ -845,6 +859,12 @@ export default {
   width: 100%;
 }
 
+.request-period,
+.product-category {
+  max-width: 550px;
+  flex-grow: 0;
+}
+
 .author-value {
   font-size: 14px;
   padding-left: 15px;
@@ -875,7 +895,7 @@ export default {
 .search-row {
   display: flex;
   align-items: stretch;
-  min-height: 40px;
+  min-height: 50px;
   border-top: 1px solid #e0e0e0;
   border-bottom: 0;
   border-left: 1px solid #e0e0e0;
@@ -916,16 +936,12 @@ export default {
 
 .search-col {
   display: flex;
-  align-items: center;
+  /* align-items: center; */
   padding: 0;
   border-left: 1px solid #e0e0e0;
 }
 
-.request-period,
-.product-category {
-  max-width: 550px;
-  flex-grow: 0;
-}
+
 
 .label-box {
   width: 80px;
@@ -941,7 +957,7 @@ export default {
   white-space: nowrap;
   padding: 0 4px;
   border-right: 1px solid #eaeaea;
-  margin-bottom: 5px;
+  /* margin-bottom: 5px; */
   color: #333333 !important;
   background-color: #e6eef8 !important;
 }
@@ -999,10 +1015,13 @@ export default {
 
 .input-width {
   max-width: 1600px;
+  
+  align-items: center;
 }
 
 .input-width-half {
   max-width: 797px;
+  align-items: center;  
 }
 
 .input-area-L {
@@ -1041,12 +1060,13 @@ export default {
 ::v-deep(.input-area .v-field) {
   margin-left: 5px;
   margin-right: 5px;
-  height: 33px !important;
+  height: 40px !important;
   font-size: 15px !important;
 }
 
+
 ::v-deep(.input-area input) {
-  padding: 0 10px !important;
+  padding: 0 10px !important;    
   font-size: 13px !important;
 }
 
