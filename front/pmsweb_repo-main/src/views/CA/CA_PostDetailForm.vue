@@ -160,7 +160,7 @@
 <script>
 import apiClient from '@/api';
 import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포넌트 import
-import { useKakao } from '@/store/kakao';
+import { useKakaoStore } from '@/store/kakao';
 
 export default {
   props: {
@@ -171,7 +171,7 @@ export default {
   },
   setup() {
     // 스토어 초기화
-    const kakaoStore = useKakao();
+    const kakaoStore = useKakaoStore();
     
     // 이 컴포넌트의 다른 메서드에서 사용할 수 있도록 반환
     return {
@@ -189,13 +189,16 @@ export default {
       fetchedFiles: [],
       showError: false,
       selectedStatus: '',
+      oldStatus: '',
       inquiry: {
         sub: "",
         context: "",
         uId: "",
         manager: "",
         srFlag: ""
-      },
+      },    
+      previousStatus: '', // 이전 상태를 저장할 변수
+      statusChanged: false, // 상태가 변경되었는지 추적      
       progressStatuses: [],
       comments: [],
       newComment: {
@@ -213,7 +216,27 @@ export default {
     },
     commentTextLength() {
       return Array.isArray(this.comments) ? this.comments.length : 0;
-    }
+    },
+
+    // 코드값으로 상태명을 반환하는 함수
+    getStatusName() {
+      return (statusCode) => {
+        if (!statusCode || !this.progressStatuses.length) return '';
+        
+        const foundStatus = this.progressStatuses.find(status => status.value === statusCode);
+        return foundStatus ? foundStatus.text : '';
+      };
+    },
+    
+    // 현재 선택된 상태명
+    currentStatusName() {
+      return this.getStatusName(this.selectedStatus);
+    },
+    
+    // 이전 상태명
+    previousStatusName() {
+      return this.getStatusName(this.oldStatus);
+    }    
   },
   watch: {
     receivedSeq: {
@@ -221,6 +244,7 @@ export default {
     },
     selectedStatus(newVal, oldVal) {
       console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
+      this.oldStatus = oldVal;
     }
   },
   mounted() {
@@ -233,6 +257,8 @@ export default {
     });
 
     this.fetchComments();
+
+
   },
   created() {
     // localStorage에서 사용자 정보 불러오기
@@ -324,6 +350,16 @@ export default {
     },
     async saveStatus() {
       try {
+        const prevStatusName = this.getStatusName(this.oldStatus);
+
+        // 이전 상태값이 false, null, undefined, 빈 문자열인 경우 알림톡 발송 중단
+        if (!prevStatusName) {
+          console.log('이전 상태값이 없어 알림톡 발송을 중단합니다.');
+          alert("접수상태가 변경되지 않았습니다.");
+          return;
+        }
+        
+        
         const statusData = {
           seq: this.receivedSeq,
           processState: this.selectedStatus
@@ -334,7 +370,7 @@ export default {
         alert("접수상태가 저장되었습니다.");
 
         // 상태변경
-        kakaoStore.sendAlimtalk();
+        this.kakaoStore.sendAlimtalk(this.receivedSeq, this.getStatusName(this.oldStatus), this.getStatusName(this.selectedStatus));
 
         // 상세정보 새로고침
         this.getDetailInquiry();
@@ -397,11 +433,13 @@ export default {
       }
       try {
         const response = await apiClient.get(`/api/comments/${this.receivedSeq}`);
-        this.comments = response.data;
+        this.comments = response.data;       
       } catch (error) {
         console.error('댓글 조회 실패:', error);
         this.comments = []; // ✅ 오류 발생 시 빈 배열 설정
       }
+
+
     },
     handleReply(comment) {
       this.replyTo = comment;

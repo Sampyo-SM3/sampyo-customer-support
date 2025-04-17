@@ -28,7 +28,7 @@
 		   ENT_DT
 		) VALUES (
 		   Getdate(),
-		   'ERR000001',       
+		   'STUS000001',       
 		   #{kakao.content},                         
 		   '01051042142',
 		   '1',

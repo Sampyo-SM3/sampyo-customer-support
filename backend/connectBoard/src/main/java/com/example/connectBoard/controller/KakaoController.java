@@ -1,6 +1,5 @@
 package com.example.connectBoard.controller;
 
-import com.example.connectBoard.dto.CommentDTO;
 import com.example.connectBoard.dto.KakaoDTO;
 import com.example.connectBoard.service.KakaoService;
 
@@ -28,7 +27,7 @@ public class KakaoController {
     public ResponseEntity<?> insertKakao(@RequestBody KakaoDTO kakao) {
     	System.out.println("-- insertKakao --");
         try {
-            kakaoService.insertKakao(kakao);
+//            kakaoService.insertKakao(kakao);
             return ResponseEntity.ok("카카오톡 전송 성공!");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("카카오 전송 실패: " + e.getMessage());

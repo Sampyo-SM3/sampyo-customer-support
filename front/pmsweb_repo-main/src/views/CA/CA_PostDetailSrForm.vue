@@ -225,6 +225,7 @@
 <script>
 import apiClient from '@/api';
 import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포넌트 import
+import { useKakaoStore } from '@/store/kakao';
 
 export default {
   // props 정의 추가
@@ -235,6 +236,15 @@ export default {
     },
     userId: JSON.parse(localStorage.getItem("userInfo"))?.id || null
   },
+  setup() {
+    // 스토어 초기화
+    const kakaoStore = useKakaoStore();
+    
+    // 이 컴포넌트의 다른 메서드에서 사용할 수 있도록 반환
+    return {
+      kakaoStore
+    }
+  },    
   components: {
     CommentTree
   },
@@ -244,6 +254,7 @@ export default {
 
       step: 1,
       selectedStatus: '', // 추가된 상태 변수
+      oldStatus: '', // 추가된 상태 변수
       inquiry: {
         sub: "",
         context: "",
@@ -451,6 +462,15 @@ export default {
     // 추가된 메서드
     async saveStatus() {              
       try {
+        const prevStatusName = this.getStatusName(this.oldStatus);
+
+        // 이전 상태값이 false, null, undefined, 빈 문자열인 경우 알림톡 발송 중단
+        if (!prevStatusName) {
+          console.log('이전 상태값이 없어 알림톡 발송을 중단합니다.');
+          alert("접수상태가 변경되지 않았습니다.");
+          return;
+        }
+        
         const statusData = {
           seq: this.receivedSeq,
           processState: this.selectedStatus
@@ -458,13 +478,15 @@ export default {
 
         // API 요청: 댓글 DB에 저장
         await apiClient.post("/api/updateStatus", statusData);
-        alert("접수상태가 저장되었습니다.");
         
-        // 상태변경 알림톡 전송
-        await this.sendAlimtalk();
+        
+        // 상태변경
+        this.kakaoStore.sendAlimtalk(this.receivedSeq, prevStatusName, this.getStatusName(this.selectedStatus));
         
         // 상세정보 새로고침
-        this.fetchRequireDetail();        
+        this.fetchRequireDetail(); 
+        
+        alert("접수상태가 저장되었습니다.");
       } catch (error) {
         console.error("상태 저장 실패");
         this.fetchRequireDetail();
@@ -591,7 +613,26 @@ export default {
     },
     commentTextLength() {
       return Array.isArray(this.comments) ? this.comments.length : 0;
-    }
+    },
+    // 코드값으로 상태명을 반환하는 함수
+    getStatusName() {
+      return (statusCode) => {
+        if (!statusCode || !this.progressStatuses.length) return '';
+        
+        const foundStatus = this.progressStatuses.find(status => status.value === statusCode);
+        return foundStatus ? foundStatus.text : '';
+      };
+    },
+    
+    // 현재 선택된 상태명
+    currentStatusName() {
+      return this.getStatusName(this.selectedStatus);
+    },
+    
+    // 이전 상태명
+    previousStatusName() {
+      return this.getStatusName(this.oldStatus);
+    }     
   },
   created() {
     // 초기화 시 현재 상태 설정
@@ -616,6 +657,7 @@ export default {
     },
     selectedStatus(newVal, oldVal) {
       console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
+      this.oldStatus = oldVal;
     }
   }
 };
