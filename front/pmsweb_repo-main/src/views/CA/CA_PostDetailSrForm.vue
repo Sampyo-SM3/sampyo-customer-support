@@ -598,7 +598,6 @@ export default {
     this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
   },
   mounted() {
-
     //접수상태 리스트 가져오기
     this.getStatus().then(() => {
       this.fetchRequireDetail();  // 상세 데이터 호출
