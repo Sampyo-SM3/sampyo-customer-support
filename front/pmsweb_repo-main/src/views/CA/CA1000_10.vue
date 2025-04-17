@@ -124,15 +124,15 @@
           <span class="text-subtitle-2 font-weight-bold">{{ totalItems }}</span>
           <!-- <span class="text-subtitle-2 text-grey">건</span> -->
           <span class="text-subtitle-2 text-grey"> / 미처리: </span>
-          <span class="text-subtitle-2 font-weight-bold text-red">{{ getUnprocessedCount('P') }}</span>
+          <span class="text-subtitle-2 font-weight-bold text-red"><span :class="getStatusClass('P')">{{ getUnprocessedCount('P') }}</span></span>
           <span class="text-subtitle-2 text-grey ml-2"> 진행: </span>
-          <span class="text-subtitle-2 font-weight-bold text-blue">{{ getUnprocessedCount('I') }}</span>
+          <span class="text-subtitle-2 font-weight-bold text-blue"><span :class="getStatusClass('I')">{{ getUnprocessedCount('I') }}</span></span>
           <span class="text-subtitle-2 text-grey ml-2"> 보류: </span>
-          <span class="text-subtitle-2 font-weight-bold text-blue">{{ getUnprocessedCount('H') }}</span>
+          <span class="text-subtitle-2 font-weight-bold text-blue"><span :class="getStatusClass('H')">{{ getUnprocessedCount('H') }}</span></span>
           <span class="text-subtitle-2 text-grey ml-2"> SR: </span>
-          <span class="text-subtitle-2 font-weight-bold text-blue">{{ getUnprocessedCount('S') }}</span>
+          <span class="text-subtitle-2 font-weight-bold text-blue"><span :class="getStatusClass('S')">{{ getUnprocessedCount('S') }}</span></span>
           <span class="text-subtitle-2 text-grey ml-2"> 종결: </span>
-          <span class="text-subtitle-2 font-weight-bold">{{ getUnprocessedCount('C') }}</span>
+          <span class="text-subtitle-2 font-weight-bold"><span :class="getStatusClass('C')">{{ getUnprocessedCount('C') }}</span></span>
 
         </span>
 
