@@ -30,6 +30,7 @@ export const useAuthStore = defineStore("auth", {
           phone: phoneWithoutHyphens,
           email: credentials.email,
         });
+        console.log('22)');
 
         // 로그인 성공
         if (response.data) {

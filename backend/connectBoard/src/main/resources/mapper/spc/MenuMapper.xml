@@ -12,6 +12,7 @@
         <result property="mIcon" column="mIcon"/>
         <result property="mGBN" column="mGBN"/>
     </resultMap>
+    
 
     <select id="getMenuItems" parameterType="com.example.connectBoard.dto.request.MenuItemRequestDto" 
             resultMap="menuItemResultMap">
@@ -20,8 +21,20 @@
     
     
     
+    
+    <resultMap id="menuItemDTOResultMap2" type="com.example.connectBoard.dto.MenuItemDTO">
+        <result property="mCode" column="mCode"/>
+        <result property="mName" column="mName"/>
+        <result property="mComment" column="mComment"/>
+        <result property="mLev" column="mLev"/>
+        <result property="mAuth" column="mAuth"/>
+        <result property="mIcon" column="mIcon"/>
+        <result property="mGBN" column="mGBN"/>
+    </resultMap>    
+
+    
 	<!-- 대메뉴 목록 조회 -->
-	<select id="getMainMenuCodes" resultMap="menuItemDTOResultMap">
+	<select id="getMainMenuCodes" resultMap="menuItemDTOResultMap2"> 
 	    SELECT 
 	        M_CODE AS mCode,
 	        M_NAME AS mName,
@@ -37,9 +50,10 @@
 	
 	
 	<!-- 특정 대메뉴와 하위 메뉴 조회 -->
-	<select id="getAllMenu" parameterType="string" resultMap="menuItemDTOResultMap">
+	<select id="getAllMenu" parameterType="string" resultMap="menuItemDTOResultMap2">	
 	    EXEC usp_get_menu_list #{menuCode}
 	</select>	
 
 </mapper>
+
 
