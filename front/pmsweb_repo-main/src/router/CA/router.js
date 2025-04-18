@@ -21,7 +21,7 @@ export const caRoutes = [
     props: true
   },  
   {  
-    path: 'ca1000_10', 
+    path: '/ca1000_10', 
     name: 'CA1000_10',
     component: CA1000_10,    
   },    
@@ -37,7 +37,7 @@ export const caRoutes = [
     props: true
   },  
   {  
-    path: 'CA2000_10', 
+    path: '/CA2000_10', 
     name: 'CA2000_10',
     component: CA2000_10,    
   }, 
