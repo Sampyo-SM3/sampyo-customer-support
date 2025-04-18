@@ -43,6 +43,10 @@
         저장
       </v-btn>
 
+      <v-btn variant="flat" color="#F7A000" class="save-status-btn mr-2 white-text" size="small">
+        담당자 이관
+      </v-btn>
+
       <v-btn v-if="this.inquiry.processState == 'P' && this.inquiry.writerId === this.userId" variant="flat"
         color="green darken-2" class="save-status-btn ml-auto mr-2" size="small" @click="moveEdit">
         수정
