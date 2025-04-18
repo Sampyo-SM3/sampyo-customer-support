@@ -236,18 +236,9 @@ export default {
     const kakaoStore = useKakaoStore();
     const authStore = useAuthStore();
 
-    // 이 컴포넌트의 다른 메서드에서 사용할 수 있도록 반환
-    return {
-      kakaoStore,
-      authStore
-    }
-  },
-  components: {
-    CommentTree
-  },
-  setup() {
     const extraBreadcrumb = inject('extraBreadcrumb', null);
     const listButtonLink = inject('listButtonLink', null);
+
     onMounted(() => {
       if (extraBreadcrumb) {
         extraBreadcrumb.value = 'SR 요청';  // 🔥 추가하고 싶은 값
@@ -258,7 +249,14 @@ export default {
       }
     });
 
-    return {};
+    // 이 컴포넌트의 다른 메서드에서 사용할 수 있도록 반환
+    return {
+      kakaoStore,
+      authStore
+    }
+  },
+  components: {
+    CommentTree
   },
   unmounted() { // ❗ 컴포넌트가 언마운트될 때
     const listButtonLink = inject('listButtonLink', null);
