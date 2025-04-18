@@ -18,7 +18,7 @@
           <div v-for="(status, index) in progressStatuses" :key="index" class="stepper-item"
             :class="{ active: step >= index + 1 }">
             <div class="step-circle">{{ index + 1 }}</div>
-            <span class="step-label">{{ status.text }}</span>
+            <span class="step-label">&nbsp;&nbsp;&nbsp;{{ status.text }}</span>
             <div v-if="index < progressStatuses.length - 1" class="step-line"
               :class="{ 'step-line-active': step > index + 1 }"></div>
           </div>
@@ -43,8 +43,8 @@
         저장
       </v-btn>
 
-      <v-btn v-if="this.inquiry.processState != 'C'" variant="flat" color="green darken-2"
-        class="save-status-btn ml-auto mr-2" size="small" @click="moveEdit">
+      <v-btn v-if="this.inquiry.processState == 'P' && this.inquiry.writerId === this.userId" variant="flat"
+        color="green darken-2" class="save-status-btn ml-auto mr-2" size="small" @click="moveEdit">
         수정
       </v-btn>
       <v-btn v-if="this.inquiry.processState === 'S'" variant="flat" color="#F7A000"
@@ -153,6 +153,8 @@
 import apiClient from '@/api';
 import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포넌트 import
 import { inject, onMounted } from 'vue';
+import { useKakaoStore } from '@/store/kakao';
+import { useAuthStore } from '@/store/auth';
 
 export default {
   props: {
@@ -160,6 +162,17 @@ export default {
       type: [Number, String],
       required: false
     },
+  },
+  setup() {
+    // 스토어 초기화
+    const kakaoStore = useKakaoStore();
+    const authStore = useAuthStore();
+
+    // 이 컴포넌트의 다른 메서드에서 사용할 수 있도록 반환
+    return {
+      kakaoStore,
+      authStore
+    }
   },
   components: {
     CommentTree
@@ -198,13 +211,17 @@ export default {
       fetchedFiles: [],
       showError: false,
       selectedStatus: '',
+      oldStatus: '',
       inquiry: {
         sub: "",
         context: "",
         uId: "",
+        writerId: "",
         manager: "",
         srFlag: ""
       },
+      previousStatus: '', // 이전 상태를 저장할 변수
+      statusChanged: false, // 상태가 변경되었는지 추적      
       progressStatuses: [],
       comments: [],
       newComment: {
@@ -222,6 +239,26 @@ export default {
     },
     commentTextLength() {
       return Array.isArray(this.comments) ? this.comments.length : 0;
+    },
+
+    // 코드값으로 상태명을 반환하는 함수
+    getStatusName() {
+      return (statusCode) => {
+        if (!statusCode || !this.progressStatuses.length) return '';
+
+        const foundStatus = this.progressStatuses.find(status => status.value === statusCode);
+        return foundStatus ? foundStatus.text : '';
+      };
+    },
+
+    // 현재 선택된 상태명
+    currentStatusName() {
+      return this.getStatusName(this.selectedStatus);
+    },
+
+    // 이전 상태명
+    previousStatusName() {
+      return this.getStatusName(this.oldStatus);
     }
   },
   watch: {
@@ -230,6 +267,7 @@ export default {
     },
     selectedStatus(newVal, oldVal) {
       console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
+      this.oldStatus = oldVal;
     }
   },
   mounted() {
@@ -242,6 +280,8 @@ export default {
     });
 
     this.fetchComments();
+
+
   },
   created() {
     // localStorage에서 사용자 정보 불러오기
@@ -263,6 +303,7 @@ export default {
         sub: response.data?.sub || "",
         etc: response.data?.etc || "",
         uid: response.data?.uid || "",
+        writerId: response.data?.writerId || "",
         manager: response.data?.manager || "",
         srFlag: response.data?.srFlag || "",
         processState: processState,
@@ -272,10 +313,13 @@ export default {
         sub: response.data?.sub || "",
         etc: response.data?.etc || "",
         uid: response.data?.uid || "",
+        writerId: response.data?.writerId || "",
         manager: response.data?.manager || "",
         srFlag: response.data?.srFlag || "",
         processState: response.data?.processState || "P",
       };
+
+      // response.data.writerId
 
       this.selectedStatus = this.inquiry.processState;
 
@@ -333,25 +377,49 @@ export default {
       this.$router.go(-1);
     },
     async saveStatus() {
+      //   c 종결
+      // H 보류중
+      // I 접수
+      // P 미처리
+      // S SR
       try {
+        const userInfoString = localStorage.getItem('userInfo');
+        const phone = JSON.parse(userInfoString).phone;
+
+        // {"companyCd":"CEMENT","id":"javachohj","name":"조희재","phone":null,"email":null,"admin":false,"pwd":null}
+
+        const prevStatusName = this.getStatusName(this.oldStatus);
+        // 이전 상태값이 false, null, undefined, 빈 문자열인 경우 알림톡 발송 중단
+        if (!prevStatusName) {
+          console.log('이전 상태값이 없어 알림톡 발송을 중단합니다.');
+          alert("접수상태가 변경되지 않았습니다.");
+          return;
+        }
+
+        // 이전 상태가 P(미처리)가 아니고, 선택된 상태가 P(미처리)인 경우 변경 불가
+        if (this.oldStatus !== 'P' && this.selectedStatus === 'P') {
+          alert("처리가 시작된 이후에는 미처리 상태로 돌아갈 수 없습니다.");
+          // 선택된 상태를 이전 상태로 되돌림
+          this.selectedStatus = this.oldStatus;
+          return;
+        }
+
         const statusData = {
           seq: this.receivedSeq,
           processState: this.selectedStatus
         };
-
         // API 요청: 댓글 DB에 저장
         await apiClient.post("/api/updateStatus", statusData);
         alert("접수상태가 저장되었습니다.");
-
+        // 상태변경
+        this.kakaoStore.sendAlimtalk(this.receivedSeq, this.getStatusName(this.oldStatus), this.getStatusName(this.selectedStatus), phone);
         // 상세정보 새로고침
         this.getDetailInquiry();
-
         //this.management.PROGRESS = this.selectedStatus;
       } catch (error) {
         console.error("상태 저장 실패");
         this.getDetailInquiry();
       }
-
     },
     async addComment() {
 
@@ -409,6 +477,8 @@ export default {
         console.error('댓글 조회 실패:', error);
         this.comments = []; // ✅ 오류 발생 시 빈 배열 설정
       }
+
+
     },
     handleReply(comment) {
       this.replyTo = comment;

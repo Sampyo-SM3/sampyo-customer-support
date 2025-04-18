@@ -42,12 +42,12 @@
         저장
       </v-btn>
 
-      <v-btn v-if="inquiry.srFlag === 'N'" variant="flat" color="green darken-2" class="save-status-btn ml-auto mr-2"
+      <!-- <v-btn v-if="inquiry.srFlag === 'N'" variant="flat" color="green darken-2" class="save-status-btn ml-auto mr-2"
         size="small" @click="moveEidtSr">
         수정
-      </v-btn>
-      <v-btn v-if="inquiry.srFlag === 'N'" variant="flat" color="#F7A000" class="save-status-btn mr-2 white-text"
-        size="small" @click="approvalBtn">
+      </v-btn> -->
+      <v-btn v-if="inquiry.srFlag === 'N'" variant="flat" color="#F7A000"
+        class="save-status-btn ml-auto mr-2 white-text" size="small" @click="approvalBtn">
         상신
       </v-btn>
       <v-btn v-if="inquiry.srFlag === 'Y'" variant="flat" color="#F7A000"
@@ -219,6 +219,8 @@
 import apiClient from '@/api';
 import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포넌트 import
 import { inject, onMounted } from 'vue';
+import { useKakaoStore } from '@/store/kakao';
+import { useAuthStore } from '@/store/auth';
 
 export default {
   // props 정의 추가
@@ -228,6 +230,17 @@ export default {
       required: false
     },
     userId: JSON.parse(localStorage.getItem("userInfo"))?.id || null
+  },
+  setup() {
+    // 스토어 초기화
+    const kakaoStore = useKakaoStore();
+    const authStore = useAuthStore();
+
+    // 이 컴포넌트의 다른 메서드에서 사용할 수 있도록 반환
+    return {
+      kakaoStore,
+      authStore
+    }
   },
   components: {
     CommentTree
@@ -264,6 +277,7 @@ export default {
 
       step: 1,
       selectedStatus: '', // 추가된 상태 변수
+      oldStatus: '', // 추가된 상태 변수
       inquiry: {
         sub: "",
         context: "",
@@ -397,7 +411,6 @@ export default {
         this.fetchedFiles = Array.isArray(fileList.data)
           ? fileList.data.filter(file => file && file.fileName)
           : [];
-
       } catch (error) {
         console.error("❌ 오류 발생:", error);
       }
@@ -470,22 +483,46 @@ export default {
     },
     // 추가된 메서드
     async saveStatus() {
+      //   c 종결
+      // H 보류중
+      // I 접수
+      // P 미처리
+      // S SR
       try {
+        const userInfoString = localStorage.getItem('userInfo');
+        const phone = JSON.parse(userInfoString).phone;
+
+        const prevStatusName = this.getStatusName(this.oldStatus);
+        // 이전 상태값이 false, null, undefined, 빈 문자열인 경우 알림톡 발송 중단
+        if (!prevStatusName) {
+          console.log('이전 상태값이 없어 알림톡 발송을 중단합니다.');
+          alert("접수상태가 변경되지 않았습니다.");
+          return;
+        }
+
+        // 이전 상태가 P(미처리)가 아니고, 선택된 상태가 P(미처리)인 경우 변경 불가
+        if (this.oldStatus !== 'P' && this.selectedStatus === 'P') {
+          alert("처리가 시작된 이후에는 미처리 상태로 돌아갈 수 없습니다.");
+          // 선택된 상태를 이전 상태로 되돌림
+          this.selectedStatus = this.oldStatus;
+          return;
+        }
+
         const statusData = {
           seq: this.receivedSeq,
           processState: this.selectedStatus
         };
-
         // API 요청: 댓글 DB에 저장
         await apiClient.post("/api/updateStatus", statusData);
         alert("접수상태가 저장되었습니다.");
-
+        // 상태변경
+        this.kakaoStore.sendAlimtalk(this.receivedSeq, this.getStatusName(this.oldStatus), this.getStatusName(this.selectedStatus), phone);
         // 상세정보 새로고침
-        this.fetchRequireDetail();
-
+        this.getDetailInquiry();
+        //this.management.PROGRESS = this.selectedStatus;
       } catch (error) {
         console.error("상태 저장 실패");
-        this.fetchRequireDetail();
+        this.getDetailInquiry();
       }
     },
     moveEidtSr() {
@@ -536,8 +573,6 @@ export default {
           empno: 'SPH221342320005', // 사원번호
           legacy_form: 'WF_FORM_SRTEST',
           datatype: 'xml',  // 데이터 타입          
-          // seq: '111', // 프로시저 호출되는 ip          
-          // DATE_TEST: '111',  // board seq번호
           ip: '10.50.20.71', // 프로시저 호출되는 ip          
           db: 'SPC_TEST',     // 프로시저 호출되는 db
         };
@@ -562,7 +597,18 @@ export default {
         const options = `width=${popupWidth},height=${popupHeight},top=${top},left=${left},location=no`;
 
         // 새 창에서 URL 열기
-        window.open(fullUrl, '_blank', options)
+        const popupWindow = window.open(fullUrl, '_blank', options);
+
+        // 팝업 창 닫힘 감지를 위한 타이머 설정
+        if (popupWindow) {
+          const checkPopupClosed = setInterval(() => {
+            if (popupWindow.closed) {
+              clearInterval(checkPopupClosed);
+              // 팝업이 닫히면 현재 페이지 새로고침
+              window.location.reload();
+            }
+          }, 500); // 500ms 간격으로 체크
+        }
       } catch (error) {
         console.error('상신 처리 중 오류 발생:', error)
       }
@@ -609,6 +655,25 @@ export default {
     },
     commentTextLength() {
       return Array.isArray(this.comments) ? this.comments.length : 0;
+    },
+    // 코드값으로 상태명을 반환하는 함수
+    getStatusName() {
+      return (statusCode) => {
+        if (!statusCode || !this.progressStatuses.length) return '';
+
+        const foundStatus = this.progressStatuses.find(status => status.value === statusCode);
+        return foundStatus ? foundStatus.text : '';
+      };
+    },
+
+    // 현재 선택된 상태명
+    currentStatusName() {
+      return this.getStatusName(this.selectedStatus);
+    },
+
+    // 이전 상태명
+    previousStatusName() {
+      return this.getStatusName(this.oldStatus);
     }
   },
   created() {
@@ -633,6 +698,7 @@ export default {
     },
     selectedStatus(newVal, oldVal) {
       console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
+      this.oldStatus = oldVal;
     }
   }
 };

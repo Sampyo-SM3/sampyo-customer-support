@@ -21,7 +21,7 @@ export const useAuthStore = defineStore("auth", {
         this.error = null;
 
         // 전화번호에서 하이픈(-) 제거
-        const phoneWithoutHyphens = credentials.phone ? credentials.phone.replace(/-/g, '') : credentials.phone;        
+        const phoneWithoutHyphens = credentials.phone ? credentials.phone.replace(/-/g, '') : credentials.phone;                
               
         const response = await apiClient.post('/api/login', {
           id: credentials.username,
@@ -30,11 +30,12 @@ export const useAuthStore = defineStore("auth", {
           phone: phoneWithoutHyphens,
           email: credentials.email,
         });
+        
 
         // 로그인 성공
         if (response.data) {
           this.userId = response.data.id;
-          this.userInfo = response.data;
+          this.userInfo = response.data;          
           this.isAuthenticated = true;
 
           // 사용자 정보 로컬 스토리지에 저장

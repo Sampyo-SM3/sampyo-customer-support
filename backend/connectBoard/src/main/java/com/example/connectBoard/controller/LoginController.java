@@ -25,7 +25,8 @@ public class LoginController {
            
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> loginParams) {                        // 
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginParams) {                        //
+    	System.out.println("-- login --");
         String id = loginParams.get("id");
         String password = loginParams.get("password");
         String name = loginParams.get("name");
@@ -38,8 +39,14 @@ public class LoginController {
             if (id == null || password == null || companyCd == null) {
                 return ResponseEntity.badRequest()
                     .body(Map.of("message", "아이디, 비밀번호, 회사코드는 필수 항목입니다."));
-            }            
+            }       
+            System.out.println(id);
+            System.out.println(password);
+            System.out.println(companyCd);
+            System.out.println(phone);
+            System.out.println(email);
             EmployeePreferenceDto result = loginService.login(id, password, companyCd, phone, email);
+            System.out.println("22");
             return ResponseEntity.ok(result);
         } catch (Exceptions.UserNotFoundException e) {
             // 여기서 외부에 선언된 변수들에 접근 가능

@@ -11,7 +11,9 @@
             ID as id,
             NAME as name,
             ADMIN as admin,
-            PWD as pwd
+            PWD as pwd,
+            PHONE as phone,
+            EMAIL as email 
         FROM 
             sys_empref 
         WHERE 

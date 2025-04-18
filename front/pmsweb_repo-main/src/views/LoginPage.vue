@@ -148,6 +148,7 @@ export default {
         // 블루샘 아이디 존재여부 통과
         if (Object.keys(result).length > 0) {
           console.log('-- 블루샘 아이디 존재여부 통과 --');
+          console.log(result.phone);          
           // 우리쪽 계정테이블에 데이터 없으면 insert후 로그인
           // 있으면 비밀번호 검증 후 로그인
           const success2 = await this.authStore.login({
