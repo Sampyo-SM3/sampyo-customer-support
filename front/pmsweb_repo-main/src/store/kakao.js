@@ -7,11 +7,12 @@ export const useKakaoStore = defineStore("kakao", {
     error: null,
   }),
   actions: {
-    async sendAlimtalk(boardSeq, prevStatus, currentStatus) {
+    async sendAlimtalk(boardSeq, prevStatus, currentStatus, phone) {
       console.log('-- sendAlimtalk --');
       console.log('boardSeq:', boardSeq);
       console.log('prevStatus:', prevStatus);
       console.log('currentStatus:', currentStatus);
+      console.log('phone:', phone);
     
       if (!prevStatus || prevStatus.trim() === '') {
         console.log('이전 상태값이 없어 알림톡 발송을 중단합니다.');
@@ -34,6 +35,7 @@ export const useKakaoStore = defineStore("kakao", {
 
         const Message = '[삼표시멘트 업무지원센터]\n' 
                       + '접수 상태 변경 안내\n' 
+                      + '\n'
                       + '■ 접수번호: ' + boardSeq + '\n' 
                       + '■ 이전상태: ' + prevStatus + '\n' 
                       + '■ 현재상태: ' + currentStatus + '\n' 
@@ -41,7 +43,8 @@ export const useKakaoStore = defineStore("kakao", {
         
         console.log(Message);
         const response = await apiClient.post('/api/kakao', {        
-          content: Message
+          content: Message,
+          phone: phone
         });
 
         if (response.data) {

@@ -5,7 +5,7 @@
 <mapper namespace="com.example.connectBoard.repository.kakao.KakaoRepository">
 
    
-    <insert id="insertKakao" parameterType="com.example.connectBoard.dto.KakaoDTO">
+    <insert id="insertKakao" parameterType="string">
 		 
 		        
 		INSERT INTO ATA_MMT_TRAN_SAMPYO2 (
@@ -28,9 +28,9 @@
 		   ENT_DT
 		) VALUES (
 		   Getdate(),
-		   'STUS000001',       
-		   #{kakao.content},                         
-		   '01051042142',
+		   'STUS000002',       
+		   #{content},                         
+		   #{phone},      
 		   '1',
 		   '',
 		   '01051042142',

@@ -146,6 +146,7 @@
 			completeDate,
 			etc,
 			uId,
+			writerId,
 			usem,
 			dpId,
 			dpDn,

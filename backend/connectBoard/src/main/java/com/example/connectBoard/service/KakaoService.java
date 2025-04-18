@@ -12,7 +12,7 @@ public class KakaoService {
     @Autowired
     private KakaoRepository kakaoRepository;
 
-    public void insertKakao(KakaoDTO kakao) {        
-    	kakaoRepository.insertKakao(kakao);
+    public void insertKakao(String content, String phone) {        
+    	kakaoRepository.insertKakao(content, phone);
     }    
 }

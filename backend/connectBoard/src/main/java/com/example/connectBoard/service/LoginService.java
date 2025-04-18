@@ -45,7 +45,7 @@ public class LoginService {
             
             // 비밀번호 정보는 응답에서 제외
             employee.setPwd(null);
-            
+                                   
             // 3. 로그인 성공 - 사용자 정보 반환
             return employee;
         } catch (Exception e) {
