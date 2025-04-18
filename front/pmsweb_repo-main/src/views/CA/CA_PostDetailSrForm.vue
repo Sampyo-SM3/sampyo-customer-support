@@ -2,13 +2,6 @@
   <v-container fluid class="pr-5 pl-5 pt-7">
     <v-row>
       <v-col>
-        <div class="d-flex align-center">
-          <div class="title-div">SR 요청</div>
-          <v-btn variant="outlined" color="primary" class="goBack-btn ml-auto mr-2" size="small"
-            @click="$router.push('/views/CA/CA1000_10')">
-            목록
-          </v-btn>
-        </div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
@@ -225,6 +218,7 @@
 <script>
 import apiClient from '@/api';
 import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포넌트 import
+import { inject, onMounted } from 'vue';
 
 export default {
   // props 정의 추가
@@ -237,6 +231,32 @@ export default {
   },
   components: {
     CommentTree
+  },
+  setup() {
+    const extraBreadcrumb = inject('extraBreadcrumb', null);
+    const listButtonLink = inject('listButtonLink', null);
+    onMounted(() => {
+      if (extraBreadcrumb) {
+        extraBreadcrumb.value = 'SR 요청';  // 🔥 추가하고 싶은 값
+      }
+
+      if (listButtonLink) {
+        listButtonLink.value = '/views/CA/CA1000_10';  // 🔥 현재 페이지에 맞는 "목록" 경로 설정
+      }
+    });
+
+    return {};
+  },
+  unmounted() { // ❗ 컴포넌트가 언마운트될 때
+    const listButtonLink = inject('listButtonLink', null);
+    if (listButtonLink) {
+      listButtonLink.value = null; // 페이지 벗어날 때 목록버튼 없애기
+    }
+
+    const extraBreadcrumb = inject('extraBreadcrumb', null);
+    if (extraBreadcrumb) {
+      extraBreadcrumb.value = null; // 페이지 벗어날 때 목록버튼 없애기
+    }
   },
   data() {
     return {

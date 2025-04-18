@@ -2,7 +2,6 @@
   <v-container fluid>
     <v-row>
       <v-col>
-        <div class="title-div">권한 등록</div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
@@ -80,7 +79,30 @@
 </template>
 
 <script>
+import { inject, onMounted } from 'vue';
+
 export default {
+  setup() {
+    const extraBreadcrumb = inject('extraBreadcrumb', null);
+    const listButtonLink = inject('listButtonLink', null);
+    onMounted(() => {
+      if (extraBreadcrumb) {
+        extraBreadcrumb.value = '권한등록';  // 🔥 추가하고 싶은 값
+      }
+
+      if (listButtonLink) {
+        listButtonLink.value = null;  // 🔥 현재 페이지에 맞는 "목록" 경로 설정
+      }
+    });
+
+    return {};
+  },
+  unmounted() { // ❗ 컴포넌트가 언마운트될 때
+    const listButtonLink = inject('listButtonLink', null);
+    if (listButtonLink) {
+      listButtonLink.value = null; // 🔥 페이지 벗어날 때 목록버튼 없애기
+    }
+  },
   data() {
     return {
       selectedUserId: null,
