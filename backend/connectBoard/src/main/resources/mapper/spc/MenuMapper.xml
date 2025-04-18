@@ -17,6 +17,29 @@
             resultMap="menuItemResultMap">
         EXEC MainMenu #{auth}, #{id}
     </select>
+    
+    
+    
+	<!-- 대메뉴 목록 조회 -->
+	<select id="getMainMenuCodes" resultMap="menuItemDTOResultMap">
+	    SELECT 
+	        M_CODE AS mCode,
+	        M_NAME AS mName,
+	        M_COMMENT AS mComment,
+	        M_GBN AS mGBN,
+	        CONVERT(VARCHAR, 1) AS mLev, 
+	        CONVERT(VARCHAR, 31) AS mAuth, 
+	        ICON AS mIcon
+	    FROM sys_menu
+	    WHERE LEN(M_CODE) = 2 AND VALID = 1
+	    ORDER BY IDX, M_CODE
+	</select>
+	
+	
+	<!-- 특정 대메뉴와 하위 메뉴 조회 -->
+	<select id="getAllMenu" parameterType="string" resultMap="menuItemDTOResultMap">
+	    EXEC usp_get_menu_list #{menuCode}
+	</select>	
 
 </mapper>
 
