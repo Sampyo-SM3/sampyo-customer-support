@@ -172,11 +172,24 @@
             <div class="td-cell">{{ item.seq }}</div>
             <div class="td-cell">{{ formatDate(item.requestDate) }}</div>
             <div class="td-cell title-cell">
-              <router-link :to="{
-                name: (item.saveFlag === 'Y' && item.processState === 'S')
-                  ? 'CA_PostDetailSrForm' : 'CA_PostDetailForm', params: { receivedSeq: item.seq }
-              }" class="title-link">{{ item.sub }}</router-link>
+              <router-link
+                :to="{
+                  name: (item.saveFlag === 'Y' && item.processState === 'S')
+                    ? 'CA_PostDetailSrForm'
+                    : 'CA_PostDetailForm',
+                  params: { receivedSeq: item.seq }
+                }"
+                class="title-link"
+              >
+                {{ item.sub }}
+                &nbsp;
+                <span v-if="item.countComment > 0" style="color: black;">[{{ item.countComment }}]</span>
+                &nbsp;
+                <v-icon v-if="item.new_yn === 'Y' && item.countComment > 0" color="red" size="22">mdi-new-box</v-icon>
+              </router-link>
             </div>
+
+
             <div class="td-cell">{{ item.division }}</div>
             <div class="td-cell" :class="getStatusClass(item.processState)">{{ item.status }}</div>
             <div class="td-cell">{{ formatDate(item.completeDate) }}</div>
@@ -298,6 +311,8 @@ export default {
       progressStatuses: [],
       manager: '',
       sub: '',
+      countComment: 0,
+      new_yn: 'n',
       dateRange: 'month',
       productType: 'test1',
       tableData: [],
@@ -553,27 +568,41 @@ export default {
             status: this.selectedStatus
           }
         });
-
+        console.log('asdasdasdasd');
+          console.log(response.data[0]);
         // API 응답 데이터 처리
         if (response.data && Array.isArray(response.data)) {
-          this.tableData = response.data.map(item => ({
-            ...item,
-            selected: false,
-            // API에서 진행상태가 오지 않으면 임의로 설정
-            status: item.processState === 'S'
-              ? (item.statusNm + ' (' + item.srFlag + ')' || this.getRandomStatus())
-              : (item.statusNm || this.getRandomStatus()),
+          this.tableData = response.data.map(item => {
+            const requestDateTime = new Date(item.requestDateTime);
+            const now = new Date();
+            const diffTime = now - requestDateTime;
+            const diffHours = diffTime / (1000 * 60 * 60);
 
-            // 테이블에 표시할 데이터 매핑
-            manager: item.manager || '-',  // 담당자 필드가 없어서 임시로 요청자 ID 사용
-            memo: item.currentIssue || '-'     // 메모 필드가 없어서 임시로 현재 이슈 사용          
-          }));
+            return {
+              ...item,
+              selected: false,
+              // API에서 진행상태가 오지 않으면 임의로 설정
+              status: item.processState === 'S'
+                ? (item.statusNm + ' (' + item.srFlag + ')' || this.getRandomStatus())
+                : (item.statusNm || this.getRandomStatus()),
+
+              // 24시간 이내 여부에 따라 new_yn 설정
+              new_yn: diffHours < 24 ? 'Y' : 'N',
+
+              // 테이블에 표시할 데이터 매핑
+              manager: item.manager || '-',  // 담당자 필드가 없어서 임시로 요청자 ID 사용
+              memo: item.currentIssue || '-' // 메모 필드가 없어서 임시로 현재 이슈 사용
+            };
+          });
 
           // 서버 측 페이징 구현시 전체 개수 설정 (API 응답에서 받아야 함)
           // this.totalItems = response.data.totalItems;
         } else {
           this.tableData = [];
         }
+
+
+
       } catch (error) {
         console.error('데이터 로드 중 오류 발생:', error);
         // 오류 발생 시 테스트 데이터 로드 (개발용)
@@ -647,9 +676,10 @@ export default {
 
       const diffTime = Math.abs(end - start);
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      const diffHours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      // const diffHours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 
-      return `${diffDays}일 ${diffHours}시간`;
+      // return `${diffDays}일 ${diffHours}시간`;
+      return `${diffDays}일`;
     },
 
     // 건수 계산

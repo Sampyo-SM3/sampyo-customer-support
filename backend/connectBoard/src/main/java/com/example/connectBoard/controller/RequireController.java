@@ -49,7 +49,8 @@ public class RequireController {
     }
     
     @GetMapping("/require/search")
-    public ResponseEntity<?> searchRequires(@ModelAttribute RequireSearchCriteria criteria) {    	
+    public ResponseEntity<?> searchRequires(@ModelAttribute RequireSearchCriteria criteria) {
+    	System.out.println("123123123123123");
         try {        	
             List<RequireDTO> requires = requireService.searchRequiresByCriteria(criteria);
             

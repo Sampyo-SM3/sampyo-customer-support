@@ -8,7 +8,7 @@
 	<select id="searchRequiresByCriteria" parameterType="com.example.connectBoard.dto.RequireSearchCriteria" resultType="com.example.connectBoard.dto.RequireDTO">
 		SELECT
 		    b.seq,
-		    b.sub,
+	        b.sub,
 		    b.division,
 		    b.context,
 		    b.uId,
@@ -20,9 +20,11 @@
 			b.managerTel,
 			b.managerEmail,
 		    b.requestDate,
+		    b.requestDate AS requestDateTime,
 		    b.completeDate,
 		    b.srFlag,
-		    b.saveFlag	   	
+		    b.saveFlag,
+		    (SELECT COUNT(*) FROM COMMENTS WHERE postid = b.seq) as countComment   	
 		FROM board b inner join code_master c
 		 on b.processState = c.codeId					
 	<where>

@@ -21,8 +21,7 @@ public class StatusService {
     	 return statusRepository.getAllStatuses();
     }
 
-    public void updateStatus(RequireDTO require) {
-    	System.out.println(require.getProcessState());
+    public void updateStatus(RequireDTO require) {    	
     	statusRepository.updateStatus(require);
     }
     

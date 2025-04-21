@@ -2,6 +2,8 @@ package com.example.connectBoard.dto;
 
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -23,6 +25,7 @@ public class RequireDTO {
 	private String useDept;
 	private String attachDoc;
 	private LocalDate requestDate;
+	private LocalDateTime requestDateTime;
 	private LocalDate acceptDate;
 	private LocalDate completeRequestDate;
 	private LocalDate completeDate;
@@ -45,4 +48,7 @@ public class RequireDTO {
 	private LocalDate insertDt;
 	private LocalDate updateDt;
 	private LocalDate completeDt;
+	private Integer countComment;
+	
+	
 }
