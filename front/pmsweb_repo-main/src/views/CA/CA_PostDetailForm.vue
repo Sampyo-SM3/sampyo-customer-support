@@ -14,13 +14,19 @@
     <!-- 진행 상태 표시 바 -->
     <v-row justify="center" class="mb-0 pt-0">
       <v-col cols="12" class="d-flex align-center justify-center">
-        <div class="stepper-container">
-          <div v-for="(status, index) in progressStatuses" :key="index" class="stepper-item"
-            :class="{ active: step >= index + 1 }">
-            <div class="step-circle">{{ index + 1 }}</div>
-            <span class="step-label">&nbsp;&nbsp;&nbsp;{{ status.text }}</span>
-            <div v-if="index < progressStatuses.length - 1" class="step-line"
-              :class="{ 'step-line-active': step > index + 1 }"></div>
+        <div class="custom-stepper">
+          <div
+            v-for="(status, index) in progressStatuses"
+            :key="index"
+            class="step"
+            :class="{
+              active: step === index + 1,
+              completed: step > index + 1
+            }"
+          >
+            <div class="circle">{{ index + 1 }}</div>
+            <div class="label">{{ status.text }}</div>
+            <div v-if="index < progressStatuses.length - 1" class="line"></div>
           </div>
         </div>
       </v-col>
@@ -555,76 +561,101 @@ export default {
 </script>
 
 <style scoped>
-.stepper-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  max-width: 600px;
+.step {
   position: relative;
-  user-select: none;
-}
-
-.stepper-item {
-  display: flex;
-  align-items: center;
-  position: relative;
+  text-align: center;
   flex: 1;
 }
 
-.step-circle {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background-color: lightgray;
+.custom-stepper {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  font-weight: bold;
-  color: white;
-  z-index: 2;
-  user-select: none;
-}
-
-.step-label {
-  margin-top: 12px;
-  text-align: center;
-  font-size: 14px;
-  font-weight: bold;
-  position: absolute;
-  bottom: -30px;
-  left: 15%;
-  transform: translateX(-50%);
-  user-select: none;
-}
-
-.step-line {
-  position: absolute;
   width: 100%;
-  height: 5px;
-  background-color: lightgray;
-  /* 기본 회색 */
-  top: 50%;
+  max-width: 750px;
+  position: relative;
+}
+
+.circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #d5dce6;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  z-index: 2;
+  transition: all 0.3s ease;
+  position: relative;  
+}
+
+.label {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+.line {
+  position: absolute;
+  top: 22px;
   left: 50%;
-  transform: translateX(-50%);
+  width: 100%;
+  height: 4px;
+  background-color: #d5dce6;
   z-index: 1;
-  transition: background-color 0.3s ease-in-out;
-  /* 색상 변경 애니메이션 */
 }
 
-.step-line-active {
-  background-color: #5B9BD5;
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  width: 100%;
+  height: 4px;
+  background-color: #d5dce6;
+  z-index: 0;
 }
 
-.active .step-circle {
-  background-color: #1867C0;
-  font-size: 20px;
+.step.completed:not(:last-child)::after {
+  background-color: #5b9bd5;
 }
 
-.active .step-label {
-  color: #1867C0;
+.step.completed .line {
+  background-color: #5b9bd5;
 }
+
+.step.completed .circle {
+  background-color: #5b9bd5;
+}
+
+.step.active .circle {
+  background-color: #1867c0;
+  box-shadow: 0 0 0 4px rgba(24, 103, 192, 0.2);
+  font-size: 18px;
+}
+
+.step.active .label {
+  color: #1867c0;
+}
+
+.status-row {
+  overflow: hidden;
+}
+
+.status-select-row {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  /* height: 45px; */
+  margin-bottom: 15px;
+  /* height: 42px;   */
+}
+
+
 
 .product-category {
   display: flex;

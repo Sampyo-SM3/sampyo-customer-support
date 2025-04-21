@@ -1,236 +1,434 @@
 <template>
-  <div class="comment-wrapper">
-    <div class="comment-item">
-      <div v-if="comment.depth > 0" class="reply-indicator-wrapper" :style="getIndentStyle">
-        <span class="reply-indicator">ㄴ</span>
-      </div>
-      <div class="comment-content">
-        <div class="comment-header">
-          <span class="comment-user">{{ comment.userId }}</span>
-          <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
-        </div>
-        <!-- 수정모드가 아닐때 -->
-        <div v-if="!isEditing" class="comment-text">{{ comment.content }}</div>
+  <v-container fluid class="pr-0 pl-0 pt-0">
 
-        <!-- 수정 모드일 때 -->
-        <div v-else class="comment-edit-container">
-          <v-textarea v-model="editedContent" label="댓글 수정" class="edit-textarea"></v-textarea>
-          <div class="edit-btn-container" style="margin-top: -10px">
-            <v-btn text class="reply-sub-btn" @click="saveEditedComment(comment)">
-              저장
-            </v-btn>
-            <v-btn text class="reply-sub-btn" @click="cancelEdit">
-              취소
-            </v-btn>
+    <!-- 진행 상태 표시 바 -->
+    <v-row justify="center" class="mb-0 pt-0">
+      <v-col cols="12" class="d-flex align-center justify-center">
+        <div class="stepper-container">
+          <div v-for="(status, index) in progressStatuses" :key="index" class="stepper-item"
+            :class="{ active: step >= index + 1 }">
+            <div class="step-circle">{{ index + 1 }}</div>
+            <span class="step-label">&nbsp;&nbsp;&nbsp;{{ status.text }}</span>
+            <div v-if="index < progressStatuses.length - 1" class="step-line"
+              :class="{ 'step-line-active': step > index + 1 }"></div>
           </div>
         </div>
+      </v-col>
+    </v-row>
 
-        <div class="comment-actions" v-if="comment.userId === this.userId">
-          <v-menu>
-            <template v-slot:activator="{ isActive, props }">
-              <v-icon v-bind="props" :color="isActive ? 'primary' : 'default'" size="20">
-                mdi-dots-vertical
-              </v-icon>
-            </template>
 
-            <v-list class="more-actions-list">
-              <v-list-item @click="onEdit" title="수정" class="more-actions-item text-center" />
-              <v-list-item @click="deleteComment(comment.commentId)" title="삭제" class="more-actions-item text-center" />
-            </v-list>
-          </v-menu>
-        </div>
-
-        <v-btn v-if="!isEditing" text class="reply-btn" @click="toggleReplyInput(comment)">답글</v-btn>
-        <!--<v-btn text class="reply-btn" @click="deleteComment(comment.commentId)">삭제</v-btn> -->
-
-        <div v-if="showReplyInput" class="reply-input-container">
-          <v-textarea v-model="replyContent" label="답글 입력" class="reply-textarea"></v-textarea>
-          <div class="reply-btn-container">
-            <v-btn text class="reply-sub-btn" @click="submitReply">등록</v-btn>
-            <v-btn text class="reply-sub-btn" @click="cancelReply">취소</v-btn>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 대댓글 목록 -->
-    <div class="replies-container">
-      <comment-tree v-for="child in childComments" :key="child.commentId" :comment="child" :all-comments="allComments"
-        @reply="$emit('reply', $event)" @delete="$emit('delete', $event)" @refresh="$emit('refresh')" />
-    </div>
-  </div>
+  </v-container>
 </template>
 
 
 
-<style>
-.comment-wrapper {
-  margin-bottom: 5px;
+
+<style scoped>
+.status-row {
+  overflow: hidden;
 }
 
-.comment-item {
-  position: relative;
-  /* 이게 중요함! */
-  display: flex;
-  flex-direction: row;
-  padding: 16px;
-  border-bottom: 1px solid #eee;
+.status-select-row {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  /* height: 45px; */
+  margin-bottom: 15px;
+  /* height: 42px;   */
 }
 
-.comment-item.has-reply-input {
-  border-bottom: none !important;
+.template {
+  font-family: "Noto Sans KR", sans-serif;
 }
 
-.reply-indicator-wrapper {
+.stepper-container {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 600px;
+  position: relative;
+  user-select: none;
 }
 
-.reply-indicator {
-  color: #666;
-  margin-right: 8px;
-  font-weight: bold;
-  font-size: 16px;
-}
-
-.comment-content {
+.stepper-item {
+  display: flex;
+  align-items: center;
+  position: relative;
   flex: 1;
 }
 
-.comment-header {
-  margin-bottom: 8px;
+.step-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: lightgray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  z-index: 2;
+  user-select: none;
 }
 
-.comment-user {
+.step-label {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  position: absolute;
+  bottom: -30px;
+  left: 15%;
+  transform: translateX(-50%);
+  user-select: none;
+}
+
+.step-line {
+  position: absolute;
+  width: 100%;
+  height: 5px;
+  background-color: lightgray;
+  /* 기본 회색 */
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  transition: background-color 0.3s ease-in-out;
+  /* 색상 변경 애니메이션 */
+}
+
+/* ✅ 진행된 상태일 때 파란색으로 변경 */
+.step-line-active {
+  background-color: #5B9BD5;
+}
+
+.active .step-circle {
+  background-color: #1867C0;
+  font-size: 20px;
+}
+
+.active .step-label {
+  color: #1867C0;
+}
+
+/* 폼 디자인 */
+.product-category {
+  display: flex;
+  flex-direction: row;
+  /* 가로 방향으로 배치 */
+  align-items: center;
+  flex-wrap: nowrap;
+  /* 줄바꿈 방지 */
+  width: 100%;
+}
+
+.author-value {
+  font-size: 14px;
+  padding-left: 15px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.title-div {
+  font-size: 25px;
+}
+
+.manager-search,
+.content-textarea {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 15px;
+  width: 800px;
+  height: 450px;
+  font-size: 15px;
+  font-weight: 400;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.search-row {
+  display: flex;
+  align-items: stretch;
+  min-height: 40px;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 0;
+  border-left: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  /* 하단 테두리 제거 */
+}
+
+.search-row.top-row {
+  border-top: 3px solid #e0e0e0;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  overflow: hidden;
+}
+
+.search-row.bottom-row {
+  border-bottom: 2px solid #e0e0e0;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  overflow: hidden;
+}
+
+/* 새로 추가된 스타일 */
+.search-row.top-row .search-col:first-child {
+  border-top-left-radius: 8px;
+}
+
+.search-row.bottom-row .search-col:first-child {
+  border-bottom-left-radius: 8px;
+}
+
+.search-row.top-row .search-col:last-child {
+  border-top-right-radius: 8px;
+}
+
+.search-row.bottom-row .search-col:last-child {
+  border-bottom-right-radius: 8px;
+}
+
+.search-col {
+  display: flex;
+  /* align-items: center; */
+  padding: 0;
+  border-left: 1px solid #e0e0e0;
+}
+
+.request-period,
+.product-category {
+  max-width: 550px;
+  flex-grow: 0;
+}
+
+.label-box {
+  width: 80px;
+  flex-shrink: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
   font-weight: 500;
+  color: #578ADB;
+  background-color: #f5f5f5;
+  white-space: nowrap;
+  padding: 0 4px;
+  border-right: 1px solid #eaeaea;
+  /* margin-bottom: 5px; */
+  color: #333333 !important;
+  background-color: #e6eef8 !important;
+}
+
+.white-text {
+  color: white !important;
+}
+
+.status-select {
+  margin-left: 15px;
+  margin-bottom: 10px;
+}
+
+.status-select-row {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 45px;
+}
+
+.status-select>>>.v-select__selection {
+  font-size: 14.5px !important;
+  margin-bottom: 2px;
+  /* 원하는 크기로 조정 */
+}
+
+.mdi-menu-down::before {
   margin-right: 10px;
 }
 
-.comment-date {
-  color: #666;
-  font-size: 13px;
-}
 
-.comment-text {
-  margin: 5px 0;
+
+.save-status-btn {
+  height: 42px;
+  min-width: 60px;
   font-size: 14px;
-  line-height: 1.4;
-}
-
-.reply-btn {
-  text-transform: none !important;
-  min-width: 30px !important;
-  height: 28px !important;
-  font-size: 12px !important;
-  color: #666 !important;
-  margin-top: 5px;
-  margin-left: 5px;
-  box-shadow: none !important;
-  background-color: transparent !important;
-  border: 1px solid #ddd !important;
-  border-radius: 4px !important;
-}
-
-.reply-sub-btn {
-  text-transform: none !important;
-  min-width: 45px !important;
-  height: 30px !important;
-  font-size: 14px !important;
-  color: #666 !important;
-  margin-top: 3px;
-  margin-left: 5px;
-  box-shadow: none !important;
-  background-color: transparent !important;
-  border: 1px solid #ddd !important;
-  border-radius: 4px !important;
-}
-
-.reply-input-container {
-  margin-top: 8px;
-  padding: 10px;
-  border-left: none;
   border-radius: 6px;
+  margin-bottom: 15px;
 }
 
-.reply-textarea {
-  width: 100%;
-  font-size: 14px;
-  min-height: 60px;
-}
-
-.reply-btn-container {
+.section-title {
+  font-size: 17px;
+  margin-bottom: 15px;
+  font-weight: 400;
   display: flex;
-  justify-content: flex-end;
-  gap: 5px;
+  align-items: center;
 }
 
-.reply-submit-btn {
+.info-subtitle {
+  font-size: 16px;
+  line-height: 22px;
+  color: #666;
+  -webkit-text-size-adjust: none;
+  letter-spacing: -0.05em;
+  margin: 20px 0 6px;
+  font-weight: 500;
+}
+
+.info-title-after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 17px;
+  background-color: #B0CAE6;
+  margin-right: 10px;
+  position: relative;
+}
+
+.comments-container {
+  margin-bottom: 20px;
+  background-color: #f9fbfd;
+  border-radius: 8px;
+  padding: 10px 15px;
+  border: 1px solid #E6EEF8;
+}
+
+.no-comments {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  background-color: #f9fbfd;
+  border-radius: 8px;
+  border: 1px solid #E6EEF8;
+  margin-bottom: 20px;
+}
+
+.comment-input-container {
+  margin-bottom: 40px;
+  padding: 15px;
+  background-color: #f9fbfd;
+  border-radius: 8px;
+  border: 1px solid #E6EEF8;
+}
+
+.comment-textarea {
+  margin-bottom: 10px;
+  background-color: white;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.info-card {
+  background-color: #f9f9f9;
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid #ddd;
+  padding-top: 0 !important;
+}
+
+.colNm {
+  width: 140px;
+}
+
+.vertical-label {
+  height: 100%;
+  background-color: #f1f5fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.5;
+  border-right: 1px solid #ddd;
+}
+
+.sub-label {
+  font-weight: 500;
+  font-size: 13.5px;
+  border-bottom: 1px solid #e0e0e0;
+  height: 35px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 0 4px;
+  border-right: 1px solid #eaeaea;
+  margin-bottom: 5px;
+  color: #333333 !important;
+  background-color: #e6eef8 !important;
+}
+
+.custom-btn {
   background-color: #1867C0;
   color: white;
+  font-size: 13px;
+  border: none;
+  box-shadow: none;
+  border-radius: 6px;
+  margin-top: -10px !important;
+  margin-bottom: 15px;
+  min-width: 60px;
 }
 
-.reply-cancel-btn {
-  background-color: #ccc;
-  color: white;
-}
-
-.replies-container {
-  width: 100%;
-}
-
-.comment-actions {
-  position: absolute;
-  right: 8px;
-  top: 8px;
-}
-
-.more-actions-list {
-  min-width: 80px;
-}
-
-.more-actions-item {
-  cursor: pointer;
-  padding: 10px 16px;
-  transition: background-color 0.3s;
-}
-
-.more-actions-item:hover {
-  background-color: rgba(0, 0, 0, 0.08);
-}
-
-/* 기존 스타일에 추가 */
-.reply-count-btn {
-  text-transform: none !important;
-  min-width: 80px !important;
-  height: 28px !important;
-  font-size: 12px !important;
-  color: #666 !important;
-  margin-top: 5px;
-  margin-left: 5px;
-  box-shadow: none !important;
-  background-color: transparent !important;
-  border: 1px solid #ddd !important;
-  border-radius: 4px !important;
-  display: flex;
-  align-items: center;
-}
-
-.comment-footer {
-  margin-top: 8px;
-  display: flex;
-  align-items: center;
-}
-
-.edit-textarea {
-  width: 100%;
-  font-size: 14px;
-  margin-top: 10px;
-}
-
-.edit-btn-container {
+.btn-container {
   display: flex;
   justify-content: flex-end;
   margin-top: 10px;
-  gap: 10px;
+}
+
+.comment-submit-btn {
+  font-size: 14px;
+  text-transform: none;
+  border-radius: 4px;
+  height: 36px;
+  color: white !important;
+}
+
+.cancel-btn {
+  font-size: 14px;
+  text-transform: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  height: 36px;
+}
+
+.multiline-box {
+  font-size: 14px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+
+  padding: 10px;
+}
+
+.goBack-btn {
+  height: 35px;
+  min-width: 55px;
+  font-size: 14px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.fileBox {
+  background-color: rgba(26, 92, 168, 0.08);
+  border: 1px solid #d0dff1;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.commentBtn {
+  border: 1px solid #888A8D !important;
+  color: #5A5C5F !important;
+  border-radius: 4px;
+  padding: 4px 12px;
+  background-color: white;
 }
 </style>
