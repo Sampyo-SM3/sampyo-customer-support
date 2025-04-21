@@ -1,16 +1,8 @@
-<template style="margin-top:-30px;">
-  <v-container fluid class="pr-5 pl-5 pt-7">
-    <v-row>
-      <v-col>
-        <div class="mt-2">
-          <v-divider thickness="3" color="#578ADB"></v-divider>
-        </div>
-      </v-col>
-    </v-row>
+<template>
+  <v-container fluid class="pr-0 pl-0 pt-0">
 
-    <br>
     <!-- 진행 상태 표시 바 -->
-    <v-row justify="center" class="mb-6 pt-6">
+    <v-row justify="center" class="mb-0 pt-0">
       <v-col cols="12" class="d-flex align-center justify-center">
         <div class="stepper-container">
           <div v-for="(status, index) in progressStatuses" :key="index" class="stepper-item"
@@ -23,6 +15,9 @@
         </div>
       </v-col>
     </v-row>
+
+    <br>
+    <br>    
 
     <!-- 전체 래퍼: 접수상태 박스 + 버튼을 나란히 배치 -->
     <div class="d-flex align-center mb-4">
@@ -47,11 +42,11 @@
         수정
       </v-btn> -->
       <v-btn v-if="inquiry.srFlag === 'N'" variant="flat" color="#F7A000"
-        class="save-status-btn ml-auto mr-2 white-text" size="small" @click="approvalBtn">
+        class="save-status-btn ml-auto mr-0 white-text" size="small" @click="approvalBtn">
         상신
       </v-btn>
       <v-btn v-if="inquiry.srFlag === 'Y'" variant="flat" color="#F7A000"
-        class="save-status-btn ml-auto mr-2 white-text" size="small" @click="showSrBtn">
+        class="save-status-btn ml-auto mr-0 white-text" size="small" @click="showSrBtn">
         SR요청서 보기
       </v-btn>
     </div>

@@ -1,18 +1,14 @@
 <template>
-  <v-container fluid class="pr-5 pl-5 pt-7">
+  <v-container fluid class="pr-0 pl-0 pt-4">
 
-    <v-row>
-      <v-col>
-        <!-- <div class="title-div">작업요청</div> -->
+    <!-- <v-row>
+      <v-col>        
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
       </v-col>
-    </v-row>
-
-    <br>
-
-
+    </v-row> -->
+    
     <v-row dense align="center" class="flex-wrap rounded-border sky-bg" style="gap: 12px;">
 
       <!-- 요청기간 -->
@@ -109,6 +105,7 @@
 
     </v-row>
 
+    <br>
     <br>
 
     <!-- 데이터 테이블 상단 버튼 영역 -->

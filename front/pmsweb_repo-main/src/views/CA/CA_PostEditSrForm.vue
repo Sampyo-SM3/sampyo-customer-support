@@ -1,14 +1,8 @@
 <template style="margin-top:-30px;">
-  <v-container fluid class="pr-5 pl-5 pt-7">
-    <v-row>
-      <v-col>
-        <div class="mt-2">
-          <v-divider thickness="3" color="#578ADB"></v-divider>
-        </div>
-      </v-col>
-    </v-row>
-
+  <v-container fluid class="pr-0 pl-0 pt-0">
+     
     <br>
+
     <v-row no-gutters class="search-row top-row">
       <v-col class="search-col input-width">
         <div class="label-box colNm">

@@ -1,18 +1,18 @@
 <template>
-  <v-container fluid class="pr-5 pl-5 pt-7">
+  <v-container fluid class="pr-0 pl-0 pt-0">
 
-    <v-row>
+    <!-- <v-row>
       <v-col>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
       </v-col>
-    </v-row>
+    </v-row> -->
 
-    <br>
+    <!-- <br> -->
 
     <!-- 진행 상태 표시 바 -->
-    <v-row justify="center" class="mb-6 pt-6">
+    <v-row justify="center" class="mb-0 pt-0">
       <v-col cols="12" class="d-flex align-center justify-center">
         <div class="stepper-container">
           <div v-for="(status, index) in progressStatuses" :key="index" class="stepper-item"
@@ -25,6 +25,9 @@
         </div>
       </v-col>
     </v-row>
+
+    <br>
+    <br>
 
     <!-- 전체 래퍼: 접수상태 박스 + 버튼을 나란히 배치 -->
     <div class="d-flex align-center mb-4">
@@ -43,12 +46,12 @@
         저장
       </v-btn>
 
-      <v-btn variant="flat" color="#F7A000" class="save-status-btn mr-2 white-text" size="small">
+      <v-btn variant="flat" color="#F7A000" class="save-status-btn ml-3 mr-2 white-text" size="small">
         담당자 이관
       </v-btn>
 
       <v-btn v-if="this.inquiry.processState == 'P' && this.inquiry.writerId === this.userId" variant="flat"
-        color="green darken-2" class="save-status-btn ml-auto mr-2" size="small" @click="moveEdit">
+        color="green darken-2" class="save-status-btn ml-auto mr-0" size="small" @click="moveEdit">
         수정
       </v-btn>
       <v-btn v-if="this.inquiry.processState === 'S'" variant="flat" color="#F7A000"
@@ -126,11 +129,12 @@
           <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
             :all-comments="comments" @refresh="fetchComments" />
         </div>
-
+        
         <!-- 댓글 입력 -->
-        <div class="comment-input-container" :class="{ 'mt-20': commentTextLength === 0 }">
-          <v-textarea v-model="newComment.content"
-            :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"></v-textarea>
+        <div class="comment-input-container mb-8" :class="{ 'mt-20': commentTextLength === 0 }">
+          <v-textarea v-model="newComment.content" 
+            :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"
+            class="comment-textarea"></v-textarea>
           <div class="btn-container">
             <v-btn v-if="replyTo" text @click="cancelReply" class="mr-2">답글 취소</v-btn>
             <v-btn variant="flat" style="background-color: rgba(236, 236, 236, 0.5); color: #000;" class="commentBtn"
@@ -811,5 +815,16 @@ export default {
   border-radius: 4px;
   padding: 4px 12px;
   background-color: white;
+}
+
+.comment-input-container {
+  width: 100%;
+  margin-bottom: 50px; /* 하단 여백 추가 */
+  padding-bottom: 20px; /* 내부 하단 여백 */
+}
+
+.comment-textarea {
+  width: 100%;
+  max-height: 200px;
 }
 </style>

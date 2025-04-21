@@ -1,0 +1,457 @@
+<template>
+  <v-container fluid class="pr-5 pl-0 pt-0 pb-">
+
+    <!-- <v-row>
+      <v-col>
+        <div class="mt-2">
+          <v-divider thickness="3" color="#578ADB"></v-divider>
+        </div>
+      </v-col>
+    </v-row> -->
+
+    <!-- <br> -->
+
+    <!-- 진행 상태 표시 바 -->
+    <v-row justify="center" class="mb-0 pt-0">
+      <v-col cols="12" class="d-flex align-center justify-center">
+        <div class="stepper-container">
+          <div v-for="(status, index) in progressStatuses" :key="index" class="stepper-item"
+            :class="{ active: step >= index + 1 }">
+            <div class="step-circle">{{ index + 1 }}</div>
+            <span class="step-label">&nbsp;&nbsp;&nbsp;{{ status.text }}</span>
+            <div v-if="index < progressStatuses.length - 1" class="step-line"
+              :class="{ 'step-line-active': step > index + 1 }"></div>
+          </div>
+        </div>
+      </v-col>
+    </v-row>
+
+    <br>
+    <br>
+
+    <!-- 전체 래퍼: 접수상태 박스 + 버튼을 나란히 배치 -->
+    <div class="d-flex align-center mb-4">
+      <!-- 접수상태 박스 -->
+      <v-row no-gutters class="status-row status-select-row" style="width: 220px; 
+        min-width: 220px; 
+        max-width: 220px;">
+        <v-col class="search-col">
+          <div class="label-box">접수상태</div>
+          <v-select v-model="selectedStatus" :items="progressStatuses" item-title="text" item-value="value"
+            density="compact" variant="plain" hide-details class="status-select" />
+        </v-col>
+      </v-row>
+
+      <v-btn variant="flat" color="#3A70B1" size="small" class="save-status-btn ml-3" @click="saveStatus">
+        저장
+      </v-btn>
+
+      <v-btn variant="flat" color="#F7A000" class="save-status-btn ml-3 mr-2 white-text" size="small">
+        담당자 이관
+      </v-btn>
+
+      <v-btn v-if="this.inquiry.processState == 'P' && this.inquiry.writerId === this.userId" variant="flat"
+        color="green darken-2" class="save-status-btn ml-auto mr-2" size="small" @click="moveEdit">
+        수정
+      </v-btn>
+      <v-btn v-if="this.inquiry.processState === 'S'" variant="flat" color="#F7A000"
+        class="save-status-btn mr-2 white-text" size="small" @click="$router.push({
+          name: 'CA_PostEditSrForm',
+          params: { receivedSeq: this.receivedSeq }
+        })">
+        SR요청서
+      </v-btn>
+
+    </div>
+
+
+    <v-row no-gutters class="search-row top-row">
+      <v-col class="search-col product-category">
+        <div class="label-box">작성자</div>
+        <div class="author-value">{{ inquiry.uid }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <v-col class="search-col product-category">
+        <div class="label-box">담당자</div>
+        <div class="author-value">{{ inquiry.manager }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <!-- 제목 필드 -->
+      <v-col class="search-col request-period">
+        <div class="label-box">제 목</div>
+        <div class="author-value">{{ inquiry.sub }}</div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <!-- 내용 텍스트필드 -->
+      <v-col class="search-col content-field">
+        <div class="label-box">내 용</div>
+        <div class="author-value content-textarea">{{ inquiry.etc }}</div>
+      </v-col>
+    </v-row>
+
+    <!-- 첨부파일 -->
+    <v-row no-gutters class="search-row bottom-row">
+      <v-col class="search-col d-flex align-center">
+        <div class="label-box">첨부파일</div>
+
+        <div v-if="fetchedFiles.length > 0" class="ml-2 mt-2 mb-2" style="flex: 1;">
+          <div class="d-flex flex-wrap" style="gap: 8px;">
+            <div v-for="(file) in fetchedFiles" :key="file.seq" class="file-chip d-flex align-center px-3 py-2 fileBox"
+              @click="downloadFile(file)">
+              <span class="text-body-2" style="color:#1A5CA8">{{ file.fileName }}</span>
+              <v-icon class="ml-2" size="20" style="color:#1A5CA8">mdi-download</v-icon>
+            </div>
+          </div>
+        </div>
+      </v-col>
+    </v-row>
+
+
+    <br>
+    <br>
+
+
+    <!-- 하단: 댓글 섹션을 아래로 배치 -->
+    <v-row>
+      <v-col cols="12">
+        <div class="section-title">
+          <div class="info-title-after"></div>답변 내용
+        </div>
+        <!-- 댓글 섹션 -->
+        <!-- <div class="info-subtitle">댓글 {{ commentTextLength }}</div> -->
+        <div class="pa-3 mb-3" v-if="commentTextLength > 0" style="margin-top:-20px;">
+          <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
+            :all-comments="comments" @refresh="fetchComments" />
+        </div>
+        
+        <!-- 댓글 입력 -->
+        <div class="comment-input-container mb-8" :class="{ 'mt-20': commentTextLength === 0 }">
+          <v-textarea v-model="newComment.content" 
+            :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"
+            class="comment-textarea"></v-textarea>
+          <div class="btn-container">
+            <v-btn v-if="replyTo" text @click="cancelReply" class="mr-2">답글 취소</v-btn>
+            <v-btn variant="flat" style="background-color: rgba(236, 236, 236, 0.5); color: #000;" class="commentBtn"
+              @click="addComment()">댓글 등록</v-btn>
+          </div>
+        </div>
+      </v-col>
+    </v-row>
+  </v-container>
+
+  <!-- 스낵바로 오류 메시지 표시 -->
+  <v-snackbar v-model="showError" color="warning" timeout="5000" location="center" elevation="8" variant="elevated">
+    {{ errorMessages[0] }}
+
+    <template v-slot:actions>
+      <v-btn variant="text" @click="showError = false">
+        닫기
+      </v-btn>
+    </template>
+  </v-snackbar>
+</template>
+
+
+
+<style scoped>
+.stepper-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 600px;
+  position: relative;
+  user-select: none;
+}
+
+.stepper-item {
+  display: flex;
+  align-items: center;
+  position: relative;
+  flex: 1;
+}
+
+.step-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: lightgray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  z-index: 2;
+  user-select: none;
+}
+
+.step-label {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  position: absolute;
+  bottom: -30px;
+  left: 15%;
+  transform: translateX(-50%);
+  user-select: none;
+}
+
+.step-line {
+  position: absolute;
+  width: 100%;
+  height: 5px;
+  background-color: lightgray;
+  /* 기본 회색 */
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  transition: background-color 0.3s ease-in-out;
+  /* 색상 변경 애니메이션 */
+}
+
+.step-line-active {
+  background-color: #5B9BD5;
+}
+
+.active .step-circle {
+  background-color: #1867C0;
+  font-size: 20px;
+}
+
+.active .step-label {
+  color: #1867C0;
+}
+
+.product-category {
+  display: flex;
+  flex-direction: row;
+  /* 가로 방향으로 배치 */
+  align-items: center;
+  flex-wrap: nowrap;
+  /* 줄바꿈 방지 */
+  width: 100%;
+}
+
+.author-value {
+  font-size: 14px;
+  padding-left: 15px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.title-div {
+  font-size: 25px;
+}
+
+.manager-search,
+.content-textarea {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 15px;
+  width: 800px;
+  height: 450px;
+  font-size: 15px;
+  font-weight: 400;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.custom-btn {
+  background-color: #1867C0;
+  color: white;
+  font-size: 13px;
+  border: none;
+  box-shadow: none;
+  border-radius: 6px;
+  margin-top: -10px !important;
+  margin-bottom: 15px;
+  min-width: 60px;
+}
+
+.search-row {
+  display: flex;
+  align-items: stretch;
+  min-height: 40px;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 0;
+  border-left: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  /* 하단 테두리 제거 */
+}
+
+.search-row.top-row {
+  border-top: 3px solid #e0e0e0;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  overflow: hidden;
+}
+
+.search-row.bottom-row {
+  border-bottom: 2px solid #e0e0e0;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  overflow: hidden;
+}
+
+/* 새로 추가된 스타일 */
+.search-row.top-row .search-col:first-child {
+  border-top-left-radius: 8px;
+}
+
+.search-row.bottom-row .search-col:first-child {
+  border-bottom-left-radius: 8px;
+}
+
+.search-row.top-row .search-col:last-child {
+  border-top-right-radius: 8px;
+}
+
+.search-row.bottom-row .search-col:last-child {
+  border-bottom-right-radius: 8px;
+}
+
+
+
+.search-col {
+  display: flex;
+  /* align-items: center; */
+  padding: 0;
+  border-left: 1px solid #e0e0e0;
+}
+
+.request-period,
+.product-category {
+  max-width: 550px;
+  flex-grow: 0;
+}
+
+.label-box {
+  width: 80px;
+  flex-shrink: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: #e6eef8 !important;
+  color: #333333 !important;
+  white-space: nowrap;
+  padding: 0 4px;
+  border-right: 1px solid #eaeaea;
+  /* margin-bottom: 5px; */
+}
+
+.white-text {
+  color: white !important;
+}
+
+.status-select {
+  margin-left: 15px;
+  margin-bottom: 10px;
+}
+
+.status-select>>>.v-select__selection {
+  font-size: 14.5px !important;
+  margin-bottom: 2px;
+  /* 원하는 크기로 조정 */
+}
+
+.mdi-menu-down::before {
+  margin-right: 10px;
+}
+
+.status-row {
+  overflow: hidden;
+}
+
+
+.status-select-row {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  /* height: 45px; */
+  margin-bottom: 15px;
+  /* height: 42px;   */
+}
+
+
+.save-status-btn {
+  height: 42px;
+  min-width: 60px;
+  font-size: 14px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  border-width: 1.5px;
+}
+
+.goBack-btn {
+  height: 35px;
+  min-width: 55px;
+  font-size: 14px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.info-title-after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 17px;
+  background-color: #B0CAE6;
+  margin-right: 10px;
+  margin-bottom: 3px;
+  position: relative;
+  top: 4px;
+}
+
+.section-title {
+  font-size: 17px;
+  margin-bottom: 15px;
+  font-weight: 400;
+}
+
+.fileBox {
+  border: 1px solid #B0CAE6;
+  border-radius: 6px;
+  background-color: rgba(231, 239, 248, 0.6);
+  cursor: pointer;
+  user-select: none;
+}
+
+.commentBtn {
+  border: 1px solid #888A8D !important;
+  color: #5A5C5F !important;
+  border-radius: 4px;
+  padding: 4px 12px;
+  background-color: white;
+}
+
+.comment-input-container {
+  width: 100%;
+  margin-bottom: 50px; /* 하단 여백 추가 */
+  padding-bottom: 20px; /* 내부 하단 여백 */
+}
+
+.comment-textarea {
+  width: 100%;
+  max-height: 200px;
+}
+</style>

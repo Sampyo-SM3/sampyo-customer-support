@@ -64,7 +64,7 @@
         <v-icon>mdi-bell-outline</v-icon>        
       </v-btn>       -->
 
-      <div class="pr-10">
+      <div class="pr-5">
         <v-icon>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="24" height="24">
             <circle cx="50" cy="30" r="20" :fill="iconColor" />
@@ -78,7 +78,7 @@
 
       <!-- 로그인 버튼 -->
 
-      <v-btn class="login-btn mr-3" @click="handleLoginLogout">
+      <v-btn class="login-btn" @click="handleLoginLogout">
         <p class="login-text">{{ userLoginStatus ? '로그아웃' : '로그인' }}</p>
       </v-btn>
 

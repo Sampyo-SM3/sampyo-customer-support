@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-main>
+    <v-main class="no-scroll">
       <router-view></router-view>
     </v-main>
   </v-app>
@@ -13,9 +13,14 @@ export default {
 </script>
 
 <style>
-/* 전역 스타일이 필요하다면 여기에 추가하세요 */
-body {
+/* html, body {
   overflow: hidden;
-  /* 기본은 스크롤 막음 */
+  height: 100vh;
+  margin: 0;
+  padding: 0;
 }
+
+.no-scroll {
+  overflow: hidden;
+} */
 </style>
