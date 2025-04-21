@@ -4,9 +4,11 @@ package com.example.connectBoard.dto;
 import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 public class RequireDTO {
 	private Integer seq;
 	private String sub;

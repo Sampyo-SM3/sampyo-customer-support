@@ -20,9 +20,14 @@
     </select>
 
 	<update id="updateStatus" parameterType="com.example.connectBoard.dto.RequireDTO">
-   		UPDATE board 
-    	SET processState = #{processState}
-    	WHERE seq = #{seq} 	
+	UPDATE board
+	SET 
+	    processState = #{processState},
+	    completeDt = CASE 
+	                    WHEN #{processState} = 'C' THEN GETDATE() 
+	                    ELSE completeDt 
+	                 END
+	WHERE seq = #{seq}
 	</update>
 </mapper>
 

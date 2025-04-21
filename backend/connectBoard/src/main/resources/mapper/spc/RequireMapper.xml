@@ -174,7 +174,8 @@
     		managerId = #{managerId},
     		managerEmail = #{managerEmail},
     		managerTel = #{managerTel},
-    		saveFlag = 'Y'
+    		saveFlag = 'Y',
+    		updateDt = GETDATE()
     	WHERE seq = #{seq};
 	</update>
 	

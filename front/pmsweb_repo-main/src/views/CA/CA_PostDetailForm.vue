@@ -46,14 +46,17 @@
         저장
       </v-btn>
 
-      <v-btn variant="flat" color="#F7A000" class="save-status-btn ml-3 mr-2 white-text" size="small">
+      <v-btn variant="flat" color="#F7A000" class="save-status-btn ml-3 white-text" size="small">
         담당자 이관
       </v-btn>
 
+      <v-spacer></v-spacer>
+
       <v-btn v-if="this.inquiry.processState == 'P' && this.inquiry.writerId === this.userId" variant="flat"
-        color="green darken-2" class="save-status-btn ml-auto mr-0" size="small" @click="moveEdit">
+        color="green darken-2" class="save-status-btn mr-2" size="small" @click="moveEdit">
         수정
       </v-btn>
+
       <v-btn v-if="this.inquiry.processState === 'S'" variant="flat" color="#F7A000"
         class="save-status-btn mr-2 white-text" size="small" @click="$router.push({
           name: 'CA_PostEditSrForm',
@@ -61,6 +64,9 @@
         })">
         SR요청서
       </v-btn>
+
+ 
+      
 
     </div>
 
@@ -414,9 +420,10 @@ export default {
           seq: this.receivedSeq,
           processState: this.selectedStatus
         };
-        // API 요청: 댓글 DB에 저장
+        
         await apiClient.post("/api/updateStatus", statusData);
         alert("접수상태가 저장되었습니다.");
+        
         // 상태변경
         this.kakaoStore.sendAlimtalk(this.receivedSeq, this.getStatusName(this.oldStatus), this.getStatusName(this.selectedStatus), phone);
         // 상세정보 새로고침

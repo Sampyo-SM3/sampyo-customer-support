@@ -319,6 +319,54 @@ export default {
     };
   },
   methods: {
+    async getDetailInquiry() {
+      const response = await apiClient.get("/api/require/detail", {
+        params: { seq: this.receivedSeq }
+      });
+
+      const processState = response.data?.processState || "P"; // 기본값 설정
+      this.selectedStatus = processState;
+      this.step = this.statusMapping?.[this.selectedStatus] ?? 1;
+
+      // 3. 나머지 데이터 매핑
+      this.inquiry = {
+        sub: response.data?.sub || "",
+        etc: response.data?.etc || "",
+        uid: response.data?.uid || "",
+        writerId: response.data?.writerId || "",
+        manager: response.data?.manager || "",
+        srFlag: response.data?.srFlag || "",
+        processState: processState,
+      };
+
+      this.inquiry = {
+        sub: response.data?.sub || "",
+        etc: response.data?.etc || "",
+        uid: response.data?.uid || "",
+        writerId: response.data?.writerId || "",
+        manager: response.data?.manager || "",
+        srFlag: response.data?.srFlag || "",
+        processState: response.data?.processState || "P",
+      };
+
+      // response.data.writerId
+
+      this.selectedStatus = this.inquiry.processState;
+
+      //첨부파일 리스트 불러오기
+      try {
+        const fileList = await apiClient.get("/api/file-attach/fileList", {
+          params: { seq: this.receivedSeq }
+        });
+
+        this.fetchedFiles = Array.isArray(fileList.data)
+          ? fileList.data.filter(file => file && file.fileName)
+          : [];
+
+      } catch (error) {
+        console.error("❌ 오류 발생:", error);
+      }
+    },    
     async getStatus() {
       try {
         const statusList = await apiClient.get("/api/status/list");

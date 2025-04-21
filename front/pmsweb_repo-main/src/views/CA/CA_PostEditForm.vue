@@ -89,7 +89,7 @@
 
     <br>
 
-    <div class="pt-5 d-flex justify-center">
+    <div class="pb-5 pt-5 d-flex justify-center">
       <v-btn variant="flat" color="grey darken-2" class="mr-2 d-flex align-center custom-btn-size " size="large"
         @click="goBack">
         <v-icon size="default" class="mr-1">mdi-close</v-icon>

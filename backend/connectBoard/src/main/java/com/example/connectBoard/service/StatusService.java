@@ -22,6 +22,7 @@ public class StatusService {
     }
 
     public void updateStatus(RequireDTO require) {
+    	System.out.println(require.getProcessState());
     	statusRepository.updateStatus(require);
     }
     
