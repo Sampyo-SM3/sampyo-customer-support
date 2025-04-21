@@ -1,9 +1,7 @@
 <template>
   <v-container fluid class="pr-5 pl-5 pt-7">
-
     <v-row>
       <v-col>
-        <div class="title-div">문의 내용 수정</div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
@@ -131,6 +129,7 @@
 <script>
 import apiClient from '@/api';
 import userPopup from '@/components/userPopup.vue';
+import { inject, onMounted } from 'vue';
 
 export default {
   props: {
@@ -141,6 +140,32 @@ export default {
   },
   components: {
     userPopup
+  },
+  setup() {
+    const extraBreadcrumb = inject('extraBreadcrumb', null);
+    const listButtonLink = inject('listButtonLink', null);
+    onMounted(() => {
+      if (extraBreadcrumb) {
+        extraBreadcrumb.value = '문의 내용 수정';  // 🔥 추가하고 싶은 값
+      }
+
+      if (listButtonLink) {
+        listButtonLink.value = '/views/CA/CA1000_10';  // 🔥 현재 페이지에 맞는 "목록" 경로 설정
+      }
+    });
+
+    return {};
+  },
+  unmounted() { // ❗ 컴포넌트가 언마운트될 때
+    const listButtonLink = inject('listButtonLink', null);
+    if (listButtonLink) {
+      listButtonLink.value = null; // 페이지 벗어날 때 목록버튼 없애기
+    }
+
+    const extraBreadcrumb = inject('extraBreadcrumb', null);
+    if (extraBreadcrumb) {
+      extraBreadcrumb.value = null; // 페이지 벗어날 때 목록버튼 없애기
+    }
   },
   data() {
     return {

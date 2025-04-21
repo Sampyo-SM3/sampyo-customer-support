@@ -3,7 +3,7 @@
 
     <v-row>
       <v-col>
-        <div class="title-div">작업요청</div>
+        <!-- <div class="title-div">작업요청</div> -->
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
@@ -110,7 +110,6 @@
     </v-row>
 
     <br>
-    <br>
 
     <!-- 데이터 테이블 상단 버튼 영역 -->
     <v-row class="top-button-row mb-2">
@@ -179,8 +178,7 @@
               <router-link :to="{
                 name: (item.saveFlag === 'Y' && item.processState === 'S')
                   ? 'CA_PostDetailSrForm' : 'CA_PostDetailForm', params: { receivedSeq: item.seq }
-              }"
-                class="title-link">{{ item.sub }}</router-link>
+              }" class="title-link">{{ item.sub }}</router-link>
             </div>
             <div class="td-cell">{{ item.division }}</div>
             <div class="td-cell" :class="getStatusClass(item.processState)">{{ item.status }}</div>
@@ -267,8 +265,30 @@
 
 <script>
 import apiClient from '@/api';
+import { inject, onMounted } from 'vue';
 
 export default {
+  setup() {
+    const extraBreadcrumb = inject('extraBreadcrumb', null);
+    const listButtonLink = inject('listButtonLink', null);
+    onMounted(() => {
+      if (extraBreadcrumb) {
+        extraBreadcrumb.value = null;
+      }
+
+      if (listButtonLink) {
+        listButtonLink.value = null;
+      }
+    });
+
+    return {};
+  },
+  unmounted() { // ❗ 컴포넌트가 언마운트될 때
+    const listButtonLink = inject('listButtonLink', null);
+    if (listButtonLink) {
+      listButtonLink.value = null; // 🔥 페이지 벗어날 때 목록버튼 없애기
+    }
+  },
   data() {
     return {
       Date_startDate: new Date(),
@@ -904,7 +924,7 @@ export default {
 
 .table-row {
   border-bottom: 1px solid #e0e0e0;
-  height: 54px;  
+  height: 54px;
   color: #5B5D60;
 }
 

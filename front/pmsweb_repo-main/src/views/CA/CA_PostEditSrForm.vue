@@ -2,9 +2,6 @@
   <v-container fluid class="pr-5 pl-5 pt-7">
     <v-row>
       <v-col>
-        <div class="d-flex align-center">
-          <div class="title-div">SR 요청서 작성</div>
-        </div>
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
@@ -17,11 +14,7 @@
         <div class="label-box colNm">
           <span class="required-star">*</span> 제목
         </div>
-        <v-text-field 
-          v-model="inquiry.sub" 
-          variant="outlined" 
-          density="compact" 
-          hide-details
+        <v-text-field v-model="inquiry.sub" variant="outlined" density="compact" hide-details
           class="input-area title-field" />
       </v-col>
     </v-row>
@@ -67,7 +60,7 @@
     </v-row>
 
     <v-row no-gutters class="search-row middle-row" style="height:200px;">
-      <v-col class="search-col request-period" >
+      <v-col class="search-col request-period">
         <div class="label-box colNm"><span class="required-star">*</span>개발(변경)<br />업무내용</div>
       </v-col>
 
@@ -94,12 +87,7 @@
         <div class="label-box colNm">
           <span class="required-star">*</span>사용부서
         </div>
-        <v-text-field 
-          v-model="inquiry.useDept" 
-          variant="outlined" 
-          density="compact" 
-          hide-details 
-          class="input-area"
+        <v-text-field v-model="inquiry.useDept" variant="outlined" density="compact" hide-details class="input-area"
           style="width: 100%;">
         </v-text-field>
       </v-col>
@@ -267,6 +255,7 @@ import apiClient from '@/api';
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
+import { inject, onMounted } from 'vue';
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -280,6 +269,32 @@ export default {
       required: false
     },
     userId: JSON.parse(localStorage.getItem("userInfo"))?.id || null
+  },
+  setup() {
+    const extraBreadcrumb = inject('extraBreadcrumb', null);
+    const listButtonLink = inject('listButtonLink', null);
+    onMounted(() => {
+      if (extraBreadcrumb) {
+        extraBreadcrumb.value = 'SR 요청서 작성';  // 🔥 추가하고 싶은 값
+      }
+
+      if (listButtonLink) {
+        listButtonLink.value = '/views/CA/CA1000_10';  // 🔥 현재 페이지에 맞는 "목록" 경로 설정
+      }
+    });
+
+    return {};
+  },
+  unmounted() { // ❗ 컴포넌트가 언마운트될 때
+    const listButtonLink = inject('listButtonLink', null);
+    if (listButtonLink) {
+      listButtonLink.value = null; // 🔥 페이지 벗어날 때 목록버튼 없애기
+    }
+
+    const extraBreadcrumb = inject('extraBreadcrumb', null);
+    if (extraBreadcrumb) {
+      extraBreadcrumb.value = null; // 페이지 벗어날 때 목록버튼 없애기
+    }
   },
   data() {
     return {
@@ -1015,13 +1030,13 @@ export default {
 
 .input-width {
   max-width: 1600px;
-  
+
   align-items: center;
 }
 
 .input-width-half {
   max-width: 797px;
-  align-items: center;  
+  align-items: center;
 }
 
 .input-area-L {
@@ -1066,7 +1081,7 @@ export default {
 
 
 ::v-deep(.input-area input) {
-  padding: 0 10px !important;    
+  padding: 0 10px !important;
   font-size: 13px !important;
 }
 

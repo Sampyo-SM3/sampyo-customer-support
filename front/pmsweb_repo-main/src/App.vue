@@ -14,4 +14,8 @@ export default {
 
 <style>
 /* 전역 스타일이 필요하다면 여기에 추가하세요 */
+body {
+  overflow: hidden;
+  /* 기본은 스크롤 막음 */
+}
 </style>

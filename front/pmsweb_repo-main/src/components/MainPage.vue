@@ -12,16 +12,28 @@
         <!-- 실제 콘텐츠 -->
         <v-col style="height: 100vh; overflow-y: auto;">
           <!-- 브레드크럼 및 제목 영역 css잘몰라서 강제로 위치맞춤..-->
-          <div class="breadcrum-div d-flex align-center text-body-2 ml-16 pl-10 pt-15">
+          <div class="breadcrum-div d-flex align-center text-body-2 pl-5 pt-15 mt-2">
 
-            <br><br><br><br>
+            <br><br><br>
 
             <v-icon size="small" class="mx-1">mdi-chevron-right</v-icon>
-            <span class="menu-text">
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <span class="menu-text-header">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               {{ savedMidMenu }} </span>
-            <span class="menu-text"> <v-icon size="small" class="mx-1">mdi-chevron-right</v-icon> </span>
-            <span class="menu-text"> {{ savedSubMenu }} </span>
+            <span class="menu-text-header"> <v-icon size="small" class="mx-1">mdi-chevron-right</v-icon> </span>
+            <span class="menu-text-header"> {{ savedSubMenu }} </span>
+
+            <template v-if="extraBreadcrumb">
+              <span class="menu-text-header">
+                <v-icon size="small" class="mx-1">mdi-chevron-right</v-icon>
+              </span>
+              <span class="menu-text-header">{{ extraBreadcrumb }}</span>
+            </template>
+
+            <v-btn v-if="listButtonLink" variant="outlined" color="primary" class="goBack-btn ml-auto mr-5" size="small"
+              @click="$router.push(listButtonLink)">
+              목록
+            </v-btn>
           </div>
 
           <!-- 메인 컨텐츠 영역 -->
@@ -34,7 +46,7 @@
   </v-app>
 </template>
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, provide } from 'vue';
 import SideMenu from '@/components/SideMenu.vue';
 import HeaderBar from '@/components/HeaderBar.vue';
 
@@ -49,6 +61,12 @@ export default {
     // 반응형 변수로 선언
     const savedMidMenu = ref(null);
     const savedSubMenu = ref(null);
+
+    const extraBreadcrumb = ref('');
+    const listButtonLink = ref(null);
+
+    provide('extraBreadcrumb', extraBreadcrumb);
+    provide('listButtonLink', listButtonLink);
 
     // 로컬 스토리지 값을 확인하고 반응형 변수에 저장하는 함수
     const checkLocalStorage = () => {
@@ -89,7 +107,9 @@ export default {
       handleMenuSelection,
       handleMenuClick,
       savedMidMenu,  // 템플릿에서 사용하기 위해 반환
-      savedSubMenu   // 템플릿에서 사용하기 위해 반환
+      savedSubMenu,   // 템플릿에서 사용하기 위해 반환
+      extraBreadcrumb,
+      listButtonLink
     };
   }
 }
@@ -101,9 +121,9 @@ export default {
   margin-top: -40px;
 }
 
-.menu-text {
-  font-size: 12px;
-  color: #A1A6A6;
+.menu-text-header {
+  font-size: 24px;
+  color: #66686A;
 }
 
 .menu-text {

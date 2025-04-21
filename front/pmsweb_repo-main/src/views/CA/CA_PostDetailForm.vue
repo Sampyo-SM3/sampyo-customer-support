@@ -3,14 +3,6 @@
 
     <v-row>
       <v-col>
-        <div class="d-flex align-center">
-          <div class="title-div">문의 상세보기</div>
-          <v-btn variant="outlined" color="primary" class="goBack-btn ml-auto mr-2" size="small"
-            @click="$router.push('/views/CA/CA1000_10')">
-            목록
-          </v-btn>
-        </div>
-
         <div class="mt-2">
           <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
@@ -51,14 +43,12 @@
         저장
       </v-btn>
 
-      <v-btn 
-        v-if="this.inquiry.processState == 'P' && this.inquiry.writerId === this.userId" 
-        variant="flat" 
-        color="green darken-2"
-        class="save-status-btn ml-auto mr-2" 
-        size="small" 
-        @click="moveEdit"
-      >
+      <v-btn variant="flat" color="#F7A000" class="save-status-btn mr-2 white-text" size="small">
+        담당자 이관
+      </v-btn>
+
+      <v-btn v-if="this.inquiry.processState == 'P' && this.inquiry.writerId === this.userId" variant="flat"
+        color="green darken-2" class="save-status-btn ml-auto mr-2" size="small" @click="moveEdit">
         수정
       </v-btn>
       <v-btn v-if="this.inquiry.processState === 'S'" variant="flat" color="#F7A000"
@@ -166,6 +156,7 @@
 <script>
 import apiClient from '@/api';
 import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포넌트 import
+import { inject, onMounted } from 'vue';
 import { useKakaoStore } from '@/store/kakao';
 import { useAuthStore } from '@/store/auth';
 
@@ -180,15 +171,39 @@ export default {
     // 스토어 초기화
     const kakaoStore = useKakaoStore();
     const authStore = useAuthStore();
-    
+
+    const extraBreadcrumb = inject('extraBreadcrumb', null);
+    const listButtonLink = inject('listButtonLink', null);
+
+    onMounted(() => {
+      if (extraBreadcrumb) {
+        extraBreadcrumb.value = '상세보기';  // 🔥 추가하고 싶은 값
+      }
+
+      if (listButtonLink) {
+        listButtonLink.value = '/views/CA/CA1000_10';  // 🔥 현재 페이지에 맞는 "목록" 경로 설정
+      }
+    });
+
     // 이 컴포넌트의 다른 메서드에서 사용할 수 있도록 반환
     return {
       kakaoStore,
       authStore
     }
-  },  
+  },
   components: {
     CommentTree
+  },
+  unmounted() { // ❗ 컴포넌트가 언마운트될 때
+    const listButtonLink = inject('listButtonLink', null);
+    if (listButtonLink) {
+      listButtonLink.value = null; // 🔥 페이지 벗어날 때 목록버튼 없애기
+    }
+
+    const extraBreadcrumb = inject('extraBreadcrumb', null);
+    if (extraBreadcrumb) {
+      extraBreadcrumb.value = null; // 🔥 페이지 벗어날 때 목록버튼 없애기
+    }
   },
   data() {
     return {
@@ -206,7 +221,7 @@ export default {
         writerId: "",
         manager: "",
         srFlag: ""
-      },    
+      },
       previousStatus: '', // 이전 상태를 저장할 변수
       statusChanged: false, // 상태가 변경되었는지 추적      
       progressStatuses: [],
@@ -232,21 +247,21 @@ export default {
     getStatusName() {
       return (statusCode) => {
         if (!statusCode || !this.progressStatuses.length) return '';
-        
+
         const foundStatus = this.progressStatuses.find(status => status.value === statusCode);
         return foundStatus ? foundStatus.text : '';
       };
     },
-    
+
     // 현재 선택된 상태명
     currentStatusName() {
       return this.getStatusName(this.selectedStatus);
     },
-    
+
     // 이전 상태명
     previousStatusName() {
       return this.getStatusName(this.oldStatus);
-    }    
+    }
   },
   watch: {
     receivedSeq: {
@@ -273,6 +288,7 @@ export default {
   created() {
     // localStorage에서 사용자 정보 불러오기
     this.getUserInfo();
+
   },
   methods: {
     async getDetailInquiry() {
@@ -369,9 +385,9 @@ export default {
       // P 미처리
       // S SR
       try {
-        const userInfoString = localStorage.getItem('userInfo');        
+        const userInfoString = localStorage.getItem('userInfo');
         const phone = JSON.parse(userInfoString).phone;
-        
+
         // {"companyCd":"CEMENT","id":"javachohj","name":"조희재","phone":null,"email":null,"admin":false,"pwd":null}
 
         const prevStatusName = this.getStatusName(this.oldStatus);
@@ -381,7 +397,7 @@ export default {
           alert("접수상태가 변경되지 않았습니다.");
           return;
         }
-        
+
         // 이전 상태가 P(미처리)가 아니고, 선택된 상태가 P(미처리)인 경우 변경 불가
         if (this.oldStatus !== 'P' && this.selectedStatus === 'P') {
           alert("처리가 시작된 이후에는 미처리 상태로 돌아갈 수 없습니다.");
@@ -389,7 +405,7 @@ export default {
           this.selectedStatus = this.oldStatus;
           return;
         }
-        
+
         const statusData = {
           seq: this.receivedSeq,
           processState: this.selectedStatus
@@ -458,7 +474,7 @@ export default {
       }
       try {
         const response = await apiClient.get(`/api/comments/${this.receivedSeq}`);
-        this.comments = response.data;       
+        this.comments = response.data;
       } catch (error) {
         console.error('댓글 조회 실패:', error);
         this.comments = []; // ✅ 오류 발생 시 빈 배열 설정
