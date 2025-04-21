@@ -1,7 +1,9 @@
 package com.example.connectBoard.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,34 +28,74 @@ public class MenuItemService {
         return responseDto;
     }
     
-    public List<MenuItemDTO> getAllMenu() {
+    public List<Map<String, Object>> getAllMenu() {
+        // 원본 메뉴 아이템 리스트 가져오기
+        List<MenuItemDTO> menuItems = menuitemRepository.getAllMenu();
+        System.out.println("원본 메뉴 아이템 수: " + menuItems.size());
+        
         // 결과를 담을 리스트 초기화
-        List<MenuItemDTO> allMenus = new ArrayList<>();
+        List<Map<String, Object>> allMenus = new ArrayList<>();
         
-        // 대메뉴 코드 목록 조회
-        List<MenuItemDTO> mainMenuItems = menuitemRepository.getMainMenuCodes();
+        // 대메뉴 코드 기준으로 그룹화
+        Map<String, List<MenuItemDTO>> groupedMenus = new HashMap<>();
+        Map<String, String> groupNames = new HashMap<>();
         
-        // 각 대메뉴에 대해 반복하여 프로시저 호출
-        for (MenuItemDTO mainMenu : mainMenuItems) {
-            // 대메뉴 코드로 해당 메뉴와 하위 메뉴 조회
-            String menuCode = mainMenu.getMCode();
-            List<MenuItemDTO> menuItems = menuitemRepository.getAllMenu(menuCode);
+        // 먼저 메뉴 아이템을 대메뉴 코드 기준으로 분류
+        for (MenuItemDTO item : menuItems) {
+            String mCode = item.getMCode();
+            // 코드가 2자리인 경우 대메뉴로 간주
+            if (mCode != null && mCode.length() == 2) {
+                groupNames.put(mCode, item.getMName());
+                System.out.println("대메뉴 발견: " + mCode + " - " + item.getMName());
+                continue;
+            }
             
-            // 결과 리스트에 추가
-            if (menuItems != null && !menuItems.isEmpty()) {
-                allMenus.addAll(menuItems);
+            // 하위 메뉴인 경우 대메뉴 코드 추출 (앞 2자리)
+            if (mCode != null && mCode.length() > 2) {
+                String groupKey = mCode.substring(0, 2);
+                if (!groupedMenus.containsKey(groupKey)) {
+                    groupedMenus.put(groupKey, new ArrayList<>());
+                }
+                groupedMenus.get(groupKey).add(item);
+                System.out.println("하위메뉴 추가: " + mCode + " -> 그룹 " + groupKey);
             }
         }
         
-        // 최종 결과 로그 출력
-        System.out.println("============ 최종 결과 메뉴 목록 ============");
-        System.out.println("총 메뉴 개수: " + allMenus.size());
-        for (int i = 0; i < allMenus.size(); i++) {
-            MenuItemDTO menu = allMenus.get(i);
-            System.out.println(i + ") " + menu.getMCode() + " - " + menu.getMName() + 
-                              " (레벨: " + menu.getMLev() + ")");
+        // 그룹화된 메뉴를 결과 형식으로 변환
+        for (String groupKey : groupedMenus.keySet()) {
+            Map<String, Object> groupMap = new HashMap<>();
+            groupMap.put("groupLabel", groupNames.getOrDefault(groupKey, groupKey));
+            groupMap.put("groupKey", groupKey);
+            groupMap.put("selected", new ArrayList<>());
+            groupMap.put("checked", false);
+            
+            // 옵션 목록 생성
+            List<Map<String, String>> options = new ArrayList<>();
+            for (MenuItemDTO item : groupedMenus.get(groupKey)) {
+                Map<String, String> option = new HashMap<>();
+                option.put("label", item.getMName());
+                option.put("value", item.getMCode());
+                options.add(option);
+            }
+            
+            groupMap.put("options", options);
+            allMenus.add(groupMap);
+            
+            System.out.println("그룹 생성: " + groupKey + " (" + groupNames.getOrDefault(groupKey, groupKey) + "), 하위메뉴 " + options.size() + "개");
         }
-        System.out.println("============ 결과 목록 끝 ============");
+        
+        // 최종 결과 로그 출력
+        System.out.println("최종 결과 그룹 수: " + allMenus.size());
+        for (int i = 0; i < allMenus.size(); i++) {
+            Map<String, Object> group = allMenus.get(i);
+            System.out.println(i + ". " + group.get("groupLabel") + " (" + group.get("groupKey") + ")");
+            
+            @SuppressWarnings("unchecked")
+            List<Map<String, String>> options = (List<Map<String, String>>) group.get("options");
+            for (Map<String, String> opt : options) {
+                System.out.println("   - " + opt.get("label") + " (" + opt.get("value") + ")");
+            }
+        }
         
         return allMenus;
     }

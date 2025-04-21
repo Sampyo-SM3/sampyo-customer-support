@@ -11,6 +11,10 @@ import '@mdi/font/css/materialdesignicons.css'
 loadFonts()
 
 const app = createApp(App)
+if (process.env.NODE_ENV === 'development') {
+    app.config.devtools = true;
+  }
+  
 const pinia = createPinia()
 
 app.use(vuetify)

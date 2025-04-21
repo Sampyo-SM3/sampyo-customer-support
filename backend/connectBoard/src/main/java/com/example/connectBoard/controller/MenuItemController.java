@@ -1,6 +1,7 @@
 package com.example.connectBoard.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +29,8 @@ public class MenuItemController {
 	}
     
     @GetMapping("/all-menu")
-    public ResponseEntity<List<MenuItemDTO>> getMainMenus() {
-        List<MenuItemDTO> mainMenus = menuitemService.getAllMenu();
+    public ResponseEntity<List<Map<String, Object>>> getMainMenus() {
+        List<Map<String, Object>> mainMenus = menuitemService.getAllMenu();
         return ResponseEntity.ok(mainMenus);
     }
 }

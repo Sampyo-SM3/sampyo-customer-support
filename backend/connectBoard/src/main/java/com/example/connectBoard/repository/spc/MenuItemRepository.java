@@ -1,6 +1,8 @@
 package com.example.connectBoard.repository.spc;
 
 import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import com.example.connectBoard.dto.MenuItemDTO;
@@ -11,7 +13,7 @@ import com.example.connectBoard.dto.response.MenuItemResponseDto.MenuItem;
 public interface MenuItemRepository {
     List<MenuItem> getMenuItems(MenuItemRequestDto requestDto);
     
-    List<MenuItemDTO> getAllMenu(String menuCode);
+    List<MenuItemDTO> getAllMenu();
     
     List<MenuItemDTO> getMainMenuCodes();
 }

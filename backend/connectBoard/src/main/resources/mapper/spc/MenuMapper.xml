@@ -50,8 +50,8 @@
 	
 	
 	<!-- 특정 대메뉴와 하위 메뉴 조회 -->
-	<select id="getAllMenu" parameterType="string" resultMap="menuItemDTOResultMap2">	
-	    EXEC usp_get_menu_list #{menuCode}
+	<select id="getAllMenu" resultMap="menuItemDTOResultMap2">	
+	    EXEC usp_get_menu_list
 	</select>	
 
 </mapper>
