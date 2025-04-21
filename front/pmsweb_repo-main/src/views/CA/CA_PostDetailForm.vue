@@ -129,22 +129,37 @@
         <div class="section-title">
           <div class="info-title-after"></div>답변 내용
         </div>
+        
         <!-- 댓글 섹션 -->
-        <!-- <div class="info-subtitle">댓글 {{ commentTextLength }}</div> -->
-        <div class="pa-3 mb-3" v-if="commentTextLength > 0" style="margin-top:-20px;">
+        <div class="comments-container" v-if="commentTextLength > 0">
           <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
             :all-comments="comments" @refresh="fetchComments" />
         </div>
         
+        <!-- 댓글이 없을 때 메시지 -->
+        <div v-else class="no-comments">
+          <p>등록된 답변이 없습니다. 첫 번째 답변을 작성해보세요.</p>
+        </div>
+        
         <!-- 댓글 입력 -->
-        <div class="comment-input-container mb-8" :class="{ 'mt-20': commentTextLength === 0 }">
-          <v-textarea v-model="newComment.content" 
-            :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '댓글 입력'"
+        <div class="comment-input-container" :class="{ 'mt-4': commentTextLength === 0 }">
+          <v-textarea 
+            auto-grow
+            v-model="newComment.content" 
+            :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '답변 입력'" 
+            variant="outlined"
+            density="comfortable"
+            color="#3A70B1"
+            rows="3"
+            hide-details
             class="comment-textarea"></v-textarea>
           <div class="btn-container">
-            <v-btn v-if="replyTo" text @click="cancelReply" class="mr-2">답글 취소</v-btn>
-            <v-btn variant="flat" style="background-color: rgba(236, 236, 236, 0.5); color: #000;" class="commentBtn"
-              @click="addComment()">댓글 등록</v-btn>
+            <v-btn v-if="replyTo" variant="text" color="#666" class="cancel-btn mr-2" @click="cancelReply">
+              답글 취소
+            </v-btn>
+            <v-btn variant="flat" color="#3A70B1" class="white--text comment-submit-btn" @click="addComment()">
+              답변 등록
+            </v-btn>
           </div>
         </div>
       </v-col>
@@ -651,6 +666,23 @@ export default {
 .btn-container {
   display: flex;
   justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.comment-submit-btn {
+  font-size: 14px;
+  text-transform: none;
+  border-radius: 4px;
+  height: 36px;
+  color: white !important;
+}
+
+.cancel-btn {
+  font-size: 14px;
+  text-transform: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  height: 36px;
 }
 
 .custom-btn {
@@ -797,15 +829,34 @@ export default {
   height: 17px;
   background-color: #B0CAE6;
   margin-right: 10px;
-  margin-bottom: 3px;
   position: relative;
-  top: 4px;
+}
+
+.comments-container {
+  margin-bottom: 20px;
+  background-color: #f9fbfd;
+  border-radius: 8px;
+  padding: 10px 15px;
+  border: 1px solid #E6EEF8;
+}
+
+
+.no-comments {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  background-color: #f9fbfd;
+  border-radius: 8px;
+  border: 1px solid #E6EEF8;
+  margin-bottom: 20px;
 }
 
 .section-title {
   font-size: 17px;
   margin-bottom: 15px;
   font-weight: 400;
+  display: flex;
+  align-items: center;
 }
 
 .fileBox {
@@ -825,13 +876,17 @@ export default {
 }
 
 .comment-input-container {
-  width: 100%;
-  margin-bottom: 50px; /* 하단 여백 추가 */
-  padding-bottom: 20px; /* 내부 하단 여백 */
+  margin-bottom: 40px;
+  padding: 15px;
+  background-color: #f9fbfd;
+  border-radius: 8px;
+  border: 1px solid #E6EEF8;
 }
 
 .comment-textarea {
-  width: 100%;
-  max-height: 200px;
+  margin-bottom: 10px;
+  background-color: white;
+  border-radius: 4px;
+  font-size: 14px;
 }
 </style>

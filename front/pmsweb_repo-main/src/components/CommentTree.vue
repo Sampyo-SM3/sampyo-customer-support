@@ -9,18 +9,31 @@
           <span class="comment-user">{{ comment.userId }}</span>
           <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
         </div>
+        
         <!-- 수정모드가 아닐때 -->
         <div v-if="!isEditing" class="comment-text">{{ comment.content }}</div>
 
         <!-- 수정 모드일 때 -->
         <div v-else class="comment-edit-container">
-          <v-textarea v-model="editedContent" label="댓글 수정" class="edit-textarea"></v-textarea>
-          <div class="edit-btn-container" style="margin-top: -10px">
-            <v-btn text class="reply-sub-btn" @click="saveEditedComment(comment)">
-              저장
-            </v-btn>
-            <v-btn text class="reply-sub-btn" @click="cancelEdit">
+          <v-textarea 
+            auto-grow
+            v-model="editedContent" 
+            label="댓글 수정" 
+            variant="outlined"
+            density="comfortable"
+            color="#3A70B1"
+            rows="3"
+            hide-details
+            class="edit-textarea"></v-textarea>
+          <div class="edit-btn-container">
+            <!-- <v-btn text class="edit-btn" color="#666" @click="cancelEdit">            
               취소
+            </v-btn> -->
+            <v-btn variant="flat" color="#666" class="white--text save-btn" @click="cancelEdit">
+              취소
+            </v-btn>            
+            <v-btn variant="flat" color="#3A70B1" class="white--text save-btn" @click="saveEditedComment(comment)">
+              저장
             </v-btn>
           </div>
         </div>
@@ -28,26 +41,46 @@
         <div class="comment-actions" v-if="comment.userId === this.userId">
           <v-menu>
             <template v-slot:activator="{ isActive, props }">
-              <v-icon v-bind="props" :color="isActive ? 'primary' : 'default'" size="20">
+              <v-icon v-bind="props" :color="isActive ? '#3A70B1' : '#666'" size="18">
                 mdi-dots-vertical
               </v-icon>
             </template>
 
             <v-list class="more-actions-list">
-              <v-list-item @click="onEdit" title="수정" class="more-actions-item text-center" />
-              <v-list-item @click="deleteComment(comment.commentId)" title="삭제" class="more-actions-item text-center" />
+              <v-list-item @click="onEdit" title="수정" class="more-actions-item" />
+              <v-list-item @click="deleteComment(comment.commentId)" title="삭제" class="more-actions-item" />
             </v-list>
           </v-menu>
         </div>
 
-        <v-btn v-if="!isEditing" text class="reply-btn" @click="toggleReplyInput(comment)">답글</v-btn>
-        <!--<v-btn text class="reply-btn" @click="deleteComment(comment.commentId)">삭제</v-btn> -->
+        <div class="comment-footer">
+          <v-btn v-if="!isEditing" variant="text" size="small" class="reply-btn" @click="toggleReplyInput(comment)">
+            <v-icon size="16" class="mr-1">mdi-reply</v-icon>
+            답글
+          </v-btn>
+        </div>
 
         <div v-if="showReplyInput" class="reply-input-container">
-          <v-textarea v-model="replyContent" label="답글 입력" class="reply-textarea"></v-textarea>
+          <v-textarea 
+            auto-grow
+            v-model="replyContent" 
+            label="답글 입력" 
+            variant="outlined"
+            density="comfortable"
+            color="#3A70B1"
+            rows="2"
+            hide-details
+            class="reply-textarea"></v-textarea>
           <div class="reply-btn-container">
-            <v-btn text class="reply-sub-btn" @click="submitReply">등록</v-btn>
-            <v-btn text class="reply-sub-btn" @click="cancelReply">취소</v-btn>
+            <!-- <v-btn text class="cancel-reply-btn" color="#666" @click="cancelReply">
+              취소
+            </v-btn> -->
+            <v-btn variant="flat" color="#666" class="white--text submit-reply-btn" @click="cancelReply">
+              취소
+            </v-btn>            
+            <v-btn variant="flat" color="#3A70B1" class="white--text submit-reply-btn" @click="submitReply">
+              등록
+            </v-btn>
           </div>
         </div>
       </div>
@@ -228,22 +261,20 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .comment-wrapper {
-  margin-bottom: 5px;
+  margin-bottom: 12px;
 }
 
 .comment-item {
   position: relative;
-  /* 이게 중요함! */
   display: flex;
   flex-direction: row;
-  padding: 16px;
-  border-bottom: 1px solid #eee;
-}
-
-.comment-item.has-reply-input {
-  border-bottom: none !important;
+  padding: 12px 16px;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  margin-bottom: 8px;
 }
 
 .reply-indicator-wrapper {
@@ -252,7 +283,7 @@ export default {
 }
 
 .reply-indicator {
-  color: #666;
+  color: #3A70B1;
   margin-right: 8px;
   font-weight: bold;
   font-size: 16px;
@@ -264,138 +295,100 @@ export default {
 
 .comment-header {
   margin-bottom: 8px;
+  display: flex;
+  align-items: center;
 }
 
 .comment-user {
   font-weight: 500;
   margin-right: 10px;
+  color: #333;
+  font-size: 14px;
 }
 
 .comment-date {
-  color: #666;
-  font-size: 13px;
+  color: #888;
+  font-size: 12px;
 }
 
 .comment-text {
-  margin: 5px 0;
+  margin: 5px 0 10px;
   font-size: 14px;
-  line-height: 1.4;
+  line-height: 1.5;
+  color: #444;
+  white-space: pre-wrap;  /* 엔터와 공백을 그대로 표시 */
+  word-break: break-word; /* 긴 단어가 있을 때 줄바꿈 */  
+}
+
+.comment-footer {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
 }
 
 .reply-btn {
-  text-transform: none !important;
-  min-width: 30px !important;
-  height: 28px !important;
   font-size: 12px !important;
   color: #666 !important;
-  margin-top: 5px;
-  margin-left: 5px;
-  box-shadow: none !important;
-  background-color: transparent !important;
-  border: 1px solid #ddd !important;
-  border-radius: 4px !important;
-}
-
-.reply-sub-btn {
   text-transform: none !important;
-  min-width: 45px !important;
-  height: 30px !important;
-  font-size: 14px !important;
-  color: #666 !important;
-  margin-top: 3px;
-  margin-left: 5px;
-  box-shadow: none !important;
-  background-color: transparent !important;
-  border: 1px solid #ddd !important;
-  border-radius: 4px !important;
-}
-
-.reply-input-container {
-  margin-top: 8px;
-  padding: 10px;
-  border-left: none;
-  border-radius: 6px;
-}
-
-.reply-textarea {
-  width: 100%;
-  font-size: 14px;
-  min-height: 60px;
-}
-
-.reply-btn-container {
-  display: flex;
-  justify-content: flex-end;
-  gap: 5px;
-}
-
-.reply-submit-btn {
-  background-color: #1867C0;
-  color: white;
-}
-
-.reply-cancel-btn {
-  background-color: #ccc;
-  color: white;
-}
-
-.replies-container {
-  width: 100%;
+  min-width: auto !important;
+  height: 28px !important;
+  padding: 0 10px !important;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
 .comment-actions {
   position: absolute;
-  right: 8px;
-  top: 8px;
+  right: 12px;
+  top: 12px;
 }
 
 .more-actions-list {
-  min-width: 80px;
+  min-width: 100px;
+  border-radius: 4px;
 }
 
 .more-actions-item {
-  cursor: pointer;
-  padding: 10px 16px;
-  transition: background-color 0.3s;
+  font-size: 14px !important;
+  min-height: 36px;
 }
 
-.more-actions-item:hover {
-  background-color: rgba(0, 0, 0, 0.08);
+.reply-input-container {
+  margin-top: 12px;
+  padding: 10px;
+  background-color: #f5f8fb;
+  border-radius: 4px;
 }
 
-/* 기존 스타일에 추가 */
-.reply-count-btn {
-  text-transform: none !important;
-  min-width: 80px !important;
-  height: 28px !important;
-  font-size: 12px !important;
-  color: #666 !important;
-  margin-top: 5px;
-  margin-left: 5px;
-  box-shadow: none !important;
-  background-color: transparent !important;
-  border: 1px solid #ddd !important;
-  border-radius: 4px !important;
-  display: flex;
-  align-items: center;
-}
-
-.comment-footer {
-  margin-top: 8px;
-  display: flex;
-  align-items: center;
-}
-
-.edit-textarea {
+.reply-textarea, .edit-textarea {
   width: 100%;
   font-size: 14px;
-  margin-top: 10px;
+  background-color: white;
+  border-radius: 4px;
 }
 
-.edit-btn-container {
+.reply-btn-container, .edit-btn-container {
   display: flex;
   justify-content: flex-end;
   margin-top: 10px;
-  gap: 10px;
+  gap: 8px;
+}
+
+
+.submit-reply-btn, .save-btn {
+  font-size: 13px;
+  text-transform: none;
+  height: 32px;
+  border-radius: 4px;
+  color: white !important;
+}
+
+.replies-container {
+  padding-left: 24px;
+}
+
+.comment-edit-container {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 </style>

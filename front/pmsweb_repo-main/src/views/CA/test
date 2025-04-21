@@ -1,0 +1,236 @@
+<template>
+  <div class="comment-wrapper">
+    <div class="comment-item">
+      <div v-if="comment.depth > 0" class="reply-indicator-wrapper" :style="getIndentStyle">
+        <span class="reply-indicator">ㄴ</span>
+      </div>
+      <div class="comment-content">
+        <div class="comment-header">
+          <span class="comment-user">{{ comment.userId }}</span>
+          <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
+        </div>
+        <!-- 수정모드가 아닐때 -->
+        <div v-if="!isEditing" class="comment-text">{{ comment.content }}</div>
+
+        <!-- 수정 모드일 때 -->
+        <div v-else class="comment-edit-container">
+          <v-textarea v-model="editedContent" label="댓글 수정" class="edit-textarea"></v-textarea>
+          <div class="edit-btn-container" style="margin-top: -10px">
+            <v-btn text class="reply-sub-btn" @click="saveEditedComment(comment)">
+              저장
+            </v-btn>
+            <v-btn text class="reply-sub-btn" @click="cancelEdit">
+              취소
+            </v-btn>
+          </div>
+        </div>
+
+        <div class="comment-actions" v-if="comment.userId === this.userId">
+          <v-menu>
+            <template v-slot:activator="{ isActive, props }">
+              <v-icon v-bind="props" :color="isActive ? 'primary' : 'default'" size="20">
+                mdi-dots-vertical
+              </v-icon>
+            </template>
+
+            <v-list class="more-actions-list">
+              <v-list-item @click="onEdit" title="수정" class="more-actions-item text-center" />
+              <v-list-item @click="deleteComment(comment.commentId)" title="삭제" class="more-actions-item text-center" />
+            </v-list>
+          </v-menu>
+        </div>
+
+        <v-btn v-if="!isEditing" text class="reply-btn" @click="toggleReplyInput(comment)">답글</v-btn>
+        <!--<v-btn text class="reply-btn" @click="deleteComment(comment.commentId)">삭제</v-btn> -->
+
+        <div v-if="showReplyInput" class="reply-input-container">
+          <v-textarea v-model="replyContent" label="답글 입력" class="reply-textarea"></v-textarea>
+          <div class="reply-btn-container">
+            <v-btn text class="reply-sub-btn" @click="submitReply">등록</v-btn>
+            <v-btn text class="reply-sub-btn" @click="cancelReply">취소</v-btn>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 대댓글 목록 -->
+    <div class="replies-container">
+      <comment-tree v-for="child in childComments" :key="child.commentId" :comment="child" :all-comments="allComments"
+        @reply="$emit('reply', $event)" @delete="$emit('delete', $event)" @refresh="$emit('refresh')" />
+    </div>
+  </div>
+</template>
+
+
+
+<style>
+.comment-wrapper {
+  margin-bottom: 5px;
+}
+
+.comment-item {
+  position: relative;
+  /* 이게 중요함! */
+  display: flex;
+  flex-direction: row;
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.comment-item.has-reply-input {
+  border-bottom: none !important;
+}
+
+.reply-indicator-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.reply-indicator {
+  color: #666;
+  margin-right: 8px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.comment-content {
+  flex: 1;
+}
+
+.comment-header {
+  margin-bottom: 8px;
+}
+
+.comment-user {
+  font-weight: 500;
+  margin-right: 10px;
+}
+
+.comment-date {
+  color: #666;
+  font-size: 13px;
+}
+
+.comment-text {
+  margin: 5px 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.reply-btn {
+  text-transform: none !important;
+  min-width: 30px !important;
+  height: 28px !important;
+  font-size: 12px !important;
+  color: #666 !important;
+  margin-top: 5px;
+  margin-left: 5px;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+}
+
+.reply-sub-btn {
+  text-transform: none !important;
+  min-width: 45px !important;
+  height: 30px !important;
+  font-size: 14px !important;
+  color: #666 !important;
+  margin-top: 3px;
+  margin-left: 5px;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+}
+
+.reply-input-container {
+  margin-top: 8px;
+  padding: 10px;
+  border-left: none;
+  border-radius: 6px;
+}
+
+.reply-textarea {
+  width: 100%;
+  font-size: 14px;
+  min-height: 60px;
+}
+
+.reply-btn-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.reply-submit-btn {
+  background-color: #1867C0;
+  color: white;
+}
+
+.reply-cancel-btn {
+  background-color: #ccc;
+  color: white;
+}
+
+.replies-container {
+  width: 100%;
+}
+
+.comment-actions {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+}
+
+.more-actions-list {
+  min-width: 80px;
+}
+
+.more-actions-item {
+  cursor: pointer;
+  padding: 10px 16px;
+  transition: background-color 0.3s;
+}
+
+.more-actions-item:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+/* 기존 스타일에 추가 */
+.reply-count-btn {
+  text-transform: none !important;
+  min-width: 80px !important;
+  height: 28px !important;
+  font-size: 12px !important;
+  color: #666 !important;
+  margin-top: 5px;
+  margin-left: 5px;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+  display: flex;
+  align-items: center;
+}
+
+.comment-footer {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.edit-textarea {
+  width: 100%;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.edit-btn-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+  gap: 10px;
+}
+</style>
