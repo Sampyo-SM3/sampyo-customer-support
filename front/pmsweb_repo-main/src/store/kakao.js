@@ -7,13 +7,7 @@ export const useKakaoStore = defineStore("kakao", {
     error: null,
   }),
   actions: {
-    async sendAlimtalk(boardSeq, prevStatus, currentStatus, phone) {
-      console.log('-- sendAlimtalk --');
-      console.log('boardSeq:', boardSeq);
-      console.log('prevStatus:', prevStatus);
-      console.log('currentStatus:', currentStatus);
-      console.log('phone:', phone);
-    
+    async sendAlimtalk(boardSeq, prevStatus, currentStatus, phone) {          
       if (!prevStatus || prevStatus.trim() === '') {
         console.log('이전 상태값이 없어 알림톡 발송을 중단합니다.');
         return false;
@@ -41,14 +35,14 @@ export const useKakaoStore = defineStore("kakao", {
                       + '■ 현재상태: ' + currentStatus + '\n' 
                       + '■ 변경일시: ' + currentDateTime; 
         
-        console.log(Message);
+        // console.log(Message);
         const response = await apiClient.post('/api/kakao', {        
           content: Message,
           phone: phone
         });
 
         if (response.data) {
-          console.log('알림톡 전송 결과:', response.data);
+          // console.log('알림톡 전송 결과:', response.data);
           return response.data;
         }
       } catch (error) {

@@ -90,7 +90,7 @@ export default {
     };
 
     const handleMenuSelection = (headerCode) => {
-      console.log('Header menu selected:', headerCode);
+      // console.log('Header menu selected:', headerCode);
       setTimeout(() => {
         if (sideMenu.value) {
           sideMenu.value.activateFirstSubmenuByHeader(headerCode);

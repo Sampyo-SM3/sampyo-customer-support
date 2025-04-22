@@ -180,12 +180,21 @@
                   params: { receivedSeq: item.seq }
                 }"
                 class="title-link"
+                style="display: inline-flex; align-items: center;"
               >
                 {{ item.sub }}
-                &nbsp;
-                <span v-if="item.countComment > 0" style="color: black;">[{{ item.countComment }}]</span>
-                &nbsp;
-                <v-icon v-if="item.new_yn === 'Y' && item.countComment > 0" color="red" size="22">mdi-new-box</v-icon>
+
+                <span v-if="item.countComment > 0">&nbsp;</span> 
+                <span v-if="item.countComment > 0" style="color: #737577;">[{{ item.countComment }}]</span>
+
+                <span v-if="item.new_yn === 'Y'">&nbsp;</span>                                                
+                <v-img v-if="item.new_yn === 'Y'" 
+                  src="@/assets/new-icon.png" 
+                  alt="new" 
+                  width="22" 
+                  height="22"
+                  style="display: inline-block; vertical-align: middle;">
+                </v-img>             
               </router-link>
             </div>
 
@@ -387,9 +396,9 @@ export default {
         this.endDate = '';
       }
     },
-    selectedStatus(newVal, oldVal) {
-      console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
-    }
+    // selectedStatus(newVal, oldVal) {
+    //   console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
+    // }
   },
 
   mounted() {
@@ -568,8 +577,7 @@ export default {
             status: this.selectedStatus
           }
         });
-        console.log('asdasdasdasd');
-          console.log(response.data[0]);
+        
         // API 응답 데이터 처리
         if (response.data && Array.isArray(response.data)) {
           this.tableData = response.data.map(item => {

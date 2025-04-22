@@ -52,7 +52,7 @@
         저장
       </v-btn>
 
-      <v-btn variant="flat" color="#F7A000" class="save-status-btn ml-3 white-text" size="small">
+      <v-btn variant="flat" color="#F7A000" class="save-status-btn ml-3 white-text" size="small" @click="showUserPopup = true">
         담당자 이관
       </v-btn>
 
@@ -182,6 +182,9 @@
       </v-btn>
     </template>
   </v-snackbar>
+
+  <!-- 관리자 추가하기 팝업 -->
+  <user-popup :show="showUserPopup" @manager-selected_edit="editManager" @close="showUserPopup = false" />  
 </template>
 
 <script>
@@ -190,6 +193,7 @@ import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포�
 import { inject, onMounted } from 'vue';
 import { useKakaoStore } from '@/store/kakao';
 import { useAuthStore } from '@/store/auth';
+import userPopup from '@/components/userPopup.vue';
 
 export default {
   props: {
@@ -223,7 +227,8 @@ export default {
     }
   },
   components: {
-    CommentTree
+    CommentTree,
+    userPopup
   },
   unmounted() { // ❗ 컴포넌트가 언마운트될 때
     const listButtonLink = inject('listButtonLink', null);
@@ -238,6 +243,7 @@ export default {
   },
   data() {
     return {
+      showUserPopup: false,
       step: 1,
       loading: false,
       errorMessages: [],
@@ -299,7 +305,7 @@ export default {
       immediate: true  // 컴포넌트 생성 시점에도 즉시 실행
     },
     selectedStatus(newVal, oldVal) {
-      console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
+      // console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
       this.oldStatus = oldVal;
     }
   },
@@ -322,6 +328,31 @@ export default {
 
   },
   methods: {
+    async editManager(selectedManager) {    
+      try {
+        this.loading = true;
+
+        const boardData = {
+          "seq": this.receivedSeq,
+          "manager": selectedManager.name,
+          "managerId": selectedManager.usrId,
+          "managerTel": selectedManager.handTelNo,
+          "managerEmail": selectedManager.emailAddr
+        };            
+
+        // 게시글 등록 및 seq 값 반환
+        await apiClient.post("/api/require/updateForm", boardData);      
+      } catch (error) {
+        console.error("관리자 수정 중 오류:", error);
+        this.errorMessages = [error.message || "관리자 수정 중 오류가 발생했습니다."];
+        this.showError = true;
+      } finally {
+        this.loading = false;
+      }
+
+      // 수정 성공 후 페이지 새로고침
+      window.location.reload();      
+    },     
     async getDetailInquiry() {
       const response = await apiClient.get("/api/require/detail", {
         params: { seq: this.receivedSeq }
@@ -403,6 +434,7 @@ export default {
       // localStorage에서 userInfo를 가져와서 userName에 할당
       this.userName = JSON.parse(localStorage.getItem("userInfo"))?.name || null;
       this.userId = JSON.parse(localStorage.getItem("userInfo"))?.id || null;
+      this.userPhone = JSON.parse(localStorage.getItem("userInfo"))?.phone || null;      
     },
 
     goBack() {
@@ -416,8 +448,11 @@ export default {
       // P 미처리
       // S SR
       try {
+        // 로그인정보
         const userInfoString = localStorage.getItem('userInfo');
         const phone = JSON.parse(userInfoString).phone;
+
+
 
         // {"companyCd":"CEMENT","id":"javachohj","name":"조희재","phone":null,"email":null,"admin":false,"pwd":null}
 
@@ -439,7 +474,7 @@ export default {
 
         const statusData = {
           seq: this.receivedSeq,
-          processState: this.selectedStatus
+          processState: this.selectedStatus,          
         };
         
         await apiClient.post("/api/updateStatus", statusData);

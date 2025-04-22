@@ -232,6 +232,9 @@
       </v-col>
     </v-row>
   </v-container>
+
+  <!-- 관리자 추가하기 팝업 -->
+  <user-popup :show="showUserPopup" @manager-selected_sr_edit="editManager" @close="showUserPopup = false" />    
 </template>
 
 
@@ -241,6 +244,7 @@ import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포�
 import { inject, onMounted } from 'vue';
 import { useKakaoStore } from '@/store/kakao';
 import { useAuthStore } from '@/store/auth';
+import userPopup from '@/components/userPopup.vue';
 
 export default {
   // props 정의 추가
@@ -276,7 +280,8 @@ export default {
     }
   },
   components: {
-    CommentTree
+    CommentTree,
+    userPopup
   },
   unmounted() { // ❗ 컴포넌트가 언마운트될 때
     const listButtonLink = inject('listButtonLink', null);
@@ -344,6 +349,31 @@ export default {
     };
   },
   methods: {
+    async editManager(selectedManager) {    
+      try {
+        this.loading = true;
+
+        const boardData = {
+          "seq": this.receivedSeq,
+          "manager": selectedManager.name,
+          "managerId": selectedManager.usrId,
+          "managerTel": selectedManager.handTelNo,
+          "managerEmail": selectedManager.emailAddr
+        };            
+
+        // 게시글 등록 및 seq 값 반환
+        await apiClient.post("/api/require/updateForm", boardData);      
+      } catch (error) {
+        console.error("관리자 수정 중 오류:", error);
+        this.errorMessages = [error.message || "관리자 수정 중 오류가 발생했습니다."];
+        this.showError = true;
+      } finally {
+        this.loading = false;
+      }
+
+      // 수정 성공 후 페이지 새로고침
+      window.location.reload();      
+    },      
     async getDetailInquiry() {
       const response = await apiClient.get("/api/require/detail", {
         params: { seq: this.receivedSeq }
@@ -763,7 +793,7 @@ export default {
       immediate: true  // 컴포넌트 생성 시점에도 즉시 실행
     },
     selectedStatus(newVal, oldVal) {
-      console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
+      // console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
       this.oldStatus = oldVal;
     }
   }

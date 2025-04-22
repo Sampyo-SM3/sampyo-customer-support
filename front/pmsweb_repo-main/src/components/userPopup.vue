@@ -93,7 +93,11 @@ export default {
             }
         },
         addUser() {
+            // 글작성 폼으로 전달
             this.$emit('manager-selected', this.selectedUser);
+            // 글수정 폼으로 전달달
+            this.$emit('manager-selected_edit', this.selectedUser);
+            this.$emit('manager-selected_sr_edit', this.selectedUser);
             this.closeDialog();
         },
         closeDialog() {

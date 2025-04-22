@@ -49,8 +49,7 @@ public class RequireController {
     }
     
     @GetMapping("/require/search")
-    public ResponseEntity<?> searchRequires(@ModelAttribute RequireSearchCriteria criteria) {
-    	System.out.println("123123123123123");
+    public ResponseEntity<?> searchRequires(@ModelAttribute RequireSearchCriteria criteria) {    	
         try {        	
             List<RequireDTO> requires = requireService.searchRequiresByCriteria(criteria);
             
@@ -79,7 +78,7 @@ public class RequireController {
     
 	// 문의글 수정
     @PostMapping("/require/updateForm")
-    public ResponseEntity<?> updateForm(@RequestBody RequireDTO require) {
+    public ResponseEntity<?> updateForm(@RequestBody RequireDTO require) {    	
         try {
         	requireService.updateForm(require);
             return ResponseEntity.ok("접수상태가 변경되었습니다.");

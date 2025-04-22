@@ -72,8 +72,10 @@ export default defineComponent({
     onMounted(async () => {
       await menuStore.fetchMenuData(auth.value, id.value)
 
+      // watch(menuData, (newValue) => {
       watch(menuData, (newValue) => {
-        console.log('menuData changed:', newValue);
+        
+        console.log(newValue);
 
         // 첫 로드시에만 실행
         if (isFirstLoad.value && menuData.value && menuData.value.length > 0) {
@@ -92,7 +94,7 @@ export default defineComponent({
     });
 
     const processedMenuItems = computed(() => {
-      console.log('----------processedMenuItems()-----------')
+      // console.log('----------processedMenuItems()-----------')
 
       if (isLoading.value || menuData.value.length === 0) {
         return []
@@ -121,8 +123,8 @@ export default defineComponent({
     })
 
     const activateMenuItem = (item) => {
-      console.log(`Activate menu item: ${item.M_NAME}, Code: ${item.M_CODE}`)
-      console.log(menuData.value);
+      // console.log(`Activate menu item: ${item.M_NAME}, Code: ${item.M_CODE}`)
+      // console.log(menuData.value);
 
       const level3Name = item.M_NAME;
       const level2Name = getLevel2MenuName(item.M_CODE);
@@ -177,9 +179,9 @@ export default defineComponent({
     }
 
     const toggleMenu = (item) => {
-      console.log('----------toggleMenu----------')
-      console.log('processedMenuItems.value[1] -> ', processedMenuItems.value[1])
-      console.log('processedMenuItems.value[4] -> ', processedMenuItems.value[4])
+      // console.log('----------toggleMenu----------')
+      // console.log('processedMenuItems.value[1] -> ', processedMenuItems.value[1])
+      // console.log('processedMenuItems.value[4] -> ', processedMenuItems.value[4])
 
       processedMenuItems.value.forEach(menuItem => {
         if (menuItem !== item) {
@@ -187,20 +189,20 @@ export default defineComponent({
         }
       });
 
-      console.log('클릭 후')
-      console.log('processedMenuItems.value[1] -> ', processedMenuItems.value[1])
-      console.log('processedMenuItems.value[4] -> ', processedMenuItems.value[4])
+      // console.log('클릭 후')
+      // console.log('processedMenuItems.value[1] -> ', processedMenuItems.value[1])
+      // console.log('processedMenuItems.value[4] -> ', processedMenuItems.value[4])
 
       item.isOpen = !item.isOpen;
 
-      console.log('item.isOpen -> ', item.isOpen)
+      // console.log('item.isOpen -> ', item.isOpen)
     }
 
     const activateFirstSubmenuByHeader = (headerCode) => {
-      console.log('activateFirstSubmenuByHeader called with:', headerCode);
+      // console.log('activateFirstSubmenuByHeader called with:', headerCode);
 
       if (!menuData.value || menuData.value.length === 0) {
-        console.log('No menu data available');
+        // console.log('No menu data available');
         return;
       }
 
@@ -211,7 +213,7 @@ export default defineComponent({
       );
 
       if (targetMenu) {
-        console.log('First clickable menu found:', targetMenu.M_NAME);
+        // console.log('First clickable menu found:', targetMenu.M_NAME);
         activateMenuItem(targetMenu);
       } else {
         console.log('No clickable menu found for header:', headerCode);

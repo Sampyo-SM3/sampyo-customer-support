@@ -28,7 +28,8 @@ public class KakaoController {
 		try {
 			String content = request.get("content");
 			String phone = request.get("phone");
-
+			System.out.println("!!!!!!!!!!");
+			System.out.println(phone);
 			// 템플릿 승인나면 주석풀자
 //            kakaoService.insertKakao(content, phone);
 			return ResponseEntity.ok("카카오톡 전송 성공!");

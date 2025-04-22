@@ -13,7 +13,7 @@ export const useMenuStore = defineStore("menu", {
   }),
   actions: {
     async fetchMenuData(auth, id) {
-      console.log("-------fetchMenuData ---------");
+      // console.log("-------fetchMenuData ---------");
       try {
         this.isLoading = true;
         
@@ -26,7 +26,7 @@ export const useMenuStore = defineStore("menu", {
 
         if (response.data && Array.isArray(response.data.menuItems)) {
           this.menuData = response.data.menuItems.map(this.mapMenuItem);
-          console.log("store this.menuData -> ", this.menuData);
+          // console.log("store this.menuData -> ", this.menuData);
         } else {
           throw new Error(
             "Invalid data structure or menuItems is not an array"

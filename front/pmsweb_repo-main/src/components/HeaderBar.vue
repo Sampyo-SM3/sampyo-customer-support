@@ -133,8 +133,8 @@ export default defineComponent({
     };
 
     const showSideMenu = (item) => {
-      console.log('--------showSideMenu--------')
-      console.log('item-> ', item)
+      // console.log('--------showSideMenu--------')
+      // console.log('item-> ', item)
 
       // 로컬 저장소에서 user_id 가져오기
       const userId = localStorage.getItem('user_id');
@@ -146,7 +146,7 @@ export default defineComponent({
     }
 
     const fetchMenuData = async (id) => {
-      console.log('----------fetchMenuData2----------')
+      // console.log('----------fetchMenuData2----------')
       try {
         isLoading.value = true
         const response = await apiClient.get('/api/menuitem', {
@@ -161,7 +161,7 @@ export default defineComponent({
             m_code: item.mcode,
             m_name: item.mname
           }))
-          console.log('menuItems.value -> ', menuItems.value)
+          // console.log('menuItems.value -> ', menuItems.value)
         } else {
           throw new Error('Invalid data structure or menuItems is not an array')
         }
@@ -210,8 +210,8 @@ export default defineComponent({
 
     // 메뉴 클릭 핸들러 수정
     const handleMenuClick = (item) => {
-      console.log('--------handleMenuClick--------');
-      console.log('item-> ', item);
+      // console.log('--------handleMenuClick--------');
+      // console.log('item-> ', item);
 
       // 기존 사이드메뉴 데이터 로드 함수 호출
       showSideMenu(item);

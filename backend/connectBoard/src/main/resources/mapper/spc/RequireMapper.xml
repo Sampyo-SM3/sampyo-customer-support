@@ -169,16 +169,30 @@
 	</select>
 
 	<update id="updateForm" parameterType="com.example.connectBoard.dto.RequireDTO">
-   		UPDATE board 
-    	SET sub = #{sub},
-    		etc = #{etc},
-    		manager = #{manager},
-    		managerId = #{managerId},
-    		managerEmail = #{managerEmail},
-    		managerTel = #{managerTel},
-    		saveFlag = 'Y',
-    		updateDt = GETDATE()
-    	WHERE seq = #{seq};
+	    UPDATE board
+	    <set>
+	        <if test="sub != null and sub != ''">
+	            sub = #{sub},
+	        </if>
+	        <if test="etc != null and etc != ''">
+	            etc = #{etc},
+	        </if>
+	        <if test="manager != null and manager != ''">
+	            manager = #{manager},
+	        </if>
+	        <if test="managerId != null and managerId != ''">
+	            managerId = #{managerId},
+	        </if>
+	        <if test="managerEmail != null and managerEmail != ''">
+	            managerEmail = #{managerEmail},
+	        </if>
+	        <if test="managerTel != null and managerTel != ''">
+	            managerTel = #{managerTel},
+	        </if>
+	        saveFlag = 'Y',
+	        updateDt = GETDATE()
+	    </set>
+	    WHERE seq = #{seq}
 	</update>
 	
 	<update id="updateSrForm" parameterType="com.example.connectBoard.dto.RequireDTO">

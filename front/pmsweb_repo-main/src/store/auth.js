@@ -15,7 +15,7 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     // 로그인 시도
     async login(credentials) {   
-      console.log('--login--');
+      // console.log('--login--');
       try {
         this.isLoading = true;
         this.error = null;

@@ -469,7 +469,7 @@ export default {
         const response = await apiClient.post("/api/require/insert", boardData);
         const boardSeq = response.data; // 등록된 게시글의 seq
 
-        console.log('게시글 등록 성공!' + boardSeq);
+        // console.log('게시글 등록 성공!' + boardSeq);
 
         // selectedFiles 배열의 각 파일에 대해 반복
         const fileAttachPromises = this.selectedFiles.map(async (file) => {
@@ -565,7 +565,7 @@ export default {
       this.managerEmail = selectedManager.emailAddr;
 
       this.selectedManager = selectedManager;
-      console.log(selectedManager);
+      // console.log(selectedManager);
     }
   }
 }
