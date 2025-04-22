@@ -22,6 +22,7 @@
 		    b.requestDate,
 		    b.requestDate AS requestDateTime,
 		    b.completeDate,
+		    b.completeDt,
 		    b.srFlag,
 		    b.saveFlag,
 		    (SELECT COUNT(*) FROM COMMENTS WHERE postid = b.seq) as countComment   	

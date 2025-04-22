@@ -104,7 +104,7 @@ export default defineComponent({
       const level3Map = new Map()
 
       menuData.value.forEach(item => {
-        console.log(item.M_NAME)
+        // console.log(item.M_NAME)
         if (item.LEV === 2) {
           result.push(item)
         } else if (item.LEV === 3) {

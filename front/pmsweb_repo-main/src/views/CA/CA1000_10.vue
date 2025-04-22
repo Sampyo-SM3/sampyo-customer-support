@@ -201,9 +201,9 @@
 
             <div class="td-cell">{{ item.division }}</div>
             <div class="td-cell" :class="getStatusClass(item.processState)">{{ item.status }}</div>
-            <div class="td-cell">{{ formatDate(item.completeDate) }}</div>
+            <div class="td-cell">{{ formatDate(item.completeDt) }}</div>
             <div class="td-cell">{{ item.manager || '-' }}</div>
-            <div class="td-cell">{{ calculateDuration(item.requestDate, item.completeDate) }}</div>
+            <div class="td-cell">{{ calculateDuration(item.requestDate, item.completeDt) }}</div>
             <!-- <div class="td-cell">{{ item.memo || '-' }}</div> -->
           </div>
         </div>
@@ -576,15 +576,18 @@ export default {
             sub: this.sub,
             status: this.selectedStatus
           }
-        });
+        });        
         
         // API 응답 데이터 처리
         if (response.data && Array.isArray(response.data)) {
+        
+          
           this.tableData = response.data.map(item => {
             const requestDateTime = new Date(item.requestDateTime);
             const now = new Date();
             const diffTime = now - requestDateTime;
             const diffHours = diffTime / (1000 * 60 * 60);
+            
 
             return {
               ...item,
@@ -599,7 +602,7 @@ export default {
 
               // 테이블에 표시할 데이터 매핑
               manager: item.manager || '-',  // 담당자 필드가 없어서 임시로 요청자 ID 사용
-              memo: item.currentIssue || '-' // 메모 필드가 없어서 임시로 현재 이슈 사용
+              memo: item.currentIssue || '-', // 메모 필드가 없어서 임시로 현재 이슈 사용              
             };
           });
 
@@ -676,6 +679,7 @@ export default {
 
     // 소요시간 계산 함수
     calculateDuration(startDate, endDate) {
+      
       if (!startDate || !endDate) return '-';
 
       const start = new Date(startDate);
@@ -683,10 +687,9 @@ export default {
       if (isNaN(start.getTime()) || isNaN(end.getTime())) return '-';
 
       const diffTime = Math.abs(end - start);
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      // const diffHours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+      // const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
 
-      // return `${diffDays}일 ${diffHours}시간`;
       return `${diffDays}일`;
     },
 
