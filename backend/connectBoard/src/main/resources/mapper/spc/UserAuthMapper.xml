@@ -7,16 +7,16 @@
     <!-- 메뉴에 대한 권한을 받은 사람들 -->
 	<select id="getAllUserAuth" resultType="com.example.connectBoard.dto.UserAuthDTO">   	
 		SELECT 
-			ISNULL(a.ID, '') AS id,
-			ISNULL(a.AUTH, '') AS auth,
-			ISNULL(b.NAME, '') AS name,
-			ISNULL(b.ROLL_PSTN_NM, '') AS ROLL_PSTN_NM,
-			ISNULL(b.DEPT_NM, '') AS deptNm,
-			ISNULL(b.CORP_NM, '') AS corpNm
-		FROM sys_menu_auth a
-		LEFT OUTER JOIN [UNIERP_DB2_80].SPG.dbo.CRM_USER_MASTER b 
-			ON a.ID = b.USR_ID
-		GROUP BY a.ID
+		a.ID AS id,
+		MAX(a.AUTH) AS auth,
+		MAX(ISNULL(b.NAME, '')) AS name,
+		MAX(ISNULL(b.ROLL_PSTN_NM, '')) AS ROLL_PSTN_NM,
+		MAX(ISNULL(b.DEPT_NM, '')) AS deptNm,
+		MAX(ISNULL(b.CORP_NM, '')) AS corpNm
+	FROM sys_menu_auth a
+	LEFT OUTER JOIN [UNIERP_DB2_80].SPG.dbo.CRM_USER_MASTER b 
+		ON a.ID = b.USR_ID
+	GROUP BY a.ID
 	</select>
 	
 	<!-- 특정 임직원에 대한 권한 조회 -->
