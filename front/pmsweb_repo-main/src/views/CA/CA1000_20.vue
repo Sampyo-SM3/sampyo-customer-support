@@ -35,7 +35,7 @@
           </thead>
           <tbody>
             <tr v-for="user in users" :key="user.userId" :class="{ 'selected-row': selectedUserId === user.userId }"
-              @click="selectUser(user.userId)" style="cursor: pointer;">
+              @click="selectUser(user.userId);" style="cursor: pointer;">
               <td @click.stop>
                 <v-icon @click="selectUser(user.userId)" :color="selectedUserId === user.userId ? 'primary' : '#aaa'">
                   {{ selectedUserId === user.userId ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline' }}
@@ -57,7 +57,7 @@
         <div class="text-h6 mb-1">게시판 목록</div>
 
         <v-card>
-          <div style="padding:15px;">
+          <div class="height-scroll-container">
             <div v-for="(group, index) in menuGroups" :key="group.groupKey" class="mb-6">
               <div class="text-subtitle-1 font-weight-bold mb-1 d-flex align-center">
                 <v-checkbox v-model="group.checked" :label="group.groupLabel" hide-details density="compact"
@@ -72,6 +72,7 @@
             </div>
           </div>
 
+
         </v-card>
       </div>
     </div>
@@ -80,6 +81,7 @@
 
 <script>
 import { inject, onMounted } from 'vue';
+import apiClient from '@/api';
 
 export default {
   setup() {
@@ -123,36 +125,24 @@ export default {
       channelSSelected: [], // 하위 체크 항목들
       menuGroups: [
         {
-          groupLabel: '채널S',
-          groupKey: 'channelS',
-          selected: [],
-          checked: false,
-          options: [
-            { label: '최근게시', value: '최근게시' },
-            { label: '심포스토리', value: '심포스토리' },
-            { label: '심포생활백서', value: '심포생활백서' },
-            { label: '이벤트', value: '이벤트' },
-            { label: '심포블로그', value: '심포블로그' }
-          ]
-        },
-        {
-          groupLabel: '공지사항',
-          groupKey: 'notice',
-          selected: [],  //체크된 애는 여기에 넣으면
-          checked: false,
-          options: [
-            { label: '그룹공지', value: '그룹공지' },
-            { label: '심포공지', value: '심포공지' },
-            { label: 'IT공지', value: 'IT공지' },
-            { label: '인사소식', value: '인사소식' },
-            { label: '경조소식', value: '경조소식' },
-            { label: '복리후생소식', value: '복리후생소식' },
-            { label: '회계/재무일람', value: '회계/재무일람' }
-          ]
+          // groupLabel: '채널S',
+          // groupKey: 'channelS',
+          // selected: [],
+          // checked: false,
+          // options: [
+          //   { label: '최근게시', value: '최근게시' },
+          //   { label: '심포스토리', value: '심포스토리' },
+          //   { label: '심포생활백서', value: '심포생활백서' },
+          //   { label: '이벤트', value: '이벤트' },
+          //   { label: '심포블로그', value: '심포블로그' }
+          // ]
         },
       ]
 
     };
+  },
+  mounted() {
+    this.fetchMenuGroups();
   },
   methods: {
     selectUser(userId) {
@@ -163,6 +153,42 @@ export default {
         group.checked = false;
         group.selected = [];
       });
+
+      //선택된 user의 권한 체크
+      this.fetchUserAuth(userId);
+    },
+    async fetchUserAuth(userId) {
+      try {
+        const response = await apiClient.get(`/api/userAuth/detailList`, {
+          params: { userId }
+        });
+
+        const authList = response.data; // 서버에서 받은 권한 데이터
+
+        // groupKey로 그룹 매칭
+        this.menuGroups.forEach(group => {
+          const matchedCodes = authList.filter(auth => auth.mcode.startsWith(group.groupKey));
+
+          if (matchedCodes.length > 0) {
+            group.checked = true; // 그룹 활성화
+            group.selected = [];  // 초기화
+
+            matchedCodes.forEach(auth => {
+              // 옵션 안에 존재하는 mcode만 추가
+              const exists = group.options.some(opt => opt.value === auth.mcode);
+              if (exists) {
+                group.selected.push(auth.mcode);
+              }
+            });
+          } else {
+            group.checked = false;
+            group.selected = [];
+          }
+        });
+
+      } catch (err) {
+        console.error('❌ 사용자 권한 정보 로딩 실패:', err);
+      }
     },
     toggleGroup(index) {
       const group = this.menuGroups[index];
@@ -174,8 +200,24 @@ export default {
     },
     isChecked(value, selectedList) {
       return selectedList.includes(value) ? '#1867C0' : '#888888';
-      // 체크됐으면 파란색, 아니면 연회색
-    }
+    },
+    async fetchMenuGroups() {
+      try {
+        const res = await apiClient.get('/api/menuitem/all-menu');
+
+        console.log(res);
+
+        this.menuGroups = res.data.map(group => ({
+          groupLabel: group.groupLabel,
+          groupKey: group.groupKey,
+          checked: false,
+          selected: [],
+          options: group.options
+        }));
+      } catch (err) {
+        console.error('메뉴 불러오기 실패:', err);
+      }
+    },
   },
   watch: {
     menuGroups: {
@@ -255,5 +297,13 @@ export default {
   /* Vuetify primary */
   font-weight: 500;
   opacity: 1 !important;
+}
+
+.height-scroll-container {
+  padding: 15px;
+  max-height: 700px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
 }
 </style>

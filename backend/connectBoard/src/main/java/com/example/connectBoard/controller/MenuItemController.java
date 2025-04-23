@@ -21,7 +21,6 @@ public class MenuItemController {
     private MenuItemService menuitemService;
 
     @GetMapping
-    // test커밋 나는 세림세림
     public MenuItemResponseDto getMenuItems(@RequestParam(required = false) String auth, @RequestParam String id) {    	
         MenuItemRequestDto requestDto = new MenuItemRequestDto(auth, id);
                 
