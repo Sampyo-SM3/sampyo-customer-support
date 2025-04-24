@@ -15,15 +15,10 @@
     <v-row justify="center" class="mb-0 pt-0">
       <v-col cols="12" class="d-flex align-center justify-center">
         <div class="custom-stepper">
-          <div
-            v-for="(status, index) in progressStatuses"
-            :key="index"
-            class="step"
-            :class="{
-              active: step === index + 1,
-              completed: step > index + 1
-            }"
-          >
+          <div v-for="(status, index) in progressStatuses" :key="index" class="step" :class="{
+            active: step === index + 1,
+            completed: step > index + 1
+          }">
             <div class="circle">{{ index + 1 }}</div>
             <div class="label">{{ status.text }}</div>
             <div v-if="index < progressStatuses.length - 1" class="line"></div>
@@ -52,7 +47,8 @@
         저장
       </v-btn>
 
-      <v-btn variant="flat" color="#F7A000" class="save-status-btn ml-3 white-text" size="small" @click="showUserPopup = true">
+      <v-btn variant="flat" color="#F7A000" class="save-status-btn ml-3 white-text" size="small"
+        @click="showManagerPopup = true">
         담당자 이관
       </v-btn>
 
@@ -71,8 +67,8 @@
         SR요청서
       </v-btn>
 
- 
-      
+
+
 
     </div>
 
@@ -135,29 +131,22 @@
         <div class="section-title">
           <div class="info-title-after"></div>답변 내용
         </div>
-        
+
         <!-- 댓글 섹션 -->
         <div class="comments-container" v-if="commentTextLength > 0">
           <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
             :all-comments="comments" @refresh="fetchComments" />
         </div>
-        
+
         <!-- 댓글이 없을 때 메시지 -->
         <div v-else class="no-comments">
           <p>등록된 답변이 없습니다. 첫 번째 답변을 작성해보세요.</p>
         </div>
-        
+
         <!-- 댓글 입력 -->
         <div class="comment-input-container" :class="{ 'mt-4': commentTextLength === 0 }">
-          <v-textarea 
-            auto-grow
-            v-model="newComment.content" 
-            :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '답변 입력'" 
-            variant="outlined"
-            density="comfortable"
-            color="#3A70B1"
-            rows="3"
-            hide-details
+          <v-textarea auto-grow v-model="newComment.content" :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '답변 입력'"
+            variant="outlined" density="comfortable" color="#3A70B1" rows="3" hide-details
             class="comment-textarea"></v-textarea>
           <div class="btn-container">
             <v-btn v-if="replyTo" variant="text" color="#666" class="cancel-btn mr-2" @click="cancelReply">
@@ -184,7 +173,7 @@
   </v-snackbar>
 
   <!-- 관리자 추가하기 팝업 -->
-  <user-popup :show="showUserPopup" @manager-selected_edit="editManager" @close="showUserPopup = false" />  
+  <manager-popup :show="showManagerPopup" @manager-selected_edit="editManager" @close="showManagerPopup = false" />
 </template>
 
 <script>
@@ -193,7 +182,7 @@ import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포�
 import { inject, onMounted } from 'vue';
 import { useKakaoStore } from '@/store/kakao';
 import { useAuthStore } from '@/store/auth';
-import userPopup from '@/components/userPopup.vue';
+import managerPopup from '@/components/managerPopup.vue';
 
 export default {
   props: {
@@ -228,7 +217,7 @@ export default {
   },
   components: {
     CommentTree,
-    userPopup
+    managerPopup
   },
   unmounted() { // ❗ 컴포넌트가 언마운트될 때
     const listButtonLink = inject('listButtonLink', null);
@@ -243,7 +232,7 @@ export default {
   },
   data() {
     return {
-      showUserPopup: false,
+      showManagerPopup: false,
       step: 1,
       loading: false,
       errorMessages: [],
@@ -328,7 +317,7 @@ export default {
 
   },
   methods: {
-    async editManager(selectedManager) {    
+    async editManager(selectedManager) {
       try {
         this.loading = true;
 
@@ -338,10 +327,10 @@ export default {
           "managerId": selectedManager.usrId,
           "managerTel": selectedManager.handTelNo,
           "managerEmail": selectedManager.emailAddr
-        };            
+        };
 
         // 게시글 등록 및 seq 값 반환
-        await apiClient.post("/api/require/updateForm", boardData);      
+        await apiClient.post("/api/require/updateForm", boardData);
       } catch (error) {
         console.error("관리자 수정 중 오류:", error);
         this.errorMessages = [error.message || "관리자 수정 중 오류가 발생했습니다."];
@@ -351,8 +340,8 @@ export default {
       }
 
       // 수정 성공 후 페이지 새로고침
-      window.location.reload();      
-    },     
+      window.location.reload();
+    },
     async getDetailInquiry() {
       const response = await apiClient.get("/api/require/detail", {
         params: { seq: this.receivedSeq }
@@ -434,7 +423,7 @@ export default {
       // localStorage에서 userInfo를 가져와서 userName에 할당
       this.userName = JSON.parse(localStorage.getItem("userInfo"))?.name || null;
       this.userId = JSON.parse(localStorage.getItem("userInfo"))?.id || null;
-      this.userPhone = JSON.parse(localStorage.getItem("userInfo"))?.phone || null;      
+      this.userPhone = JSON.parse(localStorage.getItem("userInfo"))?.phone || null;
     },
 
     goBack() {
@@ -474,12 +463,12 @@ export default {
 
         const statusData = {
           seq: this.receivedSeq,
-          processState: this.selectedStatus,          
+          processState: this.selectedStatus,
         };
-        
+
         await apiClient.post("/api/updateStatus", statusData);
         alert("접수상태가 저장되었습니다.");
-        
+
         // 상태변경
         this.kakaoStore.sendAlimtalk(this.receivedSeq, this.getStatusName(this.oldStatus), this.getStatusName(this.selectedStatus), phone);
         // 상세정보 새로고침
@@ -625,7 +614,7 @@ export default {
   margin: 0 auto;
   z-index: 2;
   transition: all 0.3s ease;
-  position: relative;  
+  position: relative;
 }
 
 .label {

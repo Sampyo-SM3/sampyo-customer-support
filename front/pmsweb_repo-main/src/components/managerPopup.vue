@@ -115,7 +115,7 @@ export default {
 
             try {
                 // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
-                const response = await apiClient.get('/api/userPop/allList', {
+                const response = await apiClient.get('/api/userPop/list', {
                     params: {
                         name: this.searchText
                     }

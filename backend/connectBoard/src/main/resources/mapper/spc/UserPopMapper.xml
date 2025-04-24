@@ -5,7 +5,7 @@
 <mapper namespace="com.example.connectBoard.repository.spc.UserPopRepository">
 
     <!-- 임직원 조회 팝업 -->
-    <select id="getAllUser" parameterType="com.example.connectBoard.dto.UserPopDTO" resultType="com.example.connectBoard.dto.UserPopDTO">   	
+    <select id="getManagerList" parameterType="com.example.connectBoard.dto.UserPopDTO" resultType="com.example.connectBoard.dto.UserPopDTO">   	
     	SELECT CORP_NM as corpNm,
       	   	   DEPT_NM as deptNm,
       	   	   NAME as name,
@@ -16,6 +16,20 @@
     	FROM [UNIERP80].SPG.DBO.CRM_USER_MASTER
     	WHERE NAME LIKE CONCAT('%', #{name}, '%')
     	  AND DEPT_CD = 'SPH220007'		<!-- SM3팀만 보여줌 -->
+    </select>
+
+
+    <!-- 임직원 조회 팝업 -->
+    <select id="getAllUser" parameterType="com.example.connectBoard.dto.UserPopDTO" resultType="com.example.connectBoard.dto.UserPopDTO">   	
+    	SELECT CORP_NM as corpNm,
+      	   	   DEPT_NM as deptNm,
+      	   	   NAME as name,
+       	   	   ROLL_PSTN_NM as rollPstnNm,
+         	   USR_ID as usrId,
+         	   EMAIL_ADDR as emailAddr,
+         	   HAND_TEL_NO as handTelNo
+    	FROM [UNIERP80].SPG.DBO.CRM_USER_MASTER
+    	WHERE NAME LIKE CONCAT('%', #{name}, '%')
     </select>
 
 </mapper>

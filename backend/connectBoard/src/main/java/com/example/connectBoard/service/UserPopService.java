@@ -16,6 +16,10 @@ public class UserPopService {
         this.userPopRepository = userPopRepository;
     }    
 
+    public List<UserPopDTO> getManagerList(UserPopDTO userPop) {    	
+        return userPopRepository.getManagerList(userPop);
+    }  
+    
     public List<UserPopDTO> getAllUser(UserPopDTO userPop) {    	
         return userPopRepository.getAllUser(userPop);
     }  

@@ -10,6 +10,8 @@ import com.example.connectBoard.dto.UserPopDTO;
 @Mapper
 public interface UserPopRepository {
     
+	List<UserPopDTO> getManagerList(UserPopDTO userPop);
+	 
     List<UserPopDTO> getAllUser(UserPopDTO userPop);
     
 }

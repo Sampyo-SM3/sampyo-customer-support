@@ -8,7 +8,7 @@
         </div>
       </v-col>
     </v-row> -->
-    
+
     <v-row dense align="center" class="flex-wrap rounded-border sky-bg" style="gap: 12px;">
 
       <!-- 요청기간 -->
@@ -105,9 +105,6 @@
 
     </v-row>
 
-    <br>
-    <br>
-
     <!-- 데이터 테이블 상단 버튼 영역 -->
     <v-row class="top-button-row mb-2">
       <v-col class="d-flex align-center">
@@ -120,15 +117,20 @@
           <span class="text-subtitle-2 font-weight-bold">{{ totalItems }}</span>
           <!-- <span class="text-subtitle-2 text-grey">건</span> -->
           <span class="text-subtitle-2 text-grey"> / 미처리: </span>
-          <span class="text-subtitle-2 font-weight-bold text-red"><span :class="getStatusClass('P')">{{ getUnprocessedCount('P') }}</span></span>
+          <span class="text-subtitle-2 font-weight-bold text-red"><span :class="getStatusClass('P')">{{
+              getUnprocessedCount('P') }}</span></span>
           <span class="text-subtitle-2 text-grey ml-2"> 진행: </span>
-          <span class="text-subtitle-2 font-weight-bold text-blue"><span :class="getStatusClass('I')">{{ getUnprocessedCount('I') }}</span></span>
+          <span class="text-subtitle-2 font-weight-bold text-blue"><span :class="getStatusClass('I')">{{
+              getUnprocessedCount('I') }}</span></span>
           <span class="text-subtitle-2 text-grey ml-2"> 보류: </span>
-          <span class="text-subtitle-2 font-weight-bold text-blue"><span :class="getStatusClass('H')">{{ getUnprocessedCount('H') }}</span></span>
+          <span class="text-subtitle-2 font-weight-bold text-blue"><span :class="getStatusClass('H')">{{
+              getUnprocessedCount('H') }}</span></span>
           <span class="text-subtitle-2 text-grey ml-2"> SR: </span>
-          <span class="text-subtitle-2 font-weight-bold text-blue"><span :class="getStatusClass('S')">{{ getUnprocessedCount('S') }}</span></span>
+          <span class="text-subtitle-2 font-weight-bold text-blue"><span :class="getStatusClass('S')">{{
+              getUnprocessedCount('S') }}</span></span>
           <span class="text-subtitle-2 text-grey ml-2"> 종결: </span>
-          <span class="text-subtitle-2 font-weight-bold"><span :class="getStatusClass('C')">{{ getUnprocessedCount('C') }}</span></span>
+          <span class="text-subtitle-2 font-weight-bold"><span :class="getStatusClass('C')">{{ getUnprocessedCount('C')
+              }}</span></span>
 
         </span>
 
@@ -172,29 +174,21 @@
             <div class="td-cell">{{ item.seq }}</div>
             <div class="td-cell">{{ formatDate(item.requestDate) }}</div>
             <div class="td-cell title-cell">
-              <router-link
-                :to="{
-                  name: (item.saveFlag === 'Y' && item.processState === 'S')
-                    ? 'CA_PostDetailSrForm'
-                    : 'CA_PostDetailForm',
-                  params: { receivedSeq: item.seq }
-                }"
-                class="title-link"
-                style="display: inline-flex; align-items: center;"
-              >
+              <router-link :to="{
+                name: (item.saveFlag === 'Y' && item.processState === 'S')
+                  ? 'CA_PostDetailSrForm'
+                  : 'CA_PostDetailForm',
+                params: { receivedSeq: item.seq }
+              }" class="title-link" style="display: inline-flex; align-items: center;">
                 {{ item.sub }}
 
-                <span v-if="item.countComment > 0">&nbsp;</span> 
+                <span v-if="item.countComment > 0">&nbsp;</span>
                 <span v-if="item.countComment > 0" style="color: #737577;">[{{ item.countComment }}]</span>
 
-                <span v-if="item.new_yn === 'Y'">&nbsp;</span>                                                
-                <v-img v-if="item.new_yn === 'Y'" 
-                  src="@/assets/new-icon.png" 
-                  alt="new" 
-                  width="22" 
-                  height="22"
+                <span v-if="item.new_yn === 'Y'">&nbsp;</span>
+                <v-img v-if="item.new_yn === 'Y'" src="@/assets/new-icon.png" alt="new" width="22" height="22"
                   style="display: inline-block; vertical-align: middle;">
-                </v-img>             
+                </v-img>
               </router-link>
             </div>
 
@@ -576,18 +570,18 @@ export default {
             sub: this.sub,
             status: this.selectedStatus
           }
-        });        
-        
+        });
+
         // API 응답 데이터 처리
         if (response.data && Array.isArray(response.data)) {
-        
-          
+
+
           this.tableData = response.data.map(item => {
             const requestDateTime = new Date(item.requestDateTime);
             const now = new Date();
             const diffTime = now - requestDateTime;
             const diffHours = diffTime / (1000 * 60 * 60);
-            
+
 
             return {
               ...item,
@@ -679,7 +673,7 @@ export default {
 
     // 소요시간 계산 함수
     calculateDuration(startDate, endDate) {
-      
+
       if (!startDate || !endDate) return '-';
 
       const start = new Date(startDate);

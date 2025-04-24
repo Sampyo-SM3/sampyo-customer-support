@@ -26,8 +26,14 @@ public class UserPopController {
         this.userPopService = userPopService;
     }
            
-    //접수상태 리스트 조회
+    //담당자 리스트 조회
     @GetMapping("/userPop/list")
+    public List<UserPopDTO> getManagerList(UserPopDTO userPop) {
+    	return userPopService.getManagerList(userPop);
+    }  
+    
+    //임직원 리스트 조회
+    @GetMapping("/userPop/allList")
     public List<UserPopDTO> getAllUser(UserPopDTO userPop) {
     	return userPopService.getAllUser(userPop);
     }  

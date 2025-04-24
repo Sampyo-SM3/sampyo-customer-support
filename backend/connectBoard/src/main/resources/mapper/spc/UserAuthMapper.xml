@@ -28,7 +28,8 @@
 		FROM sys_menu_auth a
 		LEFT OUTER JOIN [UNIERP_DB2_80].SPG.dbo.CRM_USER_MASTER b 
 			ON a.ID = b.USR_ID
-		WHERE a.id = #{userId}
+		WHERE a.id = #{userId} 
+		  AND a.auth = 31
 	</select>
 
 </mapper>

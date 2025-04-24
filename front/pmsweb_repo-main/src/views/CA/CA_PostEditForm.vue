@@ -14,7 +14,7 @@
       <v-col class="search-col" style="max-width:350px;">
         <div class="label-box">담당자</div>
         <v-text-field class="sub-text-field input-manager" v-model="manager" readonly hide-details density="compact"
-          variant="outlined" append-icon="mdi-magnify" @click="showUserPopup = true">
+          variant="outlined" append-icon="mdi-magnify" @click="showManagerPopup = true">
         </v-text-field>
       </v-col>
 
@@ -116,12 +116,12 @@
   </v-snackbar>
 
   <!-- 관리자 추가하기 팝업 -->
-  <user-popup :show="showUserPopup" @manager-selected="onAdminAdded" @close="showUserPopup = false" />
+  <manager-popup :show="showManagerPopup" @manager-selected="onAdminAdded" @close="showManagerPopup = false" />
 </template>
 
 <script>
 import apiClient from '@/api';
-import userPopup from '@/components/userPopup.vue';
+import managerPopup from '@/components/managerPopup.vue';
 import { inject, onMounted } from 'vue';
 
 export default {
@@ -132,7 +132,7 @@ export default {
     },
   },
   components: {
-    userPopup
+    managerPopup
   },
   setup() {
     const extraBreadcrumb = inject('extraBreadcrumb', null);
@@ -165,7 +165,7 @@ export default {
       loading: false,
       errorMessages: [],
       showError: false,
-      showUserPopup: false,
+      showManagerPopup: false,
       userName: null,
       manager: '',
       managerId: '',

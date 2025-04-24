@@ -58,16 +58,6 @@
 	            m_name AS mName, 
 	            * 
 	        FROM sys_menu
-	        WHERE LEN(m_code) = 2
-	
-	        UNION ALL
-	
-	        SELECT 
-	            m_code AS mCode, 
-	            m_name AS mName, 
-	            * 
-	        FROM sys_menu
-	        WHERE LEN(m_code) > 4
 	    ) AS t
 	    WHERE 1 = 1
 	    ORDER BY mCode;

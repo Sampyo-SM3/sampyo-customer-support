@@ -5,15 +5,10 @@
     <v-row justify="center" class="mb-0 pt-0">
       <v-col cols="12" class="d-flex align-center justify-center">
         <div class="custom-stepper">
-          <div
-            v-for="(status, index) in progressStatuses"
-            :key="index"
-            class="step"
-            :class="{
-              active: step === index + 1,
-              completed: step > index + 1
-            }"
-          >
+          <div v-for="(status, index) in progressStatuses" :key="index" class="step" :class="{
+            active: step === index + 1,
+            completed: step > index + 1
+          }">
             <div class="circle">{{ index + 1 }}</div>
             <div class="label">{{ status.text }}</div>
             <div v-if="index < progressStatuses.length - 1" class="line"></div>
@@ -23,7 +18,7 @@
     </v-row>
 
     <br>
-    <br>    
+    <br>
 
     <!-- 전체 래퍼: 접수상태 박스 + 버튼을 나란히 배치 -->
     <div class="d-flex align-center mb-4">
@@ -45,16 +40,16 @@
 
       <!-- 오른쪽 정렬: 수정 + 상신 -->
       <div class="d-flex ml-auto">
-        <v-btn v-if="inquiry.srFlag === 'N'" variant="flat" color="green darken-2"
-          class="save-status-btn mr-2" size="small" @click="moveEidtSr">
+        <v-btn v-if="inquiry.srFlag === 'N'" variant="flat" color="green darken-2" class="save-status-btn mr-2"
+          size="small" @click="moveEidtSr">
           수정
         </v-btn>
-        <v-btn v-if="inquiry.srFlag === 'N'" variant="flat" color="#F7A000"
-          class="save-status-btn white-text" size="small" @click="approvalBtn">
+        <v-btn v-if="inquiry.srFlag === 'N'" variant="flat" color="#F7A000" class="save-status-btn white-text"
+          size="small" @click="approvalBtn">
           상신
         </v-btn>
-        <v-btn v-if="inquiry.srFlag === 'Y'" variant="flat" color="#F7A000"
-          class="save-status-btn white-text" size="small" @click="showSrBtn">
+        <v-btn v-if="inquiry.srFlag === 'Y'" variant="flat" color="#F7A000" class="save-status-btn white-text"
+          size="small" @click="showSrBtn">
           SR요청서 보기
         </v-btn>
       </div>
@@ -196,32 +191,25 @@
         <div class="section-title">
           <div class="info-title-after"></div>답변 내용
         </div>
-        
+
         <!-- 댓글 섹션 -->
         <div class="comments-container" v-if="commentTextLength > 0">
           <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
             :all-comments="comments" @refresh="fetchComments" />
         </div>
-        
+
         <!-- 댓글이 없을 때 메시지 -->
         <div v-else class="no-comments">
           <p>등록된 답변이 없습니다. 첫 번째 답변을 작성해보세요.</p>
         </div>
-        
+
         <!-- 댓글 입력 -->
         <div class="comment-input-container" :class="{ 'mt-4': commentTextLength === 0 }">
-          <v-textarea 
-            auto-grow
-            v-model="newComment.content" 
-            :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '답변 입력'" 
-            variant="outlined"
-            density="comfortable"
-            color="#3A70B1"
-            rows="3"
-            hide-details
+          <v-textarea auto-grow v-model="newComment.content" :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '답변 입력'"
+            variant="outlined" density="comfortable" color="#3A70B1" rows="3" hide-details
             class="comment-textarea"></v-textarea>
           <div class="btn-container">
-            <v-btn v-if="replyTo" variant="text" color="#666" class="cancel-btn mr-2" @click="cancelReply">            
+            <v-btn v-if="replyTo" variant="text" color="#666" class="cancel-btn mr-2" @click="cancelReply">
               답글 취소
             </v-btn>
             <v-btn variant="flat" color="#3A70B1" class="white--text comment-submit-btn" @click="addComment()">
@@ -234,7 +222,7 @@
   </v-container>
 
   <!-- 관리자 추가하기 팝업 -->
-  <user-popup :show="showUserPopup" @manager-selected_sr_edit="editManager" @close="showUserPopup = false" />    
+  <manager-popup :show="showManagerPopup" @manager-selected_sr_edit="editManager" @close="showManagerPopup = false" />
 </template>
 
 
@@ -244,7 +232,7 @@ import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포�
 import { inject, onMounted } from 'vue';
 import { useKakaoStore } from '@/store/kakao';
 import { useAuthStore } from '@/store/auth';
-import userPopup from '@/components/userPopup.vue';
+import managerPopup from '@/components/managerPopup.vue';
 
 export default {
   // props 정의 추가
@@ -281,7 +269,7 @@ export default {
   },
   components: {
     CommentTree,
-    userPopup
+    managerPopup
   },
   unmounted() { // ❗ 컴포넌트가 언마운트될 때
     const listButtonLink = inject('listButtonLink', null);
@@ -349,7 +337,7 @@ export default {
     };
   },
   methods: {
-    async editManager(selectedManager) {    
+    async editManager(selectedManager) {
       try {
         this.loading = true;
 
@@ -359,10 +347,10 @@ export default {
           "managerId": selectedManager.usrId,
           "managerTel": selectedManager.handTelNo,
           "managerEmail": selectedManager.emailAddr
-        };            
+        };
 
         // 게시글 등록 및 seq 값 반환
-        await apiClient.post("/api/require/updateForm", boardData);      
+        await apiClient.post("/api/require/updateForm", boardData);
       } catch (error) {
         console.error("관리자 수정 중 오류:", error);
         this.errorMessages = [error.message || "관리자 수정 중 오류가 발생했습니다."];
@@ -372,8 +360,8 @@ export default {
       }
 
       // 수정 성공 후 페이지 새로고침
-      window.location.reload();      
-    },      
+      window.location.reload();
+    },
     async getDetailInquiry() {
       const response = await apiClient.get("/api/require/detail", {
         params: { seq: this.receivedSeq }
@@ -421,7 +409,7 @@ export default {
       } catch (error) {
         console.error("❌ 오류 발생:", error);
       }
-    },    
+    },
     async getStatus() {
       try {
         const statusList = await apiClient.get("/api/status/list");
@@ -830,7 +818,7 @@ export default {
   margin: 0 auto;
   z-index: 2;
   transition: all 0.3s ease;
-  position: relative;  
+  position: relative;
 }
 
 .label {
