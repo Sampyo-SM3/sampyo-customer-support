@@ -85,13 +85,15 @@
       <!-- 담당자 -->
       <v-col cols="auto" class="d-flex align-center filter-col">
         <span class="filter-label">담당자<span class="label-divider"></span></span>
-        <v-text-field v-model="manager" variant="outlined" density="compact" hide-details class="filter-input" />
+        <v-text-field v-model="manager" @keydown.enter="fetchData" variant="outlined" density="compact" hide-details
+          class="filter-input" />
       </v-col>
 
       <!-- 제목 -->
       <v-col cols="auto" class="d-flex align-center filter-col">
         <span class="filter-label">제목<span class="label-divider"></span></span>
-        <v-text-field v-model="sub" variant="outlined" density="compact" hide-details class="filter-input-sub" />
+        <v-text-field v-model="sub" @keydown.enter="fetchData" variant="outlined" density="compact" hide-details
+          class="filter-input-sub" />
       </v-col>
 
       <!-- 검색 버튼 -->
@@ -118,16 +120,16 @@
           <!-- <span class="text-subtitle-2 text-grey">건</span> -->
           <span class="text-subtitle-2 text-grey"> / 미처리: </span>
           <span class="text-subtitle-2 font-weight-bold text-red"><span :class="getStatusClass('P')">{{
-              getUnprocessedCount('P') }}</span></span>
+            getUnprocessedCount('P') }}</span></span>
           <span class="text-subtitle-2 text-grey ml-2"> 진행: </span>
           <span class="text-subtitle-2 font-weight-bold text-blue"><span :class="getStatusClass('I')">{{
-              getUnprocessedCount('I') }}</span></span>
+            getUnprocessedCount('I') }}</span></span>
           <span class="text-subtitle-2 text-grey ml-2"> 보류: </span>
           <span class="text-subtitle-2 font-weight-bold text-blue"><span :class="getStatusClass('H')">{{
-              getUnprocessedCount('H') }}</span></span>
+            getUnprocessedCount('H') }}</span></span>
           <span class="text-subtitle-2 text-grey ml-2"> SR: </span>
           <span class="text-subtitle-2 font-weight-bold text-blue"><span :class="getStatusClass('S')">{{
-              getUnprocessedCount('S') }}</span></span>
+            getUnprocessedCount('S') }}</span></span>
           <span class="text-subtitle-2 text-grey ml-2"> 종결: </span>
           <span class="text-subtitle-2 font-weight-bold"><span :class="getStatusClass('C')">{{ getUnprocessedCount('C')
               }}</span></span>
