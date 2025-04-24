@@ -232,7 +232,7 @@ import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포�
 import { inject, onMounted } from 'vue';
 import { useKakaoStore } from '@/store/kakao';
 import { useAuthStore } from '@/store/auth';
-import managerPopup from '@/components/managerPopup.vue';
+import managerPopup from '@/components/ManagerPopup.vue';
 
 export default {
   // props 정의 추가

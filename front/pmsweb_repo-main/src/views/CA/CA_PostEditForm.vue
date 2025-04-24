@@ -121,7 +121,7 @@
 
 <script>
 import apiClient from '@/api';
-import managerPopup from '@/components/managerPopup.vue';
+import managerPopup from '@/components/ManagerPopup.vue';
 import { inject, onMounted } from 'vue';
 
 export default {

@@ -109,12 +109,12 @@
 
 <script>
 import apiClient from '@/api';
-import managerPopup from '@/components/managerPopup.vue';
+import ManagerPopup from '@/components/ManagerPopup.vue';
 import { inject, onMounted } from 'vue';
 
 export default {
   components: {
-    managerPopup
+    ManagerPopup
   },
   setup() {
     const extraBreadcrumb = inject('extraBreadcrumb', null);

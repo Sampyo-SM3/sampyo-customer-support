@@ -11,7 +11,7 @@
     <div class="d-flex">
       <div style="flex: 2; margin-right: 20px; padding-left: 70px;">
         <div class="d-flex align-center justify-end mb-2">
-          <v-btn @click="showManagerPopup = true" prepend-icon="mdi-plus" size="small" color="green darken-2"
+          <v-btn @click="showUserPopup = true" prepend-icon="mdi-plus" size="small" color="green darken-2"
             class="text-none mr-2">추가</v-btn>
           <v-btn @click="deleteUser" prepend-icon="mdi-delete" size="small" color="grey darken-2"
             class="text-none">삭제</v-btn>
@@ -82,16 +82,17 @@
 
   <!-- user 추가하기 팝업 -->
   <user-popup :show="showUserPopup" @manager-selected="onAdminAdded" @close="showUserPopup = false" />
+
 </template>
 
 <script>
 import { inject, onMounted } from 'vue';
 import apiClient from '@/api';
-import userPopup from '@/components/userPopup.vue';
+import UserPopup from '@/components/UserPopup.vue';
 
 export default {
   components: {
-    userPopup
+    UserPopup
   },
   setup() {
     const extraBreadcrumb = inject('extraBreadcrumb', null);
@@ -106,7 +107,8 @@ export default {
     return {
       selectedUserId: null,
       users: [],
-      menuGroups: []
+      menuGroups: [],
+      showUserPopup: false,
     };
   },
   mounted() {
@@ -127,17 +129,28 @@ export default {
       }));
     },
     selectUser(userId) {
-      this.selectedUserId = this.selectedUserId === userId ? null : userId;
-      this.menuGroups.forEach(group => {
-        group.checked = false;
-        group.selected = [];
-      });
-      this.$nextTick(() => {
-        const container = this.$refs.menuScrollContainer;
-        if (container?.scrollTo) container.scrollTo({ top: 0, behavior: 'smooth' });
-        else if (container) container.scrollTop = 0;
-      });
-      this.fetchUserAuth(userId);
+      if (this.selectedUserId === userId) {
+        // 이미 선택된 사용자 다시 클릭 → 해제 처리
+        this.selectedUserId = null;
+        this.menuGroups.forEach(group => {
+          group.checked = false;
+          group.selected = [];
+        });
+        this.fetchUserAuth(null); // ✅ 체크 해제 시 이 함수 호출
+      } else {
+        // 새 사용자 선택
+        this.selectedUserId = userId;
+        this.menuGroups.forEach(group => {
+          group.checked = false;
+          group.selected = [];
+        });
+        this.$nextTick(() => {
+          const container = this.$refs.menuScrollContainer;
+          if (container?.scrollTo) container.scrollTo({ top: 0, behavior: 'smooth' });
+          else if (container) container.scrollTop = 0;
+        });
+        this.fetchUserAuth(userId);
+      }
     },
     async fetchUserAuth(userId) {
       const res = await apiClient.get(`/api/userAuth/detailList`, { params: { userId } });
