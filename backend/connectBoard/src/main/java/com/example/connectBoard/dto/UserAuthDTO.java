@@ -10,9 +10,12 @@ import lombok.Setter;
 public class UserAuthDTO {
 	private String id;
 	private String mCode;
-	private String auth;
+	private int auth;
 	private String name;
 	private String rollPstnNm;
 	private String deptNm;
 	private String corpNm;
+	private String menuCode;
+	private String insertUser;
+	private String updateUser;
 }

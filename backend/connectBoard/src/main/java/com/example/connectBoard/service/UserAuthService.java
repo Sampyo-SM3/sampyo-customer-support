@@ -24,4 +24,22 @@ public class UserAuthService {
         return userAuthRepository.getUserAuth(userId);
     }
 
+    /**
+     * 메뉴 권한 데이터 upsert (존재 시 update, 없으면 insert)
+     */
+    public void saveOrUpdateUserAuth(UserAuthDTO userAuthDTO) {
+        int count = userAuthRepository.checkMenuAuthExists(userAuthDTO);
+        System.out.println("🧮 checkMenuAuthExists count = " + count);
+        
+        if (count > 0) {
+            userAuthRepository.updateMenuAuth(userAuthDTO);
+        } else {
+            userAuthRepository.insertMenuAuth(userAuthDTO);
+        }
+    }
+    
+    public void deleteUserAuth(UserAuthDTO userAuthDTO) {    	
+       userAuthRepository.deleteUserAuth(userAuthDTO);
+    }
+  
 }
