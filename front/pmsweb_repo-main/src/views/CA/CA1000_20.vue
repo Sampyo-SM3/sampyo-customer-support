@@ -169,7 +169,7 @@ export default {
           .map(auth => auth.mcode)
           .filter(code => availableCodes.includes(code));
 
-        // 초기 상태에서 하위 메뉴 상태에 따라 그룹 체크 상태 설정
+        // 초기 상태에서 하위 메뉴 상태에 따라 그룹 체크 상태 설정.
         group.checked = this.hasAnySelected(group);
       });
 
