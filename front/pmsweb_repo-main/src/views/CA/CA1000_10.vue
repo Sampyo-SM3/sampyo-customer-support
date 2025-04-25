@@ -14,49 +14,50 @@
       <!-- 요청기간 -->
       <v-col cols="auto" class="d-flex align-center filter-col ml-2">
         <span class="filter-label">요청기간<span class="label-divider"></span></span>
-        <div class="date-wrapper">
-          <!-- 시작일 입력 필드 -->
-          <v-menu v-model="startDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
-            min-width="auto">
-            <template v-slot:activator="{ props }">
-              <div class="date-field-wrapper" v-bind="props">
-                <v-text-field v-model="startDate" class="date-input" density="compact" hide-details readonly
-                  variant="plain"></v-text-field>
-                <div class="calendar-icon-container">
-                  <v-btn icon class="calendar-btn">
-                    <v-icon size="small" color="#7A7A7A">mdi-calendar-search</v-icon>
-                  </v-btn>
-                </div>
-              </div>
-            </template>
-            <v-date-picker v-model="Date_startDate" @update:model-value="startDateMenu = false" locale="ko-KR"
-              elevation="1" color="blue" width="290" first-day-of-week="1" show-adjacent-months scrollable
-              :allowed-dates="allowedDates"></v-date-picker>
-          </v-menu>
+        <!-- 시작일 입력 필드 -->
+        <div class="start-date-wrapper">
+              <VueDatePicker
+                class="date-picker"
+                :month-picker="false"
+                preview-format="yyyy-MM-dd"
+                v-model="Date_startDate"
+                :teleport="true"
+                position="bottom"
+                :enable-time-picker="false"
+                auto-apply
+                locale="ko"
+                format="yyyy-MM-dd"                
+                :week-start="1"
+                :allowed-dates="allowedDates"                                
+                @update:model-value="onStartDateChange"
+                v-model:open="startDatePickerOpen"
+                :clearable="false"
+                :text-input="false"
+              />              
         </div>
         <span class="date-separator">~</span>
 
-        <div class="date-wrapper">
-          <!-- 종료일 입력 필드 -->
-          <v-menu v-model="endDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
-            min-width="auto">
-            <template v-slot:activator="{ props }">
-              <div class="date-field-wrapper" v-bind="props">
-                <v-text-field v-model="endDate" class="date-input" density="compact" hide-details readonly
-                  variant="plain"></v-text-field>
-                <div class="calendar-icon-container">
-                  <v-btn icon class="calendar-btn">
-                    <v-icon size="small" color="#7A7A7A">mdi-calendar-search</v-icon>
-                  </v-btn>
-                </div>
-              </div>
-            </template>
-            <v-date-picker v-model="Date_endDate" @update:model-value="endDateMenu = false" locale="ko-KR" elevation="1"
-              color="blue" width="290" first-day-of-week="1" show-adjacent-months scrollable
-              :allowed-dates="allowedDates"></v-date-picker>
-          </v-menu>
-        </div>
-
+        <!-- 종료일 입력 필드 -->
+        <div class="end-date-wrapper">
+              <VueDatePicker
+                class="date-picker"
+                :month-picker="false"
+                preview-format="yyyy-MM-dd"
+                v-model="Date_endDate"
+                :teleport="true"
+                position="bottom"
+                :enable-time-picker="false"
+                auto-apply
+                locale="ko"
+                format="yyyy-MM-dd"                
+                :week-start="1"
+                :allowed-dates="allowedDates"                                
+                @update:model-value="onEndDateChange"
+                v-model:open="endDatePickerOpen"
+                :clearable="false"
+                :text-input="false"
+              />              
+        </div>        
 
         <!-- 날짜 버튼 -->
         <div class="date-buttons mr-2">
@@ -97,7 +98,7 @@
       </v-col>
 
       <!-- 검색 버튼 -->
-      <v-col cols="auto">
+      <v-col cols="auto" class="ms-auto">
         <v-btn variant="flat" color="primary" class="custom-btn mr-2 d-flex align-center" size="small"
           @click="fetchData()">
           <v-icon size="default" class="mr-1">mdi-magnify</v-icon>
@@ -281,8 +282,13 @@
 <script>
 import apiClient from '@/api';
 import { inject, onMounted } from 'vue';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 export default {
+  components: {
+    VueDatePicker
+  },  
   setup() {
     const extraBreadcrumb = inject('extraBreadcrumb', null);
     const listButtonLink = inject('listButtonLink', null);
@@ -306,6 +312,8 @@ export default {
   },
   data() {
     return {
+      startDatePickerOpen: false,
+      endDatePickerOpen: false,      
       Date_startDate: new Date(),
       Date_endDate: new Date(),
       startDate: '',
@@ -373,7 +381,7 @@ export default {
         const day = String(date.getDate()).padStart(2, '0');
 
         // 형식화된 문자열을 startDate에 할당
-        this.startDate = `${year}-${month}-${day}`;
+        this.startDate = `${year}-${month}-${day}`;        
       } else {
         this.startDate = '';
       }
@@ -405,6 +413,31 @@ export default {
   },
 
   methods: {
+    onStartDateChange(date) {
+      this.Date_startDate = date;
+      this.startDatePickerOpen = false;
+      // Date 객체를 'YYYY-MM-DD' 형식의 문자열로 변환
+      if (date) {
+        const formattedDate = new Date(date);
+        const year = formattedDate.getFullYear();
+        const month = String(formattedDate.getMonth() + 1).padStart(2, '0');
+        const day = String(formattedDate.getDate()).padStart(2, '0');
+        this.startDate = `${year}-${month}-${day}`;
+      }
+    },
+    
+    onEndDateChange(date) {
+      this.Date_endDate = date;
+      this.endDatePickerOpen = false;
+      // Date 객체를 'YYYY-MM-DD' 형식의 문자열로 변환
+      if (date) {
+        const formattedDate = new Date(date);
+        const year = formattedDate.getFullYear();
+        const month = String(formattedDate.getMonth() + 1).padStart(2, '0');
+        const day = String(formattedDate.getDate()).padStart(2, '0');
+        this.endDate = `${year}-${month}-${day}`;
+      }
+    },    
     checkLocalStorage() {
       const midMenuFromStorage = localStorage.getItem('midMenu');
       const subMenuFromStorage = localStorage.getItem('subMenu');
@@ -747,6 +780,41 @@ export default {
 }</script>
 
 <style scoped>
+
+
+
+
+
+
+/* VueDatePicker 관련 추가 스타일 */
+.date-picker {  
+  width: auto;
+  min-width: 0; /* 최소 너비 제거 */
+  padding: 0; /* 패딩 제거 */
+}
+
+
+:deep(.dp__input) {
+  border: none;
+  box-shadow: none;
+}
+
+:deep(.dp__main) {
+  font-family: inherit;
+  border-radius: 8px;
+  z-index: 100;
+}
+
+:deep(.dp__theme_light) {
+  --dp-primary-color: #2196F3;
+  --dp-border-radius: 8px;
+}
+
+:deep(.dp__overlay_cell_active) {
+  background-color: var(--dp-primary-color);
+  color: white;
+}
+
 .breadcrumb-div {
   font-size: 12px;
   color: #A1A6A6;
@@ -790,25 +858,7 @@ export default {
 
 }
 
-.date-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 125px;
-  color: #737577;
-}
 
-.date-input {
-  width: 120px;
-  align-items: center;
-  /* 수직 가운데 정렬 */
-}
-
-.date-input :deep(.v-field__input) {
-  font-size: 15px;
-  padding-top: 0;
-  padding-bottom: 0;
-}
 
 .calendar-icon-container {
   display: flex;
@@ -816,17 +866,29 @@ export default {
   margin-left: 12px;
 }
 
-.calendar-btn {
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
-  z-index: 1;
-}
-
 .date-separator {
-  margin: 0 10px;
+  margin-left: -15px;
+  z-index: 100; 
   font-size: 16px;
   color: #7A7A7A;
+}
+
+.start-date-wrapper {
+  margin-left: -0px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 150px;
+  color: #737577;
+}
+
+.end-date-wrapper {
+  margin-left: 10px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 150px;
+  color: #737577;
 }
 
 .date-buttons {
@@ -1134,7 +1196,7 @@ export default {
   font-weight: 500;
   color: #005bac;
   margin-left: 10px;
-  margin-right: 10px;
+  margin-right: 0px;
 }
 
 
@@ -1215,10 +1277,9 @@ export default {
 
 .label-divider {
   display: inline-block;
-  height: 18px;
-  width: 1px;
+  height: 18px;  
   background-color: #bbb;
-  margin-left: 10px;
+  margin-left: 10px;  
   margin-bottom: 2px;
   border-radius: 1px;
   vertical-align: middle;
