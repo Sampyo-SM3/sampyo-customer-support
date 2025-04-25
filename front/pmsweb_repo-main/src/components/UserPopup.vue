@@ -2,7 +2,7 @@
     <v-dialog v-model="dialogVisible" width="900px" persistent>
         <v-card style="background-color: white;">
             <v-card-title class="primary-bg white--text d-flex justify-space-between align-center">
-                <span class="title-custom">담당자 검색</span>
+                <span class="title-custom">사용자 검색</span>
                 <v-icon @click="closeDialog" color="#155A9E">mdi-close</v-icon>
             </v-card-title>
 
@@ -10,7 +10,7 @@
                 <v-row>
                     <v-col cols="12">
                         <v-text-field v-model="searchText" label="이름을 검색해주세요" append-icon="mdi-magnify" outlined dense
-                            hide-details @keyup.enter="fetchData"></v-text-field>
+                            hide-details @keyup.enter="fetchData" @click:append="fetchData" />
                     </v-col>
                 </v-row>
 
@@ -25,7 +25,7 @@
                         <template #no-data>
                             <div class="d-flex justify-center align-center pa-4 text-subtitle-1" style="color:#155A9E">
                                 <v-icon class="mr-2">mdi-alert-circle-outline</v-icon>
-                                담당자 이름을 검색해주세요.
+                                사용자 이름을 검색해주세요.
                             </div>
                         </template>
                     </v-data-table>
@@ -34,7 +34,7 @@
 
             <v-card-actions class="d-flex justify-end pa-4 mr-2">
                 <v-btn color="primary" @click="addUser()" :disabled="!selectedUser">
-                    담당자 등록
+                    등록
                 </v-btn>
             </v-card-actions>
         </v-card>
@@ -94,10 +94,8 @@ export default {
         },
         addUser() {
             // 글작성 폼으로 전달
-            this.$emit('manager-selected', this.selectedUser);
-            // 글수정 폼으로 전달달
-            this.$emit('manager-selected_edit', this.selectedUser);
-            this.$emit('manager-selected_sr_edit', this.selectedUser);
+            this.$emit('user-selected', this.selectedUser);
+
             this.closeDialog();
         },
         closeDialog() {
@@ -166,7 +164,6 @@ export default {
         this.dialogVisible = this.show;
     },
     mounted() {
-        this.fetchData();
     },
 }
 </script>

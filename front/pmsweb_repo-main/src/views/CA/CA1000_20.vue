@@ -11,7 +11,7 @@
     <div class="d-flex">
       <div style="flex: 2; margin-right: 20px; padding-left: 70px;">
         <div class="d-flex align-center justify-end mb-2">
-          <v-btn @click="showManagerPopup = true" prepend-icon="mdi-plus" size="small" color="green darken-2"
+          <v-btn @click="handleAddUser" prepend-icon="mdi-plus" size="small" color="green darken-2"
             class="text-none mr-2">추가</v-btn>
           <v-btn @click="deleteUser" prepend-icon="mdi-delete" size="small" color="grey darken-2"
             class="text-none">삭제</v-btn>
@@ -81,17 +81,18 @@
   </v-container>
 
   <!-- user 추가하기 팝업 -->
-  <user-popup :show="showUserPopup" @manager-selected="onAdminAdded" @close="showUserPopup = false" />
+  <user-popup :show="showUserPopup" @user-selected="onUserAdded" @close="showUserPopup = false" />
+
 </template>
 
 <script>
 import { inject, onMounted } from 'vue';
 import apiClient from '@/api';
-import userPopup from '@/components/userPopup.vue';
+import UserPopup from '@/components/UserPopup.vue';
 
 export default {
   components: {
-    userPopup
+    UserPopup
   },
   setup() {
     const extraBreadcrumb = inject('extraBreadcrumb', null);
@@ -106,7 +107,9 @@ export default {
     return {
       selectedUserId: null,
       users: [],
-      menuGroups: []
+      menuGroups: [],
+      showUserPopup: false,
+      selectedUser: null,
     };
   },
   mounted() {
@@ -123,21 +126,33 @@ export default {
         name: item.name || '',
         rollPstnNm: item.rollPstnNm || '',
         deptNm: item.deptNm || '',
-        corpNm: item.corpNm || ''
+        corpNm: item.corpNm || '',
+        isNew: false
       }));
     },
     selectUser(userId) {
-      this.selectedUserId = this.selectedUserId === userId ? null : userId;
-      this.menuGroups.forEach(group => {
-        group.checked = false;
-        group.selected = [];
-      });
-      this.$nextTick(() => {
-        const container = this.$refs.menuScrollContainer;
-        if (container?.scrollTo) container.scrollTo({ top: 0, behavior: 'smooth' });
-        else if (container) container.scrollTop = 0;
-      });
-      this.fetchUserAuth(userId);
+      if (this.selectedUserId === userId) {
+        // 이미 선택된 사용자 다시 클릭 → 해제 처리
+        this.selectedUserId = null;
+        this.menuGroups.forEach(group => {
+          group.checked = false;
+          group.selected = [];
+        });
+        this.fetchUserAuth(null); // 체크 해제 시 이 함수 호출
+      } else {
+        // 새 사용자 선택
+        this.selectedUserId = userId;
+        this.menuGroups.forEach(group => {
+          group.checked = false;
+          group.selected = [];
+        });
+        this.$nextTick(() => {
+          const container = this.$refs.menuScrollContainer;
+          if (container?.scrollTo) container.scrollTo({ top: 0, behavior: 'smooth' });
+          else if (container) container.scrollTop = 0;
+        });
+        this.fetchUserAuth(userId);
+      }
     },
     async fetchUserAuth(userId) {
       const res = await apiClient.get(`/api/userAuth/detailList`, { params: { userId } });
@@ -193,25 +208,27 @@ export default {
       const hasChildren = mid.children && mid.children.length > 0;
       const selected = new Set(group.selected);
 
-      // 중메뉴 자체의 체크 상태 변경
       if (isChecked) {
         selected.add(mid.value);
-        // 중메뉴 체크 시 모든 하위 메뉴 체크
+
         if (hasChildren) {
           mid.children.forEach(sub => selected.add(sub.value));
         }
+        group.checked = true; // 중메뉴가 체크되면 대메뉴도 체크
       } else {
         selected.delete(mid.value);
-        // 중메뉴 해제 시 모든 하위 메뉴 해제
         if (hasChildren) {
           mid.children.forEach(sub => selected.delete(sub.value));
         }
+
+        // ✅ 중메뉴 해제 후 대메뉴 체크 상태 다시 계산
+        const stillChecked = group.options.some(opt =>
+          selected.has(opt.value) ||
+          (opt.children && opt.children.some(sub => selected.has(sub.value)))
+        );
+        group.checked = stillChecked;
       }
-
       group.selected = Array.from(selected);
-
-      // 그룹 체크 상태 업데이트 - 하나라도 선택됐으면 체크
-      //group.checked = this.hasAnySelected(group);
     },
     // 하위 메뉴 변경 시 상위 메뉴 상태 업데이트
     updateParentCheckStatus(group, mid) {
@@ -250,10 +267,34 @@ export default {
         options: group.options
       }));
     },
-    insertUser() {
-      alert('추가');
+    deleteUser() {
+      const selectedUser = this.users.find(user => user.id === this.selectedUserId);
+
+      if (!selectedUser) {
+        alert('삭제할 사용자를 선택해주세요.');
+        return;
+      }
+
+      const isNew = selectedUser.isNew === true;
+      const isSaved = selectedUser.isNew === false;
+
+      // 1. 추가된 사용자만 선택한 경우 → 바로 삭제
+      if (isNew) {
+        this.users = this.users.filter(user => user.id !== selectedUser.id);
+        this.selectedUserId = null;
+        return;
+      }
+
+      // 2. 저장된 사용자만 선택한 경우 → confirm 후 삭제
+      if (isSaved) {
+        const confirmed = confirm("해당 사용자의 권한을 제거하시겠습니까?");
+        if (confirmed) {
+          // TODO: 삭제 API 호출
+          alert('삭제 기능은 아직 구현되지 않았습니다.');
+        }
+        return;
+      }
     },
-    deleteUser() { alert('삭제'); },
     async savePermissions() {
       if (!this.selectedUserId)
         return alert('사용자를 먼저 선택해주세요.');
@@ -268,6 +309,11 @@ export default {
         selectedCodes.push(...group.selected);
       });
 
+      if (selectedCodes.length === 0) {
+        alert('권한을 부여할 게시판을 하나 이상 선택해주세요.');
+        return;
+      }
+
       const toInsert = selectedCodes.filter(c => !existingCodes.includes(c));
       const toDelete = existingCodes.filter(c => !selectedCodes.includes(c));
 
@@ -280,7 +326,38 @@ export default {
       alert('권한이 저장되었습니다.');
 
       this.fetchUserAuth(this.selectedUserId);
-    }
+    },
+    handleAddUser() {
+      const hasUnsavedUser = this.users.some(user => user.isNew);
+      if (hasUnsavedUser) {
+        alert('기존 추가된 사용자를 먼저 저장해주세요.');
+        return;
+      }
+
+      this.showUserPopup = true; // 조건 만족 시 팝업 오픈
+    },
+    onUserAdded(selectedUser) {
+      if (!selectedUser) return;
+
+      const exists = this.users.some(user => user.id === selectedUser.usrId);
+      if (exists) {
+        alert('이미 등록된 사용자입니다.');
+        return;
+      }
+
+      this.users.push({
+        id: selectedUser.usrId,
+        name: selectedUser.name,
+        rollPstnNm: selectedUser.rollPstnNm || '',
+        deptNm: selectedUser.deptNm || '',
+        corpNm: selectedUser.corpNm || '',
+        isNew: true // 새로 추가된 유저 표시
+      });
+
+      this.selectedUserId = selectedUser.usrId; // 체크 표시용 선택
+
+      this.fetchUserAuth(null);
+    },
   }
 };
 </script>
