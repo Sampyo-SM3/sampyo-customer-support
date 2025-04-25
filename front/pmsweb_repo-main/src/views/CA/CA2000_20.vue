@@ -1,453 +1,481 @@
 <template>
-  <v-container fluid class="pr-5 pl-5 pt-7">
+  <v-container fluid>
+    <v-row>
+      <v-col>
+        <div style="margin-top:-10px;">
+          <v-divider thickness="3" color="#578ADB"></v-divider>
+        </div>
+      </v-col>
+    </v-row>
+    <br>
+    <div class="d-flex">
+      <div style="flex: 2; margin-right: 20px; padding-left: 70px;">
+        <div class="d-flex align-center justify-end mb-2">
+          <v-btn @click="handleAddUser" prepend-icon="mdi-plus" size="small" color="green darken-2"
+            class="text-none mr-2">추가</v-btn>
+          <v-btn @click="deleteUser" prepend-icon="mdi-delete" size="small" color="grey darken-2"
+            class="text-none">삭제</v-btn>
+        </div>
+        <v-table density="compact" fixed-header class="table-style">
+          <thead class="table-header">
+            <tr>
+              <th class="text-left" style="width: 70px;">선택</th>
+              <th class="text-left">사용자ID</th>
+              <th class="text-left">이름</th>
+              <th class="text-left">직급</th>
+              <th class="text-left">부서</th>
+              <th class="text-left">회사</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="user in users" :key="user.id" :class="{ 'selected-row': selectedUserId === user.id }"
+              @click="selectUser(user.id);" style="cursor: pointer;">
+              <td @click.stop>
+                <v-icon @click="selectUser(user.id)" :color="selectedUserId === user.id ? 'primary' : '#aaa'">
+                  {{ selectedUserId === user.id ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline' }}
+                </v-icon>
+              </td>
+              <td>{{ user.id }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.rollPstnNm }}</td>
+              <td>{{ user.deptNm }}</td>
+              <td>{{ user.corpNm }}</td>
+            </tr>
+          </tbody>
+        </v-table>
+      </div>
+      <div style="flex: 1; padding-right: 70px;">
+        <div class="d-flex justify-space-between align-center mb-1">
+          <div class="text-h6">게시판 목록</div>
+          <v-btn color="primary" class="ml-auto py-2 text-body-1" @click="savePermissions">저장</v-btn>
+        </div>
+        <v-card>
+          <div class="height-scroll-container" ref="menuScrollContainer">
+            <div v-for="(group, groupIdx) in menuGroups" :key="group.groupKey" class="mb-2">
+              <div class="text-subtitle-1 font-weight-bold d-flex align-center">
+                <v-checkbox v-model="group.checked" :label="group.groupLabel" hide-details density="compact"
+                  class="my-1 main-label" @change="toggleGroup(groupIdx)"
+                  :style="{ color: group.checked ? '#1867C0' : '#888888' }" />
+              </div>
+              <div v-for="(mid) in group.options" :key="mid.value" class="ml-6">
+                <div class="font-weight-medium mb-1 d-flex align-center">
+                  <v-checkbox :label="mid.label" :model-value="isMidChecked(group, mid)"
+                    @update:model-value="checked => toggleMid(group, mid, checked)" hide-details density="compact"
+                    class="my-1 checkbox-mid" :style="{
+                      color: isMidChecked(group, mid) ? '#1867C0' : '#888888'
+                    }" />
+                </div>
+                <div>
+                  <v-checkbox v-for="sub in mid.children" :key="sub.value" :label="sub.label" :value="sub.value"
+                    v-model="group.selected" hide-details density="compact" class="my-1 ml-7 sub-label"
+                    @change="updateParentCheckStatus(group, mid)"
+                    :style="{ color: isChecked(sub.value, group.selected) }" />
 
-    <v-dialog v-model="showAdminPopup" max-width="600px">
-      <v-card>
-        <v-card-title class="text-h5">
-          관리자 추가하기
-          <v-spacer></v-spacer>
-          <v-btn icon @click="closePopup">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <div class="board_control">
-            <div class="search_board">
-              <v-row>
-                <v-col cols="4">
-                  <v-select
-                    v-model="searchType"
-                    :items="searchTypes"
-                    label="검색 조건"
-                    variant="outlined"
-                    density="compact"
-                  ></v-select>
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field
-                    v-model="searchText"
-                    label="검색어"
-                    variant="outlined"
-                    density="compact"
-                    append-inner-icon="mdi-magnify"
-                    @click:append-inner="searchUsers"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="2">
-                  <v-btn color="primary" @click="searchUsers">검색</v-btn>
-                </v-col>
-              </v-row>
+                </div>
+              </div>
             </div>
           </div>
-
-          <v-data-table
-            :headers="userHeaders"
-            :items="users"
-            :items-per-page="10"
-            item-value="userId"
-            v-model:selected="selectedUsers"
-            show-select
-            class="elevation-1 mt-4 mb-5"
-          ></v-data-table>
-        </v-card-text>
-        <v-card-actions class="d-flex justify-end">
-          <v-btn variant="text" color="grey" @click="closePopup">취소</v-btn>
-          <v-btn variant="text" color="primary" @click="saveSelectedUsers">저장</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-
+        </v-card>
+      </div>
+    </div>
   </v-container>
+
+  <!-- user 추가하기 팝업 -->
+  <user-popup :show="showUserPopup" @user-selected="onUserAdded" @close="showUserPopup = false" />
+
 </template>
 
 <script>
+import { inject, onMounted } from 'vue';
 import apiClient from '@/api';
+import UserPopup from '@/components/UserPopup.vue';
 
 export default {
-  data() {
-    return {
-      isLoading: false,
-      progressStatuses: [],
-      // 파일 업로드 관련 데이터
-      newFiles: [], // 새로 선택한 파일 (v-file-input에 연결됨)
-      selectedFiles: [], // 업로드 대기 중인 파일들
-      uploadedFiles: [], // 이미 업로드된 파일들
-      isFileLoading: false,
-      fileRules: [
-        value => {
-          return !value || !value.length || value[0].size < 5000000 || '파일 크기는 5MB 이하여야 합니다.';
-        },
-      ],
-      // 파일 덮어쓰기 관련
-      showOverwriteDialog: false,
-      duplicateFiles: [],
-      pendingFiles: [] // 덮어쓰기 대기 중인 파일들
+  components: {
+    UserPopup
+  },
+  setup() {
+    const extraBreadcrumb = inject('extraBreadcrumb', null);
+    const listButtonLink = inject('listButtonLink', null);
+    onMounted(() => {
+      if (extraBreadcrumb) extraBreadcrumb.value = null;
+      if (listButtonLink) listButtonLink.value = null;
+    });
+    return {};
+  },
+  unmounted() { // 컴포넌트가 언마운트될 때
+    const listButtonLink = inject('listButtonLink', null);
+    if (listButtonLink) {
+      listButtonLink.value = null; // 페이지 벗어날 때 목록버튼 없애기
     }
   },
-
-  methods: {
-    test() {
-      console.log('--test--');
-
-      try {
-        // 폼 타입 결정        
-        const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
-        const params = {
-          key: '111',  // board seq번호
-          empno: 'SPH221342320005', // 사원번호
-          legacy_form: 'WF_FORM_SRTEST',
-          datatype: 'xml',  // 데이터 타입          
-          // seq: '111', // 프로시저 호출되는 ip          
-          // DATE_TEST: '111',  // board seq번호
-          ip: '10.50.20.71', // 프로시저 호출되는 ip          
-          db: 'SPC_TEST'     // 프로시저 호출되는 db
-        };
-
-        // 쿼리 파라미터 문자열 생성
-        const queryString = new URLSearchParams(params).toString()
-        const fullUrl = `${baseUrl}?${queryString}`
-
-        // 새 창에서 URL 열기
-        window.open(fullUrl, '_blank')
-      } catch (error) {
-        console.error('상신 처리 중 오류 발생:', error)
-      }
-    },
-
-    async test2() {
-      try {
-        this.isLoading = true;
-
-        const errorMessage = '2024-01-01 00:00:00\n' +
-          'test\n' +
-          '오류가 발생했습니다.';
-
-        const response = await apiClient.post('/api/kakao', {
-          content: errorMessage
-        });
-
-        if (response.data) {
-          console.log(response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching user info:', error);
-        this.error = '사용자 정보를 가져오는 중 오류가 발생했습니다';
-      } finally {
-        this.isLoading = false;
-      }
-    },
-
-    async test3() {
-      this.isLoading = true;
-
-      try {
-        // FormData 생성
-        const formData = new FormData();
-        formData.append('to', 'javachohj@sampyo.co.kr');
-        formData.append('subject', 'test');
-        formData.append('message', 'test');
-
-        // API 호출
-        const response = await apiClient.post('/api/email/send', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-
-        // 성공 처리                    
-        console.log(response.data);
-      } catch (error) {
-        console.error('이메일 전송 실패:', error);
-      } finally {
-        this.isLoading = false;
-      }
-    },
-
-    // 파일 타입에 따른 아이콘 반환
-    getFileIcon(fileType) {
-      if (fileType.includes('image')) {
-        return 'mdi-file-image';
-      } else if (fileType.includes('pdf')) {
-        return 'mdi-file-pdf';
-      } else {
-        return 'mdi-file-document';
-      }
-    },
-
-    // 파일 크기 포맷
-    formatFileSize(size) {
-      if (size < 1024) {
-        return size + ' B';
-      } else if (size < 1024 * 1024) {
-        return (size / 1024).toFixed(2) + ' KB';
-      } else {
-        return (size / (1024 * 1024)).toFixed(2) + ' MB';
-      }
-    },
-
-    // 파일 선택 변경 처리
-    handleFileChange(event) {
-      console.log('--handleFileChange--');
-      console.log('이벤트 객체:', event);
-
-      // 파일은 v-model에 바인딩된 newFiles에서 가져옵니다
-      const files = this.newFiles;
-      console.log('newFiles:', files);
-
-      if (!files || (Array.isArray(files) && files.length === 0)) {
-        console.log('선택된 파일 없음');
-        return;
-      }
-
-      if (Array.isArray(files)) {
-        console.log('여러 파일이 선택됨:', files.length);
-        files.forEach((file, index) => {
-          console.log(`파일[${index}] 이름:`, file.name);
-
-          // 중복 파일 검사 (selectedFiles 내에서)
-          const existingSelectedIndex = this.selectedFiles.findIndex(f => f.name === file.name);
-          if (existingSelectedIndex !== -1) {
-            // 선택된 파일 목록에서 중복된 파일 교체
-            this.selectedFiles.splice(existingSelectedIndex, 1, file);
-          } else {
-            // 새 파일 추가
-            this.selectedFiles.push(file);
-          }
-        });
-      } else {
-        console.log('단일 파일 선택됨 이름:', files.name);
-
-        // 중복 파일 검사 (selectedFiles 내에서)
-        const existingSelectedIndex = this.selectedFiles.findIndex(f => f.name === files.name);
-        if (existingSelectedIndex !== -1) {
-          // 선택된 파일 목록에서 중복된 파일 교체
-          this.selectedFiles.splice(existingSelectedIndex, 1, files);
-        } else {
-          // 새 파일 추가
-          this.selectedFiles.push(files);
-        }
-      }
-
-      // 파일 선택 컨트롤 초기화
-      this.newFiles = [];
-    },
-
-    // 선택된 파일 제거 (아직 업로드되지 않은 파일)
-    removeSelectedFile(index) {
-      this.selectedFiles.splice(index, 1);
-    },
-
-    // 업로드된 파일 제거
-    removeFile(index) {
-      console.log('--removeFile--');
-      console.log(this.uploadedFiles[index].name);
-      this.test4(this.uploadedFiles[index].name);
-
-
-      this.uploadedFiles.splice(index, 1);
-    },
-
-    // 파일명 중복 확인
-    checkDuplicateFiles() {
-      const duplicates = [];
-
-      // selectedFiles의 각 파일이 uploadedFiles에 이미 존재하는지 확인
-      this.selectedFiles.forEach(selectedFile => {
-        const isDuplicate = this.uploadedFiles.some(uploadedFile =>
-          uploadedFile.name === selectedFile.name
-        );
-
-        if (isDuplicate) {
-          duplicates.push(selectedFile);
-        }
-      });
-
-      return duplicates;
-    },
-
-    // 파일 업로드 처리
-    async uploadFiles() {
-      console.log('--uploadFiles--');
-      console.log(this.selectedFiles);
-      if (!this.selectedFiles.length) return;
-
-      // 파일명 중복 확인
-      const duplicateFiles = this.checkDuplicateFiles();
-
-      if (duplicateFiles.length > 0) {
-        // 중복 파일이 있을 경우 확인 대화상자 표시
-        this.duplicateFiles = duplicateFiles;
-        this.pendingFiles = this.selectedFiles.filter(file =>
-          !duplicateFiles.some(dupFile => dupFile.name === file.name)
-        );
-        this.showOverwriteDialog = true;
-        return;
-      }
-
-      // 중복 파일이 없으면 바로 업로드 진행
-      await this.processUpload(this.selectedFiles);
-    },
-
-    // 덮어쓰기 취소
-    cancelOverwrite() {
-      this.showOverwriteDialog = false;
-
-      // 중복되지 않은 파일만 업로드 진행
-      if (this.pendingFiles.length > 0) {
-        this.processUpload(this.pendingFiles);
-      }
-
-      // 상태 초기화
-      this.duplicateFiles = [];
-      this.pendingFiles = [];
-    },
-
-    // 덮어쓰기 확인
-    confirmOverwrite() {
-      this.showOverwriteDialog = false;
-
-      // 중복 파일 제거 (기존 업로드 파일에서)
-      this.duplicateFiles.forEach(dupFile => {
-        const index = this.uploadedFiles.findIndex(f => f.name === dupFile.name);
-        if (index !== -1) {
-          this.uploadedFiles.splice(index, 1);
-        }
-      });
-
-      // 모든 선택된 파일 업로드 진행
-      this.processUpload(this.selectedFiles);
-
-      // 상태 초기화
-      this.duplicateFiles = [];
-      this.pendingFiles = [];
-    },
-
-    // 실제 파일 업로드 처리
-    async processUpload(filesToUpload) {
-      if (!filesToUpload.length) return;
-
-      this.isFileLoading = true;
-
-      try {
-        // FormData 생성
-        const formData = new FormData();
-
-        // 백엔드에서 @RequestParam("files")로 받기 때문에 모든 파일을 'files' 이름으로 추가
-        filesToUpload.forEach((file) => {
-          formData.append('files', file);
-        });
-
-        // API 호출 - 백엔드 컨트롤러 경로와 일치하도록 설정
-        const response = await apiClient.post('/api/fileUpload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-
-        // 업로드 성공 처리
-        if (response.data && response.data.result === 'success') {
-          console.log('파일 업로드 성공:', response.data);
-
-          // 백엔드에서 반환한 파일 목록 정보를 사용할 수 있습니다
-          const uploadedFileList = response.data.files || [];
-          console.log('업로드된 파일 목록:', uploadedFileList);
-          console.log('총 업로드 목록 ', this.uploadedFiles);
-
-          // 업로드 성공한 파일을 목록에 추가
-          filesToUpload.forEach(file => {
-            this.uploadedFiles.push({
-              name: file.name,
-              size: file.size,
-              type: file.type
-            });
-          });
-
-          // 업로드된 파일을 선택된 파일 목록에서 제거
-          this.selectedFiles = this.selectedFiles.filter(selectedFile =>
-            !filesToUpload.some(uploadedFile => uploadedFile.name === selectedFile.name)
-          );
-        }
-      } catch (error) {
-        console.error('파일 업로드 오류:', error);
-        alert('파일 업로드 중 오류가 발생했습니다.');
-      } finally {
-        this.isFileLoading = false;
-      }
-    },
-
-    // 파일 삭제 확인
-    async test4(para_file_name) {
-      this.showDeleteDialog = false;
-      this.deletingFile = para_file_name;
-
-      try {
-        // FormData 사용하지 않고 URL에 파라미터 포함
-        const response = await apiClient.post(`/api/fileDelete?originFile=${encodeURIComponent(this.deletingFile)}`);
-        console.log('response -> ' + response.data.result);
-
-        // 삭제 성공 처리
-        if (response.data.result === 'success') {
-          // 파일 목록에서 삭제된 파일 제거
-          // this.files = this.files.filter(file => file.originFile !== this.fileToDelete);
-
-        } else {
-          throw new Error(response.data.message || '파일 삭제에 실패했습니다.');
-        }
-      } catch (error) {
-        console.error('파일 삭제 중 오류 발생:', error);
-
-      } finally {
-        this.deletingFile = null;
-      }
-    },
-    async getStatus() {
-      try {
-        const statusList = await apiClient.get("/api/status/list");
-
-        // 상태 이름 리스트 저장
-        this.progressStatuses = statusList.data.map(status => ({
-          text: status.codeName,  // UI에 표시할 값
-          value: status.codeId    // 실제 선택될 값
-        }));
-
-      } catch (error) {
-        console.error("❌ 오류 발생:", error);
-      }
-    },
+  data() {
+    return {
+      selectedUserId: null,
+      users: [],
+      menuGroups: [],
+      showUserPopup: false,
+      selectedUser: null,
+    };
   },
   mounted() {
-    this.getStatus();
-    this.showAdminPopup = true;
+    this.getAuthUser();
+    this.fetchMenuGroups();
   },
-}
+  methods: {
+    async getAuthUser() {
+      const res = await apiClient.get('/api/userAuth/list');
+      this.users = res.data.map(item => ({
+        selected: false,
+        auth: item.auth,
+        id: item.id,
+        name: item.name || '',
+        rollPstnNm: item.rollPstnNm || '',
+        deptNm: item.deptNm || '',
+        corpNm: item.corpNm || '',
+        isNew: false
+      }));
+    },
+    selectUser(userId) {
+      if (this.selectedUserId === userId) {
+        // 이미 선택된 사용자 다시 클릭 → 해제 처리
+        this.selectedUserId = null;
+        this.menuGroups.forEach(group => {
+          group.checked = false;
+          group.selected = [];
+        });
+        this.fetchUserAuth(null); // 체크 해제 시 이 함수 호출
+      } else {
+        // 새 사용자 선택
+        this.selectedUserId = userId;
+        this.menuGroups.forEach(group => {
+          group.checked = false;
+          group.selected = [];
+        });
+        this.$nextTick(() => {
+          const container = this.$refs.menuScrollContainer;
+          if (container?.scrollTo) container.scrollTo({ top: 0, behavior: 'smooth' });
+          else if (container) container.scrollTop = 0;
+        });
+        this.fetchUserAuth(userId);
+      }
+    },
+    async fetchUserAuth(userId) {
+      const res = await apiClient.get(`/api/userAuth/detailList`, { params: { userId } });
+
+      this.menuGroups.forEach(group => {
+        const matched = res.data.filter(auth => auth.mcode.startsWith(group.groupKey));
+
+        const availableCodes = group.options.flatMap(mid => {
+          const codes = mid.children.length > 0 ? mid.children.map(sub => sub.value) : [];
+          return [...codes, mid.value];  // <- 중메뉴도 추가
+        });
+
+        group.selected = matched
+          .map(auth => auth.mcode)
+          .filter(code => availableCodes.includes(code));
+
+        // 초기 상태에서 하위 메뉴 상태에 따라 그룹 체크 상태 설정.
+        group.checked = this.hasAnySelected(group);
+      });
+
+      // 권한 로드 후 모든 메뉴 체크 상태 업데이트
+      this.updateAllCheckStatus();
+    },
+    // 해당 그룹에 선택된 항목이 있는지 확인
+    hasAnySelected(group) {
+      return group.selected.length > 0;
+    },
+    // 중메뉴 체크 상태 확인 - 하위에 하나라도 체크되면 체크된 상태
+    isMidChecked(group, mid) {
+      if (mid.children && mid.children.length > 0) {
+        return mid.children.some(sub => group.selected.includes(sub.value)) || group.selected.includes(mid.value);
+      }
+      return group.selected.includes(mid.value);
+    },
+    toggleGroup(index) {
+      const group = this.menuGroups[index];
+      if (group.checked) {
+        // 대메뉴 체크: 모든 하위 메뉴 체크
+        const allCodes = [group.groupKey];
+        group.options.forEach(mid => {
+          allCodes.push(mid.value);
+          if (mid.children && mid.children.length > 0) {
+            mid.children.forEach(sub => allCodes.push(sub.value));
+          }
+        });
+        group.selected = allCodes;
+      } else {
+        // 대메뉴 해제: 모든 하위 메뉴 해제
+        group.selected = [];
+      }
+    },
+    toggleMid(group, mid, isChecked) {
+      const hasChildren = mid.children && mid.children.length > 0;
+      const selected = new Set(group.selected);
+
+      if (isChecked) {
+        selected.add(mid.value);
+
+        if (hasChildren) {
+          mid.children.forEach(sub => selected.add(sub.value));
+        }
+        group.checked = true; // 중메뉴가 체크되면 대메뉴도 체크
+      } else {
+        selected.delete(mid.value);
+        if (hasChildren) {
+          mid.children.forEach(sub => selected.delete(sub.value));
+        }
+
+        // ✅ 중메뉴 해제 후 대메뉴 체크 상태 다시 계산
+        const stillChecked = group.options.some(opt =>
+          selected.has(opt.value) ||
+          (opt.children && opt.children.some(sub => selected.has(sub.value)))
+        );
+        group.checked = stillChecked;
+      }
+      group.selected = Array.from(selected);
+    },
+    // 하위 메뉴 변경 시 상위 메뉴 상태 업데이트
+    updateParentCheckStatus(group, mid) {
+      const isAnyChecked = mid.children.some(sub => group.selected.includes(sub.value));
+      const selected = new Set(group.selected);
+
+      if (!isAnyChecked) {
+        //selected.delete(mid.value); // 하위 항목이 모두 해제되면 중메뉴도 해제
+      } else {
+        selected.add(mid.value); // 하나라도 선택되면 중메뉴는 체크 유지
+      }
+
+      group.selected = Array.from(selected);
+
+      // 그룹 체크 상태도 갱신
+      group.checked = this.hasAnySelected(group);
+    },
+    // 모든 메뉴의 체크 상태 업데이트
+    updateAllCheckStatus() {
+      this.menuGroups.forEach(group => {
+        // 그룹 체크 상태 업데이트 - 하나라도 선택됐으면 체크
+        group.checked = this.hasAnySelected(group);
+      });
+    },
+    isChecked(value, selected) {
+      return selected.includes(value) ? '#1867C0' : '#888888';
+    },
+    async fetchMenuGroups() {
+      const res = await apiClient.get('/api/menuitem/all-menu');
+
+      this.menuGroups = res.data.map(group => ({
+        groupLabel: group.groupLabel,
+        groupKey: group.groupKey,
+        checked: false,
+        selected: [],
+        options: group.options
+      }));
+    },
+    async deleteUser() {
+      const selectedUser = this.users.find(user => user.id === this.selectedUserId);
+
+      if (!selectedUser) {
+        alert('삭제할 사용자를 선택해주세요.');
+        return;
+      }
+
+      const isNew = selectedUser.isNew === true;
+      const isSaved = selectedUser.isNew === false;
+
+      // 1. 추가된 사용자만 선택한 경우 → 바로 삭제
+      if (isNew) {
+        this.users = this.users.filter(user => user.id !== selectedUser.id);
+        this.selectedUserId = null;
+        return;
+      }
+
+      // 2. 저장된 사용자만 선택한 경우 → confirm 후 삭제
+      if (isSaved) {
+        const confirmed = confirm("해당 사용자의 권한을 제거하시겠습니까?");
+
+        if (confirmed) {
+          await apiClient.post('/api/userAuth/deleteUser', {
+            id: this.selectedUserId
+          }, {});
+
+          this.getAuthUser()
+          this.fetchUserAuth(null);
+          alert('삭제하였습니다.');
+        }
+
+        return;
+      }
+    },
+    async savePermissions() {
+      if (!this.selectedUserId)
+        return alert('사용자를 먼저 선택해주세요.');
+
+      const res = await apiClient.get(`/api/userAuth/detailList`, { params: { userId: this.selectedUserId } });
+
+      const existingCodes = res.data.map(auth => auth.mcode);
+      const selectedCodes = [];
+
+      this.menuGroups.forEach(group => {
+        if (group.checked) selectedCodes.push(group.groupKey);
+        selectedCodes.push(...group.selected);
+      });
+
+      if (selectedCodes.length === 0) {
+        alert('권한을 부여할 게시판을 하나 이상 선택해주세요.');
+        return;
+      }
+
+      const toInsert = selectedCodes.filter(c => !existingCodes.includes(c));
+      const toDelete = existingCodes.filter(c => !selectedCodes.includes(c));
+
+      try {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const insertUser = userInfo?.id || 'system'; // 혹시 null일 경우 대비
+
+        for (const menuCd of toInsert) {
+          console.log(menuCd)
+          const payload = {
+            id: this.selectedUserId,
+            menuCode: menuCd,
+            auth: 31,
+            insertUser: insertUser,
+            updateUser: insertUser
+          };
+
+          await apiClient.post('/api/userAuth/save', payload);
+        }
+
+        // 권한 제거 처리 (auth = 0으로 설정)
+        for (const menuCd of toDelete) {
+          const payload = {
+            id: this.selectedUserId,
+            menuCode: menuCd,
+            auth: 0,
+            insertUser: insertUser,
+            updateUser: insertUser
+          };
+
+          await apiClient.post('/api/userAuth/save', payload);
+        }
+
+        this.fetchUserAuth(this.selectedUserId);
+        alert('권한이 저장되었습니다.');
+
+      } catch (error) {
+        console.error('권한 저장 오류:', error);
+        alert('권한 저장 중 오류가 발생했습니다.');
+      }
+    },
+    handleAddUser() {
+      const hasUnsavedUser = this.users.some(user => user.isNew);
+      if (hasUnsavedUser) {
+        alert('기존 추가된 사용자를 먼저 저장해주세요.');
+        return;
+      }
+
+      this.showUserPopup = true; // 조건 만족 시 팝업 오픈
+    },
+    onUserAdded(selectedUser) {
+      if (!selectedUser) return;
+
+      const exists = this.users.some(user => user.id === selectedUser.usrId);
+      if (exists) {
+        alert('이미 등록된 사용자입니다.');
+        return;
+      }
+
+      this.users.push({
+        id: selectedUser.usrId,
+        name: selectedUser.name,
+        rollPstnNm: selectedUser.rollPstnNm || '',
+        deptNm: selectedUser.deptNm || '',
+        corpNm: selectedUser.corpNm || '',
+        isNew: true // 새로 추가된 유저 표시
+      });
+
+      this.selectedUserId = selectedUser.usrId; // 체크 표시용 선택
+
+      this.fetchUserAuth(null);
+    },
+  }
+};
 </script>
 
 <style scoped>
-.selected-files {
+.v-table th {
+  font-weight: bold;
+  background-color: #f5f5f5;
+}
+
+.title-div {
+  font-size: 25px;
+}
+
+.table-style {
+  min-height: auto;
   border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  background-color: #f9f9f9;
-}
-
-.selected-files>div {
-  border-bottom: 1px solid #e0e0e0;
-  padding: 8px 12px;
-}
-
-.selected-files>div:last-child {
-  border-bottom: none;
-}
-
-.file-name {
-  font-weight: 500;
+  width: 100%;
+  position: relative;
+  border-radius: 10px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.file-size {
-  color: #757575;
-  font-size: 0.85rem;
+::v-deep(.table-header) {
+  height: 56px;
+}
+
+::v-deep(.table-header th) {
+  background-color: #D0DFF1 !important;
+  font-weight: 500;
+  border-bottom: 1px solid #e0e0e0 !important;
+}
+
+.v-table tbody tr {
+  height: 40px;
+}
+
+.v-table tbody td {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  height: 40px;
+  vertical-align: middle;
+}
+
+.lickable-icon {
+  cursor: pointer;
+  font-size: 22px;
+}
+
+.selected-row {
+  background-color: #FAF9F1;
+  transition: background-color 0.3s;
+}
+
+::v-deep(.main-label .v-label) {
+  color: black !important;
+  font-weight: 500;
+  opacity: 1 !important;
+}
+
+::v-deep(.checkbox-mid .v-label) {
+  color: #5A5C5F !important;
+  font-weight: 500;
+  opacity: 1 !important;
+}
+
+::v-deep(.sub-label .v-label) {
+  color: #5A5C5F !important;
+  font-weight: 500;
+  opacity: 1 !important;
+}
+
+.height-scroll-container {
+  padding: 15px;
+  max-height: 700px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
 }
 </style>
