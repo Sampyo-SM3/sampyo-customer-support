@@ -88,7 +88,7 @@
 <script>
 import { inject, onMounted } from 'vue';
 import apiClient from '@/api';
-import UserPopup from '@/components/UserPopup.vue';
+import UserPopup from '@/components/UserListPopup.vue';
 
 export default {
   components: {
