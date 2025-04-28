@@ -32,4 +32,27 @@
 		  AND a.auth = 31
 	</select>
 
+	<select id="checkMenuAuthExists" resultType="int" parameterType="com.example.connectBoard.dto.UserAuthDTO">
+		SELECT COUNT(*) 
+		FROM sys_menu_auth
+		WHERE ID = #{id} AND M_CODE = #{menuCode}
+	</select>
+	
+	<update id="updateMenuAuth" parameterType="com.example.connectBoard.dto.UserAuthDTO">
+		UPDATE sys_menu_auth
+		SET AUTH = #{auth}, UPDATE_USER = #{updateUser}, UPDATE_DT = GETDATE()
+		WHERE ID = #{id} AND M_CODE = #{menuCode}
+	</update>
+	
+	<insert id="insertMenuAuth" parameterType="com.example.connectBoard.dto.UserAuthDTO">
+		INSERT INTO sys_menu_auth (ID, M_CODE, AUTH, INSERT_USER, INSERT_DT)
+		VALUES (#{id}, #{menuCode}, #{auth}, #{insertUser}, GETDATE())
+	</insert>
+
+	<delete id="deleteUserAuth" parameterType="com.example.connectBoard.dto.UserAuthDTO">
+		DELETE
+		 FROM sys_menu_auth
+		WHERE ID = #{id}
+	</delete>
+
 </mapper>

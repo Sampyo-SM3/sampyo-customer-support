@@ -14,4 +14,16 @@ public interface UserAuthRepository {
     
     List<UserAuthDTO> getUserAuth(String userId);
     
+    // 추가된 권한 여부 확인
+    int checkMenuAuthExists(UserAuthDTO userAuthDTO);
+
+    // 권한 업데이트
+    int updateMenuAuth(UserAuthDTO userAuthDTO);
+
+    // 권한 삽입
+    int insertMenuAuth(UserAuthDTO userAuthDTO);
+    
+    // 권한 전체 삭제
+    int deleteUserAuth(UserAuthDTO userAuthDTO);
+    
 }

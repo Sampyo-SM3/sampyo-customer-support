@@ -169,7 +169,7 @@ export default {
           .map(auth => auth.mcode)
           .filter(code => availableCodes.includes(code));
 
-        // 초기 상태에서 하위 메뉴 상태에 따라 그룹 체크 상태 설정
+        // 초기 상태에서 하위 메뉴 상태에 따라 그룹 체크 상태 설정.
         group.checked = this.hasAnySelected(group);
       });
 
@@ -267,7 +267,7 @@ export default {
         options: group.options
       }));
     },
-    deleteUser() {
+    async deleteUser() {
       const selectedUser = this.users.find(user => user.id === this.selectedUserId);
 
       if (!selectedUser) {
@@ -288,10 +288,17 @@ export default {
       // 2. 저장된 사용자만 선택한 경우 → confirm 후 삭제
       if (isSaved) {
         const confirmed = confirm("해당 사용자의 권한을 제거하시겠습니까?");
+
         if (confirmed) {
-          // TODO: 삭제 API 호출
-          alert('삭제 기능은 아직 구현되지 않았습니다.');
+          await apiClient.post('/api/userAuth/deleteUser', {
+            id: this.selectedUserId
+          }, {});
+
+          this.getAuthUser()
+          this.fetchUserAuth(null);
+          alert('삭제하였습니다.');
         }
+
         return;
       }
     },
@@ -317,15 +324,43 @@ export default {
       const toInsert = selectedCodes.filter(c => !existingCodes.includes(c));
       const toDelete = existingCodes.filter(c => !selectedCodes.includes(c));
 
-      console.log('추가할 권한:', toInsert);
-      console.log('삭제할 권한:', toDelete);
+      try {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const insertUser = userInfo?.id || 'system'; // 혹시 null일 경우 대비
 
-      // 여기에 권한 저장 API 호출 로직 추가 필요
-      // await apiClient.post('/api/userAuth/save', { userId: this.selectedUserId, toInsert, toDelete });
+        for (const menuCd of toInsert) {
+          console.log(menuCd)
+          const payload = {
+            id: this.selectedUserId,
+            menuCode: menuCd,
+            auth: 31,
+            insertUser: insertUser,
+            updateUser: insertUser
+          };
 
-      alert('권한이 저장되었습니다.');
+          await apiClient.post('/api/userAuth/save', payload);
+        }
 
-      this.fetchUserAuth(this.selectedUserId);
+        // 권한 제거 처리 (auth = 0으로 설정)
+        for (const menuCd of toDelete) {
+          const payload = {
+            id: this.selectedUserId,
+            menuCode: menuCd,
+            auth: 0,
+            insertUser: insertUser,
+            updateUser: insertUser
+          };
+
+          await apiClient.post('/api/userAuth/save', payload);
+        }
+
+        this.fetchUserAuth(this.selectedUserId);
+        alert('권한이 저장되었습니다.');
+
+      } catch (error) {
+        console.error('권한 저장 오류:', error);
+        alert('권한 저장 중 오류가 발생했습니다.');
+      }
     },
     handleAddUser() {
       const hasUnsavedUser = this.users.some(user => user.isNew);
