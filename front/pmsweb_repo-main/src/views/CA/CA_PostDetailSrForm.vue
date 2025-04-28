@@ -2,7 +2,7 @@
   <v-container fluid class="pr-0 pl-0 pt-0">
 
     <!-- 진행 상태 표시 바 -->
-    <v-row justify="center" class="mb-0 pt-0">
+    <v-row justify="center" class="mb-6 pt-0">
       <v-col cols="12" class="d-flex align-center justify-center">
         <div class="custom-stepper">
           <div v-for="(status, index) in progressStatuses" :key="index" class="step" :class="{
@@ -17,11 +17,13 @@
       </v-col>
     </v-row>
 
-    <br>
-    <br>
+    <v-alert v-if="inquiry.stateSr === 'R'" type="error" variant="outlined" class="reject-alert mb-3"
+      density="comfortable" icon="mdi-alert-circle-outline" color="#D32F2F">
+      SR요청서가 <strong>반려</strong>되었습니다. 다시 작성해주세요.
+    </v-alert>
 
     <!-- 전체 래퍼: 접수상태 박스 + 버튼을 나란히 배치 -->
-    <div class="d-flex align-center mb-4">
+    <div class="d-flex align-center mb-1">
       <!-- 접수상태 박스 -->
       <!-- <v-row no-gutters class="search-row top-row bottom-row status-select-row"       -->
       <v-row no-gutters class="status-row status-select-row" style="width: 220px; 
@@ -40,21 +42,20 @@
 
       <!-- 오른쪽 정렬: 수정 + 상신 -->
       <div class="d-flex ml-auto">
-        <v-btn v-if="inquiry.srFlag === 'N'" variant="flat" color="green darken-2" class="save-status-btn mr-2"
-          size="small" @click="moveEidtSr">
+        <v-btn v-if="inquiry.srFlag === 'N' || inquiry.stateSr === 'R'" variant="flat" color="green darken-2"
+          class="save-status-btn mr-2" size="small" @click="moveEidtSr">
           수정
         </v-btn>
-        <v-btn v-if="inquiry.srFlag === 'N'" variant="flat" color="#F7A000" class="save-status-btn white-text"
-          size="small" @click="approvalBtn">
+        <v-btn v-if="inquiry.srFlag === 'N' || inquiry.stateSr === 'R'" variant="flat" color="#F7A000"
+          class="save-status-btn white-text mr-2" size="small" @click="approvalBtn">
           상신
         </v-btn>
-        <v-btn v-if="inquiry.srFlag === 'Y'" variant="flat" color="#F7A000" class="save-status-btn white-text"
+        <v-btn v-if="inquiry.srFlag === 'Y'" variant="flat" color="#1976D2" class="save-status-btn white-text"
           size="small" @click="showSrBtn">
           SR요청서 보기
         </v-btn>
       </div>
     </div>
-
 
     <v-row no-gutters class="search-row top-row">
       <v-col class="search-col product-category">
@@ -315,6 +316,7 @@ export default {
         division: "",
         processState: "",
         srFlag: "",
+        stateSr: "",
         docNum: ""
       },
       management: {
@@ -362,54 +364,6 @@ export default {
       // 수정 성공 후 페이지 새로고침
       window.location.reload();
     },
-    async getDetailInquiry() {
-      const response = await apiClient.get("/api/require/detail", {
-        params: { seq: this.receivedSeq }
-      });
-
-      const processState = response.data?.processState || "P"; // 기본값 설정
-      this.selectedStatus = processState;
-      this.step = this.statusMapping?.[this.selectedStatus] ?? 1;
-
-      // 3. 나머지 데이터 매핑
-      this.inquiry = {
-        sub: response.data?.sub || "",
-        etc: response.data?.etc || "",
-        uid: response.data?.uid || "",
-        writerId: response.data?.writerId || "",
-        manager: response.data?.manager || "",
-        srFlag: response.data?.srFlag || "",
-        processState: processState,
-      };
-
-      this.inquiry = {
-        sub: response.data?.sub || "",
-        etc: response.data?.etc || "",
-        uid: response.data?.uid || "",
-        writerId: response.data?.writerId || "",
-        manager: response.data?.manager || "",
-        srFlag: response.data?.srFlag || "",
-        processState: response.data?.processState || "P",
-      };
-
-      // response.data.writerId
-
-      this.selectedStatus = this.inquiry.processState;
-
-      //첨부파일 리스트 불러오기
-      try {
-        const fileList = await apiClient.get("/api/file-attach/fileList", {
-          params: { seq: this.receivedSeq }
-        });
-
-        this.fetchedFiles = Array.isArray(fileList.data)
-          ? fileList.data.filter(file => file && file.fileName)
-          : [];
-
-      } catch (error) {
-        console.error("❌ 오류 발생:", error);
-      }
-    },
     async getStatus() {
       try {
         const statusList = await apiClient.get("/api/status/list");
@@ -438,7 +392,7 @@ export default {
 
         // ✅ response.data 또는 processState가 존재하는지 확인 후 할당
         if (!response.data || !response.data.processState) {
-          console.warn("⚠ processState 값이 없습니다. 기본값(P)로 설정합니다.");
+          console.warn("processState 값이 없습니다. 기본값(P)로 설정합니다.");
         }
 
         const processState = response.data?.processState || "P"; // 기본값 설정
@@ -477,6 +431,7 @@ export default {
           division: response.data?.division || "",
           processState: response.data?.processState || "",
           srFlag: response.data?.srFlag || "",
+          stateSr: response.data?.stateSr || "",
           docNum: response.data?.docNum || "",
           management: {
             PROGRESS: processState
@@ -624,8 +579,6 @@ export default {
     },
     async downloadFile(file) {
       try {
-        console.log(file);
-
         const response = await apiClient.get("/api/download", {
           params: { filename: file.fileName },
           responseType: 'blob',
@@ -659,11 +612,14 @@ export default {
           datatype: 'xml',  // 데이터 타입          
           ip: '10.50.20.71', // 프로시저 호출되는 ip          
           db: 'SPC_TEST',     // 프로시저 호출되는 db
+          flag: 'Y'            //업무지원센터에서 sr요청서 작성했다는 flag
         };
 
         // 쿼리 파라미터 문자열 생성
         const queryString = new URLSearchParams(params).toString()
         const fullUrl = `${baseUrl}?${queryString}`
+
+        console.log(fullUrl);
 
         const popupWidth = 800;
         const popupHeight = 900;
@@ -705,7 +661,8 @@ export default {
         const params = {
           mode: '',  // board seq번호
           piid: this.inquiry.docNum,
-          usid: '&usid=srbyeon@sampyo.co.kr'
+          usid: this.userInfo.email,
+          flag: 'Y'            //업무지원센터에서 sr요청서 작성했다는 flag
         };
 
         const queryString = new URLSearchParams(params).toString()

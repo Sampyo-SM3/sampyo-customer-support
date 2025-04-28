@@ -1,6 +1,6 @@
 <template style="margin-top:-30px;">
   <v-container fluid class="pr-0 pl-0 pt-0">
-     
+
     <br>
 
     <v-row no-gutters class="search-row top-row">
@@ -96,7 +96,14 @@
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col input-width-half">
         <div class="label-box colNm"><span class="required-star">*</span>의뢰일자</div>
-        <v-menu v-model="requestDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
+
+        <VueDatePicker class="date-picker ml-1" :month-picker="false" preview-format="yyyy-MM-dd"
+          v-model="inquiry.requestDate" :teleport="false" position="top" :enable-time-picker="false" auto-apply
+          locale="ko" format="yyyy-MM-dd" :week-start="1" :allowed-dates="allowedDates"
+          @update:model-value="requestDateMenu = false" v-model:open="datePickerOpen" :clearable="false"
+          :text-input="false" />
+
+        <!-- <v-menu v-model="requestDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
           min-width="auto">
           <template v-slot:activator="{ props }">
             <div class="date-field-wrapper" v-bind="props"
@@ -107,16 +114,21 @@
             </div>
           </template>
 
-          <v-date-picker v-model="inquiry.requestDate" @update:model-value="requestDateMenu = false" locale="ko-KR"
-            elevation="1" color="blue" width="310" first-day-of-week="1" show-adjacent-months scrollable
-            :allowed-dates="allowedDates" />
-        </v-menu>
+<v-date-picker v-model="inquiry.requestDate" @update:model-value="requestDateMenu = false" locale="ko-KR" elevation="1"
+  color="blue" width="310" first-day-of-week="1" show-adjacent-months scrollable :allowed-dates="allowedDates" />
+</v-menu> -->
       </v-col>
 
 
       <v-col class="search-col input-width-half">
         <div class="label-box colNm">접수일자</div>
-        <v-menu v-model="acceptDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
+        <VueDatePicker class="date-picker ml-1" :month-picker="false" preview-format="yyyy-MM-dd"
+          v-model="inquiry.acceptDate" :teleport="false" position="top" :enable-time-picker="false" auto-apply
+          locale="ko" format="yyyy-MM-dd" :week-start="1" :allowed-dates="allowedDates"
+          @update:model-value="acceptDateMenu = false" v-model:open="datePickerOpen" :clearable="false"
+          :text-input="false" />
+
+        <!-- <v-menu v-model="acceptDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
           min-width="auto">
           <template v-slot:activator="{ props }">
             <div class="date-field-wrapper" v-bind="props"
@@ -130,14 +142,20 @@
           <v-date-picker v-model="inquiry.acceptDate" @update:model-value="acceptDateMenu = false" locale="ko-KR"
             elevation="1" color="blue" width="300" first-day-of-week="1" show-adjacent-months scrollable
             :allowed-dates="allowedDates" />
-        </v-menu>
+        </v-menu> -->
       </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col input-width-half">
         <div class="label-box colNm"><span class="required-star">*</span>완료요청일자</div>
-        <v-menu v-model="completeRequestDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
+        <VueDatePicker class="date-picker ml-1" :month-picker="false" preview-format="yyyy-MM-dd"
+          v-model="inquiry.completeRequestDate" :teleport="false" position="top" :enable-time-picker="false" auto-apply
+          locale="ko" format="yyyy-MM-dd" :week-start="1" :allowed-dates="allowedDates"
+          @update:model-value="completeRequestDateMenu = false" v-model:open="datePickerOpen" :clearable="false"
+          :text-input="false" />
+
+        <!-- <v-menu v-model="completeRequestDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
           min-width="auto">
           <template v-slot:activator="{ props }">
             <div class="date-field-wrapper" v-bind="props"
@@ -150,13 +168,19 @@
 
           <v-date-picker v-model="inquiry.completeRequestDate" @update:model-value="completeRequestDateMenu = false"
             locale="ko-KR" elevation="1" color="blue" width="300" first-day-of-week="1" show-adjacent-months scrollable
-            :allowed-dates="allowedDates" />
-        </v-menu>
+            :allowed-dates="allowedDates" /> 
+        </v-menu> -->
       </v-col>
 
       <v-col class="search-col" style="max-width:600px;">
         <div class="label-box colNm">완료일자</div>
-        <v-menu v-model="completeDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
+        <VueDatePicker class="date-picker ml-1 mt-1" :month-picker="false" preview-format="yyyy-MM-dd"
+          v-model="inquiry.completeDate" :teleport="false" position="top" :enable-time-picker="false" auto-apply
+          locale="ko" format="yyyy-MM-dd" :week-start="1" :allowed-dates="allowedDates"
+          @update:model-value="completeDateMenu = false" v-model:open="datePickerOpen" :clearable="false"
+          :text-input="false" />
+
+        <!-- <v-menu v-model="completeDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
           min-width="auto">
           <template v-slot:activator="{ props }">
             <div class="date-field-wrapper" v-bind="props"
@@ -170,7 +194,7 @@
           <v-date-picker v-model="inquiry.completeDate" @update:model-value="completeDateMenu = false" locale="ko-KR"
             elevation="1" color="blue" width="300" first-day-of-week="1" show-adjacent-months scrollable
             :allowed-dates="allowedDates" />
-        </v-menu>
+        </v-menu> -->
       </v-col>
     </v-row>
 
@@ -250,13 +274,18 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import { inject, onMounted } from 'vue';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
+
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.tz.setDefault('Asia/Seoul')  // KST 기준 설정
 
 export default {
-  // props 정의 추가
+  components: {
+    VueDatePicker
+  },
   props: {
     receivedSeq: {
       type: [Number, String],
@@ -405,7 +434,7 @@ export default {
         }
 
       } catch (error) {
-        console.error("❌ 요구사항 불러오기 오류:", error);
+        console.error("요구사항 불러오기 오류:", error);
       }
     },
     async submitRequest() {
@@ -451,8 +480,6 @@ export default {
           alert("완료요청일자는 필수 항목입니다.");
           return;
         }
-
-
 
         try {
           const param = {
@@ -1129,5 +1156,32 @@ export default {
   color: #FF0000;
   margin-right: 2px;
   font-weight: bold;
+}
+
+.date-picker {
+  width: 160px;
+  max-width: 160px;
+}
+
+:deep(.dp__input) {
+  border: 1px solid #b0b0b0;
+  box-shadow: none;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+:deep(.dp__main) {
+  font-family: inherit;
+  z-index: 100;
+}
+
+:deep(.dp__theme_light) {
+  --dp-primary-color: #2196F3;
+  --dp-border-radius: 8px;
+}
+
+:deep(.dp__overlay_cell_active) {
+  background-color: var(--dp-primary-color);
+  color: white;
 }
 </style>

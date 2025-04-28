@@ -16,48 +16,20 @@
         <span class="filter-label">요청기간<span class="label-divider"></span></span>
         <!-- 시작일 입력 필드 -->
         <div class="start-date-wrapper">
-              <VueDatePicker
-                class="date-picker"
-                :month-picker="false"
-                preview-format="yyyy-MM-dd"
-                v-model="Date_startDate"
-                :teleport="true"
-                position="bottom"
-                :enable-time-picker="false"
-                auto-apply
-                locale="ko"
-                format="yyyy-MM-dd"                
-                :week-start="1"
-                :allowed-dates="allowedDates"                                
-                @update:model-value="onStartDateChange"
-                v-model:open="startDatePickerOpen"
-                :clearable="false"
-                :text-input="false"
-              />              
+          <VueDatePicker class="date-picker" :month-picker="false" preview-format="yyyy-MM-dd" v-model="Date_startDate"
+            :teleport="true" position="bottom" :enable-time-picker="false" auto-apply locale="ko" format="yyyy-MM-dd"
+            :week-start="1" :allowed-dates="allowedDates" @update:model-value="onStartDateChange"
+            v-model:open="startDatePickerOpen" :clearable="false" :text-input="false" />
         </div>
         <span class="date-separator">~</span>
 
         <!-- 종료일 입력 필드 -->
         <div class="end-date-wrapper">
-              <VueDatePicker
-                class="date-picker"
-                :month-picker="false"
-                preview-format="yyyy-MM-dd"
-                v-model="Date_endDate"
-                :teleport="true"
-                position="bottom"
-                :enable-time-picker="false"
-                auto-apply
-                locale="ko"
-                format="yyyy-MM-dd"                
-                :week-start="1"
-                :allowed-dates="allowedDates"                                
-                @update:model-value="onEndDateChange"
-                v-model:open="endDatePickerOpen"
-                :clearable="false"
-                :text-input="false"
-              />              
-        </div>        
+          <VueDatePicker class="date-picker" :month-picker="false" preview-format="yyyy-MM-dd" v-model="Date_endDate"
+            :teleport="true" position="bottom" :enable-time-picker="false" auto-apply locale="ko" format="yyyy-MM-dd"
+            :week-start="1" :allowed-dates="allowedDates" @update:model-value="onEndDateChange"
+            v-model:open="endDatePickerOpen" :clearable="false" :text-input="false" />
+        </div>
 
         <!-- 날짜 버튼 -->
         <div class="date-buttons mr-2">
@@ -133,7 +105,7 @@
             getUnprocessedCount('S') }}</span></span>
           <span class="text-subtitle-2 text-grey ml-2"> 종결: </span>
           <span class="text-subtitle-2 font-weight-bold"><span :class="getStatusClass('C')">{{ getUnprocessedCount('C')
-              }}</span></span>
+          }}</span></span>
 
         </span>
 
@@ -185,19 +157,22 @@
               }" class="title-link" style="display: inline-flex; align-items: center;">
                 {{ item.sub }}
 
-                <span v-if="item.countComment > 0">&nbsp;</span>
-                <span v-if="item.countComment > 0" style="color: #737577;">[{{ item.countComment }}]</span>
+                <span v-if="item.countComment > 0" style="color: #737577;">&nbsp;[{{ item.countComment }}]</span>
 
                 <span v-if="item.new_yn === 'Y'">&nbsp;</span>
                 <v-img v-if="item.new_yn === 'Y'" src="@/assets/new-icon.png" alt="new" width="22" height="22"
-                  style="display: inline-block; vertical-align: middle;">
-                </v-img>
+                  style="display: inline-block; vertical-align: middle;"></v-img>
               </router-link>
             </div>
 
 
+
             <div class="td-cell">{{ item.division }}</div>
-            <div class="td-cell" :class="getStatusClass(item.processState)">{{ item.status }}</div>
+            <div class="td-cell">
+              <span :class="['status-badge', 'status-' + item.processState]">
+                {{ item.status }}
+              </span>
+            </div>
             <div class="td-cell">{{ formatDate(item.completeDt) }}</div>
             <div class="td-cell">{{ item.manager || '-' }}</div>
             <div class="td-cell">{{ calculateDuration(item.requestDate, item.completeDt) }}</div>
@@ -288,7 +263,7 @@ import '@vuepic/vue-datepicker/dist/main.css';
 export default {
   components: {
     VueDatePicker
-  },  
+  },
   setup() {
     const extraBreadcrumb = inject('extraBreadcrumb', null);
     const listButtonLink = inject('listButtonLink', null);
@@ -313,7 +288,7 @@ export default {
   data() {
     return {
       startDatePickerOpen: false,
-      endDatePickerOpen: false,      
+      endDatePickerOpen: false,
       Date_startDate: new Date(),
       Date_endDate: new Date(),
       startDate: '',
@@ -381,7 +356,7 @@ export default {
         const day = String(date.getDate()).padStart(2, '0');
 
         // 형식화된 문자열을 startDate에 할당
-        this.startDate = `${year}-${month}-${day}`;        
+        this.startDate = `${year}-${month}-${day}`;
       } else {
         this.startDate = '';
       }
@@ -425,7 +400,7 @@ export default {
         this.startDate = `${year}-${month}-${day}`;
       }
     },
-    
+
     onEndDateChange(date) {
       this.Date_endDate = date;
       this.endDatePickerOpen = false;
@@ -437,7 +412,7 @@ export default {
         const day = String(formattedDate.getDate()).padStart(2, '0');
         this.endDate = `${year}-${month}-${day}`;
       }
-    },    
+    },
     checkLocalStorage() {
       const midMenuFromStorage = localStorage.getItem('midMenu');
       const subMenuFromStorage = localStorage.getItem('subMenu');
@@ -593,7 +568,6 @@ export default {
 
     // API 호출하여 데이터 가져오기
     async fetchData() {
-
       this.loading = true;
       try {
         // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
@@ -623,7 +597,7 @@ export default {
               selected: false,
               // API에서 진행상태가 오지 않으면 임의로 설정
               status: item.processState === 'S'
-                ? (item.statusNm + ' (' + item.srFlag + ')' || this.getRandomStatus())
+                ? (item.statusNm + ' (' + (item.srFlag === 'Y' ? '상신완료' : '상신 전') + ')' || this.getRandomStatus())
                 : (item.statusNm || this.getRandomStatus()),
 
               // 24시간 이내 여부에 따라 new_yn 설정
@@ -645,47 +619,10 @@ export default {
 
       } catch (error) {
         console.error('데이터 로드 중 오류 발생:', error);
-        // 오류 발생 시 테스트 데이터 로드 (개발용)
-        //   this.loadTestData();
       } finally {
         this.loading = false;
       }
     },
-
-    // 테스트 데이터 로드 (API 연결 전이나 오류 시 사용)
-    loadTestData() {
-      const today = new Date();
-      const yesterday = new Date(today);
-      yesterday.setDate(today.getDate() - 1);
-      const lastWeek = new Date(today);
-      lastWeek.setDate(today.getDate() - 7);
-
-      // 20개의 테스트 데이터 생성
-      this.tableData = Array.from({ length: 20 }, (_, i) => {
-        const insertDate = new Date(today);
-        insertDate.setDate(today.getDate() - (i * 3));
-
-        const completeDate = i % 4 === 0 ? null : new Date(insertDate);
-        if (completeDate) {
-          completeDate.setDate(insertDate.getDate() + (i % 10) + 1);
-        }
-
-        const statusIndex = i % 4;
-
-        return {
-          seq: `REQ${(1000 + i).toString().padStart(3, '0')}`,
-          selected: false,
-          insertDt: insertDate.toISOString(),
-          projectName: `프로젝트 요청 ${i + 1}`,
-          businessSector: ['IT부문', '영업부문', '개발부문', '마케팅부문', '생산부문'][i % 5],
-          status: this.statusList[statusIndex],
-          completeDt: completeDate?.toISOString() || null,
-          manager: [`김담당`, `이매니저`, `박책임`, `최팀장`, `정대리`][i % 5],
-          memo: statusIndex === 0 ? '긴급 처리 필요' : statusIndex === 1 ? '일정 조정 중' : statusIndex === 2 ? '진행 보류 요청' : '정상 처리 완료'
-        };
-      });
-    },
-
     // 날짜 포맷 함수 (ISO 문자열 -> YYYY-MM-DD 형식)
     formatDate(dateString) {
       if (!dateString) return '-';
@@ -780,23 +717,18 @@ export default {
 }</script>
 
 <style scoped>
-
-
-
-
-
-
 /* VueDatePicker 관련 추가 스타일 */
-.date-picker {  
+.date-picker {
   width: auto;
-  min-width: 0; /* 최소 너비 제거 */
-  padding: 0; /* 패딩 제거 */
+  min-width: 0;
+  padding: 0;
 }
 
 
 :deep(.dp__input) {
   border: none;
   box-shadow: none;
+  color: #7a7a7a;
 }
 
 :deep(.dp__main) {
@@ -868,7 +800,7 @@ export default {
 
 .date-separator {
   margin-left: -15px;
-  z-index: 100; 
+  z-index: 100;
   font-size: 16px;
   color: #7A7A7A;
 }
@@ -1009,7 +941,7 @@ export default {
 .table-header,
 .table-row {
   display: grid;
-  grid-template-columns: 60px 80px 100px 1fr 100px 90px 100px 90px 100px;
+  grid-template-columns: 60px 80px 100px 1fr 100px 120px 100px 90px 100px;
 }
 
 .table-header {
@@ -1022,6 +954,7 @@ export default {
   border-bottom: 1px solid #e0e0e0;
   height: 54px;
   color: #5B5D60;
+  font-size: 15px;
 }
 
 .table-row:hover {
@@ -1054,7 +987,7 @@ export default {
 }
 
 .checkbox-cell {
-  flex: 0 0 60px;
+  flex: 0 0 40px;
   justify-content: center;
 }
 
@@ -1277,13 +1210,46 @@ export default {
 
 .label-divider {
   display: inline-block;
-  height: 18px;  
+  height: 18px;
   background-color: #bbb;
-  margin-left: 10px;  
+  margin-left: 10px;
   margin-bottom: 2px;
   border-radius: 1px;
   vertical-align: middle;
   width: 2px;
   background-color: #B0CAE6;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.status-P {
+  background-color: #fdecea;
+  color: #d93025;
+}
+
+.status-I {
+  background-color: #e8f0fe;
+  color: #1967d2;
+}
+
+.status-H {
+  background-color: #fff4e5;
+  color: #fb8c00;
+}
+
+.status-C {
+  background-color: #e6f4ea;
+  color: #137333;
+}
+
+.status-S {
+  background-color: #f0f7ff;
+  color: #2196F3;
 }
 </style>

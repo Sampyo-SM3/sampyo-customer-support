@@ -1,6 +1,6 @@
 package com.example.connectBoard.dto;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +14,6 @@ public class CommentDTO {
     private String content;
     private Long parentId;
     private int depth;
-    private LocalDate createdAt;
+    private LocalDateTime  createdAt;
     private String deleteYn;
 }

@@ -42,6 +42,7 @@ public class RequireDTO {
 	private String division;
 	private String saveFlag;
 	private String srFlag;
+	private String stateSr;
 	private String docNum;
 	private String processState;
 	private String statusNm;

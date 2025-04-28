@@ -9,29 +9,21 @@
           <span class="comment-user">{{ comment.userId }}</span>
           <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
         </div>
-        
+
         <!-- 수정모드가 아닐때 -->
         <div v-if="!isEditing" class="comment-text">{{ comment.content }}</div>
 
         <!-- 수정 모드일 때 -->
         <div v-else class="comment-edit-container">
-          <v-textarea 
-            auto-grow
-            v-model="editedContent" 
-            label="댓글 수정" 
-            variant="outlined"
-            density="comfortable"
-            color="#3A70B1"
-            rows="3"
-            hide-details
-            class="edit-textarea"></v-textarea>
+          <v-textarea auto-grow v-model="editedContent" label="댓글 수정" variant="outlined" density="comfortable"
+            color="#3A70B1" rows="3" hide-details class="edit-textarea"></v-textarea>
           <div class="edit-btn-container">
             <!-- <v-btn text class="edit-btn" color="#666" @click="cancelEdit">            
               취소
             </v-btn> -->
             <v-btn variant="flat" color="#666" class="white--text save-btn" @click="cancelEdit">
               취소
-            </v-btn>            
+            </v-btn>
             <v-btn variant="flat" color="#3A70B1" class="white--text save-btn" @click="saveEditedComment(comment)">
               저장
             </v-btn>
@@ -61,23 +53,15 @@
         </div>
 
         <div v-if="showReplyInput" class="reply-input-container">
-          <v-textarea 
-            auto-grow
-            v-model="replyContent" 
-            label="답글 입력" 
-            variant="outlined"
-            density="comfortable"
-            color="#3A70B1"
-            rows="2"
-            hide-details
-            class="reply-textarea"></v-textarea>
+          <v-textarea auto-grow v-model="replyContent" label="답글 입력" variant="outlined" density="comfortable"
+            color="#3A70B1" rows="2" hide-details class="reply-textarea"></v-textarea>
           <div class="reply-btn-container">
             <!-- <v-btn text class="cancel-reply-btn" color="#666" @click="cancelReply">
               취소
             </v-btn> -->
             <v-btn variant="flat" color="#666" class="white--text submit-reply-btn" @click="cancelReply">
               취소
-            </v-btn>            
+            </v-btn>
             <v-btn variant="flat" color="#3A70B1" class="white--text submit-reply-btn" @click="submitReply">
               등록
             </v-btn>
@@ -205,7 +189,20 @@ export default {
       this.showReplyInput = false;
     },
     formatDate(dateStr) {
-      return dateStr.split('.').join('-');
+      if (!dateStr) return '-';
+
+      const date = new Date(dateStr);
+
+      if (isNaN(date)) return '-';
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     },
     async deleteComment(commentId) {
       // 사용자 ID 확인 (최신 정보로 갱신)
@@ -273,7 +270,7 @@ export default {
   padding: 12px 16px;
   background-color: white;
   border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   margin-bottom: 8px;
 }
 
@@ -316,8 +313,10 @@ export default {
   font-size: 14px;
   line-height: 1.5;
   color: #444;
-  white-space: pre-wrap;  /* 엔터와 공백을 그대로 표시 */
-  word-break: break-word; /* 긴 단어가 있을 때 줄바꿈 */  
+  white-space: pre-wrap;
+  /* 엔터와 공백을 그대로 표시 */
+  word-break: break-word;
+  /* 긴 단어가 있을 때 줄바꿈 */
 }
 
 .comment-footer {
@@ -360,14 +359,16 @@ export default {
   border-radius: 4px;
 }
 
-.reply-textarea, .edit-textarea {
+.reply-textarea,
+.edit-textarea {
   width: 100%;
   font-size: 14px;
   background-color: white;
   border-radius: 4px;
 }
 
-.reply-btn-container, .edit-btn-container {
+.reply-btn-container,
+.edit-btn-container {
   display: flex;
   justify-content: flex-end;
   margin-top: 10px;
@@ -375,7 +376,8 @@ export default {
 }
 
 
-.submit-reply-btn, .save-btn {
+.submit-reply-btn,
+.save-btn {
   font-size: 13px;
   text-transform: none;
   height: 32px;
