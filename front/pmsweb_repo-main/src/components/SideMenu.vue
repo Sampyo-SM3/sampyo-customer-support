@@ -2,16 +2,15 @@
   <v-navigation-drawer class="custom-drawer" permanent width="270">
     <v-list class="tighter-menu-spacing">
       <template v-for="item in processedMenuItems" :key="item.M_CODE">
-        <!-- 대메뉴 (LEV 2) -->
+        <!-- 대메뉴 -->
         <div v-if="item.LEV === 2" class="category-label">{{ item.M_NAME }}</div>
 
-        <!-- 중메뉴 (LEV 3) -->
+        <!-- 중메뉴 -->
         <template v-else-if="item.LEV === 3">
           <v-list-item v-if="isClickable(item.M_CODE) && (!item.children || item.children.length === 0)"
             @click="activateMenuItem(item)" :class="['menu-item', 'no-submenu', { 'active-item': item.isActive }]">
             <template v-slot:prepend>
-              <!-- <v-icon :icon="getMenuIcon(item.M_NAME)" class="custom-menu-icon"></v-icon>               -->
-              <v-icon :icon=item.M_ICON class="custom-menu-icon"></v-icon>
+              <v-icon :icon="item.M_ICON" class="custom-menu-icon"></v-icon>
             </template>
             <template v-slot:title>
               <span class="custom-menu-title">{{ item.M_NAME }}</span>
@@ -19,27 +18,22 @@
           </v-list-item>
 
           <v-list-group v-else v-model="item.isOpen">
-
             <template v-slot:activator="{ props }">
-              <!-- 중메뉴 부분 -->
-              <!-- :prepend-icon="getMenuIcon(item.M_NAME)" -->
-              <v-list-item v-bind="props" :prepend-icon=item.M_ICON
-                :append-icon="item.children && item.children.length ? (item.isOpen ? 'mdi-menu-up' : 'mdi-menu-down') : ''"
+              <v-list-item v-bind="props" :prepend-icon="item.M_ICON"
+                :append-icon="item.children.length ? (item.isOpen ? 'mdi-menu-up' : 'mdi-menu-down') : ''"
                 class="menu-item" @click="toggleMenu(item)">
                 <template v-slot:title>
                   <span class="menu-item-text">{{ item.M_NAME }}</span>
                 </template>
                 <template v-slot:append>
-                  <v-icon class="list-icon" :icon="item.isOpen ? 'mdi-menu-up' : 'mdi-menu-down'">
-                  </v-icon>
+                  <v-icon class="list-icon" :icon="item.isOpen ? 'mdi-menu-up' : 'mdi-menu-down'"></v-icon>
                 </template>
               </v-list-item>
             </template>
 
-            <!-- 소메뉴 (LEV 4) -->
-            <v-list-item v-for="subItem in item.children" :key="subItem.M_CODE" :title="subItem.M_NAME"
-              @click="activateMenuItem(subItem)" :class="['sub-menu-item', { 'active-item': subItem.isActive }]">
-              <!-- :to="{ name: subItem.M_CODE }" -->
+            <!-- 소메뉴 -->
+            <v-list-item v-for="subItem in item.children" :key="subItem.M_CODE" @click="activateMenuItem(subItem)"
+              :class="['sub-menu-item', { 'active-item': subItem.isActive }]">
               <template v-slot:title>
                 <span class="sub-menu-text">{{ subItem.M_NAME }}</span>
               </template>
@@ -61,163 +55,110 @@ import { useBreadcrumbStore } from '@/store/breadcrumbStore';
 export default defineComponent({
   name: 'SideMenu',
   emits: ['navigate'],
-  setup(props, { emit }) { // emit을 받아옴
-    const router = useRouter()
-    const menuStore = useMenuStore()
+  setup(props, { emit }) {
+    const router = useRouter();
+    const menuStore = useMenuStore();
     const { menuData, isLoading, error } = storeToRefs(menuStore);
     const auth = ref('CA');
-    const id = ref('아이디!!아직 아이디별 권한 관리는 안됨');
+    const id = ref('아이디!!');
     const isFirstLoad = ref(true);
 
     onMounted(async () => {
-      await menuStore.fetchMenuData(auth.value, id.value)
+      await menuStore.fetchMenuData(auth.value, id.value);
 
-      // watch(menuData, (newValue) => {
-      watch(menuData, (newValue) => {
-        
-        console.log(newValue);
+      watch(menuData, () => {
+        if (isFirstLoad.value && menuData.value.length > 0) {
+          const savedSubMenu = localStorage.getItem('subMenu');
+          const cleanSubMenu = savedSubMenu ? savedSubMenu.replace(/^"|"$/g, '') : null;
 
-        // 첫 로드시에만 실행
-        if (isFirstLoad.value && menuData.value && menuData.value.length > 0) {
-          const firstClickableMenu = menuData.value.find(item =>
-            item.LEV === 3 && isClickable(item.M_CODE)
-          );
+          if (cleanSubMenu) {
+            console.log('✅ Saved subMenu from localStorage:', cleanSubMenu);
 
-          if (firstClickableMenu) {
-            activateMenuItem(firstClickableMenu);
-            isFirstLoad.value = false;  // 플래그 변경
+            menuData.value.forEach(menuItem => {
+              menuItem.isActive = false;
+              if (menuItem.children && menuItem.children.length > 0) {
+                menuItem.children.forEach(child => {
+                  child.isActive = (child.M_NAME === cleanSubMenu);
+                });
+              } else if (menuItem.LEV === 3) {
+                menuItem.isActive = (menuItem.M_NAME === cleanSubMenu);
+              }
+            });
           }
+
+          isFirstLoad.value = false;
         }
       });
-
-
     });
 
     const processedMenuItems = computed(() => {
-      // console.log('----------processedMenuItems()-----------')
-
-      if (isLoading.value || menuData.value.length === 0) {
-        return []
-      }
-
-      const result = []
-      const level3Map = new Map()
+      if (isLoading.value || menuData.value.length === 0) return [];
+      const result = [];
+      const level3Map = new Map();
 
       menuData.value.forEach(item => {
-        // console.log(item.M_NAME)
         if (item.LEV === 2) {
-          result.push(item)
+          result.push(item);
         } else if (item.LEV === 3) {
-          item.children = []
-          item.isOpen = false
-          level3Map.set(item.M_CODE, item)
-          result.push(item)
+          item.children = [];
+          item.isOpen = false;
+          level3Map.set(item.M_CODE, item);
+          result.push(item);
         } else if (item.LEV === 4) {
-          const parentCode = item.M_CODE.substring(0, item.M_CODE.lastIndexOf('_'))
+          const parentCode = item.M_CODE.substring(0, item.M_CODE.lastIndexOf('_'));
           if (level3Map.has(parentCode)) {
-            level3Map.get(parentCode).children.push(item)
+            level3Map.get(parentCode).children.push(item);
           }
-        }
-      })
-      return result
-    })
-
-    const activateMenuItem = (item) => {
-      // console.log(`Activate menu item: ${item.M_NAME}, Code: ${item.M_CODE}`)
-      // console.log(menuData.value);
-
-      const level3Name = item.M_NAME;
-      const level2Name = getLevel2MenuName(item.M_CODE);
-
-      // breadcrumbStore 초기화
-      const breadcrumbStore = useBreadcrumbStore();
-      breadcrumbStore.setMenuPath(level2Name, level3Name);
-
-
-
-
-
-      menuData.value.forEach(menuItem => {
-        menuItem.isActive = false
-        if (menuItem.children) {
-          menuItem.children.forEach(child => child.isActive = false)
-        }
-      })
-      item.isActive = true
-
-      // 라우터를 통해 해당 컴포넌트로 이동
-      if (item.M_CODE.includes('_')) {
-        const path = `/views/${item.M_CODE.substring(0, 2)}/${item.M_CODE}`
-        router.push(path)
-      }
-
-      // 메뉴 클릭 이벤트 발생 (새로 추가)
-      emit('menu-clicked', item);
-    }
-
-    const getLevel2MenuName = (mCode) => {
-      // mCode가 없거나 문자열이 아닌 경우 빈 문자열 반환
-      if (!mCode || typeof mCode !== 'string') {
-        return '';
-      }
-
-      // 레벨3 메뉴 코드에서 상위 레벨2 메뉴 코드 추출 (앞 4자리)
-      // 예: 'CA1000_10'에서 'CA10' 추출
-      const parentCode = mCode.substring(0, 4);
-
-      // menuData.value 배열에서 해당 코드와 일치하는 레벨2 메뉴 항목 찾기
-      const level2Item = menuData.value.find(item =>
-        item.LEV === 2 && item.M_CODE === parentCode
-      );
-
-      // 찾은 항목이 있으면 M_NAME 반환, 없으면 빈 문자열 반환
-      return level2Item ? level2Item.M_NAME : '';
-    };
-
-    const isClickable = (mCode) => {
-      return mCode.includes('_')
-    }
-
-    const toggleMenu = (item) => {
-      // console.log('----------toggleMenu----------')
-      // console.log('processedMenuItems.value[1] -> ', processedMenuItems.value[1])
-      // console.log('processedMenuItems.value[4] -> ', processedMenuItems.value[4])
-
-      processedMenuItems.value.forEach(menuItem => {
-        if (menuItem !== item) {
-          menuItem.isOpen = false;
         }
       });
 
-      // console.log('클릭 후')
-      // console.log('processedMenuItems.value[1] -> ', processedMenuItems.value[1])
-      // console.log('processedMenuItems.value[4] -> ', processedMenuItems.value[4])
+      return result;
+    });
 
+    const activateMenuItem = (item) => {
+      const level3Name = item.M_NAME;
+      const level2Name = getLevel2MenuName(item.M_CODE);
+
+      const breadcrumbStore = useBreadcrumbStore();
+      breadcrumbStore.setMenuPath(level2Name, level3Name);
+
+      menuData.value.forEach(menuItem => {
+        menuItem.isActive = false;
+        if (menuItem.children) {
+          menuItem.children.forEach(child => child.isActive = false);
+        }
+      });
+
+      item.isActive = true;
+
+      if (item.M_CODE.includes('_')) {
+        const path = `/views/${item.M_CODE.substring(0, 2)}/${item.M_CODE}`;
+        router.push(path);
+      }
+
+      emit('menu-clicked', item);
+    };
+
+    const getLevel2MenuName = (mCode) => {
+      if (!mCode || typeof mCode !== 'string') return '';
+      const parentCode = mCode.substring(0, 4);
+      const level2Item = menuData.value.find(item => item.LEV === 2 && item.M_CODE === parentCode);
+      return level2Item ? level2Item.M_NAME : '';
+    };
+
+    const isClickable = (mCode) => mCode.includes('_');
+
+    const toggleMenu = (item) => {
+      processedMenuItems.value.forEach(menuItem => {
+        if (menuItem !== item) menuItem.isOpen = false;
+      });
       item.isOpen = !item.isOpen;
+    };
 
-      // console.log('item.isOpen -> ', item.isOpen)
-    }
-
-    const activateFirstSubmenuByHeader = (headerCode) => {
-      // console.log('activateFirstSubmenuByHeader called with:', headerCode);
-
-      if (!menuData.value || menuData.value.length === 0) {
-        // console.log('No menu data available');
-        return;
-      }
-
-      // 해당 대메뉴에 속하는 첫 번째 클릭 가능한 항목 찾기
-      const targetMenu = menuData.value.find(item =>
-        (item.LEV === 3 || item.LEV === 4) &&
-        isClickable(item.M_CODE)
-      );
-
-      if (targetMenu) {
-        // console.log('First clickable menu found:', targetMenu.M_NAME);
-        activateMenuItem(targetMenu);
-      } else {
-        console.log('No clickable menu found for header:', headerCode);
-      }
+    const activateFirstSubmenuByHeader = () => {
+      if (!menuData.value.length) return;
+      const targetMenu = menuData.value.find(item => (item.LEV === 3 || item.LEV === 4) && isClickable(item.M_CODE));
+      if (targetMenu) activateMenuItem(targetMenu);
     };
 
     return {
@@ -230,10 +171,10 @@ export default defineComponent({
       auth,
       id,
       menuData: computed(() => menuStore.menuData),
-      activateFirstSubmenuByHeader
-    }
+      activateFirstSubmenuByHeader,
+    };
   }
-})
+});
 </script>
 
 <style scoped>

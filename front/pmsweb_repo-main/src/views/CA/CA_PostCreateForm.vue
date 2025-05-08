@@ -37,7 +37,7 @@
       <!-- 내용 텍스트필드 -->
       <v-col class="search-col">
         <div class="label-box">내 용</div>
-        <v-textarea v-model="etc" placeholder="내용을 입력하세요" auto-grow rows="20" clearable hide-details density="compact"
+        <v-textarea v-model="etc" placeholder="내용을 입력하세요" auto-grow rows="19" clearable hide-details density="compact"
           variant="outlined" class="content-textarea">
         </v-textarea>
       </v-col>
@@ -76,7 +76,7 @@
 
     <br>
 
-    <div class="pt-5 d-flex justify-center">
+    <div class="pt-2 d-flex justify-center">
       <v-btn variant="flat" color="grey darken-2" class="mr-2 d-flex align-center custom-btn-size " size="large"
         @click="goBack">
         <v-icon size="default" class="mr-1">mdi-close</v-icon>

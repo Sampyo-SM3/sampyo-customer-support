@@ -6,7 +6,6 @@ import DynamicComponentLoader from '@/components/DynamicComponentLoader.vue'
 // CA 메뉴 라우터 import
 import caRoutes from './CA/router.js'
 
-
 const routes = [
   {
     path: '/',
@@ -17,6 +16,7 @@ const routes = [
     path: '/main',
     name: 'Main',
     component: MainPage,
+    redirect: '/views/CA/CA1000_10', // ✅ 여기 추가!!
     children: [
       {
         path: '/views/:folder/:file',

@@ -105,7 +105,7 @@
             getUnprocessedCount('S') }}</span></span>
           <span class="text-subtitle-2 text-grey ml-2"> 종결: </span>
           <span class="text-subtitle-2 font-weight-bold"><span :class="getStatusClass('C')">{{ getUnprocessedCount('C')
-          }}</span></span>
+              }}</span></span>
 
         </span>
 
@@ -1080,7 +1080,7 @@ export default {
 }
 
 .text-error {
-  color: #E6373A;
+  color: #f34a4d;
 }
 
 .text-info {
