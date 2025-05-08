@@ -28,13 +28,13 @@
 		   ENT_DT
 		) VALUES (
 		   Getdate(),
-		   'STUS000002',       
+		   #{templateCode},         
 		   #{content},                         
 		   #{phone},		       
 		   '1',
 		   '',
 		   <!--#{phone}, 발신자인듯 -->
-		   '01051042142',
+		   '1004',
 		   '3eb660730e424d82081c19d62c818bc0fd45cd25',
 		   '1008',
 		   '',

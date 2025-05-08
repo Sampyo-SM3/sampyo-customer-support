@@ -24,14 +24,15 @@ public class KakaoController {
 
 	@PostMapping("/kakao")
 	public ResponseEntity<?> insertKakao(@RequestBody Map<String, String> request) {
-		System.out.println("-- insertKakao --");
+//		System.out.println("-- insertKakao --");
 		try {
 			String content = request.get("content");
 			String phone = request.get("phone");
-			System.out.println("!!!!!!!!!!");
-			System.out.println(phone);
+			String templateCode = request.get("templateCode");
+//			System.out.println("!!!!!!!!!!");
+//			System.out.println(phone);
 			// 템플릿 승인나면 주석풀자
-//            kakaoService.insertKakao(content, phone);
+//            kakaoService.insertKakao(content, phone, templateCode);
 			return ResponseEntity.ok("카카오톡 전송 성공!");
 		} catch (Exception e) {
 			return ResponseEntity.status(500).body("카카오 전송 실패: " + e.getMessage());

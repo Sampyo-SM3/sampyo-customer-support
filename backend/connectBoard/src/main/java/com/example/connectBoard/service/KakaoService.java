@@ -12,7 +12,8 @@ public class KakaoService {
     @Autowired
     private KakaoRepository kakaoRepository;
 
-    public void insertKakao(String content, String phone) {        
-    	kakaoRepository.insertKakao(content, phone);
+    public void insertKakao(String content, String phone, String templateCode) {        
+//    	System.out.println("test!!");
+    	kakaoRepository.insertKakao(content, phone, templateCode);
     }    
 }

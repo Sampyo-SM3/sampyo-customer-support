@@ -52,9 +52,9 @@ public class LoginController {
             // 여기서 외부에 선언된 변수들에 접근 가능
             try {
                 String userNameToUse = (name != null && !name.trim().isEmpty()) ? name : "New User";
-                System.out.println("test!!");
-                System.out.println(name);
-                System.out.println(phone);
+//                System.out.println("test!!");
+//                System.out.println(name);
+//                System.out.println(phone);
                 loginService.insertUser(id, password, userNameToUse, phone, email);
                 
                 return ResponseEntity.ok(Map.of(

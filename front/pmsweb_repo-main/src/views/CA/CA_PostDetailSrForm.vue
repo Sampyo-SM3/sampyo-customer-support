@@ -233,7 +233,7 @@ import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포�
 import { inject, onMounted } from 'vue';
 import { useKakaoStore } from '@/store/kakao';
 import { useAuthStore } from '@/store/auth';
-import managerPopup from '@/components/ManagerPopup.vue';
+import managerPopup from '@/components/ManagerPopup';
 
 export default {
   // props 정의 추가
@@ -555,7 +555,7 @@ export default {
         await apiClient.post("/api/updateStatus", statusData);
         alert("접수상태가 저장되었습니다.");
         // 상태변경
-        this.kakaoStore.sendAlimtalk(this.receivedSeq, this.getStatusName(this.oldStatus), this.getStatusName(this.selectedStatus), phone);
+        await this.kakaoStore.sendAlimtalk_Status(this.receivedSeq, this.getStatusName(this.oldStatus), this.getStatusName(this.selectedStatus), phone);
         // 상세정보 새로고침
         this.fetchRequireDetail();
         //this.management.PROGRESS = this.selectedStatus;
