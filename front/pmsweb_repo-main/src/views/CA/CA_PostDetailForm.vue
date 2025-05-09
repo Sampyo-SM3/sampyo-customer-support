@@ -321,6 +321,7 @@ export default {
   },
   methods: {
     async editManager(selectedManager) {
+      // console.log('-- editManager --');
       try {
         this.loading = true;
 
@@ -352,7 +353,8 @@ export default {
       }
 
       // 수정 성공 후 페이지 새로고침
-      window.location.reload();
+      // 조희재테스트
+      // window.location.reload();
     },
     async getDetailInquiry() {
       const response = await apiClient.get("/api/require/detail", {
@@ -572,7 +574,7 @@ export default {
     },
     async downloadFile(file) {
       try {
-        console.log(file);
+        // console.log(file);
 
         const response = await apiClient.get("/api/download", {
           params: { filename: file.fileName },

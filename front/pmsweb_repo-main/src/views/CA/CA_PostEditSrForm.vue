@@ -768,7 +768,7 @@ export default {
 
         // 업로드 성공 처리
         if (response.data && response.data.result === 'success') {
-          console.log('파일 업로드 성공:', response.data);
+          // console.log('파일 업로드 성공:', response.data);
 
           // 업로드 성공한 파일을 목록에 추가
           filesToUpload.forEach(file => {

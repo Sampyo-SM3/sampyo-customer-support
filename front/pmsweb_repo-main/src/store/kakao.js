@@ -82,10 +82,9 @@ export const useKakaoStore = defineStore("kakao", {
                       + '■ 담당자 지정일시: ' + currentDateTime + '\n'
                       + '\n'
                       + '게시글 확인 및 처리 부탁드립니다.';
-console.log(Message);
-        const templateCode = 'STUS000002';        
-        
         // console.log(Message);
+        const templateCode = 'STUS000003';        
+
         const response = await apiClient.post('/api/kakao', {        
           content: Message,
           phone: phone,

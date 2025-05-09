@@ -534,7 +534,7 @@ export default {
         const prevStatusName = this.getStatusName(this.oldStatus);
         // 이전 상태값이 false, null, undefined, 빈 문자열인 경우 알림톡 발송 중단
         if (!prevStatusName) {
-          console.log('이전 상태값이 없어 알림톡 발송을 중단합니다.');
+          // console.log('이전 상태값이 없어 알림톡 발송을 중단합니다.');
           alert("접수상태가 변경되지 않았습니다.");
           return;
         }
@@ -619,7 +619,7 @@ export default {
         const queryString = new URLSearchParams(params).toString()
         const fullUrl = `${baseUrl}?${queryString}`
 
-        console.log(fullUrl);
+        // console.log(fullUrl);
 
         const popupWidth = 800;
         const popupHeight = 900;

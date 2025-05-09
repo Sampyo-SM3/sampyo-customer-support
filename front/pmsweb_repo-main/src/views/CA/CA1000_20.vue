@@ -329,7 +329,7 @@ export default {
         const insertUser = userInfo?.id || 'system'; // 혹시 null일 경우 대비
 
         for (const menuCd of toInsert) {
-          console.log(menuCd)
+          // console.log(menuCd)
           const payload = {
             id: this.selectedUserId,
             menuCode: menuCd,
