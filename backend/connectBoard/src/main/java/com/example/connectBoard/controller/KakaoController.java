@@ -31,8 +31,8 @@ public class KakaoController {
 			String templateCode = request.get("templateCode");
 //			System.out.println("!!!!!!!!!!");
 //			System.out.println(phone);
-			// 템플릿 승인나면 주석풀자
-			kakaoService.insertKakao(content, phone, templateCode);
+			// 조희재테스트
+//			kakaoService.insertKakao(content, phone, templateCode);
 			return ResponseEntity.ok("카카오톡 전송 성공!");
 		} catch (Exception e) {
 			return ResponseEntity.status(500).body("카카오 전송 실패: " + e.getMessage());

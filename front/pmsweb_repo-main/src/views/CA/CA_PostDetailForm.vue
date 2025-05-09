@@ -352,9 +352,8 @@ export default {
         this.loading = false;
       }
 
-      // 수정 성공 후 페이지 새로고침
-      // 조희재테스트
-      // window.location.reload();
+      // 수정 성공 후 페이지 새로고침      
+      window.location.reload();
     },
     async getDetailInquiry() {
       const response = await apiClient.get("/api/require/detail", {
