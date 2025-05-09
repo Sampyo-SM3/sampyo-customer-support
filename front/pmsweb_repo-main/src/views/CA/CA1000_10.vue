@@ -18,7 +18,7 @@
         <div class="start-date-wrapper">
           <VueDatePicker class="date-picker" :month-picker="false" preview-format="yyyy-MM-dd" v-model="Date_startDate"
             :teleport="true" position="bottom" :enable-time-picker="false" auto-apply locale="ko" format="yyyy-MM-dd"
-            :week-start="1" :allowed-dates="allowedDates" @update:model-value="onStartDateChange"
+            :week-start="1" @update:model-value="onStartDateChange"
             v-model:open="startDatePickerOpen" :clearable="false" :text-input="false" />
         </div>
         <span class="date-separator">~</span>
@@ -27,7 +27,7 @@
         <div class="end-date-wrapper">
           <VueDatePicker class="date-picker" :month-picker="false" preview-format="yyyy-MM-dd" v-model="Date_endDate"
             :teleport="true" position="bottom" :enable-time-picker="false" auto-apply locale="ko" format="yyyy-MM-dd"
-            :week-start="1" :allowed-dates="allowedDates" @update:model-value="onEndDateChange"
+            :week-start="1" @update:model-value="onEndDateChange"
             v-model:open="endDatePickerOpen" :clearable="false" :text-input="false" />
         </div>
 
@@ -347,37 +347,6 @@ export default {
     endDate() {
       this.currentPage = 1;
     },
-    Date_startDate(newValue) {
-      if (newValue) {
-        // Date 객체를 'YYYY-MM-DD' 형식의 문자열로 변환
-        const date = new Date(newValue);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-
-        // 형식화된 문자열을 startDate에 할당
-        this.startDate = `${year}-${month}-${day}`;
-      } else {
-        this.startDate = '';
-      }
-    },
-    Date_endDate(newValue) {
-      if (newValue) {
-        // Date 객체를 'YYYY-MM-DD' 형식의 문자열로 변환
-        const date = new Date(newValue);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-
-        // 형식화된 문자열을 startDate에 할당
-        this.endDate = `${year}-${month}-${day}`;
-      } else {
-        this.endDate = '';
-      }
-    },
-    // selectedStatus(newVal, oldVal) {
-    //   console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
-    // }
   },
 
   mounted() {
@@ -391,14 +360,6 @@ export default {
     onStartDateChange(date) {
       this.Date_startDate = date;
       this.startDatePickerOpen = false;
-      // Date 객체를 'YYYY-MM-DD' 형식의 문자열로 변환
-      if (date) {
-        const formattedDate = new Date(date);
-        const year = formattedDate.getFullYear();
-        const month = String(formattedDate.getMonth() + 1).padStart(2, '0');
-        const day = String(formattedDate.getDate()).padStart(2, '0');
-        this.startDate = `${year}-${month}-${day}`;
-      }
     },
 
     onEndDateChange(date) {
@@ -421,6 +382,7 @@ export default {
       this.savedSubMenu = subMenuFromStorage ? JSON.parse(subMenuFromStorage) : null;
     },
 
+    // 유효성검사 다시 수정해야함
     isValidDate(options = {}) {
       const errors = [];
 
@@ -559,22 +521,30 @@ export default {
           // 3개월 전
           start.setMonth(today.getMonth() - 3);
           break;
-      }
+      }                  
 
-      this.startDate = this.formatDateForInput(start);
-      this.endDate = this.formatDateForInput(today);
-
+      this.Date_startDate = start;
+      this.Date_endDate = today;
     },
 
+    formattedDate(dateObj) {
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1 필요
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      
+      return `${year}-${month}-${day}`;
+    },
+
+
     // API 호출하여 데이터 가져오기
-    async fetchData() {
+    async fetchData() {            
       this.loading = true;
       try {
         // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
         const response = await apiClient.get('/api/require/search', {
           params: {
-            startDate: this.startDate + ' 00:00:00',
-            endDate: this.endDate + ' 23:59:59',
+            startDate: this.formattedDate(this.Date_startDate) + ' 00:00:00',
+            endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',
             manager: this.manager,
             sub: this.sub,
             status: this.selectedStatus
