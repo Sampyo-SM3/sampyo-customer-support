@@ -23,7 +23,9 @@ public class CorsConfig {
                         "http://172.17.22.120:8082",
                         "http://172.17.22.120:8083",
                         "http://172.17.22.120:8084",
-                        "http://172.17.22.118:8081"
+                        "http://172.17.22.118:8081",
+                        "https://csr.sampyo.co.kr"
+                        
                     )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
