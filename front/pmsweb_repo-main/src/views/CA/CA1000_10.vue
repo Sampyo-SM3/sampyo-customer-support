@@ -18,8 +18,8 @@
         <div class="start-date-wrapper">
           <VueDatePicker class="date-picker" :month-picker="false" preview-format="yyyy-MM-dd" v-model="Date_startDate"
             :teleport="true" position="bottom" :enable-time-picker="false" auto-apply locale="ko" format="yyyy-MM-dd"
-            :week-start="1" :allowed-dates="allowedDates" @update:model-value="onStartDateChange"
-            v-model:open="startDatePickerOpen" :clearable="false" :text-input="false" />
+            :week-start="1" @update:model-value="onStartDateChange" v-model:open="startDatePickerOpen"
+            :clearable="false" :text-input="false" />
         </div>
         <span class="date-separator">~</span>
 
@@ -27,8 +27,8 @@
         <div class="end-date-wrapper">
           <VueDatePicker class="date-picker" :month-picker="false" preview-format="yyyy-MM-dd" v-model="Date_endDate"
             :teleport="true" position="bottom" :enable-time-picker="false" auto-apply locale="ko" format="yyyy-MM-dd"
-            :week-start="1" :allowed-dates="allowedDates" @update:model-value="onEndDateChange"
-            v-model:open="endDatePickerOpen" :clearable="false" :text-input="false" />
+            :week-start="1" @update:model-value="onEndDateChange" v-model:open="endDatePickerOpen" :clearable="false"
+            :text-input="false" />
         </div>
 
         <!-- 날짜 버튼 -->
@@ -347,37 +347,6 @@ export default {
     endDate() {
       this.currentPage = 1;
     },
-    Date_startDate(newValue) {
-      if (newValue) {
-        // Date 객체를 'YYYY-MM-DD' 형식의 문자열로 변환
-        const date = new Date(newValue);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-
-        // 형식화된 문자열을 startDate에 할당
-        this.startDate = `${year}-${month}-${day}`;
-      } else {
-        this.startDate = '';
-      }
-    },
-    Date_endDate(newValue) {
-      if (newValue) {
-        // Date 객체를 'YYYY-MM-DD' 형식의 문자열로 변환
-        const date = new Date(newValue);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-
-        // 형식화된 문자열을 startDate에 할당
-        this.endDate = `${year}-${month}-${day}`;
-      } else {
-        this.endDate = '';
-      }
-    },
-    // selectedStatus(newVal, oldVal) {
-    //   console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
-    // }
   },
 
   mounted() {
@@ -391,14 +360,6 @@ export default {
     onStartDateChange(date) {
       this.Date_startDate = date;
       this.startDatePickerOpen = false;
-      // Date 객체를 'YYYY-MM-DD' 형식의 문자열로 변환
-      if (date) {
-        const formattedDate = new Date(date);
-        const year = formattedDate.getFullYear();
-        const month = String(formattedDate.getMonth() + 1).padStart(2, '0');
-        const day = String(formattedDate.getDate()).padStart(2, '0');
-        this.startDate = `${year}-${month}-${day}`;
-      }
     },
 
     onEndDateChange(date) {
@@ -421,116 +382,106 @@ export default {
       this.savedSubMenu = subMenuFromStorage ? JSON.parse(subMenuFromStorage) : null;
     },
 
+    // 유효성검사 다시 수정해야함
     isValidDate(options = {}) {
       const errors = [];
 
-      // 기본 옵션 설정
       const {
-        maxDays = null,
+        maxDays = 92,
         allowFutureDates = true,
         allowPastDates = true,
         minDate = null,
         maxDate = null,
       } = options;
 
-      // 1. 기본 입력 검사
+      // 입력 존재 여부
       if (!this.startDate || !this.endDate) {
         errors.push('시작일과 종료일을 모두 입력해주세요.');
-        return { isValid: false, errors };
+        this.errorMessages = errors;
+        this.showError = true;
+        return false;
       }
 
-      // 2. 날짜 형식 검사 (YYYY-MM-DD)
-      const dateFormatRegex = /^\d{4}-\d{2}-\d{2}$/;
-      if (!dateFormatRegex.test(this.startDate)) {
-        errors.push('시작일의 형식이 올바르지 않습니다. (YYYY-MM-DD)');
+      // 형식 검사
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(this.startDate)) {
+        errors.push('시작일 형식이 잘못되었습니다. (YYYY-MM-DD)');
       }
-      if (!dateFormatRegex.test(this.endDate)) {
-        errors.push('종료일의 형식이 올바르지 않습니다. (YYYY-MM-DD)');
+      if (!regex.test(this.endDate)) {
+        errors.push('종료일 형식이 잘못되었습니다. (YYYY-MM-DD)');
       }
 
-      // 형식이 올바르지 않으면 여기서 중단
       if (errors.length > 0) {
-        return { isValid: false, errors };
+        this.errorMessages = errors;
+        this.showError = true;
+        return false;
       }
 
-      // 3. 유효한 날짜인지 검사
-      const isValidDateObj = (dateStr) => {
-        const [year, month, day] = dateStr.split('-').map(Number);
-        const date = new Date(year, month - 1, day);
-        return (
-          date.getFullYear() === year &&
-          date.getMonth() === month - 1 &&
-          date.getDate() === day
-        );
-      };
+      // 날짜 객체로 변환
+      const s = new Date(this.startDate);
+      const e = new Date(this.endDate);
 
-      if (!isValidDateObj(this.startDate)) {
-        errors.push('시작일이 유효한 날짜가 아닙니다.');
+      // 날짜 변환 유효성 확인
+      if (isNaN(s.getTime())) {
+        errors.push('시작일이 유효하지 않습니다.');
       }
-      if (!isValidDateObj(this.endDate)) {
-        errors.push('종료일이 유효한 날짜가 아닙니다.');
+      if (isNaN(e.getTime())) {
+        errors.push('종료일이 유효하지 않습니다.');
       }
 
-      // 유효한 날짜가 아니면 여기서 중단
       if (errors.length > 0) {
-        return { isValid: false, errors };
+        this.errorMessages = errors;
+        this.showError = true;
+        return false;
       }
 
-      // 날짜 객체 생성
-      const startDate = new Date(this.startDate);
-      const endDate = new Date(this.endDate);
-      startDate.setHours(0, 0, 0, 0);
-      endDate.setHours(23, 59, 59, 999);
+      // 시작일과 종료일 비교 (년월일만 비교하기 위해 시간 초기화)
+      const startDate = new Date(s.getFullYear(), s.getMonth(), s.getDate());
+      const endDate = new Date(e.getFullYear(), e.getMonth(), e.getDate());
 
-      // 4. 날짜 범위 검사 (시작일 <= 종료일)
+      // 시작일이 종료일보다 뒤인 경우
       if (startDate > endDate) {
-        errors.push('시작일이 종료일보다 나중일 수 없습니다.');
+        this.errorMessages = ['시작일은 종료일보다 늦을 수 없습니다.'];
+        this.showError = true;
+        return false;
       }
 
-      // 5. 최대 기간 검사
+      // 최대 기간 검사
       if (maxDays) {
         const diffTime = Math.abs(endDate - startDate);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
         if (diffDays > maxDays) {
-          errors.push(`조회 기간은 최대 ${maxDays}일까지 가능합니다.`);
+          errors.push(`조회 기간은 최대 ${maxDays}일을 초과할 수 없습니다.`);
         }
       }
 
-      // 7. 현재 날짜와 비교
+      // 미래/과거 제한
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // 시간 부분 제거
+      today.setHours(0, 0, 0, 0);
 
-      // 미래 날짜 검사
       if (!allowFutureDates && startDate > today) {
-        errors.push('시작일은 오늘 이후일 수 없습니다.');
+        errors.push('시작일은 미래일 수 없습니다.');
       }
-
-      // 과거 날짜 검사
       if (!allowPastDates && endDate < today) {
-        errors.push('종료일은 오늘 이전일 수 없습니다.');
+        errors.push('종료일은 과거일 수 없습니다.');
       }
 
-      // 8. 허용된 날짜 범위 검사
-      if (minDate) {
-        const minDateObj = new Date(minDate);
-        if (startDate < minDateObj) {
-          errors.push(`시작일은 ${minDate} 이후여야 합니다.`);
-        }
+      // 제한 범위 검사
+      if (minDate && startDate < new Date(minDate)) {
+        errors.push(`시작일은 ${minDate} 이후여야 합니다.`);
+      }
+      if (maxDate && endDate > new Date(maxDate)) {
+        errors.push(`종료일은 ${maxDate} 이전이어야 합니다.`);
       }
 
-      if (maxDate) {
-        const maxDateObj = new Date(maxDate);
-        if (endDate > maxDateObj) {
-          errors.push(`종료일은 ${maxDate} 이전이어야 합니다.`);
-        }
+      // 결과 처리
+      if (errors.length > 0) {
+        this.errorMessages = errors;
+        this.showError = true;
+        return false;
       }
 
-      // 최종 결과 반환
-      return {
-        isValid: errors.length === 0,
-        errors
-      };
+      return true;
     },
 
     // 날짜 범위 설정 함수
@@ -561,20 +512,29 @@ export default {
           break;
       }
 
-      this.startDate = this.formatDateForInput(start);
-      this.endDate = this.formatDateForInput(today);
-
+      this.Date_startDate = start;
+      this.Date_endDate = today;
     },
+
+    formattedDate(dateObj) {
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1 필요
+      const day = String(dateObj.getDate()).padStart(2, '0');
+
+      return `${year}-${month}-${day}`;
+    },
+
 
     // API 호출하여 데이터 가져오기
     async fetchData() {
       this.loading = true;
+
       try {
         // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
         const response = await apiClient.get('/api/require/search', {
           params: {
-            startDate: this.startDate + ' 00:00:00',
-            endDate: this.endDate + ' 23:59:59',
+            startDate: this.formattedDate(this.Date_startDate) + ' 00:00:00',
+            endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',
             manager: this.manager,
             sub: this.sub,
             status: this.selectedStatus
@@ -597,8 +557,15 @@ export default {
               selected: false,
               // API에서 진행상태가 오지 않으면 임의로 설정
               status: item.processState === 'S'
-                ? (item.statusNm + ' (' + (item.srFlag === 'Y' ? '상신완료' : '상신 전') + ')' || this.getRandomStatus())
+                ? (item.statusNm + ' (' +
+                  (item.srFlag === 'Y'
+                    ? '상신완료'
+                    : item.srFlag === 'F'
+                      ? '반려'
+                      : '상신 전'
+                  ) + ')' || this.getRandomStatus())
                 : (item.statusNm || this.getRandomStatus()),
+
 
               // 24시간 이내 여부에 따라 new_yn 설정
               new_yn: diffHours < 24 ? 'Y' : 'N',
@@ -789,8 +756,6 @@ export default {
   width: 100%;
 
 }
-
-
 
 .calendar-icon-container {
   display: flex;

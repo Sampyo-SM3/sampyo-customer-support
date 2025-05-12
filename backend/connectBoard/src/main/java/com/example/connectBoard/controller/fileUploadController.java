@@ -39,8 +39,13 @@ public class fileUploadController {
     private Logger logger = LoggerFactory.getLogger(fileUploadController.class);
 
     // 경로 !! ->  \\sp_file.sampyo.co.kr\idrive\SP_ERP_FILE\spc_file\WEB
-    private final String uploadLogisticsDir = "\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spc_file\\WEB\\";
+    //private final String uploadLogisticsDir = "\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spc_file\\WEB\\";
 
+    String uploadLogisticsDir = "/mnt/share/SP_ERP_FILE/sampyo_file/spc_file/WEB";
+    String targetDir = "/mnt/share/SP_ERP_FILE/sampyo_file/spc_file/WEB";
+    String g_id = "staerpfiles1";
+    String g_pwd = "비밀번호가 들어가는 자리입니다.";
+    
     @PostMapping("/fileUpload")
     public ResponseEntity<Map<String, Object>> handleFileUpload(@RequestParam("files") MultipartFile[] files) {
         Map<String, Object> response = new HashMap<>();
@@ -91,7 +96,7 @@ public class fileUploadController {
     @PostMapping("/fileDelete")
     public ResponseEntity<Map<String, String>> handleFileDelete(@RequestParam("originFile") String originFile) {
         Map<String, String> response = new HashMap<>();
-
+        
         try {  	
             Path fileToDeletePath = Paths.get(uploadLogisticsDir + originFile);
             Files.delete(fileToDeletePath);
@@ -108,6 +113,7 @@ public class fileUploadController {
 
     @GetMapping("/download")
     public ResponseEntity<Resource> downloadFile(@RequestParam("filename") String filename) {
+    	
         try {
             // 파일 경로 설정 (업로드된 디렉토리)
             Path filePath = Paths.get(uploadLogisticsDir + filename).normalize();

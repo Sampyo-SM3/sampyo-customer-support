@@ -36,7 +36,10 @@ console.log(getInfo("templatemode"));
 		
 		document.getElementById("ATTACH_DATA_DIV").style.display = "none";
 		
-        bindingLegacyData("R");
+		if (getInfo("lkey") && getInfo("lkey").trim() !== '') {
+			bindingLegacyData("R");
+		}	
+        
     }
     else {
         $('[data-mode="readOnly"]').each(function () {
@@ -47,14 +50,19 @@ console.log(getInfo("templatemode"));
 		
         // 에디터 처리
         if (formJson.oFormData.mode == "DRAFT" || formJson.oFormData.mode == "TEMPSAVE") {
+			
             document.getElementById("INITIATOR_OU_DP").value = m_oFormMenu.getLngLabel(getInfo("dpdn"), false);
             document.getElementById("INITIATOR_DP").value = m_oFormMenu.getLngLabel(getInfo("usdn"), false);
-            if (formJson.oFormData.mode == "DRAFT") {
-                bindingLegacyData("W");
-                $("#LegacyKey").val(getInfo("lkey"));
-                $("#ip").val(getInfo("ip"));
-                $("#db").val(getInfo("db"));
-            }
+			
+			if (getInfo("lkey") && getInfo("lkey").trim() !== '') {
+				if (formJson.oFormData.mode == "DRAFT") {
+					bindingLegacyData("W");
+					$("#LegacyKey").val(getInfo("lkey"));
+					$("#ip").val(getInfo("ip"));
+					$("#db").val(getInfo("db"));
+				}
+			}
+			      
         }
     }
 }

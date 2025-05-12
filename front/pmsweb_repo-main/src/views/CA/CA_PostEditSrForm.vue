@@ -97,10 +97,21 @@
       <v-col class="search-col input-width-half">
         <div class="label-box colNm"><span class="required-star">*</span>의뢰일자</div>
 
-        <VueDatePicker class="date-picker ml-1" :month-picker="false" preview-format="yyyy-MM-dd"
-          v-model="inquiry.requestDate" :teleport="false" position="top" :enable-time-picker="false" auto-apply
-          locale="ko" format="yyyy-MM-dd" :week-start="1" :allowed-dates="allowedDates"
-          @update:model-value="requestDateMenu = false" v-model:open="datePickerOpen" :clearable="false"
+        <VueDatePicker 
+          class="date-picker ml-1" 
+          :month-picker="false" 
+          preview-format="yyyy-MM-dd"
+          v-model="inquiry.requestDate" 
+          :teleport="true"           
+          :enable-time-picker="false" 
+          auto-apply
+          locale="ko" 
+          format="yyyy-MM-dd" 
+          :week-start="1" 
+          :allowed-dates="allowedDates"
+          @update:model-value="requestDateMenu = false" 
+          v-model:open="datePickerOpen" 
+          :clearable="false"
           :text-input="false" />
 
         <!-- <v-menu v-model="requestDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
@@ -757,7 +768,7 @@ export default {
 
         // 업로드 성공 처리
         if (response.data && response.data.result === 'success') {
-          console.log('파일 업로드 성공:', response.data);
+          // console.log('파일 업로드 성공:', response.data);
 
           // 업로드 성공한 파일을 목록에 추가
           filesToUpload.forEach(file => {

@@ -19,7 +19,7 @@
 
     <v-alert v-if="inquiry.stateSr === 'R'" type="error" variant="outlined" class="reject-alert mb-3"
       density="comfortable" icon="mdi-alert-circle-outline" color="#D32F2F">
-      SR요청서가 <strong>반려</strong>되었습니다. 다시 작성해주세요.
+      SR요청서가 <strong>반려</strong>되었습니다. 문의글을 다시 작성해주세요.
     </v-alert>
 
     <!-- 전체 래퍼: 접수상태 박스 + 버튼을 나란히 배치 -->
@@ -42,16 +42,16 @@
 
       <!-- 오른쪽 정렬: 수정 + 상신 -->
       <div class="d-flex ml-auto">
-        <v-btn v-if="inquiry.srFlag === 'N' || inquiry.stateSr === 'R'" variant="flat" color="green darken-2"
-          class="save-status-btn mr-2" size="small" @click="moveEidtSr">
+        <v-btn v-if="inquiry.srFlag === 'N'" variant="flat" color="green darken-2" class="save-status-btn mr-2"
+          size="small" @click="moveEidtSr">
           수정
         </v-btn>
-        <v-btn v-if="inquiry.srFlag === 'N' || inquiry.stateSr === 'R'" variant="flat" color="#F7A000"
-          class="save-status-btn white-text mr-2" size="small" @click="approvalBtn">
+        <v-btn v-if="inquiry.srFlag === 'N'" variant="flat" color="#F7A000" class="save-status-btn white-text mr-2"
+          size="small" @click="approvalBtn">
           상신
         </v-btn>
-        <v-btn v-if="inquiry.srFlag === 'Y'" variant="flat" color="#1976D2" class="save-status-btn white-text"
-          size="small" @click="showSrBtn">
+        <v-btn v-if="inquiry.srFlag === 'Y' || inquiry.srFlag === 'F'" variant="flat" color="#1976D2"
+          class="save-status-btn white-text" size="small" @click="showSrBtn">
           SR요청서 보기
         </v-btn>
       </div>
@@ -233,7 +233,7 @@ import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포�
 import { inject, onMounted } from 'vue';
 import { useKakaoStore } from '@/store/kakao';
 import { useAuthStore } from '@/store/auth';
-import managerPopup from '@/components/ManagerPopup.vue';
+import managerPopup from '@/components/ManagerPopup';
 
 export default {
   // props 정의 추가
@@ -534,7 +534,7 @@ export default {
         const prevStatusName = this.getStatusName(this.oldStatus);
         // 이전 상태값이 false, null, undefined, 빈 문자열인 경우 알림톡 발송 중단
         if (!prevStatusName) {
-          console.log('이전 상태값이 없어 알림톡 발송을 중단합니다.');
+          // console.log('이전 상태값이 없어 알림톡 발송을 중단합니다.');
           alert("접수상태가 변경되지 않았습니다.");
           return;
         }
@@ -555,7 +555,7 @@ export default {
         await apiClient.post("/api/updateStatus", statusData);
         alert("접수상태가 저장되었습니다.");
         // 상태변경
-        this.kakaoStore.sendAlimtalk(this.receivedSeq, this.getStatusName(this.oldStatus), this.getStatusName(this.selectedStatus), phone);
+        await this.kakaoStore.sendAlimtalk_Status(this.receivedSeq, this.getStatusName(this.oldStatus), this.getStatusName(this.selectedStatus), phone);
         // 상세정보 새로고침
         this.fetchRequireDetail();
         //this.management.PROGRESS = this.selectedStatus;
@@ -619,7 +619,7 @@ export default {
         const queryString = new URLSearchParams(params).toString()
         const fullUrl = `${baseUrl}?${queryString}`
 
-        console.log(fullUrl);
+        // console.log(fullUrl);
 
         const popupWidth = 800;
         const popupHeight = 900;

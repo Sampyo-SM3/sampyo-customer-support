@@ -8,6 +8,6 @@ import com.example.connectBoard.dto.KakaoDTO;
 @Mapper
 public interface KakaoRepository {
     
-	int insertKakao(@Param("content") String content, @Param("phone") String phone);
+	int insertKakao(@Param("content") String content, @Param("phone") String phone, @Param("templateCode") String templateCode);
 
 }

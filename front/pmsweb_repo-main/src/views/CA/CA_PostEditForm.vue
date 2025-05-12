@@ -121,8 +121,9 @@
 
 <script>
 import apiClient from '@/api';
-import managerPopup from '@/components/ManagerPopup.vue';
+import managerPopup from '@/components/ManagerPopup';
 import { inject, onMounted } from 'vue';
+import { useKakaoStore } from '@/store/kakao';
 
 export default {
   props: {
@@ -135,6 +136,7 @@ export default {
     managerPopup
   },
   setup() {
+    const kakaoStore = useKakaoStore();
     const extraBreadcrumb = inject('extraBreadcrumb', null);
     const listButtonLink = inject('listButtonLink', null);
     onMounted(() => {
@@ -147,7 +149,7 @@ export default {
       }
     });
 
-    return {};
+    return {kakaoStore};
   },
   unmounted() { // ❗ 컴포넌트가 언마운트될 때
     const listButtonLink = inject('listButtonLink', null);
@@ -176,6 +178,7 @@ export default {
       etc: '',
       content: '',
       selectedManager: null,
+      managerChanged: false, // manager 변경 여부
       fileAttach: '',
       // 파일 업로드 관련 데이터
       newFiles: [], // 새로 선택한 파일 (v-file-input에 연결됨)
@@ -186,7 +189,7 @@ export default {
         value => {
           return !value || !value.length || value[0].size < 5000000 || '파일 크기는 5MB 이하여야 합니다.';
         },
-      ],
+      ],      
       // 파일 덮어쓰기 관련
       showOverwriteDialog: false,
       duplicateFiles: [],
@@ -441,7 +444,7 @@ export default {
 
         // 업로드 성공 처리
         if (response.data && response.data.result === 'success') {
-          console.log('파일 업로드 성공:', response.data);
+          // console.log('파일 업로드 성공:', response.data);
 
           // 업로드 성공한 파일을 목록에 추가
           filesToUpload.forEach(file => {
@@ -543,6 +546,12 @@ export default {
         await apiClient.post("/api/require/updateForm", boardData);
         const boardSeq = this.receivedSeq; // 등록된 게시글의 seq
 
+        // 담당자가 변경된 경우 알림톡 전송
+        if (this.managerChanged == true) {
+          await this.kakaoStore.sendAlimtalk_Manager(this.sub, this.manager, this.userName, this.managerTel);    
+        }
+        
+
         // selectedFiles 배열의 각 파일에 대해 반복
         const fileAttachPromises = this.selectedFiles.map(async (file) => {
           try {
@@ -631,12 +640,22 @@ export default {
       this.$router.go(-1);
     },
     onAdminAdded(selectedManager) {
+      const previousManager = this.manager; // 이전 값 저장
+
       this.manager = selectedManager.name;
       this.managerId = selectedManager.usrId;
       this.managerTel = selectedManager.handTelNo;
       this.managerEmail = selectedManager.emailAddr;
       this.selectedManager = selectedManager;
+
+      // 담당자 변경 감지
+      if (previousManager !== selectedManager.name) {
+        // console.log('담당자가 변경되었습니다:', previousManager, '->', selectedManager.name);
+        this.managerChanged = true; // 담당자 변경 플래그 설정
+      }      
     }
+
+
   }
 }
 </script>

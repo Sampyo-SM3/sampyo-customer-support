@@ -173,7 +173,10 @@
   </v-snackbar>
 
   <!-- 관리자 추가하기 팝업 -->
-  <manager-popup :show="showManagerPopup" @manager-selected_edit="editManager" @close="showManagerPopup = false" />
+  <manager-popup 
+    :show="showManagerPopup"     
+    @manager-selected_edit="editManager"     
+    @close="showManagerPopup = false" />  
 </template>
 
 <script>
@@ -182,7 +185,7 @@ import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포�
 import { inject, onMounted } from 'vue';
 import { useKakaoStore } from '@/store/kakao';
 import { useAuthStore } from '@/store/auth';
-import managerPopup from '@/components/ManagerPopup.vue';
+import managerPopup from '@/components/ManagerPopup';
 
 export default {
   props: {
@@ -318,6 +321,7 @@ export default {
   },
   methods: {
     async editManager(selectedManager) {
+      // console.log('-- editManager --');
       try {
         this.loading = true;
 
@@ -331,6 +335,15 @@ export default {
 
         // 게시글 등록 및 seq 값 반환
         await apiClient.post("/api/require/updateForm", boardData);
+        
+        // 담당자 변경 알림톡
+        // console.log(this.inquiry.sub);
+        // console.log(selectedManager.name);
+        // console.log(this.inquiry.uid);
+        // console.log(selectedManager.handTelNo);
+
+        await this.kakaoStore.sendAlimtalk_Manager(this.inquiry.sub, selectedManager.name, this.inquiry.uid, selectedManager.handTelNo);   
+         
       } catch (error) {
         console.error("관리자 수정 중 오류:", error);
         this.errorMessages = [error.message || "관리자 수정 중 오류가 발생했습니다."];
@@ -339,7 +352,7 @@ export default {
         this.loading = false;
       }
 
-      // 수정 성공 후 페이지 새로고침
+      // 수정 성공 후 페이지 새로고침      
       window.location.reload();
     },
     async getDetailInquiry() {
@@ -470,7 +483,7 @@ export default {
         alert("접수상태가 저장되었습니다.");
 
         // 상태변경
-        this.kakaoStore.sendAlimtalk(this.receivedSeq, this.getStatusName(this.oldStatus), this.getStatusName(this.selectedStatus), phone);
+        await this.kakaoStore.sendAlimtalk_Status(this.receivedSeq, this.getStatusName(this.oldStatus), this.getStatusName(this.selectedStatus), phone);
         // 상세정보 새로고침
         this.getDetailInquiry();
         //this.management.PROGRESS = this.selectedStatus;
@@ -560,7 +573,7 @@ export default {
     },
     async downloadFile(file) {
       try {
-        console.log(file);
+        // console.log(file);
 
         const response = await apiClient.get("/api/download", {
           params: { filename: file.fileName },

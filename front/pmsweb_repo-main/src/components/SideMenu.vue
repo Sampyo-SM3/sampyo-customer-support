@@ -72,7 +72,7 @@ export default defineComponent({
           const cleanSubMenu = savedSubMenu ? savedSubMenu.replace(/^"|"$/g, '') : null;
 
           if (cleanSubMenu) {
-            console.log('✅ Saved subMenu from localStorage:', cleanSubMenu);
+            // console.log('✅ Saved subMenu from localStorage:', cleanSubMenu);
 
             menuData.value.forEach(menuItem => {
               menuItem.isActive = false;
