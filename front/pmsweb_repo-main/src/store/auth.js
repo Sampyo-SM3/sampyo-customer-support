@@ -74,17 +74,11 @@ export const useAuthStore = defineStore("auth", {
       try {
         this.isLoading = true;
         this.error = null;
-         
-        // 조희재테스트
-        // const response = await apiClient.post('/api/validate-blue-id', {
-        //   id: credentials.username,
-        //   password: credentials.password,          
-        // });
-
-        const response = await axios.post('/csr/api/validate-blue-id', {
+                 
+        const response = await apiClient.post('/api/validate-blue-id', {
           id: credentials.username,
-          password: credentials.password,   
-        });               
+          password: credentials.password,          
+        });      
 
         this.userId = response.data.id;
         this.userInfo = response.data;      

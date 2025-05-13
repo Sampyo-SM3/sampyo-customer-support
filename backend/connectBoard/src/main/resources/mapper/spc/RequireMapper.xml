@@ -46,7 +46,7 @@
 	        AND b.processState LIKE '%' + #{status} + '%'
 	        <!-- AND b.projectName LIKE '%' + ? + '%' COLLATE SQL_Latin1_General_CP1_CI_AS -->
 	    </if>
-	    <if test="dpId != null and dpId != '' and dpId != 'SPH220007*'">
+	    <if test="dpId != null and dpId != '' and dpId != 'SPH220007'">
         	AND b.dpId LIKE '%' + #{dpId} + '%'
     	</if>    
 	</where>
