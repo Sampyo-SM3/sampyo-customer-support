@@ -131,7 +131,7 @@ export default {
       }
     });
 
-    return {kakaoStore};
+    return { kakaoStore };
   },
   unmounted() { // ❗ 컴포넌트가 언마운트될 때
     const listButtonLink = inject('listButtonLink', null);
@@ -454,11 +454,14 @@ export default {
 
         this.loading = true;
 
+
+
         const boardData = {
           "sub": this.sub,
           "etc": this.etc,
           "writerId": this.userId,
           "uid": this.userName,
+          "dpId": JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null,
           "manager": this.manager,
           "managerId": this.managerId,
           "managerTel": this.managerTel,
@@ -472,7 +475,7 @@ export default {
         const boardSeq = response.data; // 등록된 게시글의 seq
 
         // console.log('test_1');
-        await this.kakaoStore.sendAlimtalk_Manager(this.sub, this.manager, this.userName, this.managerTel);    
+        await this.kakaoStore.sendAlimtalk_Manager(this.sub, this.manager, this.userName, this.managerTel);
 
         // selectedFiles 배열의 각 파일에 대해 반복
         const fileAttachPromises = this.selectedFiles.map(async (file) => {
@@ -566,7 +569,7 @@ export default {
       this.managerTel = selectedManager.handTelNo;
       this.managerEmail = selectedManager.emailAddr;
 
-      this.selectedManager = selectedManager;         
+      this.selectedManager = selectedManager;
       // console.log(selectedManager);
     }
   }

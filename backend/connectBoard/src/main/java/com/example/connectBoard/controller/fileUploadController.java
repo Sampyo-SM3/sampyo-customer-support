@@ -44,7 +44,7 @@ public class fileUploadController {
     String uploadLogisticsDir = "/mnt/share/SP_ERP_FILE/sampyo_file/spc_file/WEB";
     String targetDir = "/mnt/share/SP_ERP_FILE/sampyo_file/spc_file/WEB";
     String g_id = "staerpfiles1";
-    String g_pwd = "비밀번호가 들어가는 자리입니다.";
+    String g_pwd = "비밀번호자리=";
     
     @PostMapping("/fileUpload")
     public ResponseEntity<Map<String, Object>> handleFileUpload(@RequestParam("files") MultipartFile[] files) {

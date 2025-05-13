@@ -45,7 +45,10 @@
 	    <if test="status != null and status != ''">
 	        AND b.processState LIKE '%' + #{status} + '%'
 	        <!-- AND b.projectName LIKE '%' + ? + '%' COLLATE SQL_Latin1_General_CP1_CI_AS -->
-	    </if>	    
+	    </if>
+	    <if test="dpId != null and dpId != '' and dpId != 'SPH220007*'">
+        	AND b.dpId LIKE '%' + #{dpId} + '%'
+    	</if>    
 	</where>
 		ORDER BY b.seq DESC
 	</select>
@@ -66,6 +69,7 @@
             updateDt,
             writerId,
             uId,
+            dpId,
             manager,
             managerId,
             managerTel,
@@ -79,6 +83,7 @@
             GETDATE(),
             #{writerId, jdbcType=VARCHAR},
             #{uId, jdbcType=VARCHAR},
+            #{dpId, jdbcType=VARCHAR},
             #{manager, jdbcType=VARCHAR},
             #{managerId, jdbcType=VARCHAR},
             #{managerTel, jdbcType=VARCHAR},
@@ -131,42 +136,44 @@
 	<!-- ✅ 특정 SEQ 데이터 조회 -->
 	<select id="getRequire" parameterType="int" resultType="com.example.connectBoard.dto.RequireDTO">
 		select
-			seq,
-			sub,
-			context,
-			taskName,
-			help,
-			necessity,
-			effect,
-			module,
-			beforeTaskContent,
-			afterTaskContent,
-			useDept,
-			attachDoc,
-			requestDate,
-			acceptDate,
-			completeRequestDate,
-			completeDate,
-			etc,
-			uId,
-			writerId,
-			usem,
-			dpId,
-			dpDn,
-			manager,
-			managerId,
-			managerTel,
-			managerEmail,
-			division,
-			processState,
-			saveFlag,
-			srFlag,
-			state_sr as stateSr ,
-			docNum,
-			insertDt,
-			updateDt,
-			completeDt
-		from board
+			a.seq,
+			a.sub,
+			a.context,
+			a.taskName,
+			a.help,
+			a.necessity,
+			a.effect,
+			a.module,
+			a.beforeTaskContent,
+			a.afterTaskContent,
+			a.useDept,
+			a.attachDoc,
+			a.requestDate,
+			a.acceptDate,
+			a.completeRequestDate,
+			a.completeDate,
+			a.etc,
+			a.uId,
+			a.writerId,
+			a.usem,
+			a.dpId,
+			a.dpDn,
+			a.manager,
+			a.managerId,
+			a.managerTel,
+			a.managerEmail,
+			a.division,
+			a.processState,
+			a.saveFlag,
+			a.srFlag,
+			a.state_sr as stateSr ,
+			a.docNum,
+			a.insertDt,
+			a.updateDt,
+			a.completeDt,
+			b.phone as writerPhone
+		from board a
+		 left outer join sys_empref b on a.writerId = b.id
 		where seq = #{seq};
 	</select>
 

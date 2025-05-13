@@ -537,7 +537,8 @@ export default {
             endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',
             manager: this.manager,
             sub: this.sub,
-            status: this.selectedStatus
+            status: this.selectedStatus,
+            dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
           }
         });
 
