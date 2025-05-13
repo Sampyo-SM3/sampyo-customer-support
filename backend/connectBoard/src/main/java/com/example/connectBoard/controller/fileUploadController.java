@@ -45,11 +45,11 @@ public class fileUploadController {
     // 경로 !! ->  \\sp_file.sampyo.co.kr\idrive\SP_ERP_FILE\spc_file\WEB
     //private final String uploadLogisticsDir = "\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spc_file\\WEB\\";
 
-    String uploadDir = "\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spenc_file\\WEB\\";
-    String targetDir = "\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spenc_file\\WEB";
+    String uploadDir = "\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spc_file\\WEB\\crs\\";
+    String targetDir = "\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spc_file\\WEB\\crs";
     String g_id = "staerpfiles1";
     String g_pwd = fileServerPassword;
-    
+
     @PostMapping("/fileUpload")
     public ResponseEntity<Map<String, Object>> handleFileUpload(@RequestParam("files") MultipartFile[] files) {
         Map<String, Object> response = new HashMap<>();

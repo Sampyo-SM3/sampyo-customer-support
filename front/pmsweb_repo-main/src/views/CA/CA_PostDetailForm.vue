@@ -1,4 +1,4 @@
-<template>
+C:\Users\user\AppData\Local\Temp\tomcat.8080.8623853284345763014\work\Tomcat\localhost\ROOT\mnt\share\SP_ERP_FILE\sampyo_file\spc_file<template>
   <v-container fluid class="pr-0 pl-0 pt-0">
 
     <!-- <v-row>
@@ -33,7 +33,7 @@
     <!-- 전체 래퍼: 접수상태 박스 + 버튼을 나란히 배치 -->
     <div class="d-flex align-center mb-4">
       <!-- 접수상태 박스 -->
-      <v-row no-gutters class="status-row status-select-row" style="width: 220px; 
+      <v-row v-if="this.userDeptCd === 'SPH220007'" no-gutters class="status-row status-select-row" style="width: 220px; 
         min-width: 220px; 
         max-width: 220px;">
         <v-col class="search-col">
@@ -43,12 +43,13 @@
         </v-col>
       </v-row>
 
-      <v-btn variant="flat" color="#3A70B1" size="small" class="save-status-btn ml-3" @click="saveStatus">
+      <v-btn v-if="this.userDeptCd === 'SPH220007'" variant="flat" color="#3A70B1" size="small"
+        class="save-status-btn ml-3" @click="saveStatus">
         저장
       </v-btn>
 
-      <v-btn variant="flat" color="#F7A000" class="save-status-btn ml-3 white-text" size="small"
-        @click="showManagerPopup = true">
+      <v-btn v-if="this.userDeptCd === 'SPH220007'" variant="flat" color="#F7A000"
+        class="save-status-btn ml-3 white-text" size="small" @click="showManagerPopup = true">
         담당자 이관
       </v-btn>
 
@@ -311,7 +312,6 @@ export default {
 
     this.fetchComments();
 
-
   },
   created() {
     // localStorage에서 사용자 정보 불러오기
@@ -428,6 +428,7 @@ export default {
       this.userName = JSON.parse(localStorage.getItem("userInfo"))?.name || null;
       this.userId = JSON.parse(localStorage.getItem("userInfo"))?.id || null;
       this.userPhone = JSON.parse(localStorage.getItem("userInfo"))?.phone || null;
+      this.userDeptCd = JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null;
     },
 
     goBack() {

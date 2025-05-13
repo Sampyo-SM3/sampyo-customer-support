@@ -26,7 +26,7 @@
     <div class="d-flex align-center mb-1">
       <!-- 접수상태 박스 -->
       <!-- <v-row no-gutters class="search-row top-row bottom-row status-select-row"       -->
-      <v-row no-gutters class="status-row status-select-row" style="width: 220px; 
+      <v-row v-if="this.userDeptCd === 'SPH220007'" no-gutters class="status-row status-select-row" style="width: 220px; 
         min-width: 220px; 
         max-width: 220px;">
         <v-col class="search-col">
@@ -36,7 +36,8 @@
         </v-col>
       </v-row>
 
-      <v-btn variant="flat" color="#3A70B1" size="small" class="save-status-btn ml-3" @click="saveStatus">
+      <v-btn v-if="this.userDeptCd === 'SPH220007'" variant="flat" color="#3A70B1" size="small"
+        class="save-status-btn ml-3" @click="saveStatus">
         저장
       </v-btn>
 
@@ -722,6 +723,7 @@ export default {
     this.selectedStatus = this.management.PROGRESS;
 
     this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    this.userDeptCd = JSON.parse(localStorage.getItem("userInfo")).deptCd;
   },
   mounted() {
     //접수상태 리스트 가져오기
