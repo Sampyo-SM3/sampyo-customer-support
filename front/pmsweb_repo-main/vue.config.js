@@ -4,7 +4,14 @@ module.exports = defineConfig({
   transpileDependencies: true,
 
   devServer: {
-    historyApiFallback: true // ✅ 이 줄 추가!
+    historyApiFallback: true,
+    // proxy: {
+    //   '/api': {
+    //     target: 'https://csr.sampyo.co.kr', // Spring 서버 주소        
+    //     changeOrigin: true,
+    //     secure: false,
+    //   }
+    // }    
   },
 
   pluginOptions: {
@@ -13,3 +20,5 @@ module.exports = defineConfig({
     }
   }
 })
+
+

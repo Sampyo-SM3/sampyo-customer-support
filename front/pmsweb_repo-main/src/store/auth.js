@@ -30,6 +30,7 @@ export const useAuthStore = defineStore("auth", {
           phone: phoneWithoutHyphens,
           email: credentials.email,
         });
+
         
 
         // 로그인 성공
@@ -72,11 +73,17 @@ export const useAuthStore = defineStore("auth", {
       try {
         this.isLoading = true;
         this.error = null;
-                
-        const response = await apiClient.post('/api/validate-blue-id', {
+         
+        // 조희재테스트
+        // const response = await apiClient.post('/api/validate-blue-id', {
+        //   id: credentials.username,
+        //   password: credentials.password,          
+        // });
+
+        const response = await axios.post('/csr/api/validate-blue-id', {
           id: credentials.username,
-          password: credentials.password,          
-        });
+          password: credentials.password,   
+        });               
 
         this.userId = response.data.id;
         this.userInfo = response.data;      
@@ -124,8 +131,7 @@ export const useAuthStore = defineStore("auth", {
       // API 헤더 제거
       delete axios.defaults.headers.common['Authorization'];
       
-      // 필요한 경우 서버에 로그아웃 요청
-      // axios.post('http://222222:8080/api/logout');
+
     },
     
     // 사용자 정보 가져오기 --> 아직 사용안하는중

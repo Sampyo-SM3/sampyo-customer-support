@@ -88,5 +88,11 @@ public class CommentController {
         }
     }
     
+    @GetMapping("/test")
+    public String getCommentsByPostI222d() {	       
+    	return "Test works!";
+    }     
+   
+    
     
 }

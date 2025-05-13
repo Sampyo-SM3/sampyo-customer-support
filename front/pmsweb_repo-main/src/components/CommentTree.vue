@@ -174,6 +174,18 @@ export default {
         // API 요청: 댓글 DB에 저장
         await apiClient.post("api/insertComment", commentData);
 
+        // const apiClient = axios.create({
+        //   baseURL: process.env.VUE_APP_API_URL || 'http://10.50.10.10:29001/',
+          
+        //   timeout: 10000,
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   }
+        // });
+
+
+
+
       } catch (error) {
         alert("오류가 발생했습니다. 관리자에게 문의해주세요.");
       } finally {
