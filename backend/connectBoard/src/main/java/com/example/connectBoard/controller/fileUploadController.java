@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.connectBoard.config.PasswordManager;
 import com.example.connectBoard.dto.CommentDTO;
 
 import java.nio.file.Files;
@@ -38,15 +39,16 @@ import java.net.URLEncoder;
 public class fileUploadController {
 
     private Logger logger = LoggerFactory.getLogger(fileUploadController.class);
+    
+    String fileServerPassword = PasswordManager.getPassword("파일서버비밀번호");
 
     // 경로 !! ->  \\sp_file.sampyo.co.kr\idrive\SP_ERP_FILE\spc_file\WEB
-    private final String uploadLogisticsDir = "\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spc_file\\WEB\\";
+    //private final String uploadLogisticsDir = "\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spc_file\\WEB\\";
 
     String uploadDir = "\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spenc_file\\WEB\\";
     String targetDir = "\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spenc_file\\WEB";
     String g_id = "staerpfiles1";
-    String g_pwd = "비밀번호";
-
+    String g_pwd = fileServerPassword;
     
     @PostMapping("/fileUpload")
     public ResponseEntity<Map<String, Object>> handleFileUpload(@RequestParam("files") MultipartFile[] files) {
@@ -55,20 +57,20 @@ public class fileUploadController {
         
         try {
             //cmd 추가
-        	String netUseCommand = "cmd.exe /c net use " + targetDir + " /user:" + g_id + " " + g_pwd;
-        	
-        	try {
-        	    Process process = Runtime.getRuntime().exec(netUseCommand);
-        	    int exitCode = process.waitFor();  // waitFor() 호출
-        	    if (exitCode != 0) {
-        	        logger.error("Command failed with exit code: " + exitCode);
-        	    }
-        	} catch (IOException | InterruptedException e) {
-        	    logger.error("Error occurred while executing the command", e);
-        	    response.put("result", "failure");
-        	    response.put("message", "파일 업로드 실패");
-        	    return ResponseEntity.status(500).body(response);
-        	}
+            String netUseCommand = "cmd.exe /c net use " + targetDir + " /user:" + g_id + " " + g_pwd;
+            
+            try {
+                Process process = Runtime.getRuntime().exec(netUseCommand);
+                int exitCode = process.waitFor();  // waitFor() 호출
+                if (exitCode != 0) {
+                    logger.error("Command failed with exit code: " + exitCode);
+                }
+            } catch (IOException | InterruptedException e) {
+                logger.error("Error occurred while executing the command", e);
+                response.put("result", "failure");
+                response.put("message", "파일 업로드 실패");
+                return ResponseEntity.status(500).body(response);
+            }
             
             for (MultipartFile file : files) {
                 String originFile = file.getOriginalFilename();
@@ -111,39 +113,39 @@ public class fileUploadController {
     public ResponseEntity<Map<String, String>> handleFileDelete(@RequestParam("originFile") String originFile) {
         Map<String, String> response = new HashMap<>();
         
-	    try {
-	    	String netUseCommand = "cmd.exe /c net use " + targetDir + " /user:" + g_id + " " + g_pwd;
-	    	
-	    	try {
-        	    Process process = Runtime.getRuntime().exec(netUseCommand);
-        	    int exitCode = process.waitFor();  // waitFor() 호출
-        	    if (exitCode != 0) {
-        	        logger.error("Command failed with exit code: " + exitCode);
-        	    }
-        	} catch (IOException | InterruptedException e) {
-        	    logger.error("Error occurred while executing the command", e);
-        	    response.put("result", "failure");
-        	    response.put("message", "파일 업로드 실패");
-        	    return ResponseEntity.status(500).body(response);
-        	}
-	    	
-	        Path fileToDeletePath = Paths.get(uploadDir + originFile);
-	        Files.delete(fileToDeletePath);
-	        response.put("result", "success");
-	        response.put("message", "파일 삭제 성공");
-	        return ResponseEntity.ok(response);
-	    } catch (IOException e) {
-	        logger.error("File delete failed", e);
-	        response.put("result", "failure");
-	        response.put("message", "파일 삭제 실패");
-	        return ResponseEntity.status(500).body(response);
-	    }
+        try {
+            String netUseCommand = "cmd.exe /c net use " + targetDir + " /user:" + g_id + " " + g_pwd;
+            
+            try {
+                Process process = Runtime.getRuntime().exec(netUseCommand);
+                int exitCode = process.waitFor();  // waitFor() 호출
+                if (exitCode != 0) {
+                    logger.error("Command failed with exit code: " + exitCode);
+                }
+            } catch (IOException | InterruptedException e) {
+                logger.error("Error occurred while executing the command", e);
+                response.put("result", "failure");
+                response.put("message", "파일 업로드 실패");
+                return ResponseEntity.status(500).body(response);
+            }
+            
+            Path fileToDeletePath = Paths.get(uploadDir + originFile);
+            Files.delete(fileToDeletePath);
+            response.put("result", "success");
+            response.put("message", "파일 삭제 성공");
+            return ResponseEntity.ok(response);
+        } catch (IOException e) {
+            logger.error("File delete failed", e);
+            response.put("result", "failure");
+            response.put("message", "파일 삭제 실패");
+            return ResponseEntity.status(500).body(response);
+        }
     }
 
     @GetMapping("/download")
     public ResponseEntity<Resource> downloadFile(@RequestParam("filename") String filename) {
-    	String netUseCommand = "cmd.exe /c net use " + targetDir + " /user:" + g_id + " " + g_pwd;
-    	
+        String netUseCommand = "cmd.exe /c net use " + targetDir + " /user:" + g_id + " " + g_pwd;
+        
         try {
             // 파일 경로 설정 (업로드된 디렉토리)
             Path filePath = Paths.get(uploadDir + filename).normalize();
