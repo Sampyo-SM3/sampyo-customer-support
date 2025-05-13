@@ -40,12 +40,13 @@ public class fileUploadController {
     private Logger logger = LoggerFactory.getLogger(fileUploadController.class);
 
     // 경로 !! ->  \\sp_file.sampyo.co.kr\idrive\SP_ERP_FILE\spc_file\WEB
-    //private final String uploadLogisticsDir = "\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spc_file\\WEB\\";
+    private final String uploadLogisticsDir = "\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spc_file\\WEB\\";
 
     String uploadDir = "\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spenc_file\\WEB\\";
     String targetDir = "\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spenc_file\\WEB";
     String g_id = "staerpfiles1";
     String g_pwd = "비밀번호";
+
     
     @PostMapping("/fileUpload")
     public ResponseEntity<Map<String, Object>> handleFileUpload(@RequestParam("files") MultipartFile[] files) {
