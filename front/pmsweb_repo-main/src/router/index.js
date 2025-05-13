@@ -16,7 +16,7 @@ const routes = [
     path: '/main',
     name: 'Main',
     component: MainPage,
-    redirect: '/views/CA/CA1000_10', // ✅ 여기 추가!!
+    redirect: '/views/CA/CA1000_10', // 여기 추가!!
     children: [
       {
         path: '/views/:folder/:file',

@@ -5,63 +5,31 @@
         <v-row no-gutters align="center" justify="center" class="fill-height">
           <v-card class="elevation-16 rounded-lg d-flex" width="1000" max-width="90%">
             <v-col cols="12" md="7" class="pa-0 d-none d-md-flex">
-              <v-img
-                src="@/assets/login_side.jpg"
-                cover
-                height="100%"
-                width="100%"
-                class="rounded-l-lg"
-              ></v-img>
+              <v-img src="@/assets/login_side.jpg" cover height="100%" width="100%" class="rounded-l-lg"></v-img>
             </v-col>
             <v-col cols="12" md="5">
               <v-card-text class="text-center pa-8 pa-sm-12">
                 <h1 class="text-h3 font-weight-bold mb-2">Welcome</h1>
                 <h2 class="text-h5 font-weight-bold mb-8">sampyo cement</h2>
                 <v-form @submit.prevent="login" class="mb-8">
-                  <v-text-field
-                    v-model="username"
-                    label="Account"
-                    prepend-inner-icon="mdi-account"
-                    variant="outlined"
-                    class="mb-4"
-                    color="primary"
-                  ></v-text-field>
-                  <v-text-field
-                    v-model="password"
-                    label="Password"
-                    prepend-inner-icon="mdi-lock"
+                  <v-text-field v-model="username" label="Account" prepend-inner-icon="mdi-account" variant="outlined"
+                    class="mb-4" color="primary"></v-text-field>
+                  <v-text-field v-model="password" label="Password" prepend-inner-icon="mdi-lock"
                     :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                    @click:append-inner="showPassword = !showPassword"
-                    :type="showPassword ? 'text' : 'password'"
-                    variant="outlined"
-                    color="primary"
-                    class="mb-2"
-                  ></v-text-field>
+                    @click:append-inner="showPassword = !showPassword" :type="showPassword ? 'text' : 'password'"
+                    variant="outlined" color="primary" class="mb-2"></v-text-field>
                   <div class="text-right mb-4">
                     <v-btn variant="text" color="primary" density="compact" class="text-caption">
                       비밀번호를 잊으셨나요?
                     </v-btn>
                   </div>
-                  <v-btn
-                    block
-                    color="primary"
-                    size="large"
-                    type="submit"
-                    class="mb-6"
-                    elevation="2"
-                  >
+                  <v-btn block color="primary" size="large" type="submit" class="mb-6" elevation="2">
                     로그인
                   </v-btn>
                 </v-form>
                 <div class="text-divider mb-6" style="color: #808080;">간편 로그인</div>
                 <div class="text-center">
-                  <v-btn
-                    icon="mdi-google"
-                    color="surface"
-                    elevation="2"
-                    @click="googleLogin"
-                    class="rounded-circle"
-                  >
+                  <v-btn icon="mdi-google" color="surface" elevation="2" @click="googleLogin" class="rounded-circle">
                     <v-icon color="error">mdi-google</v-icon>
                   </v-btn>
                 </div>
@@ -74,25 +42,15 @@
   </v-app>
 
   <!-- 스낵바로 오류 메시지 표시 -->
-  <v-snackbar
-    v-model="showError"
-    color="warning"
-    timeout="5000"
-    location="center"
-    elevation="8"              
-    variant="elevated" 
-  >
+  <v-snackbar v-model="showError" color="warning" timeout="5000" location="center" elevation="8" variant="elevated">
     {{ errorMessages }}
-    
+
     <template v-slot:actions>
-      <v-btn
-        variant="text"
-        @click="showError = false"
-      >
+      <v-btn variant="text" @click="showError = false">
         닫기
       </v-btn>
     </template>
-  </v-snackbar>  
+  </v-snackbar>
 </template>
 
 <script>
@@ -109,7 +67,7 @@ export default {
       loading: false,
       showError: false,
       errorMessages: '',
-      
+
     }
   },
   computed: {
@@ -117,34 +75,34 @@ export default {
     authStore() {
       return useAuthStore();
     }
-  },  
+  },
   methods: {
-    async login() {    
+    async login() {
       // console.log('--로그인페이지 로그인버튼 클릭--')  
       this.loading = true;
       let result;
 
-      try {        
-        if (this.username != 'admin') {     
+      try {
+        if (this.username != 'admin') {
           // 블루샘 계정테이블에 있는 아이디인지 먼저 확인
           result = await this.authStore.validate_blue_id({
             username: this.username,
             password: this.password
             // username: '1',
             // password: '1' 
-          });    
+          });
         } else {
-          result = '관리자';  
+          result = '관리자';
         }
 
         if (!result.bool) {
           // console.log('validate_blue_id 에러발생');
-          this.showError = true;  
+          this.showError = true;
           this.errorMessages = result.data;
-          
+
           return;
         }
-          
+
         // 블루샘 아이디 존재여부 통과
         if (Object.keys(result).length > 0) {
           // console.log('-- 블루샘 아이디 존재여부 통과 --');
@@ -157,9 +115,10 @@ export default {
             name: result.name,
             phone: result.phone,
             email: result.email,
+            deptCd: result.deptCd
             // username: '1',
             // password: '1' 
-          }); 
+          });
 
           if (success2) {
             this.$router.push({ name: 'Main' });
@@ -167,19 +126,19 @@ export default {
             // 로그인 실패 (authStore에서 false 반환)
             this.showError = true;
             this.errorMessages = this.authStore.error || '로그인에 실패했습니다.-2';
-          }   
+          }
 
         } else {
           // 로그인 실패 (authStore에서 false 반환)
           this.showError = true;
           this.errorMessages = this.authStore.error || '로그인에 실패했습니다.-3';
-        }      
-        
-           
+        }
+
+
       } catch (error) {
         console.error('로그인 처리 중 오류:', error);
         this.errorMessages = '로그인 처리 중 오류가 발생했습니다.';
-        this.showError = true;            
+        this.showError = true;
       } finally {
         this.loading = false;
       }
@@ -189,7 +148,7 @@ export default {
 
     // async login() {
     //   this.loading = true;
-      
+
     //   try {        
     //     const success = await this.authStore.login({
     //       username: this.username,
@@ -197,7 +156,7 @@ export default {
     //       // username: '1',
     //       // password: '1' 
     //     });        
-        
+
     //     if (success) {
     //       this.$router.push({ name: 'Main' });
     //     } else {
@@ -213,8 +172,8 @@ export default {
     //     this.loading = false;
     //   }
     // },  
-    
-   
+
+
 
 
     googleLogin() {
@@ -227,9 +186,8 @@ export default {
 <style>
 .bg-gradient-elegant-blue {
   background: linear-gradient(135deg,
-     rgba(142, 168, 195, 0.8) 0%,
-     rgba(236, 242, 247, 0.7) 100%
-  );
+      rgba(142, 168, 195, 0.8) 0%,
+      rgba(236, 242, 247, 0.7) 100%);
 }
 
 .v-main {

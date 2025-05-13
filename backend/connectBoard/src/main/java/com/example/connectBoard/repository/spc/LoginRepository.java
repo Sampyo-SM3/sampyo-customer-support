@@ -66,13 +66,12 @@ public interface LoginRepository {
             @Param("password") String password);
     
     
-    
     int insertUser(
     		@Param("id") String id,
     		@Param("name") String name,
-    		@Param("password") String password,     		 
+    		@Param("password") String password,     	
+    		@Param("deptCd") String deptCd,
     		@Param("phone") String phone, 
     		@Param("email") String email);
-     
     
 }

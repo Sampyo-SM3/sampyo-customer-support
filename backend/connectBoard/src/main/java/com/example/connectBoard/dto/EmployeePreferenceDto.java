@@ -13,6 +13,7 @@ public class EmployeePreferenceDto {
 	private String name;
 	private String phone;
 	private String email;
+	private String deptCd;
 	private boolean admin;
 	private byte[] pwd;
 }

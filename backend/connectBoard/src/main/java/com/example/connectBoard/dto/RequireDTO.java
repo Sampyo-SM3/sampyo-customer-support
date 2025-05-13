@@ -50,6 +50,7 @@ public class RequireDTO {
 	private LocalDate updateDt;
 	private LocalDate completeDt;
 	private Integer countComment;
+	private String writerPhone;
 	
 	
 }

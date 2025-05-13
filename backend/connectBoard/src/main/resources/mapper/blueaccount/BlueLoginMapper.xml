@@ -13,7 +13,8 @@
             USR_ID AS id,
             NAME AS name,
             EMAIL_ADDR AS email, 
-            HAND_TEL_NO AS phone
+            HAND_TEL_NO AS phone,
+            DEPT_CD as deptCd
         FROM 
             CRM_USER_MASTER 
         WHERE 

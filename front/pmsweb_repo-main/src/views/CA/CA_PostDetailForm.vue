@@ -173,10 +173,7 @@
   </v-snackbar>
 
   <!-- 관리자 추가하기 팝업 -->
-  <manager-popup 
-    :show="showManagerPopup"     
-    @manager-selected_edit="editManager"     
-    @close="showManagerPopup = false" />  
+  <manager-popup :show="showManagerPopup" @manager-selected_edit="editManager" @close="showManagerPopup = false" />
 </template>
 
 <script>
@@ -247,9 +244,11 @@ export default {
         sub: "",
         context: "",
         uId: "",
+        dpId: "",
         writerId: "",
         manager: "",
-        srFlag: ""
+        srFlag: "",
+        writerPhone: ""
       },
       previousStatus: '', // 이전 상태를 저장할 변수
       statusChanged: false, // 상태가 변경되었는지 추적      
@@ -335,15 +334,15 @@ export default {
 
         // 게시글 등록 및 seq 값 반환
         await apiClient.post("/api/require/updateForm", boardData);
-        
+
         // 담당자 변경 알림톡
         // console.log(this.inquiry.sub);
         // console.log(selectedManager.name);
         // console.log(this.inquiry.uid);
         // console.log(selectedManager.handTelNo);
 
-        await this.kakaoStore.sendAlimtalk_Manager(this.inquiry.sub, selectedManager.name, this.inquiry.uid, selectedManager.handTelNo);   
-         
+        await this.kakaoStore.sendAlimtalk_Manager(this.inquiry.sub, selectedManager.name, this.inquiry.uid, selectedManager.handTelNo);
+
       } catch (error) {
         console.error("관리자 수정 중 오류:", error);
         this.errorMessages = [error.message || "관리자 수정 중 오류가 발생했습니다."];
@@ -364,28 +363,20 @@ export default {
       this.selectedStatus = processState;
       this.step = this.statusMapping?.[this.selectedStatus] ?? 1;
 
+      console.log(response)
+
       // 3. 나머지 데이터 매핑
       this.inquiry = {
         sub: response.data?.sub || "",
         etc: response.data?.etc || "",
         uid: response.data?.uid || "",
+        dpId: response.data?.dpId || "",
         writerId: response.data?.writerId || "",
         manager: response.data?.manager || "",
         srFlag: response.data?.srFlag || "",
         processState: processState,
+        writerPhone: response.data?.writerPhone || "",
       };
-
-      this.inquiry = {
-        sub: response.data?.sub || "",
-        etc: response.data?.etc || "",
-        uid: response.data?.uid || "",
-        writerId: response.data?.writerId || "",
-        manager: response.data?.manager || "",
-        srFlag: response.data?.srFlag || "",
-        processState: response.data?.processState || "P",
-      };
-
-      // response.data.writerId
 
       this.selectedStatus = this.inquiry.processState;
 
@@ -450,13 +441,6 @@ export default {
       // P 미처리
       // S SR
       try {
-        // 로그인정보
-        const userInfoString = localStorage.getItem('userInfo');
-        const phone = JSON.parse(userInfoString).phone;
-
-
-
-        // {"companyCd":"CEMENT","id":"javachohj","name":"조희재","phone":null,"email":null,"admin":false,"pwd":null}
 
         const prevStatusName = this.getStatusName(this.oldStatus);
         // 이전 상태값이 false, null, undefined, 빈 문자열인 경우 알림톡 발송 중단
@@ -483,7 +467,7 @@ export default {
         alert("접수상태가 저장되었습니다.");
 
         // 상태변경
-        await this.kakaoStore.sendAlimtalk_Status(this.receivedSeq, this.getStatusName(this.oldStatus), this.getStatusName(this.selectedStatus), phone);
+        await this.kakaoStore.sendAlimtalk_Status(this.receivedSeq, this.getStatusName(this.oldStatus), this.getStatusName(this.selectedStatus), this.inquiry.writerPhone);
         // 상세정보 새로고침
         this.getDetailInquiry();
         //this.management.PROGRESS = this.selectedStatus;

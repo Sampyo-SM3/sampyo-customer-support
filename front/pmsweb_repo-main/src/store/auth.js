@@ -29,6 +29,7 @@ export const useAuthStore = defineStore("auth", {
           name: credentials.name,
           phone: phoneWithoutHyphens,
           email: credentials.email,
+          deptCd: credentials.deptCd
         });
 
         

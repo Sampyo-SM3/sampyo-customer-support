@@ -33,7 +33,10 @@ public class LoginController {
         String companyCd = "CEMENT";
         String phone = loginParams.get("phone");
         String email = loginParams.get("email"); 
+        String deptCd = loginParams.get("deptCd"); 
 
+        System.out.println("🔍 loginParams 전체" + loginParams );
+        
         try {
             // 필수 파라미터 검증
             if (id == null || password == null || companyCd == null) {
@@ -45,7 +48,8 @@ public class LoginController {
 //            System.out.println(companyCd);
 //            System.out.println(phone);
 //            System.out.println(email);
-            EmployeePreferenceDto result = loginService.login(id, password, companyCd, phone, email);
+            EmployeePreferenceDto result = loginService.login(id, password, deptCd, companyCd, phone, email);
+            
 //            System.out.println("22");
             return ResponseEntity.ok(result);
         } catch (Exceptions.UserNotFoundException e) {
@@ -55,7 +59,7 @@ public class LoginController {
 //                System.out.println("test!!");
 //                System.out.println(name);
 //                System.out.println(phone);
-                loginService.insertUser(id, password, userNameToUse, phone, email);
+                loginService.insertUser(id, password, deptCd, userNameToUse, phone, email);
                 
                 return ResponseEntity.ok(Map.of(
                     "message", "새로운 사용자로 등록되었습니다.",
@@ -89,8 +93,7 @@ public class LoginController {
             }                        
             // 블루샘에 존재하는 아이디인지 확인
             EmployeePreferenceDto result = loginService.validate_blue_id(id, password);
-            
-            
+
             return ResponseEntity.ok(result);
         } catch (Exceptions.UserNotFoundException e) {        	
           return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

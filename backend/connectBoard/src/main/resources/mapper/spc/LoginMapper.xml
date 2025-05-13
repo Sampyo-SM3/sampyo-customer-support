@@ -13,7 +13,8 @@
             ADMIN as admin,
             PWD as pwd,
             PHONE as phone,
-            EMAIL as email 
+            EMAIL as email,
+            DEPART1 as deptCd
         FROM 
             sys_empref 
         WHERE 
@@ -60,14 +61,20 @@
     
     <insert id="insertUser">
         INSERT INTO sys_empref 
-            (COMPANY_CD, id, name, admin, pwd, phone, email, smsyn) 
+            (COMPANY_CD, id, name, admin, pwd, phone, depart1, email, smsyn) 
         VALUES 
-            ('CEMENT', #{id}, #{name}, 0, PWDENCRYPT(#{password}), #{phone}, #{email}, 1)
+            ('CEMENT', #{id}, #{name}, 0, PWDENCRYPT(#{password}), #{phone}, #{deptCd}, #{email}, 1)
+        
+   		INSERT INTO sys_menu_auth (ID, M_CODE, AUTH, INSERT_USER, INSERT_DT)
+		VALUES (#{id}, 'CA', '31', #{id}, GETDATE())
+		
+		INSERT INTO sys_menu_auth (ID, M_CODE, AUTH, INSERT_USER, INSERT_DT)
+		VALUES (#{id}, 'CA10', '31', #{id}, GETDATE())
+		
+		INSERT INTO sys_menu_auth (ID, M_CODE, AUTH, INSERT_USER, INSERT_DT)
+		VALUES (#{id}, 'CA1000_10', '31', #{id}, GETDATE())
     </insert>
     
-    
-    		
-    		
-    		    
+ 		    
 
 </mapper>

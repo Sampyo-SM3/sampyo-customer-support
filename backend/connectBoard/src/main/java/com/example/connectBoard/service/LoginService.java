@@ -21,7 +21,7 @@ public class LoginService {
         this.blueLoginRepository = blueLoginRepository;
     }
 
-    public EmployeePreferenceDto login(String id, String password, String companyCd, String phone, String email) {
+    public EmployeePreferenceDto login(String id, String password, String deptCd, String companyCd, String phone, String email) {
 //        System.out.println("서비스 로그인");
 //        System.out.println("ID: " + id);
 //        System.out.println("companyCd: " + companyCd);
@@ -68,8 +68,8 @@ public class LoginService {
     }    
     
     
-    public void insertUser(String id, String password, String name, String phone, String email) {        
-        loginRepository.insertUser(id, name, password, phone, email);
+    public void insertUser(String id, String password, String deptCd, String name, String phone, String email) {        
+        loginRepository.insertUser(id, name, password, deptCd, phone, email);
         
     }    
 
