@@ -57,20 +57,20 @@ public class fileUploadController {
         
         try {
             //cmd 추가
-            String netUseCommand = "cmd.exe /c net use " + targetDir + " /user:" + g_id + " " + g_pwd;
+            //String netUseCommand = "cmd.exe /c net use " + targetDir + " /user:" + g_id + " " + g_pwd;
             
-            try {
-                Process process = Runtime.getRuntime().exec(netUseCommand);
-                int exitCode = process.waitFor();  // waitFor() 호출
-                if (exitCode != 0) {
-                    logger.error("Command failed with exit code: " + exitCode);
-                }
-            } catch (IOException | InterruptedException e) {
-                logger.error("Error occurred while executing the command", e);
-                response.put("result", "failure");
-                response.put("message", "파일 업로드 실패");
-                return ResponseEntity.status(500).body(response);
-            }
+//            try {
+//                Process process = Runtime.getRuntime().exec(netUseCommand);
+//                int exitCode = process.waitFor();  // waitFor() 호출
+//                if (exitCode != 0) {
+//                    logger.error("Command failed with exit code: " + exitCode);
+//                }
+//            } catch (IOException | InterruptedException e) {
+//                logger.error("Error occurred while executing the command", e);
+//                response.put("result", "failure");
+//                response.put("message", "파일 업로드 실패");
+//                return ResponseEntity.status(500).body(response);
+//            }
             
             for (MultipartFile file : files) {
                 String originFile = file.getOriginalFilename();
@@ -114,20 +114,20 @@ public class fileUploadController {
         Map<String, String> response = new HashMap<>();
         
         try {
-            String netUseCommand = "cmd.exe /c net use " + targetDir + " /user:" + g_id + " " + g_pwd;
-            
-            try {
-                Process process = Runtime.getRuntime().exec(netUseCommand);
-                int exitCode = process.waitFor();  // waitFor() 호출
-                if (exitCode != 0) {
-                    logger.error("Command failed with exit code: " + exitCode);
-                }
-            } catch (IOException | InterruptedException e) {
-                logger.error("Error occurred while executing the command", e);
-                response.put("result", "failure");
-                response.put("message", "파일 업로드 실패");
-                return ResponseEntity.status(500).body(response);
-            }
+//            String netUseCommand = "cmd.exe /c net use " + targetDir + " /user:" + g_id + " " + g_pwd;
+//            
+//            try {
+//                Process process = Runtime.getRuntime().exec(netUseCommand);
+//                int exitCode = process.waitFor();  // waitFor() 호출
+//                if (exitCode != 0) {
+//                    logger.error("Command failed with exit code: " + exitCode);
+//                }
+//            } catch (IOException | InterruptedException e) {
+//                logger.error("Error occurred while executing the command", e);
+//                response.put("result", "failure");
+//                response.put("message", "파일 업로드 실패");
+//                return ResponseEntity.status(500).body(response);
+//            }
             
             Path fileToDeletePath = Paths.get(uploadDir + originFile);
             Files.delete(fileToDeletePath);
@@ -144,7 +144,7 @@ public class fileUploadController {
 
     @GetMapping("/download")
     public ResponseEntity<Resource> downloadFile(@RequestParam("filename") String filename) {
-        String netUseCommand = "cmd.exe /c net use " + targetDir + " /user:" + g_id + " " + g_pwd;
+        //String netUseCommand = "cmd.exe /c net use " + targetDir + " /user:" + g_id + " " + g_pwd;
         
         try {
             // 파일 경로 설정 (업로드된 디렉토리)
