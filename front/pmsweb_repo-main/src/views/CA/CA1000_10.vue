@@ -12,7 +12,7 @@
     <v-row dense align="center" class="flex-wrap rounded-border sky-bg" style="gap: 12px;">
 
       <!-- 요청기간 -->
-      <v-col cols="auto" class="d-flex align-center filter-col ml-2">
+      <v-col cols="12" sm="6" md="auto" class="d-flex align-center filter-col">
         <span class="filter-label">요청기간<span class="label-divider"></span></span>
         <!-- 시작일 입력 필드 -->
         <div class="start-date-wrapper">
@@ -49,30 +49,29 @@
       </v-col>
 
       <!-- 접수상태 -->
-      <v-col cols="auto" class="d-flex align-center filter-col">
+      <v-col cols="12" sm="6" md="auto" class="d-flex align-center filter-col">
         <span class="filter-label">접수상태<span class="label-divider"></span></span>
         <v-select v-model="selectedStatus" :items="progressStatuses" item-title="text" item-value="value"
           variant="outlined" density="compact" hide-details class="filter-input" />
       </v-col>
 
       <!-- 담당자 -->
-      <v-col cols="auto" class="d-flex align-center filter-col">
+      <v-col cols="12" sm="6" md="auto" class="d-flex align-center filter-col">
         <span class="filter-label">담당자<span class="label-divider"></span></span>
         <v-text-field v-model="manager" @keydown.enter="fetchData" variant="outlined" density="compact" hide-details
           class="filter-input" />
       </v-col>
 
       <!-- 제목 -->
-      <v-col cols="auto" class="d-flex align-center filter-col">
+      <v-col cols="12" sm="6" md="auto" class="d-flex align-center filter-col">
         <span class="filter-label">제목<span class="label-divider"></span></span>
         <v-text-field v-model="sub" @keydown.enter="fetchData" variant="outlined" density="compact" hide-details
           class="filter-input-sub" />
       </v-col>
 
       <!-- 검색 버튼 -->
-      <v-col cols="auto" class="ms-auto">
-        <v-btn variant="flat" color="primary" class="custom-btn mr-2 d-flex align-center" size="small"
-          @click="fetchData()">
+      <v-col cols="12" sm="6" md="auto" class="d-flex justify-end">
+        <v-btn variant="flat" color="primary" class="custom-btn" size="small" @click="fetchData()">
           <v-icon size="default" class="mr-1">mdi-magnify</v-icon>
           조회
         </v-btn>
@@ -1166,11 +1165,15 @@ export default {
 }
 
 .rounded-border {
-  height: 70px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px;
   border: 1px solid #D0DFF1;
   border-radius: 8px;
-  overflow: hidden;
   background-color: rgba(208, 223, 241, 0.5);
+  height: auto;
+  /* 🔥 줄바꿈 허용 */
 }
 
 .label-divider {

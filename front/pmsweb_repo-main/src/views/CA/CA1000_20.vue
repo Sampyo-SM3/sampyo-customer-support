@@ -421,9 +421,15 @@ export default {
 }
 
 ::v-deep(.table-header th) {
-  background-color: #D0DFF1 !important;
+  /* background-color: #D0DFF1 !important;
   font-weight: 500;
+  border-bottom: 1px solid #e0e0e0 !important; */
+  background-color: #D0DFF1 !important;
+  color: #3E4B5B !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
   border-bottom: 1px solid #e0e0e0 !important;
+  text-align: center;
 }
 
 .v-table tbody tr {
