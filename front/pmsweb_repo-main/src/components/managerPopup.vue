@@ -111,6 +111,7 @@ export default {
             this.selectedUser = null;
             this.selectedUsers = [];
             this.searchText = '';
+            this.fetchData();
         },
         async fetchData() {
 
@@ -118,7 +119,7 @@ export default {
                 // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
                 const response = await apiClient.get('/api/userPop/list', {
                     params: {
-                        name: this.searchText
+                        name: this.searchText.trim() === '' ? '%' : this.searchText.trim()
                     }
                 });
 
@@ -164,7 +165,6 @@ export default {
         }
     },
     created() {
-        this.dialogVisible = this.show;
     },
     mounted() {
         this.fetchData();
