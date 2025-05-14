@@ -9,8 +9,10 @@
             </v-col>
             <v-col cols="12" md="5">
               <v-card-text class="text-center pa-8 pa-sm-12">
-                <h1 class="text-h3 font-weight-bold mb-2">Welcome</h1>
-                <h2 class="text-h5 font-weight-bold mb-8">sampyo cement</h2>
+                <!-- <h1 class="text-h3 font-weight-bold mb-2">Welcome</h1>
+                <h2 class="text-h5 font-weight-bold mb-8">sampyo cement</h2> -->
+                <img class="mb-8" :src="require('@/assets/SAMPYO_Cement_Signature_영문.png')" alt="Sampyo Cement Logo"
+                  style="width: 200px;" />
                 <v-form @submit.prevent="login" class="mb-8">
                   <v-text-field v-model="username" label="Account" prepend-inner-icon="mdi-account" variant="outlined"
                     class="mb-4" color="primary"></v-text-field>
@@ -18,21 +20,23 @@
                     :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                     @click:append-inner="showPassword = !showPassword" :type="showPassword ? 'text' : 'password'"
                     variant="outlined" color="primary" class="mb-2"></v-text-field>
-                  <div class="text-right mb-4">
+                  <!-- 개발전으로 주석처리 -->
+                  <!-- <div class="text-right mb-4">
                     <v-btn variant="text" color="primary" density="compact" class="text-caption">
                       비밀번호를 잊으셨나요?
                     </v-btn>
-                  </div>
+                  </div> -->
                   <v-btn block color="primary" size="large" type="submit" class="mb-6" elevation="2">
                     로그인
                   </v-btn>
                 </v-form>
-                <div class="text-divider mb-6" style="color: #808080;">간편 로그인</div>
+                <!-- 개발 전으로 주석처리 -->
+                <!-- <div class="text-divider mb-6" style="color: #808080;">간편 로그인</div>
                 <div class="text-center">
                   <v-btn icon="mdi-google" color="surface" elevation="2" @click="googleLogin" class="rounded-circle">
                     <v-icon color="error">mdi-google</v-icon>
                   </v-btn>
-                </div>
+                </div> -->
               </v-card-text>
             </v-col>
           </v-card>
@@ -67,7 +71,6 @@ export default {
       loading: false,
       showError: false,
       errorMessages: '',
-
     }
   },
   computed: {
