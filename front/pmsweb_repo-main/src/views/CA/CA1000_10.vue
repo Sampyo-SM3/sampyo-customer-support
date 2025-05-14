@@ -105,7 +105,7 @@
             getUnprocessedCount('S') }}</span></span>
           <span class="text-subtitle-2 text-grey ml-2"> 종결: </span>
           <span class="text-subtitle-2 font-weight-bold"><span :class="getStatusClass('C')">{{ getUnprocessedCount('C')
-          }}</span></span>
+              }}</span></span>
 
         </span>
 
@@ -133,6 +133,7 @@
             <div class="th-cell">접수번호</div>
             <div class="th-cell">요청일</div>
             <div class="th-cell">제목</div>
+            <div class="th-cell">작성자</div>
             <div class="th-cell">사업부문</div>
             <div class="th-cell">진행상태</div>
             <div class="th-cell">완료일</div>
@@ -164,9 +165,7 @@
                   style="display: inline-block; vertical-align: middle;"></v-img>
               </router-link>
             </div>
-
-
-
+            <div class="td-cell">{{ item.uid }}</div>
             <div class="td-cell">{{ item.division }}</div>
             <div class="td-cell">
               <span :class="['status-badge', 'status-' + item.processState]">
@@ -907,7 +906,7 @@ export default {
 .table-header,
 .table-row {
   display: grid;
-  grid-template-columns: 60px 80px 100px 1fr 100px 120px 100px 90px 100px;
+  grid-template-columns: 60px 80px 100px 1fr 100px 100px 120px 100px 90px 100px;
 }
 
 .table-header {

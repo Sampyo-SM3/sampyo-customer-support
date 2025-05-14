@@ -1,4 +1,4 @@
-<template>  
+<template>
   <HeaderBar @menuSelected="handleMenuSelection" />
   <v-container fluid class="pt-0 pr-5 pl-5">
     <v-row no-gutters style="height: 100vh;">
@@ -16,7 +16,7 @@
           <br><br><br>
 
           <!-- <v-icon size="small" class="mx-1">mdi-chevron-right</v-icon> -->
-          <span class="menu-text-header">            
+          <span class="menu-text-header">
             {{ savedMidMenu }} </span>
           <span class="menu-text-header"> <v-icon size="small" class="mx-1">mdi-chevron-right</v-icon> </span>
           <span class="menu-text-header"> {{ savedSubMenu }} </span>
@@ -40,7 +40,7 @@
         </v-main>
       </v-col>
     </v-row>
-  </v-container>  
+  </v-container>
 </template>
 <script>
 import { ref, onMounted, provide } from 'vue';
@@ -122,5 +122,4 @@ export default {
   font-size: 12px;
   color: #A1A6A6;
 }
-
 </style>
