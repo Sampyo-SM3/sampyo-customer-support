@@ -106,6 +106,11 @@ export default {
           return;
         }
 
+        let para_name = result.name;
+        let para_phone = result.phone;
+        let para_email = result.email;
+        let para_deptCd = result.deptCd;
+
         // 블루샘 아이디 존재여부 통과
         if (Object.keys(result).length > 0) {
           // console.log('-- 블루샘 아이디 존재여부 통과 --');
@@ -124,7 +129,8 @@ export default {
           });
 
           if (success2) {
-            this.$router.push({ name: 'Main' });
+            // 처음 로그인할 경우 메뉴가 안보이는 현상 때문에 임시로 한번 더 로그인처리
+            await this.login2(para_name, para_phone, para_email, para_deptCd);
           } else {
             // 로그인 실패 (authStore에서 false 반환)
             this.showError = true;
@@ -146,6 +152,34 @@ export default {
         this.loading = false;
       }
     },
+
+    // 처음 로그인할 경우 메뉴가 안보이는 현상 때문에 임시로 한번 더 로그인처리
+    async login2(para_name, para_phone, para_email, para_deptCd) {      
+      try {              
+        // console.log('-- 블루샘 아이디 존재여부 통과 --');
+        // console.log(result.phone);          
+        // 우리쪽 계정테이블에 데이터 없으면 insert후 로그인
+        // 있으면 비밀번호 검증 후 로그인
+        const success2 = await this.authStore.login({
+          username: this.username,
+          password: this.password,
+          name: para_name,
+          phone: para_phone,
+          email: para_email,
+          deptCd: para_deptCd
+          // username: '1',
+          // password: '1' 
+        });
+
+        if (success2) {
+          this.$router.push({ name: 'Main' });
+        } 
+      } catch (error) {
+        console.error('로그인 처리 중 오류_2:', error);
+        this.errorMessages = '로그인 처리 중 오류가 발생했습니다_2';
+        this.showError = true;
+      } 
+    },    
 
     googleLogin() {
       // 여기에 Google 로그인 로직을 구현하세요
