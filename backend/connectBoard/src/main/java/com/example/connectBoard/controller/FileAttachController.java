@@ -45,8 +45,6 @@ public class FileAttachController {
 	/* 파일첨부 삭제 */
     @PostMapping("/deleteFile")
     public ResponseEntity<?> deleteFileAttach(@RequestBody FileAttachDTO fileattach) {          
-    	System.out.println("fileattach::::" + fileattach.getFileName());
-    	
         try {
             // 수정된 부분
         	fileattachService.deleteFileAttach(fileattach);
