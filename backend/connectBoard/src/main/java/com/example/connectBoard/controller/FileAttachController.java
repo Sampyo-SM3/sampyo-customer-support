@@ -44,11 +44,13 @@ public class FileAttachController {
     
 	/* 파일첨부 삭제 */
     @PostMapping("/deleteFile")
-    public ResponseEntity<?> deleteFileAttach(@RequestBody FileAttachDTO fileattach) {               
+    public ResponseEntity<?> deleteFileAttach(@RequestBody FileAttachDTO fileattach) {          
+    	System.out.println("fileattach::::" + fileattach.getFileName());
+    	
         try {
             // 수정된 부분
         	fileattachService.deleteFileAttach(fileattach);
-            return ResponseEntity.ok("파일이 성공적으로 등록되었습니다.");
+            return ResponseEntity.ok("파일이 성공적으로 삭제되었습니다.");
         } catch (Exception e) {
             System.out.println("서버 오류 발생: " + e.getMessage());
             return ResponseEntity.status(500).body("서버 오류 발생: " + e.getMessage());

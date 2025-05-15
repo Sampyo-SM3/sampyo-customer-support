@@ -97,21 +97,10 @@
       <v-col class="search-col input-width-half">
         <div class="label-box colNm"><span class="required-star">*</span>의뢰일자</div>
 
-        <VueDatePicker 
-          class="date-picker ml-1" 
-          :month-picker="false" 
-          preview-format="yyyy-MM-dd"
-          v-model="inquiry.requestDate" 
-          :teleport="true"           
-          :enable-time-picker="false" 
-          auto-apply
-          locale="ko" 
-          format="yyyy-MM-dd" 
-          :week-start="1" 
-          :allowed-dates="allowedDates"
-          @update:model-value="requestDateMenu = false" 
-          v-model:open="datePickerOpen" 
-          :clearable="false"
+        <VueDatePicker class="date-picker ml-1" :month-picker="false" preview-format="yyyy-MM-dd"
+          v-model="inquiry.requestDate" :teleport="true" :enable-time-picker="false" auto-apply locale="ko"
+          format="yyyy-MM-dd" :week-start="1" :allowed-dates="allowedDates"
+          @update:model-value="requestDateMenu = false" v-model:open="datePickerOpen" :clearable="false"
           :text-input="false" />
 
         <!-- <v-menu v-model="requestDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
@@ -254,7 +243,7 @@
                 <div class="file-size text-body-2 text-grey">{{ formatFileSize(file.size) }}</div>
               </div>
               <v-btn class="ml-3" icon="mdi-delete" variant="text" color="#E44532" density="compact"
-                @click="removeFile(index, file)"></v-btn>
+                @click="markFileForDeletion(index, file)"></v-btn>
             </div>
           </div>
         </div>
@@ -371,6 +360,7 @@ export default {
       newFiles: [],
       selectedFiles: [],
       uploadedFiles: [],
+      deleteFileList: [], //삭제할 파일 정보
       showOverwriteDialog: false,
       duplicateFiles: [],
       pendingFiles: [],
@@ -538,7 +528,6 @@ export default {
               // 파일서버 업로드 API 호출
               const additionalResponse = await this.processUpload([modifiedFile]);
 
-
               return {
                 fileName: file.name,
                 status: 'success',
@@ -554,6 +543,13 @@ export default {
               };
             }
           });
+
+          if (this.deleteFileList.length > 0) {
+            for (const { file } of this.deleteFileList) {
+              await this.removeFile(file);
+            }
+            this.deleteFileList = [];
+          }
 
           // 모든 파일 첨부 및 추가 API 호출을 동시에 실행
           const responses = await Promise.all(fileAttachPromises);
@@ -654,18 +650,25 @@ export default {
       this.selectedFiles.splice(index, 1);
     },
 
+    markFileForDeletion(index, file) {
+      const exists = this.deleteFileList.some(item => item.file.seq === file.seq);
+
+      if (!exists) {
+        this.deleteFileList.push({ index, file });
+      }
+
+      this.uploadedFiles.splice(index, 1); // UI에서는 즉시 제거
+    },
+
     // 업로드된 파일 제거
-    async removeFile(index, file) {
+    async removeFile(file) {
       await apiClient.post("/api/file-attach/deleteFile", {
-        params: {
-          seq: file.seq
-          , boardSeq: this.receivedSeq
-          , fileName: file.name
-        }
+        seq: file.seq,
+        boardSeq: this.receivedSeq,
+        fileName: file.name
       });
 
-      this.fileDelete(this.uploadedFiles[index].name);
-      this.uploadedFiles.splice(index, 1);
+      this.fileDelete(file.name);
     },
 
     // 파일명 중복 확인

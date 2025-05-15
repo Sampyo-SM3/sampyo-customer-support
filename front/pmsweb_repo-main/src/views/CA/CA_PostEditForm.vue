@@ -81,7 +81,7 @@
               <div class="file-size text-body-2 text-grey">{{ formatFileSize(file.size) }}</div>
             </div>
             <v-btn class="ml-3" icon="mdi-delete" variant="text" color="#E44532" density="compact"
-              @click="removeFile(index, file)"></v-btn>
+              @click="markFileForDeletion(index, file)"></v-btn>
           </div>
         </div>
       </div>
@@ -149,7 +149,7 @@ export default {
       }
     });
 
-    return {kakaoStore};
+    return { kakaoStore };
   },
   unmounted() { // ❗ 컴포넌트가 언마운트될 때
     const listButtonLink = inject('listButtonLink', null);
@@ -184,12 +184,13 @@ export default {
       newFiles: [], // 새로 선택한 파일 (v-file-input에 연결됨)
       selectedFiles: [], // 업로드 대기 중인 파일들
       uploadedFiles: [], // 이미 업로드된 파일들
+      deleteFileList: [], //삭제할 파일 정보
       isFileLoading: false,
       fileRules: [
         value => {
           return !value || !value.length || value[0].size < 5000000 || '파일 크기는 5MB 이하여야 합니다.';
         },
-      ],      
+      ],
       // 파일 덮어쓰기 관련
       showOverwriteDialog: false,
       duplicateFiles: [],
@@ -330,18 +331,28 @@ export default {
       this.selectedFiles.splice(index, 1);
     },
 
+    markFileForDeletion(index, file) {
+      const exists = this.deleteFileList.some(item => item.file.seq === file.seq);
+
+      if (!exists) {
+        this.deleteFileList.push({ index, file });
+      }
+
+      this.uploadedFiles.splice(index, 1); // UI에서는 즉시 제거
+    },
+
     // 업로드된 파일 제거
-    async removeFile(index, file) {
+    async removeFile(file) {
+
+      console.log("랴ㅣㄷ" + file);
+
       await apiClient.post("/api/file-attach/deleteFile", {
-        params: {
-          seq: file.seq
-          , boardSeq: this.receivedSeq
-          , fileName: file.name
-        }
+        seq: file.seq,
+        boardSeq: this.receivedSeq,
+        fileName: file.name
       });
 
-      this.fileDelete(this.uploadedFiles[index].name);
-      this.uploadedFiles.splice(index, 1);
+      this.fileDelete(file.name);
     },
 
     // 파일명 중복 확인
@@ -548,9 +559,9 @@ export default {
 
         // 담당자가 변경된 경우 알림톡 전송
         if (this.managerChanged == true) {
-          await this.kakaoStore.sendAlimtalk_Manager(this.sub, this.manager, this.userName, this.managerTel);    
+          await this.kakaoStore.sendAlimtalk_Manager(this.sub, this.manager, this.userName, this.managerTel);
         }
-        
+
 
         // selectedFiles 배열의 각 파일에 대해 반복
         const fileAttachPromises = this.selectedFiles.map(async (file) => {
@@ -594,11 +605,17 @@ export default {
           }
         });
 
+        if (this.deleteFileList.length > 0) {
+          for (const { file } of this.deleteFileList) {
+            await this.removeFile(file);
+          }
+          this.deleteFileList = [];
+        }
+
         // 모든 파일 첨부 및 추가 API 호출을 동시에 실행
         const responses = await Promise.all(fileAttachPromises);
 
         // 결과 분석
-        // const successFiles = responses.filter(response => response.status === 'success');
         const errorFiles = responses.filter(response => response.status === 'error');
 
         // 실패한 파일이 있으면 사용자에게 알림
@@ -652,7 +669,7 @@ export default {
       if (previousManager !== selectedManager.name) {
         // console.log('담당자가 변경되었습니다:', previousManager, '->', selectedManager.name);
         this.managerChanged = true; // 담당자 변경 플래그 설정
-      }      
+      }
     }
 
 
