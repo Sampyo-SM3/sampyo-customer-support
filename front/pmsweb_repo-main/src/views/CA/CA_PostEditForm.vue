@@ -11,6 +11,35 @@
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
+      <v-col cols="4" class="search-col product-category">
+        <div class="label-box">문의유형</div>
+        <v-select v-model="selectedInquiryType" :items="inquiryTypeList" item-title="codeName" item-value="codeId"
+          density="compact" hide-details variant="outlined" class="inquiry-select mr-8 mt-1 mb-1" placeholder="선택"
+          style="margin-left:10px;" />
+      </v-col>
+
+      <v-col cols="4" class="search-col product-category">
+        <div class="label-box">문의부문</div>
+        <div class="category-radio-wrapper">
+          <v-radio-group v-model="selectedCategory" class="small-radios" inline density="compact" hide-details
+            color="#3A70B1">
+            <v-radio v-for="item in categoryList" :key="item.codeId" :label="item.codeName" :value="item.codeId" />
+          </v-radio-group>
+        </div>
+      </v-col>
+
+      <v-col cols="4" class="search-col product-category">
+        <div class="label-box">중요도</div>
+        <div class="priority-radio-wrapper">
+          <v-radio-group v-model="selectedPriority" class="small-radios" inline density="compact" color="#3A70B1"
+            hide-details>
+            <v-radio v-for="item in priorityList" :key="item.codeId" :label="item.codeName" :value="item.codeId" />
+          </v-radio-group>
+        </div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col" style="max-width:350px;">
         <div class="label-box">담당자</div>
         <v-text-field class="mr-8 mt-1 mb-1 input-manager" v-model="manager" readonly hide-details density="compact"
@@ -194,7 +223,13 @@ export default {
       // 파일 덮어쓰기 관련
       showOverwriteDialog: false,
       duplicateFiles: [],
-      pendingFiles: [] // 덮어쓰기 대기 중인 파일들  
+      pendingFiles: [], // 덮어쓰기 대기 중인 파일들 ,
+      inquiryTypeList: [],
+      categoryList: [],
+      priorityList: [],
+      selectedInquiryType: null,
+      selectedCategory: null,
+      selectedPriority: null,
     }
   },
 
@@ -216,6 +251,7 @@ export default {
 
   created() {
     // localStorage에서 사용자 정보 불러오기
+    this.getCodes();
     this.getUserInfo();
     this.fetchRequireDetail();
   },
@@ -240,6 +276,9 @@ export default {
         this.managerId = data?.managerId || '';
         this.managerEmail = data?.managerEmail || '';
         this.managerTel = data?.managerTel || '';
+        this.selectedInquiryType = data?.inquiryType || '';
+        this.selectedCategory = data?.inquiryPart || '';
+        this.selectedPriority = data?.priority || '';
 
       } catch (error) {
         console.error("❌ 요구사항 불러오기 오류:", error);
@@ -550,7 +589,10 @@ export default {
           "manager": this.manager,
           "managerId": this.managerId,
           "managerTel": this.managerTel,
-          "managerEmail": this.managerEmail
+          "managerEmail": this.managerEmail,
+          "inquiryType": this.selectedInquiryType,
+          "inquiryPart": this.selectedCategory,
+          "priority": this.selectedPriority
         };
 
         // 게시글 등록 및 seq 값 반환
@@ -670,7 +712,32 @@ export default {
         // console.log('담당자가 변경되었습니다:', previousManager, '->', selectedManager.name);
         this.managerChanged = true; // 담당자 변경 플래그 설정
       }
-    }
+    },
+
+    async getCodes() {
+      try {
+        // 문의유형
+        const inquiryRes = await apiClient.get("/api/code/list", {
+          params: { category: 'INQUIRY_TYPE' }
+        });
+        this.inquiryTypeList = inquiryRes.data;
+
+        // 문의부문
+        const categoryRes = await apiClient.get("/api/code/list", {
+          params: { category: 'INQUIRY_PART' }
+        });
+        this.categoryList = categoryRes.data;
+
+        // 중요도
+        const priorityRes = await apiClient.get("/api/code/list", {
+          params: { category: 'PRIORITY' }
+        });
+        this.priorityList = priorityRes.data;
+
+      } catch (error) {
+        console.error('코드 리스트 조회 실패:', error);
+      }
+    },
 
 
   }
@@ -715,18 +782,19 @@ export default {
 
 
 .author-value {
-  font-size: 14px;
+  font-size: 15px;
   padding-left: 15px;
   white-space: nowrap;
   display: flex;
   align-items: center;
+  color: #3A3C3F;
 }
 
 .title-div {
   font-size: 25px;
 }
 
-.file-btn {
+.custom-btn {
   font-size: 14px;
   height: 35px;
   border-radius: 10px;
@@ -797,11 +865,6 @@ export default {
   width: 290px;
 }
 
-.sub-text-field {
-  padding-block: 10px;
-  padding-inline: 10px;
-}
-
 .manager-search {
   padding-block: 10px;
   padding-inline: 10px;
@@ -859,20 +922,67 @@ export default {
   box-shadow: none;
   border-radius: 6px;
   margin-top: -10px !important;
+  margin-bottom: 15px;
   min-width: 60px;
-}
-
-::v-deep(.sub-text-field .v-field) {
-  font-size: 13px !important;
-}
-
-::v-deep(.content-textarea .v-field) {
-  font-size: 14px !important;
 }
 
 ::v-deep(.input-manager .v-field) {
   width: 740px;
   height: 40px !important;
-  font-size: 13px !important;
+  font-size: 15px !important;
+}
+
+.priority-radio-wrapper {
+  display: flex;
+  align-items: center;
+  padding-left: 15px;
+}
+
+.v-radio {
+  margin-right: 10px;
+}
+
+.category-radio-wrapper {
+  display: flex;
+  align-items: center;
+  padding-left: 15px;
+}
+
+.inquiry-radio-wrapper {
+  display: flex;
+  align-items: center;
+  padding-left: 15px;
+}
+
+.small-radios :deep(.v-label) {
+  color: black !important;
+  font-weight: 500;
+  font-size: 15px;
+  /* 라벨 글자 크기를 약 0.8rem로 감소 */
+}
+
+.small-radios :deep(.v-selection-control__input svg),
+.small-radios :deep(.v-selection-control__input .v-icon) {
+  font-size: 17px;
+  margin-bottom: 0.5px;
+  /* 라디오 아이콘 크기를 약 1rem(16px)로 감소 */
+}
+
+.inquiry-select :deep(.v-field) {
+  height: 37px !important;
+}
+
+.inquiry-select :deep(.v-field__input) {
+  font-size: 15px;
+}
+
+.inquiry-select :deep(.v-list-item-title) {
+  font-size: 15px;
+}
+
+.inquiry-select :deep(.v-input__control) {
+  width: 167px !important;
+  /* 원하는 너비로 조정 */
+  min-width: 167px !important;
 }
 </style>

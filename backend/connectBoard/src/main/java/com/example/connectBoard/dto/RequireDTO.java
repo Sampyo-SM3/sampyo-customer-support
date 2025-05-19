@@ -54,6 +54,9 @@ public class RequireDTO {
 	private String inquiryType;
 	private String inquiryPart;
 	private String priority;
+	private String inquiryTypeNm;
+	private String inquiryPartNm;
+	private String priorityNm;
 	
 	
 }

@@ -186,9 +186,12 @@
 			a.updateDt,
 			a.completeDt,
 			b.phone as writerPhone,
-			(SELECT codeName FROM CODE_MASTER WHERE codeId = a.inquiryType) as inquiryType,
-		    (SELECT codeName FROM CODE_MASTER WHERE codeId = a.inquiryPart) as inquiryPart,
-		    (SELECT codeName FROM CODE_MASTER WHERE codeId = a.priority) as priority
+			a.inquiryType ,
+			a.inquiryPart ,
+			a.priority ,
+			(SELECT codeName FROM CODE_MASTER WHERE codeId = a.inquiryType) as inquiryTypeNm,
+		    (SELECT codeName FROM CODE_MASTER WHERE codeId = a.inquiryPart) as inquiryPartNm,
+		    (SELECT codeName FROM CODE_MASTER WHERE codeId = a.priority) as priorityNm
 		from board a
 		 left outer join sys_empref b on a.writerId = b.id
 		where seq = #{seq};
@@ -214,6 +217,15 @@
 	        </if>
 	        <if test="managerTel != null and managerTel != ''">
 	            managerTel = #{managerTel},
+	        </if>
+	        <if test="inquiryType != null and inquiryType != ''">
+	            inquiryType = #{inquiryType},
+	        </if>
+	        <if test="inquiryPart != null and inquiryPart != ''">
+	            inquiryPart = #{inquiryPart},
+	        </if>
+	        <if test="priority != null and priority != ''">
+	            priority = #{priority},
 	        </if>
 	        saveFlag = 'Y',
 	        updateDt = GETDATE()

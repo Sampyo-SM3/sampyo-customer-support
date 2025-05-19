@@ -939,7 +939,7 @@ export default {
   border-right: none;
   display: flex;
   align-items: center;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .th-cell {
@@ -1062,7 +1062,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 16px;
+  margin-top: 10px;
 }
 
 .loading-overlay {

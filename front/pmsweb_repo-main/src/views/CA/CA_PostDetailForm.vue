@@ -395,9 +395,9 @@ export default {
         srFlag: response.data?.srFlag || "",
         processState: processState,
         writerPhone: response.data?.writerPhone || "",
-        inquiryType: response.data?.inquiryType || "",
-        inquiryPart: response.data?.inquiryPart || "",
-        priority: response.data?.priority || "",
+        inquiryType: response.data?.inquiryTypeNm || "",
+        inquiryPart: response.data?.inquiryPartNm || "",
+        priority: response.data?.priorityNm || "",
       };
 
       this.selectedStatus = this.inquiry.processState;
