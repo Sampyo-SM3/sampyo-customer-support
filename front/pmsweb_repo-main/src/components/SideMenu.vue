@@ -223,7 +223,7 @@ export default defineComponent({
   padding-left: 10px;
   /* transform: translateY(-100px) !important;   */
   font-weight: 500;
-  font-size: 13px;
+  font-size: 14x;
   color: #5B737D;
   line-height: 3 !important;
 }
@@ -288,7 +288,7 @@ export default defineComponent({
   color: #5A5C5F !important;
   transition: padding-left 0.3s ease;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 14px;
   color: #003044;
   line-height: 3 !important;
   padding-left: 20px;

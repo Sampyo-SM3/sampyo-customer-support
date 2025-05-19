@@ -11,7 +11,7 @@
               <v-card-text class="text-center pa-8 pa-sm-12">
                 <!-- <h1 class="text-h3 font-weight-bold mb-2">Welcome</h1>
                 <h2 class="text-h5 font-weight-bold mb-8">sampyo cement</h2> -->
-                <v-img src="@/assets/SAMPYO_Cement_Signature_영문.png" class='mb-8' alt="Sampyo Cement Logo"
+                <v-img src="@/assets/SAMPYO_Cement_Signature_영문.png" class='mb-8 ml-8' alt="Sampyo Cement Logo"
                   style="width: 200px;" />
                 <v-form @submit.prevent="login" class="mb-8">
                   <v-text-field v-model="username" label="Account" prepend-inner-icon="mdi-account" variant="outlined"

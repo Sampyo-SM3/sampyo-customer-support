@@ -9,7 +9,7 @@
       </v-col>
     </v-row> -->
 
-    <v-row dense align="center" class="flex-wrap rounded-border sky-bg" style="gap: 12px;">
+    <v-row dense align="center" class="flex-wrap rounded-border sky-bg" style="gap:5px;">
 
       <!-- 요청기간 -->
       <v-col cols="12" sm="6" md="auto" class="d-flex align-center filter-col">
@@ -788,7 +788,7 @@ export default {
 }
 
 .date-buttons {
-  margin-left: 20px;
+  margin-left: 5px;
 }
 
 .date-btn-container {
@@ -912,6 +912,7 @@ export default {
   background-color: #D0DFF1;
   font-weight: 500;
   border-bottom: 1px solid #e0e0e0;
+  color: #3E4B5B !important;
 }
 
 .table-row {

@@ -3,7 +3,7 @@
     <v-container fluid class="d-flex align-center pl-4">
 
       <!-- 로고 및 회사명 -->
-      <v-img src="@/assets/sam_logo.jpg" max-height="260" max-width="260" class="mr-2">
+      <v-img src="@/assets/SAMPYO.png" max-height="130" max-width="130" class="mr-2">
       </v-img>
 
       <!-- 메뉴 아이템들 -->
@@ -64,29 +64,42 @@
         <v-icon>mdi-bell-outline</v-icon>        
       </v-btn>       -->
 
-      <div class="pr-5">
+      <!-- <div class="pr-5">
         <v-icon>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="24" height="24">
-            <circle cx="50" cy="30" r="20" :fill="iconColor" />
-            <circle cx="50" cy="30" r="15" fill="#f8f9fa" />
-            <path d="M30,80 C30,65 70,65 70,80" :fill="iconColor" :stroke="iconColor" stroke-width="1" />
-          </svg>
+          <span class="mdi mdi-account-circle-outline" style="margin-bottom:1px;"></span>
         </v-icon>
         {{ userNameDisplay }}
-      </div>
-
+      </div> -->
 
       <!-- 로그인 버튼 -->
-
-      <v-btn class="login-btn" @click="handleLoginLogout">
+      <!-- <v-btn class="login-btn" @click="handleLoginLogout">
         <p class="login-text">{{ userLoginStatus ? '로그아웃' : '로그인' }}</p>
-      </v-btn>
+      </v-btn> -->
 
+      <v-menu>
+        <template #activator="{ props }">
+          <v-btn variant="text" v-bind="props" class="d-flex align-center user-btn">
+            <v-icon size="25" class="mr-1" style="color: #1867C0; margin-top:2px;">mdi-account-circle-outline</v-icon>
+            <span class="user-name-text">{{ userNameDisplay }}</span>
+            <v-icon size="18" class="ml-1">mdi-chevron-down</v-icon>
+          </v-btn>
+        </template>
+
+        <v-list density="compact">
+          <!-- <v-list-item @click="goToMyPage">
+            <v-list-item-title>내 정보</v-list-item-title>
+          </v-list-item> -->
+          <v-list-item @click="handleLoginLogout" class="custom-list-item">
+            <v-list-item-title class="list-item-text">
+              {{ userLoginStatus ? '로그아웃' : '로그인' }}
+            </v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
 
     </v-container>
   </v-app-bar>
 </template>
-
 
 <script>
 import { ref, defineComponent, onMounted, watch, provide } from 'vue';
@@ -95,7 +108,6 @@ import { useAuthStore } from '@/store/auth';
 import { useMenuStore } from '@/store/menuStore';
 import { useRouter } from 'vue-router';  // useRouter 임포트
 import apiClient from '@/api';
-
 
 
 export default defineComponent({
@@ -201,27 +213,18 @@ export default defineComponent({
     }, { immediate: true })
 
 
-
-
-
     // 사이드메뉴 참조를 위한 설정
     const sideMenuRef = ref(null);
     provide('sideMenuRef', sideMenuRef); // 자식 컴포넌트에서 접근 가능하도록 provide    
 
     // 메뉴 클릭 핸들러 수정
     const handleMenuClick = (item) => {
-      // console.log('--------handleMenuClick--------');
-      // console.log('item-> ', item);
-
       // 기존 사이드메뉴 데이터 로드 함수 호출
       showSideMenu(item);
 
       // 헤더 메뉴 클릭 이벤트 발생 - 부모 컴포넌트에 알림
       emit('menuSelected', item.m_code);
     };
-
-
-
 
     return {
       error,
@@ -238,8 +241,6 @@ export default defineComponent({
   }
 })
 </script>
-
-
 
 
 <style scoped>
@@ -274,13 +275,11 @@ export default defineComponent({
   font-weight: 600;
 }
 
-
 ::v-deep.custom-searchbar {
   margin-right: 30px;
   /* color: #52555a !important; */
   color: #52555a !important;
   max-width: 320px;
-
 }
 
 ::v-deep.v-text-field input {
@@ -308,7 +307,10 @@ export default defineComponent({
   font-weight: 600;
   font-size: 14px;
   color: #737577;
+}
 
+.tab-text {
+  font-size: 17px;
 }
 
 /* 버튼 오버레이 효과 제거 */
@@ -340,5 +342,20 @@ export default defineComponent({
 
 .business-text {
   letter-spacing: 0px
+}
+
+.user-name-text {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.custom-list-item {
+  min-height: 30px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.list-item-text {
+  font-size: 14px;
 }
 </style>

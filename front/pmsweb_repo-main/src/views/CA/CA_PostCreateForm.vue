@@ -1,7 +1,6 @@
 <template>
   <v-container fluid class="pr-0 pl-0 pt-0">
 
-
     <br>
 
     <v-row no-gutters class="search-row top-row">
@@ -12,10 +11,40 @@
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
+      <v-col cols="4" class="search-col product-category ">
+        <div class="label-box">문의유형</div>
+        <v-select v-model="selectedInquiryType" :items="['단순문의', '데이터 점검', '프로그램 개선']" density="compact" hide-details
+          variant="outlined" class="inquiry-select mr-8 mt-1 mb-1" placeholder="선택" style="margin-left:10px;" />
+      </v-col>
+
+      <v-col cols="4" class="search-col product-category">
+        <div class="label-box">문의부문</div>
+        <div class="category-radio-wrapper">
+          <v-radio-group v-model="selectedCategory" class="small-radios" inline density="compact" hide-details
+            color="#3A70B1">
+            <v-radio label="ERP" value="ERP" />
+            <v-radio label="MES" value="MES" />
+            <v-radio label="WEB" value="WEB" />
+          </v-radio-group>
+        </div>
+      </v-col>
+
+      <v-col cols="4" class="search-col product-category">
+        <div class="label-box">중요도</div>
+        <div class="priority-radio-wrapper">
+          <v-radio-group v-model="selectedPriority" class="small-radios" inline density="compact" color="#3A70B1"
+            hide-details>
+            <v-radio v-for="n in 5" :key="n" :label="n.toString()" :value="n" />
+          </v-radio-group>
+        </div>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col" style="max-width:350px;">
         <div class="label-box">담당자</div>
-        <v-text-field class="sub-text-field input-manager" v-model="manager" readonly hide-details density="compact"
-          variant="outlined" append-icon="mdi-magnify" @click="showManagerPopup = true">
+        <v-text-field class="mr-8 mt-1 mb-1 input-manager" v-model="manager" readonly hide-details density="compact"
+          variant="outlined" append-icon="mdi-magnify" @click="showManagerPopup = true" style="margin-left:10px;">
         </v-text-field>
       </v-col>
 
@@ -28,8 +57,8 @@
       <!-- 제목 필드 -->
       <v-col class="search-col">
         <div class="label-box">제 목</div>
-        <v-text-field class="sub-text-field" v-model="sub" placeholder="제목을 입력하세요" clearable hide-details
-          density="compact" variant="outlined"></v-text-field>
+        <v-text-field class="mr-8 mt-1 mb-1" v-model="sub" placeholder="제목을 입력하세요" clearable hide-details
+          density="compact" variant="outlined" style="margin-left:10px;"></v-text-field>
       </v-col>
     </v-row>
 
@@ -37,7 +66,7 @@
       <!-- 내용 텍스트필드 -->
       <v-col class="search-col">
         <div class="label-box">내 용</div>
-        <v-textarea v-model="etc" placeholder="내용을 입력하세요" auto-grow rows="19" clearable hide-details density="compact"
+        <v-textarea v-model="etc" placeholder="내용을 입력하세요" auto-grow rows="18" clearable hide-details density="compact"
           variant="outlined" class="content-textarea">
         </v-textarea>
       </v-col>
@@ -52,7 +81,7 @@
           variant="outlined" prepend-icon="" multiple :loading="isFileLoading" hide-details
           @change="handleFileChange"></v-file-input>
 
-        <v-btn variant="flat" color="#3A70B1" class="file-btn mt-2 mb-2 ml-2 mr-2 white-text d-flex align-center"
+        <v-btn variant="flat" color="#3A70B1" class="file-btn mt-1 mb-2 ml-2 mr-2 white-text d-flex align-center"
           @click="openFileSelector">
           <v-icon size="default" class="mr-1">mdi-file-upload</v-icon>
           첨부
@@ -121,6 +150,7 @@ export default {
     const kakaoStore = useKakaoStore();
     const extraBreadcrumb = inject('extraBreadcrumb', null);
     const listButtonLink = inject('listButtonLink', null);
+
     onMounted(() => {
       if (extraBreadcrumb) {
         extraBreadcrumb.value = '문의 내용 작성';  // 🔥 추가하고 싶은 값
@@ -175,7 +205,10 @@ export default {
       // 파일 덮어쓰기 관련
       showOverwriteDialog: false,
       duplicateFiles: [],
-      pendingFiles: [] // 덮어쓰기 대기 중인 파일들  
+      pendingFiles: [], // 덮어쓰기 대기 중인 파일들 
+      selectedInquiryType: null, //문의유형
+      selectedCategory: null,  //문의부문
+      selectedPriority: null,  //중요도
     }
   },
 
@@ -614,11 +647,12 @@ export default {
 
 
 .author-value {
-  font-size: 14px;
+  font-size: 15px;
   padding-left: 15px;
   white-space: nowrap;
   display: flex;
   align-items: center;
+  color: #3A3C3F;
 }
 
 .title-div {
@@ -696,12 +730,6 @@ export default {
   width: 290px;
 }
 
-.sub-text-field {
-  padding-block: 10px;
-  padding-inline: 10px;
-
-}
-
 .manager-search {
   padding-block: 10px;
   padding-inline: 10px;
@@ -735,13 +763,13 @@ export default {
 }
 
 .label-box {
-  width: 80px;
+  width: 100px;
   flex-shrink: 0;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   color: #578ADB;
   background-color: #f5f5f5;
@@ -766,6 +794,60 @@ export default {
 ::v-deep(.input-manager .v-field) {
   width: 740px;
   height: 40px !important;
-  font-size: 13px !important;
+  font-size: 15px !important;
+}
+
+.priority-radio-wrapper {
+  display: flex;
+  align-items: center;
+  padding-left: 15px;
+}
+
+.v-radio {
+  margin-right: 10px;
+}
+
+.category-radio-wrapper {
+  display: flex;
+  align-items: center;
+  padding-left: 15px;
+}
+
+.inquiry-radio-wrapper {
+  display: flex;
+  align-items: center;
+  padding-left: 15px;
+}
+
+.small-radios :deep(.v-label) {
+  color: black !important;
+  font-weight: 500;
+  font-size: 15px;
+  /* 라벨 글자 크기를 약 0.8rem로 감소 */
+}
+
+.small-radios :deep(.v-selection-control__input svg),
+.small-radios :deep(.v-selection-control__input .v-icon) {
+  font-size: 17px;
+  margin-bottom: 0.5px;
+  /* 라디오 아이콘 크기를 약 1rem(16px)로 감소 */
+}
+
+.inquiry-select :deep(.v-field) {
+  height: 37px !important;
+}
+
+.inquiry-select :deep(.v-field__input) {
+  font-size: 15px;
+}
+
+.inquiry-select :deep(.v-list-item-title) {
+  font-size: 15px;
+}
+
+.inquiry-select :deep(.v-input__control) {
+  width: 167px !important;
+  /* 원하는 너비로 조정 */
+  min-width: 167px !important;
 }
 </style>

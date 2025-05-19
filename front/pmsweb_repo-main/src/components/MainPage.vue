@@ -28,9 +28,10 @@
             <span class="menu-text-header">{{ extraBreadcrumb }}</span>
           </template>
 
-          <v-btn v-if="listButtonLink" variant="outlined" color="primary" class="goBack-btn ml-auto mr-0" size="small"
+          <v-btn v-if="listButtonLink" variant="text" color="primary" class="goBack-btn ml-auto mr-0" size="small"
             @click="$router.push(listButtonLink)">
-            목록
+            <span class="mdi mdi-menu" style="font-size: 16px; margin-top:1px;"></span>
+            <span class="goBack-text">목록</span>
           </v-btn>
         </div>
 
@@ -121,5 +122,11 @@ export default {
 .menu-text {
   font-size: 12px;
   color: #A1A6A6;
+}
+
+.goBack-text {
+  font-size: 15px;
+  font-weight: 500;
+  margin-left: 3px;
 }
 </style>
