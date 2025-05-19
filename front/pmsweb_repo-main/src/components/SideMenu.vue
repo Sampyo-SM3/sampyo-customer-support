@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer class="custom-drawer" permanent width="270">
+  <v-navigation-drawer class="custom-drawer" permanent width="240">
     <v-list class="tighter-menu-spacing">
       <template v-for="item in processedMenuItems" :key="item.M_CODE">
         <!-- 대메뉴 -->
@@ -223,7 +223,7 @@ export default defineComponent({
   padding-left: 10px;
   /* transform: translateY(-100px) !important;   */
   font-weight: 500;
-  font-size: 14x;
+  font-size: 13x;
   color: #5B737D;
   line-height: 3 !important;
 }
@@ -288,7 +288,7 @@ export default defineComponent({
   color: #5A5C5F !important;
   transition: padding-left 0.3s ease;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13.5px;
   color: #003044;
   line-height: 3 !important;
   padding-left: 20px;

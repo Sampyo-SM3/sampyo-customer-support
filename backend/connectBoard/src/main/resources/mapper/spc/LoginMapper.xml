@@ -19,7 +19,7 @@
             sys_empref 
         WHERE 
             ID = #{id} 
-            AND COMPANY_CD = #{companyCd}
+            <!--AND COMPANY_CD = #{companyCd}-->
     </select>     
     
     <!-- 사용자 존재 여부 확인 -->
@@ -63,7 +63,7 @@
         INSERT INTO sys_empref 
             (COMPANY_CD, id, name, admin, pwd, phone, depart1, email, smsyn) 
         VALUES 
-            ('CEMENT', #{id}, #{name}, 0, PWDENCRYPT(#{password}), #{phone}, #{deptCd}, #{email}, 1)
+            (#{companyCd}, #{id}, #{name}, 0, PWDENCRYPT(#{password}), #{phone}, #{deptCd}, #{email}, 1)
         
    		INSERT INTO sys_menu_auth (ID, M_CODE, AUTH, INSERT_USER, INSERT_DT)
 		VALUES (#{id}, 'CA', '31', #{id}, GETDATE())

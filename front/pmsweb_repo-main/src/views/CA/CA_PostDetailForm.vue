@@ -82,6 +82,22 @@ C:\Users\user\AppData\Local\Temp\tomcat.8080.8623853284345763014\work\Tomcat\loc
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
+      <v-col cols="4" class="search-col product-category">
+        <div class="label-box">문의유형</div>
+        <div class="author-value">{{ inquiry.inquiryType }}</div>
+      </v-col>
+
+      <v-col cols="4" class="search-col product-category">
+        <div class="label-box">문의부문</div>
+        <div class="author-value">{{ inquiry.inquiryPart }}</div>
+      </v-col>
+
+      <v-col cols="4" class="search-col product-category">
+        <div class="label-box">중요도</div>
+        <div class="author-value">{{ inquiry.priority }}</div>
+      </v-col>
+    </v-row>
+    <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col product-category">
         <div class="label-box">담당자</div>
         <div class="author-value">{{ inquiry.manager }}</div>
@@ -249,7 +265,10 @@ export default {
         writerId: "",
         manager: "",
         srFlag: "",
-        writerPhone: ""
+        writerPhone: "",
+        inquiryType: "",
+        inquiryPart: "",
+        priority: "",
       },
       previousStatus: '', // 이전 상태를 저장할 변수
       statusChanged: false, // 상태가 변경되었는지 추적      
@@ -376,6 +395,9 @@ export default {
         srFlag: response.data?.srFlag || "",
         processState: processState,
         writerPhone: response.data?.writerPhone || "",
+        inquiryType: response.data?.inquiryType || "",
+        inquiryPart: response.data?.inquiryPart || "",
+        priority: response.data?.priority || "",
       };
 
       this.selectedStatus = this.inquiry.processState;
@@ -396,7 +418,11 @@ export default {
     },
     async getStatus() {
       try {
-        const statusList = await apiClient.get("/api/status/list");
+        const statusList = await apiClient.get("/api/code/list", {
+          params: {
+            category: 'STATUS'
+          }
+        });
 
         // 상태 이름 리스트 저장
         this.progressStatuses = statusList.data.map(status => ({
@@ -808,7 +834,7 @@ export default {
 }
 
 .label-box {
-  width: 80px;
+  width: 100px;
   flex-shrink: 0;
   height: 100%;
   display: flex;

@@ -67,6 +67,7 @@ public interface LoginRepository {
     
     
     int insertUser(
+    		@Param("companyCd") String companyCd,
     		@Param("id") String id,
     		@Param("name") String name,
     		@Param("password") String password,     	

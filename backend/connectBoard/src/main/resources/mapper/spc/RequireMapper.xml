@@ -9,7 +9,8 @@
 		SELECT
 		    b.seq,
 	        b.sub,
-		    b.division,
+		    d.CORP_NM as division,
+		    d.DEPT_NM as dpNm,
 		    b.context,
 		    b.uId,
 		    b.usem,
@@ -25,9 +26,13 @@
 		    b.completeDt,
 		    b.srFlag,
 		    b.saveFlag,
+		    b.inquiryType,
+		    b.inquiryPart,
+		    b.priority,
 		    (SELECT COUNT(*) FROM COMMENTS WHERE postid = b.seq) as countComment   	
-		FROM board b inner join code_master c
-		 on b.processState = c.codeId					
+		FROM board b 
+		  inner join code_master c on b.processState = c.codeId		
+		  left outer join SPG.DBO.CRM_USER_MASTER d on b.writerId = d.USR_ID					
 	<where>
 	    <if test="manager != null and manager != ''">
 	        b.manager LIKE '%' + #{manager} + '%'
@@ -73,7 +78,10 @@
             manager,
             managerId,
             managerTel,
-            managerEmail
+            managerEmail,
+            inquiryType,
+			inquiryPart,
+			priority
         ) VALUES (
             #{sub, jdbcType=VARCHAR},
             #{etc, jdbcType=VARCHAR},
@@ -87,7 +95,10 @@
             #{manager, jdbcType=VARCHAR},
             #{managerId, jdbcType=VARCHAR},
             #{managerTel, jdbcType=VARCHAR},
-            #{managerEmail, jdbcType=VARCHAR}
+            #{managerEmail, jdbcType=VARCHAR},
+            #{inquiryType, jdbcType=VARCHAR},
+            #{inquiryPart, jdbcType=VARCHAR},
+            #{priority, jdbcType=VARCHAR}
     	)
     	
 	</insert>	
@@ -96,40 +107,43 @@
 	<!-- ✅ 모든 데이터 조회1212 -->
 	<select id="getAllRequires" resultType="com.example.connectBoard.dto.RequireDTO">
 		select
-			seq,
-			sub,
-			context,
-			taskName,
-			help,
-			necessity,
-			effect,
-			module,
-			beforeTaskContent,
-			afterTaskContent,
-			useDept,
-			attachDoc,
-			requestDate,
-			acceptDate,
-			completeRequestDate,
-			completeDate,
-			etc,
-			uId,
-			usem,
-			dpId,
-			dpDn,
-			manager,
-			managerId,
-			managerTel,
-			managerEmail,
-			division,
-			processState,
-			saveFlag,
-			srFlag,
-			docNum,
-			insertDt,
-			updateDt,
-			completeDt
-		from board;
+			b.seq,
+			b.sub,
+			b.context,
+			b.taskName,
+			b.help,
+			b.necessity,
+			b.effect,
+			b.module,
+			b.beforeTaskContent,
+			b.afterTaskContent,
+			b.useDept,
+			b.attachDoc,
+			b.requestDate,
+			b.acceptDate,
+			b.completeRequestDate,
+			b.completeDate,
+			b.etc,
+			b.uId,
+			b.usem,
+			b.dpId,
+			b.dpDn,
+			b.manager,
+			b.managerId,
+			b.managerTel,
+			b.managerEmail,
+			b.division,
+			b.processState,
+			b.saveFlag,
+			b.srFlag,
+			b.docNum,
+			b.insertDt,
+			b.updateDt,
+			b.completeDt,
+			(SELECT codeName FROM CODE_MASTER WHERE codeId = b.inquiryType) as inquiryType,
+		    (SELECT codeName FROM CODE_MASTER WHERE codeId = b.inquiryPart) as inquiryPart,
+		    (SELECT codeName FROM CODE_MASTER WHERE codeId = b.priority) as priority
+		from board;	
 		
 	</select>
 	
@@ -171,7 +185,10 @@
 			a.insertDt,
 			a.updateDt,
 			a.completeDt,
-			b.phone as writerPhone
+			b.phone as writerPhone,
+			(SELECT codeName FROM CODE_MASTER WHERE codeId = a.inquiryType) as inquiryType,
+		    (SELECT codeName FROM CODE_MASTER WHERE codeId = a.inquiryPart) as inquiryPart,
+		    (SELECT codeName FROM CODE_MASTER WHERE codeId = a.priority) as priority
 		from board a
 		 left outer join sys_empref b on a.writerId = b.id
 		where seq = #{seq};

@@ -20,7 +20,7 @@
                     :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                     @click:append-inner="showPassword = !showPassword" :type="showPassword ? 'text' : 'password'"
                     variant="outlined" color="primary" class="mb-2"></v-text-field>
-                  <!-- 개발전으로 주석처리 -->
+                  <!-- 개발 전으로 주석처리 -->
                   <!-- <div class="text-right mb-4">
                     <v-btn variant="text" color="primary" density="compact" class="text-caption">
                       비밀번호를 잊으셨나요?
@@ -112,13 +112,15 @@ export default {
           // console.log(result.phone);          
           // 우리쪽 계정테이블에 데이터 없으면 insert후 로그인
           // 있으면 비밀번호 검증 후 로그인
+
           const success2 = await this.authStore.login({
+            companyCd: result.companyCd,
             username: this.username,
             password: this.password,
             name: result.name,
             phone: result.phone,
             email: result.email,
-            deptCd: result.deptCd
+            deptCd: result.deptCd,
             // username: '1',
             // password: '1' 
           });

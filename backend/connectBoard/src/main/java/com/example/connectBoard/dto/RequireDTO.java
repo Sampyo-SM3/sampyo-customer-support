@@ -33,7 +33,7 @@ public class RequireDTO {
 	private String uId;
 	private String usem;
 	private String dpId;
-	private String dpDn;
+	private String dpNm;
 	private String writerId;
 	private String manager;
 	private String managerId;
@@ -51,6 +51,9 @@ public class RequireDTO {
 	private LocalDate completeDt;
 	private Integer countComment;
 	private String writerPhone;
+	private String inquiryType;
+	private String inquiryPart;
+	private String priority;
 	
 	
 }

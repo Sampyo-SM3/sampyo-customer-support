@@ -9,8 +9,5 @@ import com.example.connectBoard.dto.StatusDTO;
 
 @Mapper
 public interface StatusRepository {
-
-	List<StatusDTO> getAllStatuses();
-
 	void updateStatus(RequireDTO require);
 }

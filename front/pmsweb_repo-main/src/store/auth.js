@@ -29,7 +29,8 @@ export const useAuthStore = defineStore("auth", {
           name: credentials.name,
           phone: phoneWithoutHyphens,
           email: credentials.email,
-          deptCd: credentials.deptCd
+          deptCd: credentials.deptCd,
+          companyCd: credentials.companyCd
         });
 
         
@@ -52,8 +53,6 @@ export const useAuthStore = defineStore("auth", {
             // API 호출 시 인증 헤더 설정
             axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
           }
-          
-
           
           return true;
         }

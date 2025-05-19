@@ -13,8 +13,8 @@
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col" style="max-width:350px;">
         <div class="label-box">담당자</div>
-        <v-text-field class="sub-text-field input-manager" v-model="manager" readonly hide-details density="compact"
-          variant="outlined" append-icon="mdi-magnify" @click="showManagerPopup = true">
+        <v-text-field class="mr-8 mt-1 mb-1 input-manager" v-model="manager" readonly hide-details density="compact"
+          variant="outlined" append-icon="mdi-magnify" @click="showManagerPopup = true" style="margin-left:10px;">
         </v-text-field>
       </v-col>
 
@@ -27,8 +27,8 @@
       <!-- 제목 필드 -->
       <v-col class="search-col">
         <div class="label-box">제 목</div>
-        <v-text-field class="sub-text-field" v-model="sub" placeholder="제목을 입력하세요" clearable hide-details
-          density="compact" variant="outlined"></v-text-field>
+        <v-text-field class="mr-8 mt-1 mb-1" v-model="sub" placeholder="제목을 입력하세요" clearable hide-details
+          density="compact" variant="outlined" style="margin-left:10px;"></v-text-field>
       </v-col>
     </v-row>
 
@@ -835,13 +835,13 @@ export default {
 }
 
 .label-box {
-  width: 80px;
+  width: 100px;
   flex-shrink: 0;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   color: #578ADB;
   background-color: #f5f5f5;

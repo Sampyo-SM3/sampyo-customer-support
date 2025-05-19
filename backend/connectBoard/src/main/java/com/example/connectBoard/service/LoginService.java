@@ -68,8 +68,8 @@ public class LoginService {
     }    
     
     
-    public void insertUser(String id, String password, String deptCd, String name, String phone, String email) {        
-        loginRepository.insertUser(id, name, password, deptCd, phone, email);
+    public void insertUser(String id, String password, String companyCd, String deptCd, String name, String phone, String email) {        
+        loginRepository.insertUser(companyCd, id, name, password, deptCd, phone, email);
         
     }    
 

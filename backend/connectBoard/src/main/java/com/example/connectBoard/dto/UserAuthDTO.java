@@ -13,6 +13,7 @@ public class UserAuthDTO {
 	private int auth;
 	private String name;
 	private String rollPstnNm;
+	private String companyCd;
 	private String deptNm;
 	private String corpNm;
 	private String menuCode;

@@ -30,18 +30,16 @@ public class LoginController {
         String id = loginParams.get("id");
         String password = loginParams.get("password");
         String name = loginParams.get("name");
-        String companyCd = "CEMENT";
+        String companyCd = loginParams.get("companyCd");
         String phone = loginParams.get("phone");
         String email = loginParams.get("email"); 
         String deptCd = loginParams.get("deptCd"); 
 
-        System.out.println("🔍 loginParams 전체" + loginParams );
-        
         try {
             // 필수 파라미터 검증
             if (id == null || password == null || companyCd == null) {
                 return ResponseEntity.badRequest()
-                    .body(Map.of("message", "아이디, 비밀번호, 회사코드는 필수 항목입니다."));
+                    .body(Map.of("message", "아이디, 비밀번호는 필수 항목입니다."));
             }       
 //            System.out.println(id);
 //            System.out.println(password);
@@ -59,7 +57,7 @@ public class LoginController {
 //                System.out.println("test!!");
 //                System.out.println(name);
 //                System.out.println(phone);
-                loginService.insertUser(id, password, deptCd, userNameToUse, phone, email);
+                loginService.insertUser(id, password, companyCd, deptCd, userNameToUse, phone, email);
                 
                 return ResponseEntity.ok(Map.of(
                     "message", "새로운 사용자로 등록되었습니다.",
@@ -81,7 +79,7 @@ public class LoginController {
     @PostMapping("/validate-blue-id")
     public ResponseEntity<?> validate_blue_id(@RequestBody Map<String, String> loginParams) {    	
         try {
-        	
+        	      	
             String id = loginParams.get("id");
             String password = loginParams.get("password");            
 //            String companyCd = "CEMENT";                       
@@ -94,6 +92,7 @@ public class LoginController {
             // 블루샘에 존재하는 아이디인지 확인
             EmployeePreferenceDto result = loginService.validate_blue_id(id, password);
 
+            
             return ResponseEntity.ok(result);
         } catch (Exceptions.UserNotFoundException e) {        	
           return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

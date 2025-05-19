@@ -24,12 +24,6 @@ public class StatusController {
         this.statusService = statusService;
     }
     
-    //접수상태 리스트 조회
-    @GetMapping("/status/list")
-    public List<StatusDTO> getAllRequires() {
-    	return statusService.getAllStatuses();
-    }
-    
 	// 접수상태 변경
     @PostMapping("/updateStatus")
     public ResponseEntity<?> updateStatus(@RequestBody RequireDTO require) {

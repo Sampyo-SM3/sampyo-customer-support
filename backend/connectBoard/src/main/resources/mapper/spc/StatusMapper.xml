@@ -3,22 +3,6 @@
 
 <mapper namespace="com.example.connectBoard.repository.spc.StatusRepository">
 
-	<!--접수 상태 List-->
-    <select id="getAllStatuses" parameterType="com.example.connectBoard.dto.CommentDTO">   
-		SELECT 
-			codeId, 
-			codeName, 
-			codeDesc, 
-			category, 
-			parentCodeId, 
-			useYn, 
-			orderNum,
-			insertDt, 
-			updateDt			
-		FROM code_master 
-		ORDER BY orderNum;
-    </select>
-
 	<update id="updateStatus" parameterType="com.example.connectBoard.dto.RequireDTO">
 	UPDATE board
 	SET 

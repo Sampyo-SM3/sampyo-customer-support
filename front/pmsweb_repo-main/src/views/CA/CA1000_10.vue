@@ -133,7 +133,7 @@
             <div class="th-cell">요청일</div>
             <div class="th-cell">제목</div>
             <div class="th-cell">작성자</div>
-            <div class="th-cell">사업부문</div>
+            <div class="th-cell">소속</div>
             <div class="th-cell">진행상태</div>
             <div class="th-cell">완료일</div>
             <div class="th-cell">담당자</div>
@@ -165,7 +165,10 @@
               </router-link>
             </div>
             <div class="td-cell">{{ item.uid }}</div>
-            <div class="td-cell">{{ item.division }}</div>
+            <div class="td-cell" style="text-align: center;">
+              {{ item.division }}<br>
+              {{ item.dpNm }}
+            </div>
             <div class="td-cell">
               <span :class="['status-badge', 'status-' + item.processState]">
                 {{ item.status }}
@@ -663,7 +666,11 @@ export default {
     },
     async getStatus() {
       try {
-        const statusList = await apiClient.get("/api/status/list");
+        const statusList = await apiClient.get("/api/code/list", {
+          params: {
+            category: 'STATUS'
+          }
+        });
 
         // 상태 이름 리스트 저장
         this.progressStatuses = statusList.data.map(status => ({
@@ -929,7 +936,7 @@ export default {
 .th-cell,
 .td-cell {
   padding: 8px 12px;
-  border-right: 1px solid #e0e0e0;
+  border-right: none;
   display: flex;
   align-items: center;
   font-size: 13px;
@@ -939,16 +946,7 @@ export default {
   justify-content: center;
   font-weight: 500;
   white-space: nowrap;
-}
-
-.th-cell,
-.td-cell {
-  padding: 8px 12px;
-  border-right: none;
-  /* 오른쪽 테두리 제거 */
-  display: flex;
-  align-items: center;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .checkbox-cell {

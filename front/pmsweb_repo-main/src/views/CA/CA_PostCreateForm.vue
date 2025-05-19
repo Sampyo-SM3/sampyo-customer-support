@@ -11,10 +11,11 @@
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
-      <v-col cols="4" class="search-col product-category ">
+      <v-col cols="4" class="search-col product-category">
         <div class="label-box">문의유형</div>
-        <v-select v-model="selectedInquiryType" :items="['단순문의', '데이터 점검', '프로그램 개선']" density="compact" hide-details
-          variant="outlined" class="inquiry-select mr-8 mt-1 mb-1" placeholder="선택" style="margin-left:10px;" />
+        <v-select v-model="selectedInquiryType" :items="inquiryTypeList" item-title="codeName" item-value="codeId"
+          density="compact" hide-details variant="outlined" class="inquiry-select mr-8 mt-1 mb-1" placeholder="선택"
+          style="margin-left:10px;" />
       </v-col>
 
       <v-col cols="4" class="search-col product-category">
@@ -22,9 +23,7 @@
         <div class="category-radio-wrapper">
           <v-radio-group v-model="selectedCategory" class="small-radios" inline density="compact" hide-details
             color="#3A70B1">
-            <v-radio label="ERP" value="ERP" />
-            <v-radio label="MES" value="MES" />
-            <v-radio label="WEB" value="WEB" />
+            <v-radio v-for="item in categoryList" :key="item.codeId" :label="item.codeName" :value="item.codeId" />
           </v-radio-group>
         </div>
       </v-col>
@@ -34,7 +33,7 @@
         <div class="priority-radio-wrapper">
           <v-radio-group v-model="selectedPriority" class="small-radios" inline density="compact" color="#3A70B1"
             hide-details>
-            <v-radio v-for="n in 5" :key="n" :label="n.toString()" :value="n" />
+            <v-radio v-for="item in priorityList" :key="item.codeId" :label="item.codeName" :value="item.codeId" />
           </v-radio-group>
         </div>
       </v-col>
@@ -206,9 +205,12 @@ export default {
       showOverwriteDialog: false,
       duplicateFiles: [],
       pendingFiles: [], // 덮어쓰기 대기 중인 파일들 
-      selectedInquiryType: null, //문의유형
-      selectedCategory: null,  //문의부문
-      selectedPriority: null,  //중요도
+      inquiryTypeList: [],
+      categoryList: [],
+      priorityList: [],
+      selectedInquiryType: null,
+      selectedCategory: null,
+      selectedPriority: null,
     }
   },
 
@@ -222,6 +224,7 @@ export default {
   mounted() {
     this.checkLocalStorage();
     this.getUserInfo();
+    this.getCodes();
   },
 
   created() {
@@ -320,64 +323,6 @@ export default {
 
       return duplicates;
     },
-
-    // 파일 업로드 처리
-    async uploadFiles() {
-      // 파일 없으면 false 리턴
-      if (!this.selectedFiles || this.selectedFiles.length === 0) {
-        return false;
-      }
-
-      // 파일명 중복 확인
-      const duplicateFiles = this.checkDuplicateFiles();
-
-      if (duplicateFiles.length > 0) {
-        return false;
-      }
-
-      // 중복 파일이 없으면 바로 업로드 진행
-      try {
-        await this.processUpload(this.selectedFiles);
-        return true; // 성공 시 true 리턴
-      } catch (error) {
-        return false; // 실패 시 false 리턴
-      }
-    },
-
-    // 덮어쓰기 취소
-    cancelOverwrite() {
-      this.showOverwriteDialog = false;
-
-      // 중복되지 않은 파일만 업로드 진행
-      if (this.pendingFiles.length > 0) {
-        this.processUpload(this.pendingFiles);
-      }
-
-      // 상태 초기화
-      this.duplicateFiles = [];
-      this.pendingFiles = [];
-    },
-
-    // 덮어쓰기 확인
-    confirmOverwrite() {
-      this.showOverwriteDialog = false;
-
-      // 중복 파일 제거 (기존 업로드 파일에서)
-      this.duplicateFiles.forEach(dupFile => {
-        const index = this.uploadedFiles.findIndex(f => f.name === dupFile.name);
-        if (index !== -1) {
-          this.uploadedFiles.splice(index, 1);
-        }
-      });
-
-      // 모든 선택된 파일 업로드 진행
-      this.processUpload(this.selectedFiles);
-
-      // 상태 초기화
-      this.duplicateFiles = [];
-      this.pendingFiles = [];
-    },
-
 
     // 실제 파일 업로드 처리
     async processUpload(filesToUpload) {
@@ -500,7 +445,10 @@ export default {
           "managerTel": this.managerTel,
           "managerEmail": this.managerEmail,
           "processState": "C",
-          "division": "시멘트"
+          "division": JSON.parse(localStorage.getItem("userInfo"))?.companyCd || null,
+          "inquiryType": this.selectedInquiryType, // 예: 'Q1'
+          "inquiryPart": this.selectedCategory,    // 예: 'ERP'
+          "priority": this.selectedPriority        // 예: 'P1'
         };
 
         // 게시글 등록 및 seq 값 반환
@@ -568,8 +516,7 @@ export default {
         this.$router.push({ name: 'CA1000_10' });
 
       } catch (error) {
-        // 전역 에러 처리
-        this.handleError(error);
+        console.error(error);
       } finally {
         this.loading = false;
       }
@@ -604,7 +551,32 @@ export default {
 
       this.selectedManager = selectedManager;
       // console.log(selectedManager);
-    }
+    },
+    async getCodes() {
+      try {
+        // 문의유형
+        const inquiryRes = await apiClient.get("/api/code/list", {
+          params: { category: 'INQUIRY_TYPE' }
+        });
+        this.inquiryTypeList = inquiryRes.data;
+
+        // 문의부문
+        const categoryRes = await apiClient.get("/api/code/list", {
+          params: { category: 'INQUIRY_PART' }
+        });
+        this.categoryList = categoryRes.data;
+
+        // 중요도
+        const priorityRes = await apiClient.get("/api/code/list", {
+          params: { category: 'PRIORITY' }
+        });
+        this.priorityList = priorityRes.data;
+
+      } catch (error) {
+        console.error('코드 리스트 조회 실패:', error);
+      }
+    },
+
   }
 }
 </script>

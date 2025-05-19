@@ -17,10 +17,6 @@ public class StatusService {
         this.statusRepository = statusRepository;
     }    
 
-    public List<StatusDTO> getAllStatuses() {
-    	 return statusRepository.getAllStatuses();
-    }
-
     public void updateStatus(RequireDTO require) { 
 //    	System.out.println("-- require --");
 //    	System.out.println(require);
