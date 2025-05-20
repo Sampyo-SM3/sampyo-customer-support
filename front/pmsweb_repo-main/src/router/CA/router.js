@@ -5,6 +5,7 @@ import CA_PostEditSrForm from '@/views/CA/CA_PostEditSrForm.vue'
 import CA_PostDetailSrForm from '@/views/CA/CA_PostDetailSrForm.vue'
 import CA_PostDetailForm from '@/views/CA/CA_PostDetailForm.vue'
 import CA2000_10 from '@/views/CA/CA2000_10.vue'
+import CA_LibraryCreateForm from '@/views/CA/CA_LibraryCreateForm.vue'
 
 export const caRoutes = [
   {
@@ -44,6 +45,12 @@ export const caRoutes = [
     path: 'CA_PostEditSrForm/:receivedSeq?',
     name: 'CA_PostEditSrForm',
     component: CA_PostEditSrForm,
+    props: true
+  },
+  {
+    path: 'CA_LibraryCreateForm',
+    name: 'CA_LibraryCreateForm',
+    component: CA_LibraryCreateForm,
     props: true
   }
 ]

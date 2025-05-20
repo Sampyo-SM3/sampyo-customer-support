@@ -915,7 +915,7 @@ export default {
 .table-header,
 .table-row {
   display: grid;
-  grid-template-columns: 60px 80px 100px 1fr 100px 100px 100px 120px 100px 90px 100px;
+  grid-template-columns: 60px 80px 100px 1fr 120px 100px 120px 120px 100px 90px 100px;
 }
 
 .table-header {

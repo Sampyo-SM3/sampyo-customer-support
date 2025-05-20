@@ -1,164 +1,117 @@
 <template>
-  <v-container fluid class="pr-0 pl-0 pt-4">
-    <v-row>
-      <v-col>
-        <div style="margin-top:-10px;">
-          <v-divider thickness="3" color="#578ADB"></v-divider>
-        </div>
+  <!-- 상단 라인 -->
+  <v-row>
+    <v-col>
+      <v-divider thickness="3" color="#578ADB" class="mb-4"></v-divider>
+    </v-col>
+  </v-row>
+
+  <v-container fluid class="pr-4 pl-4 pt-4">
+
+    <!-- 총 건수 및 검색 영역 -->
+    <v-row dense align="center" class="flex-wrap mb-2" style="gap: 8px;">
+      <v-col cols="12" sm="6" md="4" class="d-flex align-center">
+        <span class="text-subtitle-2 text-grey">총&nbsp;</span>
+        <span class="text-subtitle-2 font-weight-bold">{{ totalItems }}</span>
+        <span class="text-subtitle-2 text-grey">건</span>
       </v-col>
-    </v-row>
-    <br>
-    <v-row dense align="center" class="flex-wrap justify-end" style="gap:5px;">
-      <!-- 제목 -->
-      <v-col cols="12" sm="6" md="auto" class="d-flex align-center filter-col">
+
+      <v-spacer></v-spacer>
+
+      <v-col cols="12" sm="6" md="4" class="d-flex justify-end align-center">
         <span class="filter-label">제목<span class="label-divider"></span></span>
         <v-text-field v-model="sub" @keydown.enter="fetchData" variant="outlined" density="compact" hide-details
           class="filter-input-sub" append-inner-icon="mdi-magnify" />
       </v-col>
     </v-row>
 
-    <!-- 데이터 테이블 상단 버튼 영역 -->
-    <v-row class="top-button-row mb-2">
-      <v-col class="d-flex align-center">
-        <span class="mx-3">
-          <span class="text-subtitle-2 text-grey">총 </span>
-          <span class="text-subtitle-2 font-weight-bold">{{ totalItems }}</span>
-          <span class="text-subtitle-2 text-grey">건</span>
-        </span>
-
-        <v-spacer></v-spacer>
-
-        <v-btn variant="flat" color="green darken-2" class="custom-btn white-text d-flex align-center" size="small"
-          @click="$router.push({ name: 'CA_PostCreateForm' })">
-
-          <v-icon size="default" class="mr-1">mdi-pencil</v-icon>
-          게시글 작성
-        </v-btn>
-
-      </v-col>
-    </v-row>
-
-    <!-- 데이터 테이블 -->
-    <v-row class="grid-table ma-0 pa-0">
+    <!-- 테이블 -->
+    <v-row class="grid-table ma-0 pa-0 mt-4">
       <v-col class="pa-0">
-        <div class="table-container">
-          <!-- 테이블 헤더 -->
+        <div class="table-container compact">
           <div class="table-header">
-            <div class="th-cell checkbox-cell">
-              <v-checkbox hide-details density="compact" v-model="selectAll" @change="toggleSelectAll"></v-checkbox>
-            </div>
-            <div class="th-cell">접수번호</div>
             <div class="th-cell">요청일</div>
             <div class="th-cell">제목</div>
             <div class="th-cell">소속</div>
             <div class="th-cell">작성자</div>
           </div>
 
-          <!-- 테이블 데이터 행 -->
-          <div v-for="(item, index) in paginatedData" :key="index" class="table-row">
-            <div class="td-cell checkbox-cell">
-              <v-checkbox hide-details density="compact" v-model="item.selected"></v-checkbox>
-            </div>
-            <div class="td-cell">{{ item.seq }}</div>
-            <div class="td-cell">{{ formatDate(item.requestDate) }}</div>
+          <div v-for="(item, index) in paginatedData" :key="index" class="table-row compact">
+            <div class="td-cell seq-cell">{{ formatDate(item.requestDate) }}</div>
             <div class="td-cell title-cell">
               <router-link :to="{
-                name: (item.saveFlag === 'Y' && item.processState === 'S')
-                  ? 'CA_PostDetailSrForm'
-                  : 'CA_PostDetailForm',
+                name: (item.saveFlag === 'Y' && item.processState === 'S') ? 'CA_PostDetailSrForm' : 'CA_PostDetailForm',
                 params: { receivedSeq: item.seq }
-              }" class="title-link" style="display: inline-flex; align-items: center;">
-                {{ item.sub }}
-
-                <span v-if="item.countComment > 0" style="color: #737577;">&nbsp;[{{ item.countComment }}]</span>
-
-                <span v-if="item.new_yn === 'Y'">&nbsp;</span>
-                <v-img v-if="item.new_yn === 'Y'" src="@/assets/new-icon.png" alt="new" width="22" height="22"
-                  style="display: inline-block; vertical-align: middle;"></v-img>
+              }" class="title-link">
+                {{ item.sub }}<span v-if="item.countComment > 0" style="color: #737577;">&nbsp;[{{ item.countComment
+                }}]</span>
               </router-link>
             </div>
-            <div class="td-cell" style="text-align: center;">
-              {{ item.division }}<br>
-              {{ item.dpNm }}
-            </div>
-            <div class="td-cell">{{ item.uid }}</div>
-            <div class="td-cell">{{ item.inquiryType }}</div>
+            <div class="td-cell seq-cell">{{ item.uid }}</div>
+            <div class="td-cell seq-cell">{{ item.inquiryType }}</div>
           </div>
         </div>
 
-        <!-- 로딩 표시 -->
+        <!-- 로딩 -->
         <div v-if="loading" class="loading-overlay">
           <v-progress-circular indeterminate color="primary"></v-progress-circular>
         </div>
 
-        <!-- 데이터 없음 표시 -->
+        <!-- 데이터 없음 -->
         <div v-if="!loading && tableData.length === 0" class="no-data">
           조회된 데이터가 없습니다.
         </div>
 
         <!-- 페이지네이션 -->
         <div class="pagination-container" v-if="tableData.length > 0">
-          <v-btn icon="mdi-chevron-left" variant="text" size="small" :disabled="currentPage === 1"
+          <v-btn icon="mdi-chevron-left" variant="text" size="default" :disabled="currentPage === 1"
             @click="currentPage--"></v-btn>
 
           <template v-if="totalPages <= 5">
-            <v-btn v-for="page in totalPages" :key="page" size="small" :variant="currentPage === page ? 'flat' : 'text'"
-              :color="currentPage === page ? 'primary' : ''" @click="currentPage = page">
+            <v-btn v-for="page in totalPages" :key="page" class="pagination-btn mx-1"
+              :variant="currentPage === page ? 'flat' : 'text'" :color="currentPage === page ? 'primary' : ''"
+              @click="currentPage = page">
               {{ page }}
             </v-btn>
+
           </template>
 
           <template v-else>
-            <!-- 처음 페이지 -->
-            <v-btn v-if="currentPage > 3" size="small" variant="text" @click="currentPage = 1">
-              1
-            </v-btn>
-
-            <!-- 생략 표시 -->
+            <v-btn v-if="currentPage > 3" size="default" variant="text" @click="currentPage = 1">1</v-btn>
             <span v-if="currentPage > 3" class="mx-1">...</span>
-
-            <!-- 이전 페이지 -->
-            <v-btn v-if="currentPage > 1" size="small" variant="text" @click="currentPage = currentPage - 1">
-              {{ currentPage - 1 }}
-            </v-btn>
-
-            <!-- 현재 페이지 -->
-            <v-btn size="small" variant="flat" color="primary">
-              {{ currentPage }}
-            </v-btn>
-
-            <!-- 다음 페이지 -->
-            <v-btn v-if="currentPage < totalPages" size="small" variant="text" @click="currentPage = currentPage + 1">
-              {{ currentPage + 1 }}
-            </v-btn>
-
-            <!-- 생략 표시 -->
+            <v-btn v-if="currentPage > 1" size="default" variant="text" @click="currentPage = currentPage - 1">{{
+              currentPage - 1 }}</v-btn>
+            <v-btn size="default" variant="flat" color="primary">{{ currentPage }}</v-btn>
+            <v-btn v-if="currentPage < totalPages" size="default" variant="text"
+              @click="currentPage = currentPage + 1">{{ currentPage + 1 }}</v-btn>
             <span v-if="currentPage < totalPages - 2" class="mx-1">...</span>
-
-            <!-- 마지막 페이지 -->
-            <v-btn v-if="currentPage < totalPages - 2" size="small" variant="text" @click="currentPage = totalPages">
-              {{ totalPages }}
-            </v-btn>
+            <v-btn v-if="currentPage < totalPages - 2" size="default" variant="text"
+              @click="currentPage = totalPages">{{ totalPages }}</v-btn>
           </template>
 
-          <v-btn icon="mdi-chevron-right" variant="text" size="small" :disabled="currentPage === totalPages"
+          <v-btn icon="mdi-chevron-right" variant="text" size="default" :disabled="currentPage === totalPages"
             @click="currentPage++"></v-btn>
         </div>
       </v-col>
     </v-row>
+
+    <!-- 플로팅 버튼 -->
+    <v-btn icon color="green" class="fab-btn" @click="$router.push({ name: 'CA_LibraryCreateForm' })">
+      <v-icon>mdi-pencil</v-icon>
+    </v-btn>
+
+    <!-- 스낵바 -->
+    <v-snackbar v-model="showError" color="warning" timeout="5000" location="center" elevation="8" variant="elevated">
+      {{ errorMessages[0] }}
+      <template v-slot:actions>
+        <v-btn variant="text" @click="showError = false">닫기</v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
-
-  <!-- 스낵바로 오류 메시지 표시 -->
-  <v-snackbar v-model="showError" color="warning" timeout="5000" location="center" elevation="8" variant="elevated">
-    {{ errorMessages[0] }}
-
-    <template v-slot:actions>
-      <v-btn variant="text" @click="showError = false">
-        닫기
-      </v-btn>
-    </template>
-  </v-snackbar>
 </template>
+
+
+
 
 <script>
 import apiClient from '@/api';
@@ -194,7 +147,6 @@ export default {
     return {
       sub: '',
       countComment: 0,
-      new_yn: 'n',
       dateRange: 'month',
       productType: 'test1',
       tableData: [],
@@ -272,13 +224,7 @@ export default {
         // API 응답 데이터 처리
         if (response.data && Array.isArray(response.data)) {
 
-
           this.tableData = response.data.map(item => {
-            const requestDateTime = new Date(item.requestDateTime);
-            const now = new Date();
-            const diffTime = now - requestDateTime;
-            const diffHours = diffTime / (1000 * 60 * 60);
-
 
             return {
               ...item,
@@ -293,10 +239,6 @@ export default {
                       : '상신 전'
                   ) + ')' || this.getRandomStatus())
                 : (item.statusNm || this.getRandomStatus()),
-
-
-              // 24시간 이내 여부에 따라 new_yn 설정
-              new_yn: diffHours < 24 ? 'Y' : 'N',
 
               // 테이블에 표시할 데이터 매핑
               manager: item.manager || '-',  // 담당자 필드가 없어서 임시로 요청자 ID 사용
@@ -330,13 +272,6 @@ export default {
       return `${year}-${month}-${day}`;
     },
 
-    // 전체 선택/해제 토글
-    toggleSelectAll() {
-      // 현재 페이지의 항목만 선택/해제
-      this.paginatedData.forEach(item => {
-        item.selected = this.selectAll;
-      });
-    },
   }
 }</script>
 
@@ -417,7 +352,7 @@ export default {
 .table-header,
 .table-row {
   display: grid;
-  grid-template-columns: 60px 80px 100px 1fr 100px 100px 100px 120px 100px 90px 100px;
+  grid-template-columns: 150px 1fr 150px 150px;
 }
 
 .table-header {
@@ -425,6 +360,7 @@ export default {
   font-weight: 500;
   border-bottom: 1px solid #e0e0e0;
   color: #3E4B5B !important;
+  min-height: 50px;
 }
 
 .table-row {
@@ -479,7 +415,18 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 10px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.pagination-btn {
+  width: 36px;
+  height: 36px;
+  min-width: 36px !important;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 14px;
 }
 
 .loading-overlay {
@@ -523,7 +470,7 @@ export default {
 }
 
 .filter-input-sub {
-  width: 220px;
+  width: 200px;
   margin-right: 6px;
   color: #5271C1;
 }
@@ -582,5 +529,20 @@ export default {
   vertical-align: middle;
   width: 2px;
   background-color: #B0CAE6;
+}
+
+.fab-btn {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  border-radius: 50%;
+  height: 56px;
+  width: 56px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+
+.seq-cell {
+  justify-content: center;
 }
 </style>

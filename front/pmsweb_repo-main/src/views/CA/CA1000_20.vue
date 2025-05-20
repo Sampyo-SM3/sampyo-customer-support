@@ -1,12 +1,9 @@
 <template>
+  <div>
+    <v-divider thickness="3" color="#578ADB"></v-divider>
+  </div>
+
   <v-container fluid>
-    <v-row>
-      <v-col>
-        <div style="margin-top:-10px;">
-          <v-divider thickness="3" color="#578ADB"></v-divider>
-        </div>
-      </v-col>
-    </v-row>
     <br>
     <div class="d-flex">
       <div style="flex: 2; margin-right: 20px; padding-left: 70px;">
