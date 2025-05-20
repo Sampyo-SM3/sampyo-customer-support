@@ -97,6 +97,7 @@ C:\Users\user\AppData\Local\Temp\tomcat.8080.8623853284345763014\work\Tomcat\loc
         <div class="author-value">{{ inquiry.priority }}</div>
       </v-col>
     </v-row>
+
     <v-row no-gutters class="search-row middle-row">
       <v-col class="search-col product-category">
         <div class="label-box">담당자</div>
@@ -883,14 +884,13 @@ export default {
   /* height: 42px;   */
 }
 
-
 .save-status-btn {
   height: 42px;
   min-width: 60px;
   font-size: 14px;
   border-radius: 6px;
   margin-bottom: 15px;
-  border-width: 1.5px;
+  border-width: 1px;
 }
 
 .goBack-btn {

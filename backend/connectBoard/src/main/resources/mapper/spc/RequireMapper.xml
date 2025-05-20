@@ -26,7 +26,7 @@
 		    b.completeDt,
 		    b.srFlag,
 		    b.saveFlag,
-		    b.inquiryType,
+		    (SELECT codeName FROM CODE_MASTER WHERE codeId = b.inquiryType) as inquiryType,
 		    b.inquiryPart,
 		    b.priority,
 		    (SELECT COUNT(*) FROM COMMENTS WHERE postid = b.seq) as countComment   	
