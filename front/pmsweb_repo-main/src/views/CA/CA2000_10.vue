@@ -1,479 +1,586 @@
 <template>
-  <v-container fluid class="pr-5 pl-5 pt-7">
-
-    <!-- test -->
-    <v-btn @click="test()">SR요청서 띄우기 테스트</v-btn>
-    <br>
-    <br>
-    <v-btn @click="test2()">알림톡테스트</v-btn>
-    <br>
-    <br>
-    <v-btn @click="test3()">메일테스트</v-btn>
-    <br>
-    <br>
-
-    <!-- 파일 업로드 컴포넌트 -->
-    <v-card class="pa-4 mb-6">
-      <v-card-title>파일 첨부 테스트</v-card-title>
-      <v-card-text>
-        <v-file-input v-model="newFiles" :rules="fileRules" accept="image/png, image/jpeg, application/pdf"
-          label="파일 선택" placeholder="파일을 선택하세요" prepend-icon="mdi-paperclip" show-size counter multiple
-          truncate-length="25" :loading="isFileLoading" @change="handleFileChange"></v-file-input>
-
-        <!-- 선택된 파일 목록 (아직 업로드되지 않은 파일) -->
-        <div v-if="selectedFiles.length > 0" class="mt-4">
-          <h3 class="text-subtitle-1 mb-2">선택된 파일</h3>
-          <div class="selected-files">
-            <div v-for="(file, index) in selectedFiles" :key="index" class="d-flex align-center py-2 border-bottom">
-              <v-icon :icon="getFileIcon(file.type)" color="primary" class="me-2"></v-icon>
-              <div class="file-info flex-grow-1">
-                <div class="file-name text-body-1">{{ file.name }}</div>
-                <div class="file-size text-body-2 text-grey">{{ formatFileSize(file.size) }}</div>
-              </div>
-              <v-btn icon="mdi-delete" variant="text" color="error" density="compact"
-                @click="removeSelectedFile(index)"></v-btn>
-            </div>
-          </div>
+  <v-container fluid class="pr-0 pl-0 pt-4">
+    <v-row>
+      <v-col>
+        <div style="margin-top:-10px;">
+          <v-divider thickness="3" color="#578ADB"></v-divider>
         </div>
-      </v-card-text>
+      </v-col>
+    </v-row>
+    <br>
+    <v-row dense align="center" class="flex-wrap justify-end" style="gap:5px;">
+      <!-- 제목 -->
+      <v-col cols="12" sm="6" md="auto" class="d-flex align-center filter-col">
+        <span class="filter-label">제목<span class="label-divider"></span></span>
+        <v-text-field v-model="sub" @keydown.enter="fetchData" variant="outlined" density="compact" hide-details
+          class="filter-input-sub" append-inner-icon="mdi-magnify" />
+      </v-col>
+    </v-row>
 
-      <v-divider class="my-3"></v-divider>
+    <!-- 데이터 테이블 상단 버튼 영역 -->
+    <v-row class="top-button-row mb-2">
+      <v-col class="d-flex align-center">
+        <span class="mx-3">
+          <span class="text-subtitle-2 text-grey">총 </span>
+          <span class="text-subtitle-2 font-weight-bold">{{ totalItems }}</span>
+          <span class="text-subtitle-2 text-grey">건</span>
+        </span>
 
-      <v-card-text v-if="uploadedFiles.length > 0">
-        <h3 class="text-subtitle-1 mb-2">업로드된 파일 목록</h3>
-        <div class="selected-files mt-2">
-          <div v-for="(file, index) in uploadedFiles" :key="index" class="d-flex align-center py-2 border-bottom">
-            <v-icon :icon="getFileIcon(file.type)" color="primary" size="24" class="me-3"></v-icon>
-            <div class="file-info flex-grow-1">
-              <div class="file-name text-body-1 font-weight-medium">{{ file.name }}</div>
-              <div class="file-size text-body-2 text-grey">{{ formatFileSize(file.size) }}</div>
-            </div>
-            <v-btn icon="mdi-delete" variant="text" color="error" density="compact" @click="removeFile(index)"></v-btn>
-          </div>
-        </div>
-      </v-card-text>
-
-      <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" @click="uploadFiles" :disabled="!selectedFiles.length || isFileLoading"
-          :loading="isFileLoading">
-          업로드
-        </v-btn>
-      </v-card-actions>
-    </v-card>
 
-    <!-- 파일 중복 확인 대화상자 -->
-    <v-dialog v-model="showOverwriteDialog" max-width="500px">
-      <v-card>
-        <v-card-title class="text-h5">파일 덮어쓰기 확인</v-card-title>
-        <v-card-text>
-          <p>다음 파일이 이미 업로드 목록에 존재합니다:</p>
-          <div v-for="(file, index) in duplicateFiles" :key="index" class="my-2 pa-2 duplicate-file">
-            <v-icon :icon="getFileIcon(file.type)" color="warning" class="me-2"></v-icon>
-            <span class="font-weight-medium">{{ file.name }}</span>
+        <v-btn variant="flat" color="green darken-2" class="custom-btn white-text d-flex align-center" size="small"
+          @click="$router.push({ name: 'CA_PostCreateForm' })">
+
+          <v-icon size="default" class="mr-1">mdi-pencil</v-icon>
+          게시글 작성
+        </v-btn>
+
+      </v-col>
+    </v-row>
+
+    <!-- 데이터 테이블 -->
+    <v-row class="grid-table ma-0 pa-0">
+      <v-col class="pa-0">
+        <div class="table-container">
+          <!-- 테이블 헤더 -->
+          <div class="table-header">
+            <div class="th-cell checkbox-cell">
+              <v-checkbox hide-details density="compact" v-model="selectAll" @change="toggleSelectAll"></v-checkbox>
+            </div>
+            <div class="th-cell">접수번호</div>
+            <div class="th-cell">요청일</div>
+            <div class="th-cell">제목</div>
+            <div class="th-cell">소속</div>
+            <div class="th-cell">작성자</div>
           </div>
-          <p class="mt-4">파일을 덮어쓰시겠습니까?</p>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="error" variant="text" @click="cancelOverwrite">취소</v-btn>
-          <v-btn color="primary" variant="text" @click="confirmOverwrite">덮어쓰기</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+
+          <!-- 테이블 데이터 행 -->
+          <div v-for="(item, index) in paginatedData" :key="index" class="table-row">
+            <div class="td-cell checkbox-cell">
+              <v-checkbox hide-details density="compact" v-model="item.selected"></v-checkbox>
+            </div>
+            <div class="td-cell">{{ item.seq }}</div>
+            <div class="td-cell">{{ formatDate(item.requestDate) }}</div>
+            <div class="td-cell title-cell">
+              <router-link :to="{
+                name: (item.saveFlag === 'Y' && item.processState === 'S')
+                  ? 'CA_PostDetailSrForm'
+                  : 'CA_PostDetailForm',
+                params: { receivedSeq: item.seq }
+              }" class="title-link" style="display: inline-flex; align-items: center;">
+                {{ item.sub }}
+
+                <span v-if="item.countComment > 0" style="color: #737577;">&nbsp;[{{ item.countComment }}]</span>
+
+                <span v-if="item.new_yn === 'Y'">&nbsp;</span>
+                <v-img v-if="item.new_yn === 'Y'" src="@/assets/new-icon.png" alt="new" width="22" height="22"
+                  style="display: inline-block; vertical-align: middle;"></v-img>
+              </router-link>
+            </div>
+            <div class="td-cell" style="text-align: center;">
+              {{ item.division }}<br>
+              {{ item.dpNm }}
+            </div>
+            <div class="td-cell">{{ item.uid }}</div>
+            <div class="td-cell">{{ item.inquiryType }}</div>
+          </div>
+        </div>
+
+        <!-- 로딩 표시 -->
+        <div v-if="loading" class="loading-overlay">
+          <v-progress-circular indeterminate color="primary"></v-progress-circular>
+        </div>
+
+        <!-- 데이터 없음 표시 -->
+        <div v-if="!loading && tableData.length === 0" class="no-data">
+          조회된 데이터가 없습니다.
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div class="pagination-container" v-if="tableData.length > 0">
+          <v-btn icon="mdi-chevron-left" variant="text" size="small" :disabled="currentPage === 1"
+            @click="currentPage--"></v-btn>
+
+          <template v-if="totalPages <= 5">
+            <v-btn v-for="page in totalPages" :key="page" size="small" :variant="currentPage === page ? 'flat' : 'text'"
+              :color="currentPage === page ? 'primary' : ''" @click="currentPage = page">
+              {{ page }}
+            </v-btn>
+          </template>
+
+          <template v-else>
+            <!-- 처음 페이지 -->
+            <v-btn v-if="currentPage > 3" size="small" variant="text" @click="currentPage = 1">
+              1
+            </v-btn>
+
+            <!-- 생략 표시 -->
+            <span v-if="currentPage > 3" class="mx-1">...</span>
+
+            <!-- 이전 페이지 -->
+            <v-btn v-if="currentPage > 1" size="small" variant="text" @click="currentPage = currentPage - 1">
+              {{ currentPage - 1 }}
+            </v-btn>
+
+            <!-- 현재 페이지 -->
+            <v-btn size="small" variant="flat" color="primary">
+              {{ currentPage }}
+            </v-btn>
+
+            <!-- 다음 페이지 -->
+            <v-btn v-if="currentPage < totalPages" size="small" variant="text" @click="currentPage = currentPage + 1">
+              {{ currentPage + 1 }}
+            </v-btn>
+
+            <!-- 생략 표시 -->
+            <span v-if="currentPage < totalPages - 2" class="mx-1">...</span>
+
+            <!-- 마지막 페이지 -->
+            <v-btn v-if="currentPage < totalPages - 2" size="small" variant="text" @click="currentPage = totalPages">
+              {{ totalPages }}
+            </v-btn>
+          </template>
+
+          <v-btn icon="mdi-chevron-right" variant="text" size="small" :disabled="currentPage === totalPages"
+            @click="currentPage++"></v-btn>
+        </div>
+      </v-col>
+    </v-row>
   </v-container>
+
+  <!-- 스낵바로 오류 메시지 표시 -->
+  <v-snackbar v-model="showError" color="warning" timeout="5000" location="center" elevation="8" variant="elevated">
+    {{ errorMessages[0] }}
+
+    <template v-slot:actions>
+      <v-btn variant="text" @click="showError = false">
+        닫기
+      </v-btn>
+    </template>
+  </v-snackbar>
 </template>
 
 <script>
 import apiClient from '@/api';
+import { inject, onMounted } from 'vue';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 export default {
+  components: {
+
+  },
+  setup() {
+    const extraBreadcrumb = inject('extraBreadcrumb', null);
+    const listButtonLink = inject('listButtonLink', null);
+    onMounted(() => {
+      if (extraBreadcrumb) {
+        extraBreadcrumb.value = null;
+      }
+
+      if (listButtonLink) {
+        listButtonLink.value = null;
+      }
+    });
+
+    return {};
+  },
+  unmounted() { // ❗ 컴포넌트가 언마운트될 때
+    const listButtonLink = inject('listButtonLink', null);
+    if (listButtonLink) {
+      listButtonLink.value = null; // 🔥 페이지 벗어날 때 목록버튼 없애기
+    }
+  },
   data() {
     return {
-      isLoading: false,
-      progressStatuses: [],
-      // 파일 업로드 관련 데이터
-      newFiles: [], // 새로 선택한 파일 (v-file-input에 연결됨)
-      selectedFiles: [], // 업로드 대기 중인 파일들
-      uploadedFiles: [], // 이미 업로드된 파일들
-      isFileLoading: false,
-      fileRules: [
-        value => {
-          return !value || !value.length || value[0].size < 5000000 || '파일 크기는 5MB 이하여야 합니다.';
-        },
-      ],
-      // 파일 덮어쓰기 관련
-      showOverwriteDialog: false,
-      duplicateFiles: [],
-      pendingFiles: [] // 덮어쓰기 대기 중인 파일들
+      sub: '',
+      countComment: 0,
+      new_yn: 'n',
+      dateRange: 'month',
+      productType: 'test1',
+      tableData: [],
+      loading: false,
+      selectAll: false,
+      // 페이징 관련 변수
+      currentPage: 1,
+      itemsPerPage: 10,
+      processState: '',
+      errorMessages: [],
+      showError: false,
+      savedMidMenu: '',
+      savedSubMenu: '',
     }
   },
 
+  computed: {
+    // 전체 페이지 수 계산
+    totalPages() {
+      return Math.ceil(this.tableData.length / this.itemsPerPage);
+    },
+
+    // 현재 페이지에 표시할 데이터
+    paginatedData() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.tableData.slice(start, end);
+    },
+
+    // 전체 아이템 수
+    totalItems() {
+      return this.tableData.length;
+    }
+  },
+
+  watch: {
+    // API 파라미터가 변경되면 데이터 다시 로드
+    startDate() {
+      this.currentPage = 1; // 검색 조건 변경 시 첫 페이지로 리셋      
+    },
+    endDate() {
+      this.currentPage = 1;
+    },
+  },
+
+  mounted() {
+    this.fetchData();
+    this.checkLocalStorage();
+  },
+
   methods: {
-    test() {
-      console.log('--test--');
+    checkLocalStorage() {
+      const midMenuFromStorage = localStorage.getItem('midMenu');
+      const subMenuFromStorage = localStorage.getItem('subMenu');
 
-      try {
-        // 폼 타입 결정        
-        const baseUrl = 'https://bluesam.sampyo.co.kr/WebSite/Approval/Forms/FormLinkForLEGACY.aspx'
-        const params = {
-          key: '111',  // board seq번호
-          empno: 'SPH221342320005', // 사원번호
-          legacy_form: 'WF_FORM_SRTEST',
-          datatype: 'xml',  // 데이터 타입          
-          // seq: '111', // 프로시저 호출되는 ip          
-          // DATE_TEST: '111',  // board seq번호
-          ip: '10.50.20.71', // 프로시저 호출되는 ip          
-          db: 'SPC_TEST'     // 프로시저 호출되는 db
-        };
-
-        // 쿼리 파라미터 문자열 생성
-        const queryString = new URLSearchParams(params).toString()
-        const fullUrl = `${baseUrl}?${queryString}`
-
-        // 새 창에서 URL 열기
-        window.open(fullUrl, '_blank')
-      } catch (error) {
-        console.error('상신 처리 중 오류 발생:', error)
-      }
+      this.savedMidMenu = midMenuFromStorage ? JSON.parse(midMenuFromStorage) : null;
+      this.savedSubMenu = subMenuFromStorage ? JSON.parse(subMenuFromStorage) : null;
     },
 
-    async test2() {
-      try {
-        this.isLoading = true;
-
-        const errorMessage = '2024-01-01 00:00:00\n' +
-          'test\n' +
-          '오류가 발생했습니다.';
-
-        const response = await apiClient.post('/api/kakao', {
-          content: errorMessage
-        });
-
-        if (response.data) {
-          console.log(response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching user info:', error);
-        this.error = '사용자 정보를 가져오는 중 오류가 발생했습니다';
-      } finally {
-        this.isLoading = false;
-      }
-    },
-
-    async test3() {
-      this.isLoading = true;
+    // API 호출하여 데이터 가져오기
+    async fetchData() {
+      this.loading = true;
 
       try {
-        // FormData 생성
-        const formData = new FormData();
-        formData.append('to', 'javachohj@sampyo.co.kr');
-        formData.append('subject', 'test');
-        formData.append('message', 'test');
-
-        // API 호출
-        const response = await apiClient.post('/api/email/send', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
+        // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
+        const response = await apiClient.get('/api/require/search', {
+          params: {
+            manager: this.manager,
+            sub: this.sub,
+            status: this.selectedStatus,
+            dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
           }
         });
 
-        // 성공 처리                    
-        console.log(response.data);
-      } catch (error) {
-        console.error('이메일 전송 실패:', error);
-      } finally {
-        this.isLoading = false;
-      }
-    },
-
-    // 파일 타입에 따른 아이콘 반환
-    getFileIcon(fileType) {
-      if (fileType.includes('image')) {
-        return 'mdi-file-image';
-      } else if (fileType.includes('pdf')) {
-        return 'mdi-file-pdf';
-      } else {
-        return 'mdi-file-document';
-      }
-    },
-
-    // 파일 크기 포맷
-    formatFileSize(size) {
-      if (size < 1024) {
-        return size + ' B';
-      } else if (size < 1024 * 1024) {
-        return (size / 1024).toFixed(2) + ' KB';
-      } else {
-        return (size / (1024 * 1024)).toFixed(2) + ' MB';
-      }
-    },
-
-    // 파일 선택 변경 처리
-    handleFileChange(event) {
-      console.log('--handleFileChange--');
-      console.log('이벤트 객체:', event);
-
-      // 파일은 v-model에 바인딩된 newFiles에서 가져옵니다
-      const files = this.newFiles;
-      console.log('newFiles:', files);
-
-      if (!files || (Array.isArray(files) && files.length === 0)) {
-        console.log('선택된 파일 없음');
-        return;
-      }
-
-      if (Array.isArray(files)) {
-        console.log('여러 파일이 선택됨:', files.length);
-        files.forEach((file, index) => {
-          console.log(`파일[${index}] 이름:`, file.name);
-
-          // 중복 파일 검사 (selectedFiles 내에서)
-          const existingSelectedIndex = this.selectedFiles.findIndex(f => f.name === file.name);
-          if (existingSelectedIndex !== -1) {
-            // 선택된 파일 목록에서 중복된 파일 교체
-            this.selectedFiles.splice(existingSelectedIndex, 1, file);
-          } else {
-            // 새 파일 추가
-            this.selectedFiles.push(file);
-          }
-        });
-      } else {
-        console.log('단일 파일 선택됨 이름:', files.name);
-
-        // 중복 파일 검사 (selectedFiles 내에서)
-        const existingSelectedIndex = this.selectedFiles.findIndex(f => f.name === files.name);
-        if (existingSelectedIndex !== -1) {
-          // 선택된 파일 목록에서 중복된 파일 교체
-          this.selectedFiles.splice(existingSelectedIndex, 1, files);
-        } else {
-          // 새 파일 추가
-          this.selectedFiles.push(files);
-        }
-      }
-
-      // 파일 선택 컨트롤 초기화
-      this.newFiles = [];
-    },
-
-    // 선택된 파일 제거 (아직 업로드되지 않은 파일)
-    removeSelectedFile(index) {
-      this.selectedFiles.splice(index, 1);
-    },
-
-    // 업로드된 파일 제거
-    removeFile(index) {
-      console.log('--removeFile--');
-      console.log(this.uploadedFiles[index].name);
-      this.test4(this.uploadedFiles[index].name);
+        // API 응답 데이터 처리
+        if (response.data && Array.isArray(response.data)) {
 
 
-      this.uploadedFiles.splice(index, 1);
-    },
+          this.tableData = response.data.map(item => {
+            const requestDateTime = new Date(item.requestDateTime);
+            const now = new Date();
+            const diffTime = now - requestDateTime;
+            const diffHours = diffTime / (1000 * 60 * 60);
 
-    // 파일명 중복 확인
-    checkDuplicateFiles() {
-      const duplicates = [];
 
-      // selectedFiles의 각 파일이 uploadedFiles에 이미 존재하는지 확인
-      this.selectedFiles.forEach(selectedFile => {
-        const isDuplicate = this.uploadedFiles.some(uploadedFile =>
-          uploadedFile.name === selectedFile.name
-        );
+            return {
+              ...item,
+              selected: false,
+              // API에서 진행상태가 오지 않으면 임의로 설정
+              status: item.processState === 'S'
+                ? (item.statusNm + ' (' +
+                  (item.srFlag === 'Y'
+                    ? '상신완료'
+                    : item.srFlag === 'F'
+                      ? '반려'
+                      : '상신 전'
+                  ) + ')' || this.getRandomStatus())
+                : (item.statusNm || this.getRandomStatus()),
 
-        if (isDuplicate) {
-          duplicates.push(selectedFile);
-        }
-      });
 
-      return duplicates;
-    },
+              // 24시간 이내 여부에 따라 new_yn 설정
+              new_yn: diffHours < 24 ? 'Y' : 'N',
 
-    // 파일 업로드 처리
-    async uploadFiles() {
-      console.log('--uploadFiles--');
-      console.log(this.selectedFiles);
-      if (!this.selectedFiles.length) return;
-
-      // 파일명 중복 확인
-      const duplicateFiles = this.checkDuplicateFiles();
-
-      if (duplicateFiles.length > 0) {
-        // 중복 파일이 있을 경우 확인 대화상자 표시
-        this.duplicateFiles = duplicateFiles;
-        this.pendingFiles = this.selectedFiles.filter(file =>
-          !duplicateFiles.some(dupFile => dupFile.name === file.name)
-        );
-        this.showOverwriteDialog = true;
-        return;
-      }
-
-      // 중복 파일이 없으면 바로 업로드 진행
-      await this.processUpload(this.selectedFiles);
-    },
-
-    // 덮어쓰기 취소
-    cancelOverwrite() {
-      this.showOverwriteDialog = false;
-
-      // 중복되지 않은 파일만 업로드 진행
-      if (this.pendingFiles.length > 0) {
-        this.processUpload(this.pendingFiles);
-      }
-
-      // 상태 초기화
-      this.duplicateFiles = [];
-      this.pendingFiles = [];
-    },
-
-    // 덮어쓰기 확인
-    confirmOverwrite() {
-      this.showOverwriteDialog = false;
-
-      // 중복 파일 제거 (기존 업로드 파일에서)
-      this.duplicateFiles.forEach(dupFile => {
-        const index = this.uploadedFiles.findIndex(f => f.name === dupFile.name);
-        if (index !== -1) {
-          this.uploadedFiles.splice(index, 1);
-        }
-      });
-
-      // 모든 선택된 파일 업로드 진행
-      this.processUpload(this.selectedFiles);
-
-      // 상태 초기화
-      this.duplicateFiles = [];
-      this.pendingFiles = [];
-    },
-
-    // 실제 파일 업로드 처리
-    async processUpload(filesToUpload) {
-      if (!filesToUpload.length) return;
-
-      this.isFileLoading = true;
-
-      try {
-        // FormData 생성
-        const formData = new FormData();
-
-        // 백엔드에서 @RequestParam("files")로 받기 때문에 모든 파일을 'files' 이름으로 추가
-        filesToUpload.forEach((file) => {
-          formData.append('files', file);
-        });
-
-        // API 호출 - 백엔드 컨트롤러 경로와 일치하도록 설정
-        const response = await apiClient.post('/api/fileUpload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-
-        // 업로드 성공 처리
-        if (response.data && response.data.result === 'success') {
-          console.log('파일 업로드 성공:', response.data);
-
-          // 백엔드에서 반환한 파일 목록 정보를 사용할 수 있습니다
-          const uploadedFileList = response.data.files || [];
-          console.log('업로드된 파일 목록:', uploadedFileList);
-          console.log('총 업로드 목록 ', this.uploadedFiles);
-
-          // 업로드 성공한 파일을 목록에 추가
-          filesToUpload.forEach(file => {
-            this.uploadedFiles.push({
-              name: file.name,
-              size: file.size,
-              type: file.type
-            });
+              // 테이블에 표시할 데이터 매핑
+              manager: item.manager || '-',  // 담당자 필드가 없어서 임시로 요청자 ID 사용
+              memo: item.currentIssue || '-', // 메모 필드가 없어서 임시로 현재 이슈 사용              
+            };
           });
 
-          // 업로드된 파일을 선택된 파일 목록에서 제거
-          this.selectedFiles = this.selectedFiles.filter(selectedFile =>
-            !filesToUpload.some(uploadedFile => uploadedFile.name === selectedFile.name)
-          );
-        }
-      } catch (error) {
-        console.error('파일 업로드 오류:', error);
-        alert('파일 업로드 중 오류가 발생했습니다.');
-      } finally {
-        this.isFileLoading = false;
-      }
-    },
-
-    // 파일 삭제 확인
-    async test4(para_file_name) {
-      this.showDeleteDialog = false;
-      this.deletingFile = para_file_name;
-
-      try {
-        // FormData 사용하지 않고 URL에 파라미터 포함
-        const response = await apiClient.post(`/api/fileDelete?originFile=${encodeURIComponent(this.deletingFile)}`);
-        console.log('response -> ' + response.data.result);
-
-        // 삭제 성공 처리
-        if (response.data.result === 'success') {
-          // 파일 목록에서 삭제된 파일 제거
-          // this.files = this.files.filter(file => file.originFile !== this.fileToDelete);
-
+          // 서버 측 페이징 구현시 전체 개수 설정 (API 응답에서 받아야 함)
+          // this.totalItems = response.data.totalItems;
         } else {
-          throw new Error(response.data.message || '파일 삭제에 실패했습니다.');
+          this.tableData = [];
         }
-      } catch (error) {
-        console.error('파일 삭제 중 오류 발생:', error);
 
+
+
+      } catch (error) {
+        console.error('데이터 로드 중 오류 발생:', error);
       } finally {
-        this.deletingFile = null;
+        this.loading = false;
       }
     },
-    async getStatus() {
-      try {
-        const statusList = await apiClient.get("/api/code/list", {
-          params: {
-            category: 'STATUS'
-          }
-        });
+    // 날짜 포맷 함수 (ISO 문자열 -> YYYY-MM-DD 형식)
+    formatDate(dateString) {
+      if (!dateString) return '-';
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '-';
 
-        // 상태 이름 리스트 저장
-        this.progressStatuses = statusList.data.map(status => ({
-          text: status.codeName,  // UI에 표시할 값
-          value: status.codeId    // 실제 선택될 값
-        }));
-
-      } catch (error) {
-        console.error("❌ 오류 발생:", error);
-      }
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
     },
-  },
-  mounted() {
-    this.getStatus();
-  },
-}
-</script>
+
+    // 전체 선택/해제 토글
+    toggleSelectAll() {
+      // 현재 페이지의 항목만 선택/해제
+      this.paginatedData.forEach(item => {
+        item.selected = this.selectAll;
+      });
+    },
+  }
+}</script>
 
 <style scoped>
-.selected-files {
+:deep(.dp__input) {
+  border: none;
+  box-shadow: none;
+  color: #7a7a7a;
+}
+
+:deep(.dp__main) {
+  font-family: inherit;
+  border-radius: 8px;
+  z-index: 100;
+}
+
+:deep(.dp__theme_light) {
+  --dp-primary-color: #2196F3;
+  --dp-border-radius: 8px;
+}
+
+:deep(.dp__overlay_cell_active) {
+  background-color: var(--dp-primary-color);
+  color: white;
+}
+
+.breadcrumb-div {
+  font-size: 12px;
+  color: #A1A6A6;
+}
+
+.title-search {
+  padding-block: 10px;
+  padding-left: 10px;
+  width: 800px;
+  font-weight: 400;
+}
+
+.custom-btn {
+  font-size: 14px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.date-btn {
+  min-width: 48px;
+  padding: 0 12px;
+  height: 32px;
+  letter-spacing: -0.5px;
+  border: 1px solid #eaeaea;
+  border-radius: 0;
+  background-color: #ffffff;
+  color: #7A7A7A;
+  box-shadow: none;
+  margin: 0;
+}
+
+.v-col.pa-0 {
+  height: 100%;
+}
+
+.top-button-row {
+  margin-bottom: 8px;
+}
+
+.white-text {
+  color: white !important;
+}
+
+.table-container {
   border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  width: 100%;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table-header,
+.table-row {
+  display: grid;
+  grid-template-columns: 60px 80px 100px 1fr 100px 100px 100px 120px 100px 90px 100px;
+}
+
+.table-header {
+  background-color: #D0DFF1;
+  font-weight: 500;
+  border-bottom: 1px solid #e0e0e0;
+  color: #3E4B5B !important;
+}
+
+.table-row {
+  border-bottom: 1px solid #e0e0e0;
+  height: 54px;
+  color: #5B5D60;
+  font-size: 15px;
+}
+
+.table-row:hover {
   background-color: #f9f9f9;
 }
 
-.selected-files>div {
-  border-bottom: 1px solid #e0e0e0;
+.th-cell,
+.td-cell {
   padding: 8px 12px;
+  border-right: none;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
 }
 
-.selected-files>div:last-child {
-  border-bottom: none;
-}
-
-.file-name {
+.th-cell {
+  justify-content: center;
   font-weight: 500;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.checkbox-cell {
+  flex: 0 0 40px;
+  justify-content: center;
+}
+
+.title-cell {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  padding-left: 12px;
 }
 
-.file-size {
+.title-link {
+  color: #1976d2;
+  text-decoration: none;
+}
+
+.title-link:hover {
+  text-decoration: underline;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+}
+
+.no-data {
+  padding: 30px;
+  text-align: center;
   color: #757575;
-  font-size: 0.85rem;
+  font-size: 14px;
+}
+
+
+.filter-label {
+  font-size: 14.5px;
+  min-width: 45px;
+  font-weight: 500;
+  color: #005bac;
+  margin-left: 10px;
+  margin-right: 0px;
+}
+
+
+.filter-label::after {
+  content: "";
+  height: 16px;
+  width: 1px;
+  background: #ddd;
+  margin-top: 13px;
+  margin-left: 11px;
+}
+
+.filter-input-sub {
+  width: 220px;
+  margin-right: 6px;
+  color: #5271C1;
+}
+
+.date-btn {
+  font-size: 12px;
+  height: 32px;
+  min-width: 56px;
+}
+
+.search-btn {
+  color: white;
+  font-weight: 500;
+  height: 36px;
+  min-width: 64px;
+}
+
+.v-btn.date-btn {
+  margin-top: 2px;
+  /* 버튼 살짝 내려서 정렬 */
+  padding: 0 8px;
+  font-size: 13px;
+}
+
+.v-btn.search-btn {
+  margin-top: 2px;
+  /* 검색 버튼도 아래 요소와 정렬 */
+}
+
+.filter-col {
+  height: 50px;
+  border: 1.5px solid #D0DFF1;
+  border-radius: 8px;
+  background-color: white;
+}
+
+.rounded-border {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #D0DFF1;
+  border-radius: 8px;
+  background-color: rgba(208, 223, 241, 0.5);
+  height: auto;
+  max-width: 450px;
+}
+
+.label-divider {
+  display: inline-block;
+  height: 18px;
+  background-color: #bbb;
+  margin-left: 10px;
+  margin-bottom: 2px;
+  border-radius: 1px;
+  vertical-align: middle;
+  width: 2px;
+  background-color: #B0CAE6;
 }
 </style>
