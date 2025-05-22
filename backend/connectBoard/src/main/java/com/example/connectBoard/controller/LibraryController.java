@@ -81,5 +81,29 @@ public class LibraryController {
         }
     }
     
+	// 자료실 게시글 삭제
+    @PostMapping("/library/delete")
+    public ResponseEntity<?> deleteLibrary(@RequestBody LibraryDTO library) {    	
+        try {
+        	libraryService.deleteLibrary(library);
+            return ResponseEntity.ok("접수상태가 변경되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 오류 발생: " + e.getMessage());
+        }
+    }
+    
+	// 문의글 수정
+    @PostMapping("/library/addCnt")
+    public ResponseEntity<?> addCnt() {    	
+        try {
+        	libraryService.addCnt();
+            return ResponseEntity.ok("접수상태가 변경되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 오류 발생: " + e.getMessage());
+        }
+    }
+    
+    
+    
     
 }

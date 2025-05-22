@@ -1,105 +1,16 @@
 <template>
   <v-container fluid class="pr-0 pl-0 pt-0">
-
-    <!-- 진행 상태 표시 바 -->
-    <v-row justify="center" class="mb-0 pt-0">
-      <v-col cols="12" class="d-flex align-center justify-center">
-        <div class="custom-stepper">
-          <div v-for="(status, index) in progressStatuses" :key="index" class="step" :class="{
-            active: step === index + 1,
-            completed: step > index + 1
-          }">
-            <div class="circle">{{ index + 1 }}</div>
-            <div class="label">{{ status.text }}</div>
-            <div v-if="index < progressStatuses.length - 1" class="line"></div>
-          </div>
-        </div>
+    <v-row>
+      <v-col>
+        <v-divider thickness="3" color="#578ADB" class="mb-6"></v-divider>
       </v-col>
     </v-row>
-
-    <br>
-    <br>
-
-    <!-- 전체 래퍼: 접수상태 박스 + 버튼을 나란히 배치 -->
-    <div class="d-flex align-center mb-4">
-      <!-- 접수상태 박스 -->
-      <v-row v-if="this.userDeptCd === 'SPH220007'" no-gutters class="status-row status-select-row" style="width: 220px; 
-        min-width: 220px; 
-        max-width: 220px;">
-        <v-col class="search-col">
-          <div class="label-box">접수상태</div>
-          <v-select v-model="selectedStatus" :items="progressStatuses" item-title="text" item-value="value"
-            density="compact" variant="plain" hide-details class="status-select" />
-        </v-col>
-      </v-row>
-
-      <v-btn v-if="this.userDeptCd === 'SPH220007'" variant="flat" color="#3A70B1" size="small"
-        class="save-status-btn ml-3" @click="saveStatus">
-        저장
-      </v-btn>
-
-      <v-btn v-if="this.userDeptCd === 'SPH220007'" variant="flat" color="#F7A000"
-        class="save-status-btn ml-3 white-text" size="small" @click="showManagerPopup = true">
-        담당자 이관
-      </v-btn>
-
-      <v-spacer></v-spacer>
-
-      <v-btn v-if="this.inquiry.processState == 'P' && this.inquiry.writerId === this.userId" variant="flat"
-        color="green darken-2" class="save-status-btn mr-2" size="small" @click="moveEdit">
-        수정
-      </v-btn>
-
-      <v-btn v-if="this.inquiry.processState === 'S'" variant="flat" color="#F7A000"
-        class="save-status-btn mr-2 white-text" size="small" @click="$router.push({
-          name: 'CA_PostEditSrForm',
-          params: { receivedSeq: this.receivedSeq }
-        })">
-        SR요청서
-      </v-btn>
-
-
-
-
-    </div>
-
 
     <v-row no-gutters class="search-row top-row">
-      <v-col class="search-col product-category">
-        <div class="label-box">작성자</div>
-        <div class="author-value">{{ inquiry.uid }}</div>
-      </v-col>
-    </v-row>
-
-    <v-row no-gutters class="search-row middle-row">
-      <v-col cols="4" class="search-col product-category">
-        <div class="label-box">문의유형</div>
-        <div class="author-value">{{ inquiry.inquiryType }}</div>
-      </v-col>
-
-      <v-col cols="4" class="search-col product-category">
-        <div class="label-box">문의부문</div>
-        <div class="author-value">{{ inquiry.inquiryPart }}</div>
-      </v-col>
-
-      <v-col cols="4" class="search-col product-category">
-        <div class="label-box">중요도</div>
-        <div class="author-value">{{ inquiry.priority }}</div>
-      </v-col>
-    </v-row>
-
-    <v-row no-gutters class="search-row middle-row">
-      <v-col class="search-col product-category">
-        <div class="label-box">담당자</div>
-        <div class="author-value">{{ inquiry.manager }}</div>
-      </v-col>
-    </v-row>
-
-    <v-row no-gutters class="search-row middle-row">
       <!-- 제목 필드 -->
-      <v-col class="search-col request-period">
+      <v-col class="search-col">
         <div class="label-box">제 목</div>
-        <div class="author-value">{{ inquiry.sub }}</div>
+        <div class="author-value">{{ title }}</div>
       </v-col>
     </v-row>
 
@@ -107,7 +18,7 @@
       <!-- 내용 텍스트필드 -->
       <v-col class="search-col content-field">
         <div class="label-box">내 용</div>
-        <div class="author-value content-textarea">{{ inquiry.etc }}</div>
+        <div class="author-value content-textarea">{{ content }}</div>
       </v-col>
     </v-row>
 
@@ -128,45 +39,14 @@
       </v-col>
     </v-row>
 
-
-    <br>
-    <br>
-
-
-    <!-- 하단: 댓글 섹션을 아래로 배치 -->
-    <v-row>
-      <v-col cols="12">
-        <div class="section-title">
-          <div class="info-title-after"></div>답변 내용
-        </div>
-
-        <!-- 댓글 섹션 -->
-        <div class="comments-container" v-if="commentTextLength > 0">
-          <comment-tree v-for="comment in topLevelComments" :key="comment.commentId" :comment="comment"
-            :all-comments="comments" @refresh="fetchComments" />
-        </div>
-
-        <!-- 댓글이 없을 때 메시지 -->
-        <div v-else class="no-comments">
-          <p>등록된 답변이 없습니다. 첫 번째 답변을 작성해보세요.</p>
-        </div>
-
-        <!-- 댓글 입력 -->
-        <div class="comment-input-container" :class="{ 'mt-4': commentTextLength === 0 }">
-          <v-textarea auto-grow v-model="newComment.content" :label="replyTo ? `${replyTo.userId}님에게 답글 작성` : '답변 입력'"
-            variant="outlined" density="comfortable" color="#3A70B1" rows="3" hide-details
-            class="comment-textarea"></v-textarea>
-          <div class="btn-container">
-            <v-btn v-if="replyTo" variant="text" color="#666" class="cancel-btn mr-2" @click="cancelReply">
-              답글 취소
-            </v-btn>
-            <v-btn variant="flat" color="#3A70B1" class="white--text comment-submit-btn" @click="addComment()">
-              답변 등록
-            </v-btn>
-          </div>
-        </div>
-      </v-col>
-    </v-row>
+    <div class="mt-4 d-flex align-center justify-center">
+      <v-btn variant="flat" color="#1E88E5" class="custom-btn mr-2" size="small" @click="moveEdit">
+        수정
+      </v-btn>
+      <v-btn variant="flat" color="#f44336" class="custom-btn mr-2" size="small" @click="moveDelete">
+        삭제
+      </v-btn>
+    </div>
   </v-container>
 
   <!-- 스낵바로 오류 메시지 표시 -->
@@ -180,17 +60,42 @@
     </template>
   </v-snackbar>
 
-  <!-- 관리자 추가하기 팝업 -->
-  <manager-popup :show="showManagerPopup" @manager-selected_edit="editManager" @close="showManagerPopup = false" />
+  <v-dialog v-model="showConfirm" persistent max-width="600" transition="dialog-bottom-transition">
+    <v-card class="pa-6 rounded-lg" elevation="10">
+      <div class="text-center mb-2">
+        <v-icon color="warning" size="50">mdi-alert-circle-outline</v-icon>
+      </div>
+
+      <div class="text-h6 font-weight-bold text-center mb-2">
+        게시글을 삭제하시겠습니까?
+      </div>
+
+      <div class="text-body-2 text-grey text-center mb-6">
+        삭제하시면 다시 복구하실 수 없습니다.
+      </div>
+
+      <!-- 버튼 -->
+      <v-card-actions class="justify-center">
+        <v-btn variant="outlined" color="#1E88E5" class="mr-2" @click="showConfirm = false">
+          취소
+        </v-btn>
+
+        <v-btn variant="flat" color="#1E88E5" class="white--text" @click="confirmDelete">
+          삭제
+        </v-btn>
+      </v-card-actions>
+
+    </v-card>
+  </v-dialog>
+
+
+
 </template>
 
 <script>
 import apiClient from '@/api';
-import CommentTree from '@/components/CommentTree.vue';  // CommentTree 컴포넌트 import
 import { inject, onMounted } from 'vue';
-import { useKakaoStore } from '@/store/kakao';
 import { useAuthStore } from '@/store/auth';
-import managerPopup from '@/components/ManagerPopup';
 
 export default {
   props: {
@@ -200,8 +105,6 @@ export default {
     },
   },
   setup() {
-    // 스토어 초기화
-    const kakaoStore = useKakaoStore();
     const authStore = useAuthStore();
 
     const extraBreadcrumb = inject('extraBreadcrumb', null);
@@ -213,19 +116,16 @@ export default {
       }
 
       if (listButtonLink) {
-        listButtonLink.value = '/views/CA/CA1000_10';  // 🔥 현재 페이지에 맞는 "목록" 경로 설정
+        listButtonLink.value = '/views/CA/CA2000_10';  // 🔥 현재 페이지에 맞는 "목록" 경로 설정
       }
     });
 
     // 이 컴포넌트의 다른 메서드에서 사용할 수 있도록 반환
     return {
-      kakaoStore,
       authStore
     }
   },
   components: {
-    CommentTree,
-    managerPopup
   },
   unmounted() { // ❗ 컴포넌트가 언마운트될 때
     const listButtonLink = inject('listButtonLink', null);
@@ -240,67 +140,17 @@ export default {
   },
   data() {
     return {
-      showManagerPopup: false,
-      step: 1,
       loading: false,
       errorMessages: [],
       fetchedFiles: [],
       showError: false,
-      selectedStatus: '',
-      oldStatus: '',
-      inquiry: {
-        sub: "",
-        context: "",
-        uId: "",
-        dpId: "",
-        writerId: "",
-        manager: "",
-        srFlag: "",
-        writerPhone: "",
-        inquiryType: "",
-        inquiryPart: "",
-        priority: "",
-      },
-      previousStatus: '', // 이전 상태를 저장할 변수
-      statusChanged: false, // 상태가 변경되었는지 추적      
-      progressStatuses: [],
-      comments: [],
-      newComment: {
-        content: "", // 댓글 내용
-        postId: null, // 게시글 ID
-        userId: "test_user", // 유저 ID
-        parentId: null // 부모 댓글 ID
-      },
-      replyTo: null,
+      title: '',
+      content: '',
+      vuewCount: '',
+      showConfirm: false,
     }
   },
   computed: {
-    topLevelComments() {
-      return Array.isArray(this.comments) ? this.comments.filter(comment => !comment.parentId) : [];
-    },
-    commentTextLength() {
-      return Array.isArray(this.comments) ? this.comments.length : 0;
-    },
-
-    // 코드값으로 상태명을 반환하는 함수
-    getStatusName() {
-      return (statusCode) => {
-        if (!statusCode || !this.progressStatuses.length) return '';
-
-        const foundStatus = this.progressStatuses.find(status => status.value === statusCode);
-        return foundStatus ? foundStatus.text : '';
-      };
-    },
-
-    // 현재 선택된 상태명
-    currentStatusName() {
-      return this.getStatusName(this.selectedStatus);
-    },
-
-    // 이전 상태명
-    previousStatusName() {
-      return this.getStatusName(this.oldStatus);
-    }
   },
   watch: {
     receivedSeq: {
@@ -314,13 +164,7 @@ export default {
   mounted() {
     this.checkLocalStorage();
     this.getUserInfo();
-
-    //접수상태 리스트 가져오기
-    this.getStatus().then(() => {
-      this.getDetailInquiry();  // 상세 데이터 호출
-    });
-
-    this.fetchComments();
+    this.getDetailLibrary();
 
   },
   created() {
@@ -329,74 +173,18 @@ export default {
 
   },
   methods: {
-    async editManager(selectedManager) {
-      // console.log('-- editManager --');
-      try {
-        this.loading = true;
-
-        const boardData = {
-          "seq": this.receivedSeq,
-          "manager": selectedManager.name,
-          "managerId": selectedManager.usrId,
-          "managerTel": selectedManager.handTelNo,
-          "managerEmail": selectedManager.emailAddr
-        };
-
-        // 게시글 등록 및 seq 값 반환
-        await apiClient.post("/api/require/updateForm", boardData);
-
-        // 담당자 변경 알림톡
-        // console.log(this.inquiry.sub);
-        // console.log(selectedManager.name);
-        // console.log(this.inquiry.uid);
-        // console.log(selectedManager.handTelNo);
-
-        await this.kakaoStore.sendAlimtalk_Manager(this.inquiry.sub, selectedManager.name, this.inquiry.uid, selectedManager.handTelNo);
-
-      } catch (error) {
-        console.error("관리자 수정 중 오류:", error);
-        this.errorMessages = [error.message || "관리자 수정 중 오류가 발생했습니다."];
-        this.showError = true;
-      } finally {
-        this.loading = false;
-      }
-
-      // 수정 성공 후 페이지 새로고침      
-      window.location.reload();
-    },
-    async getDetailInquiry() {
-      const response = await apiClient.get("/api/require/detail", {
+    async getDetailLibrary() {
+      const response = await apiClient.get("/api/library/detail", {
         params: { seq: this.receivedSeq }
       });
 
-      const processState = response.data?.processState || "P"; // 기본값 설정
-      this.selectedStatus = processState;
-      this.step = this.statusMapping?.[this.selectedStatus] ?? 1;
-
-      console.log(response)
-
-      // 3. 나머지 데이터 매핑
-      this.inquiry = {
-        sub: response.data?.sub || "",
-        etc: response.data?.etc || "",
-        uid: response.data?.uid || "",
-        dpId: response.data?.dpId || "",
-        writerId: response.data?.writerId || "",
-        manager: response.data?.manager || "",
-        srFlag: response.data?.srFlag || "",
-        processState: processState,
-        writerPhone: response.data?.writerPhone || "",
-        inquiryType: response.data?.inquiryTypeNm || "",
-        inquiryPart: response.data?.inquiryPartNm || "",
-        priority: response.data?.priorityNm || "",
-      };
-
-      this.selectedStatus = this.inquiry.processState;
+      this.title = response.data?.title || "";
+      this.content = response.data?.content || "";
 
       //첨부파일 리스트 불러오기
       try {
         const fileList = await apiClient.get("/api/file-attach/fileList", {
-          params: { seq: this.receivedSeq, boardType: 'CA1000_10' }
+          params: { seq: this.receivedSeq, boardType: 'CA2000_10' }
         });
 
         this.fetchedFiles = Array.isArray(fileList.data)
@@ -407,29 +195,22 @@ export default {
         console.error("❌ 오류 발생:", error);
       }
     },
-    async getStatus() {
+
+    moveDelete() {
+      this.showConfirm = true; // 다이얼로그 표시
+    },
+    async confirmDelete() {
       try {
-        const statusList = await apiClient.get("/api/code/list", {
-          params: {
-            category: 'STATUS'
-          }
-        });
-
-        // 상태 이름 리스트 저장
-        this.progressStatuses = statusList.data.map(status => ({
-          text: status.codeName,  // UI에 표시할 값
-          value: status.codeId    // 실제 선택될 값
-        }));
-
-        // 상태 매핑 (codeName → 숫자 변환용)
-        this.statusMapping = statusList.data.reduce((map, status) => {
-          map[status.codeId] = status.orderNum; // "P" → 1, "I" → 2, "H" → 3, "C" → 4
-          return map;
-        }, {});
-
-      } catch (error) {
-        console.error("❌ 오류 발생:", error);
+        // 실제 삭제 로직
+        await apiClient.post('/api/library/delete', { seq: this.receivedSeq });
+        this.showConfirm = false;
+        this.$router.push({ name: 'CA2000_10' });
+      } catch (err) {
+        console.error("삭제 오류:", err);
+        alert("삭제에 실패했습니다.");
       }
+
+      this.showConfirm = false;
     },
 
     checkLocalStorage() {
@@ -449,130 +230,17 @@ export default {
     },
 
     goBack() {
-      // 브라우저 히스토리에서 뒤로가기
       this.$router.go(-1);
     },
-    async saveStatus() {
-      //   c 종결
-      // H 보류중
-      // I 접수
-      // P 미처리
-      // S SR
-      try {
 
-        const prevStatusName = this.getStatusName(this.oldStatus);
-        // 이전 상태값이 false, null, undefined, 빈 문자열인 경우 알림톡 발송 중단
-        if (!prevStatusName) {
-          console.log('이전 상태값이 없어 알림톡 발송을 중단합니다.');
-          alert("접수상태가 변경되지 않았습니다.");
-          return;
-        }
-
-        // 이전 상태가 P(미처리)가 아니고, 선택된 상태가 P(미처리)인 경우 변경 불가
-        if (this.oldStatus !== 'P' && this.selectedStatus === 'P') {
-          alert("처리가 시작된 이후에는 미처리 상태로 돌아갈 수 없습니다.");
-          // 선택된 상태를 이전 상태로 되돌림
-          this.selectedStatus = this.oldStatus;
-          return;
-        }
-
-        const statusData = {
-          seq: this.receivedSeq,
-          processState: this.selectedStatus,
-        };
-
-        await apiClient.post("/api/updateStatus", statusData);
-        alert("접수상태가 저장되었습니다.");
-
-        // 상태변경
-        await this.kakaoStore.sendAlimtalk_Status(this.receivedSeq, this.getStatusName(this.oldStatus), this.getStatusName(this.selectedStatus), this.inquiry.writerPhone);
-        // 상세정보 새로고침
-        this.getDetailInquiry();
-        //this.management.PROGRESS = this.selectedStatus;
-      } catch (error) {
-        console.error("상태 저장 실패");
-        this.getDetailInquiry();
-      }
-    },
-    async addComment() {
-
-      if (!this.newComment.content) {
-        alert("댓글을 입력해주세요.");
-        return;
-      }
-
-      // 부모 댓글인지 확인 후 parentId 설정
-      var newParentId = this.replyTo ? this.replyTo.commentId : null;
-
-      // 백엔드로 보낼 데이터 객체
-      const commentData = {
-        postId: this.receivedSeq, // 게시글 ID
-        userId: this.userId || "", // 유저 ID
-        content: this.newComment.content, // 댓글 내용
-        parentId: newParentId, // 부모 댓글 ID (없으면 NULL)
-        depth: this.replyTo ? Number(this.replyTo.depth) + 1 : 0, // 대댓글이면 +1, 최상위 댓글이면 0
-        createdAt: new Date().toISOString(),
-        deleteYn: "N"
-      };
-
-      try {
-        // API 요청: 댓글 DB에 저장
-        await apiClient.post("/api/insertComment", commentData);
-
-        // 입력 필드 초기화
-        this.newComment.content = "";
-        this.replyTo = null;
-
-        // 댓글 목록 새로고침
-        this.fetchComments();
-
-      } catch (error) {
-        console.error("댓글 등록 실패");
-        this.fetchComments();
-      }
-    },
-    async fetchComments() {
-
-      try {
-        // const response = await apiClient.get(`/api/comments/${this.receivedSeq}`);
-        this.comments = [];
-        const response = await apiClient.get(`/api/comments?postId=${this.receivedSeq}`);
-        // /api/comments?postId=1
-        this.comments = response.data;
-      } catch (error) {
-        console.error('댓글 조회 실패:', error);
-        this.comments = []; // ✅ 오류 발생 시 빈 배열 설정
-      }
-      try {
-        const response = await apiClient.get(`/api/comments/${this.receivedSeq}`);
-        this.comments = response.data;
-      } catch (error) {
-        console.error('댓글 조회 실패:', error);
-        this.comments = []; // ✅ 오류 발생 시 빈 배열 설정
-      }
-
-
-    },
-    handleReply(comment) {
-      this.replyTo = comment;
-    },
-
-    cancelReply() {
-      this.replyTo = null;
-      this.newComment.newComment = '';
-    },
     moveEdit() {
-      if (this.selectedStatus != 'P') {
-        alert('미처리 상태만 수정이 가능합니다.');
-        return;
-      }
-
       this.$router.push({
-        name: 'CA_PostEditForm',
+        name: 'CA_LibraryEditForm',
         params: { receivedSeq: this.receivedSeq }
       })
 
     },
+
     async downloadFile(file) {
       try {
         // console.log(file);
@@ -600,112 +268,6 @@ export default {
 </script>
 
 <style scoped>
-.step {
-  position: relative;
-  text-align: center;
-  flex: 1;
-}
-
-.custom-stepper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 750px;
-  position: relative;
-}
-
-.circle {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background-color: #d5dce6;
-  color: white;
-  font-weight: bold;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-  z-index: 2;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.label {
-  margin-top: 8px;
-  font-size: 14px;
-  color: #333;
-}
-
-.line {
-  position: absolute;
-  top: 22px;
-  left: 50%;
-  width: 100%;
-  height: 4px;
-  background-color: #d5dce6;
-  z-index: 1;
-}
-
-.step:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  top: 22px;
-  left: 50%;
-  width: 100%;
-  height: 4px;
-  background-color: #d5dce6;
-  z-index: 0;
-}
-
-.step.completed:not(:last-child)::after {
-  background-color: #5b9bd5;
-}
-
-.step.completed .line {
-  background-color: #5b9bd5;
-}
-
-.step.completed .circle {
-  background-color: #5b9bd5;
-}
-
-.step.active .circle {
-  background-color: #1867c0;
-  box-shadow: 0 0 0 4px rgba(24, 103, 192, 0.2);
-  font-size: 18px;
-}
-
-.step.active .label {
-  color: #1867c0;
-}
-
-.status-row {
-  overflow: hidden;
-}
-
-.status-select-row {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  overflow: hidden;
-  /* height: 45px; */
-  margin-bottom: 15px;
-  /* height: 42px;   */
-}
-
-
-
-.product-category {
-  display: flex;
-  flex-direction: row;
-  /* 가로 방향으로 배치 */
-  align-items: center;
-  flex-wrap: nowrap;
-  /* 줄바꿈 방지 */
-  width: 100%;
-}
-
 .author-value {
   font-size: 14px;
   padding-left: 15px;
@@ -718,7 +280,6 @@ export default {
   font-size: 25px;
 }
 
-.manager-search,
 .content-textarea {
   display: flex;
   justify-content: flex-start;
@@ -733,44 +294,10 @@ export default {
   word-break: break-word;
 }
 
-.btn-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 10px;
-}
-
-.comment-submit-btn {
-  font-size: 14px;
-  text-transform: none;
-  border-radius: 4px;
-  height: 36px;
-  color: white !important;
-}
-
-.cancel-btn {
-  font-size: 14px;
-  text-transform: none;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  height: 36px;
-}
-
-.custom-btn {
-  background-color: #1867C0;
-  color: white;
-  font-size: 13px;
-  border: none;
-  box-shadow: none;
-  border-radius: 6px;
-  margin-top: -10px !important;
-  margin-bottom: 15px;
-  min-width: 60px;
-}
-
 .search-row {
   display: flex;
   align-items: stretch;
-  min-height: 40px;
+  min-height: 50px;
   border-top: 1px solid #e0e0e0;
   border-bottom: 0;
   border-left: 1px solid #e0e0e0;
@@ -809,19 +336,11 @@ export default {
   border-bottom-right-radius: 8px;
 }
 
-
-
 .search-col {
   display: flex;
   /* align-items: center; */
   padding: 0;
   border-left: 1px solid #e0e0e0;
-}
-
-.request-period,
-.product-category {
-  max-width: 550px;
-  flex-grow: 0;
 }
 
 .label-box {
@@ -845,39 +364,10 @@ export default {
   color: white !important;
 }
 
-.status-select {
-  margin-left: 15px;
-  margin-bottom: 10px;
-}
-
-.status-select>>>.v-select__selection {
-  font-size: 14.5px !important;
-  margin-bottom: 2px;
-  /* 원하는 크기로 조정 */
-}
-
-.mdi-menu-down::before {
-  margin-right: 10px;
-}
-
-.status-row {
-  overflow: hidden;
-}
-
-
-.status-select-row {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  overflow: hidden;
-  /* height: 45px; */
-  margin-bottom: 15px;
-  /* height: 42px;   */
-}
-
-.save-status-btn {
-  height: 42px;
-  min-width: 60px;
-  font-size: 14px;
+.custom-btn {
+  height: 45px;
+  min-width: 70px;
+  font-size: 15px;
   border-radius: 6px;
   margin-bottom: 15px;
   border-width: 1px;
@@ -891,42 +381,6 @@ export default {
   margin-bottom: 10px;
 }
 
-.info-title-after {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 17px;
-  background-color: #B0CAE6;
-  margin-right: 10px;
-  position: relative;
-}
-
-.comments-container {
-  margin-bottom: 20px;
-  background-color: #f9fbfd;
-  border-radius: 8px;
-  padding: 10px 15px;
-  border: 1px solid #E6EEF8;
-}
-
-
-.no-comments {
-  padding: 20px;
-  text-align: center;
-  color: #666;
-  background-color: #f9fbfd;
-  border-radius: 8px;
-  border: 1px solid #E6EEF8;
-  margin-bottom: 20px;
-}
-
-.section-title {
-  font-size: 17px;
-  margin-bottom: 15px;
-  font-weight: 400;
-  display: flex;
-  align-items: center;
-}
 
 .fileBox {
   border: 1px solid #B0CAE6;
@@ -934,28 +388,5 @@ export default {
   background-color: rgba(231, 239, 248, 0.6);
   cursor: pointer;
   user-select: none;
-}
-
-.commentBtn {
-  border: 1px solid #888A8D !important;
-  color: #5A5C5F !important;
-  border-radius: 4px;
-  padding: 4px 12px;
-  background-color: white;
-}
-
-.comment-input-container {
-  margin-bottom: 40px;
-  padding: 15px;
-  background-color: #f9fbfd;
-  border-radius: 8px;
-  border: 1px solid #E6EEF8;
-}
-
-.comment-textarea {
-  margin-bottom: 10px;
-  background-color: white;
-  border-radius: 4px;
-  font-size: 14px;
 }
 </style>

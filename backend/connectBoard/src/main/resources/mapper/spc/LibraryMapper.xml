@@ -6,26 +6,29 @@
 	
 	<!-- 검색 조건에 따른 요청 목록 조회 -->
 	<select id="searchLibrary" parameterType="String" resultType="com.example.connectBoard.dto.LibraryDTO">
-		SELECT
-		    a.seq,
-	        a.title,
-		    a.content,
-		    a.category,
-		    a.viewCount,
-		    a.importantYn,
-		    c.DEPT_NM as dpNm,
-		   	a.insertDt,
-			a.updateDt
-		FROM Library a	
-		  left outer join SPG.DBO.CRM_USER_MASTER c on a.insertId = c.USR_ID					
-	<where>
-	    <if test="title != null and title != ''">
-	        a.title LIKE '%' + #{title} + '%'
-	    </if> 
-	</where>
-		ORDER BY a.seq DESC
+		SELECT *
+		FROM (
+			SELECT
+				ROW_NUMBER() OVER (ORDER BY a.seq ASC) AS num,  <!-- ✅ 조회 순서용 번호 추가 -->
+				a.seq,
+				a.title,
+				a.content,
+				a.category,
+				a.viewCount,
+				a.importantYn,
+				c.DEPT_NM AS dpNm,
+				a.insertDt,
+				a.updateDt
+			FROM Library a
+			LEFT OUTER JOIN SPG.DBO.CRM_USER_MASTER c ON a.insertId = c.USR_ID
+			<where>
+				<if test="title != null and title != ''">
+					a.title LIKE '%' + #{title} + '%'
+				</if> 
+			</where>
+		) AS sub
+		ORDER BY sub.seq DESC  <!-- 정렬은 필요에 따라 seq 또는 num 기준 선택 -->
 	</select>
-	
 
 	<!-- 자료실 글 등록 -->	
 	<insert id="insertLibrary" 
@@ -57,7 +60,7 @@
 		    a.content,
 		    a.category,
 		    a.viewCount,
-		    a.importantYn
+		    a.importantYn,
 		    c.DEPT_NM as dpNm,
 		   	a.insertDt,
 			a.updateDt
@@ -78,6 +81,19 @@
 	        </if>
 	        updateDt = GETDATE()
 	    </set>
+	    WHERE seq = #{seq}
+	</update>
+		
+	<!--게시글 삭제-->
+	<update id="deleteLibrary" parameterType="com.example.connectBoard.dto.LibraryDTO">
+	    delete from Library
+	    WHERE seq = #{seq}
+	</update>
+	
+	<!--조회수++-->
+	<update id="addCnt">
+	    UPDATE Library
+		 SET viewCount = viewCount+1
 	    WHERE seq = #{seq}
 	</update>
 

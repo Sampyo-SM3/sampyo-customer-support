@@ -67,12 +67,7 @@
         })">
         SR요청서
       </v-btn>
-
-
-
-
     </div>
-
 
     <v-row no-gutters class="search-row top-row">
       <v-col class="search-col product-category">

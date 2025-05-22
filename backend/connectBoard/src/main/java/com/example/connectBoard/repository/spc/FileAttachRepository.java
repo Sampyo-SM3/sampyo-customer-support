@@ -1,6 +1,7 @@
 package com.example.connectBoard.repository.spc;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -12,6 +13,5 @@ public interface FileAttachRepository {
     
     void deleteFileAttach(FileAttachDTO fileattach);    
     
-    List<FileAttachDTO> getFileList(Long seq);
-
+    List<FileAttachDTO> getFileList(Map<String, Object> params);
 }

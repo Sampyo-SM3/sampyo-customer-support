@@ -56,9 +56,9 @@ public class FileAttachController {
     }
     
     @GetMapping("/fileList")
-    public ResponseEntity<?> getFileList(@RequestParam("seq") Long seq) {	       
+    public ResponseEntity<?> getFileList(@RequestParam("seq") Long seq, @RequestParam("boardType") String boardType) {	       
        try {
-           List<FileAttachDTO> fileAttach = fileattachService.getFileList(seq);
+           List<FileAttachDTO> fileAttach = fileattachService.getFileList(seq, boardType);
 
            if (fileAttach.isEmpty()) {
                return ResponseEntity.ok().body("해당 게시글에 첨부파일이 존재하지 않습니다.");

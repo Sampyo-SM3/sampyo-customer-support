@@ -35,7 +35,7 @@
     	  AND fileName = #{fileName};
    </delete>
 
-    <select id="getFileList"  parameterType="Long" resultType="com.example.connectBoard.dto.FileAttachDTO">   	
+    <select id="getFileList"  parameterType="map" resultType="com.example.connectBoard.dto.FileAttachDTO">   	
     	SELECT seq,
     		   fileName,
     		   fileSize,

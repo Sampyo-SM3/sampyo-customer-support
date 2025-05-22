@@ -36,7 +36,15 @@ public class LibraryService {
 
     public void updateLibrary(LibraryDTO library) {
     	libraryRepository.updateLibrary(library);    	
-    }  
+    } 
+    
+    public void deleteLibrary(LibraryDTO library) {
+    	libraryRepository.deleteLibrary(library);    	
+    } 
+    
+    public void addCnt() {
+    	libraryRepository.addCnt();    	
+    } 
     
   
 

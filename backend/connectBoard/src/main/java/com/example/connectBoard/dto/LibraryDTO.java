@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 public class LibraryDTO {
 	private Integer seq;
+	private Integer num;
 	private String title;
 	private String content;
 	private String insertId;
