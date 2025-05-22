@@ -287,7 +287,7 @@ export default {
       //첨부파일 리스트 불러오기
       try {
         const fileList = await apiClient.get("/api/file-attach/fileList", {
-          params: { seq: this.receivedSeq }
+          params: { seq: this.receivedSeq, boardType: 'CA1000_10' }
         });
 
         this.uploadedFiles = Array.isArray(fileList.data)
@@ -388,7 +388,8 @@ export default {
       await apiClient.post("/api/file-attach/deleteFile", {
         seq: file.seq,
         boardSeq: this.receivedSeq,
-        fileName: file.name
+        fileName: file.name,
+        boardType: 'CA1000_10'
       });
 
       this.fileDelete(file.name);
@@ -622,6 +623,7 @@ export default {
               fileName: fileName,
               fileSize: modifiedFile.size,
               fileType: modifiedFile.type,
+              boardType: 'CA1000_10'
             };
 
             // FileAttach 테이블 INSERT API 호출

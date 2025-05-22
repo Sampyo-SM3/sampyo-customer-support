@@ -10,6 +10,7 @@
 		fileName,
 		fileSize,
 		fileType,
+		boardType,
 		filePath,
 		insertDt,
 		updateDt
@@ -18,7 +19,8 @@
 		#{fileName},
 		#{fileSize},
 		#{fileType},
-		'\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spc_file\\WEB\\' + #{fileName},
+		#{boardType},
+		'\\\\sp_file.sampyo.co.kr\\idrive\\SP_ERP_FILE\\spc_file\\WEB\\csr\\' + #{fileName},
 		GETDATE(),
 		GETDATE()
 	)
@@ -29,6 +31,7 @@
     	DELETE FROM file_attachment
     	WHERE seq = #{seq} 
     	  AND boardSeq = #{boardSeq} 
+    	  AND boardType = #{boardType} 
     	  AND fileName = #{fileName};
    </delete>
 
@@ -39,7 +42,8 @@
     		   fileType,
     		   boardSeq
     	FROM file_attachment
-    	WHERE boardSeq = #{seq};
+    	WHERE boardSeq = #{seq}
+    	  AND boardType = #{boardType};
     </select>
 
 </mapper>

@@ -449,7 +449,7 @@ export default {
       //첨부파일 리스트 불러오기
       try {
         const fileList = await apiClient.get("/api/file-attach/fileList", {
-          params: { seq: this.receivedSeq }
+          params: { seq: this.receivedSeq, boardType: 'CA1000_10' }
         });
 
         this.fetchedFiles = Array.isArray(fileList.data)

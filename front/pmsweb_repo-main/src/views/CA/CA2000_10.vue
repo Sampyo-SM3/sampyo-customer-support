@@ -20,7 +20,7 @@
 
       <v-col cols="12" sm="6" md="4" class="d-flex justify-end align-center">
         <span class="filter-label">제목<span class="label-divider"></span></span>
-        <v-text-field v-model="sub" @keydown.enter="fetchData" variant="outlined" density="compact" hide-details
+        <v-text-field v-model="title" @keydown.enter="fetchData" variant="outlined" density="compact" hide-details
           class="filter-input-sub" append-inner-icon="mdi-magnify" />
       </v-col>
     </v-row>
@@ -30,6 +30,7 @@
       <v-col class="pa-0">
         <div class="table-container compact">
           <div class="table-header">
+            <div class="th-cell"></div>
             <div class="th-cell">요청일</div>
             <div class="th-cell">제목</div>
             <div class="th-cell">소속</div>
@@ -37,14 +38,14 @@
           </div>
 
           <div v-for="(item, index) in paginatedData" :key="index" class="table-row compact">
+            <div class="td-cell seq-cell">{{ item.seq }}</div>
             <div class="td-cell seq-cell">{{ formatDate(item.requestDate) }}</div>
             <div class="td-cell title-cell">
               <router-link :to="{
-                name: (item.saveFlag === 'Y' && item.processState === 'S') ? 'CA_PostDetailSrForm' : 'CA_PostDetailForm',
+                name: 'CA_LibraryDetailForm',
                 params: { receivedSeq: item.seq }
               }" class="title-link">
-                {{ item.sub }}<span v-if="item.countComment > 0" style="color: #737577;">&nbsp;[{{ item.countComment
-                }}]</span>
+                {{ item.sub }}
               </router-link>
             </div>
             <div class="td-cell seq-cell">{{ item.uid }}</div>
@@ -58,8 +59,12 @@
         </div>
 
         <!-- 데이터 없음 -->
-        <div v-if="!loading && tableData.length === 0" class="no-data">
-          조회된 데이터가 없습니다.
+        <div v-if="!loading && tableData.length === 0"
+          class="no-data d-flex flex-column align-center justify-center py-10">
+          <v-icon size="64" color="#9E9E9E">mdi-file-document-outline</v-icon>
+          <div class="mt-4 text-center">
+            <p class="text-h6 font-weight-medium" style="color: #757575;">조회된 데이터가 없습니다.</p>
+          </div>
         </div>
 
         <!-- 페이지네이션 -->
@@ -145,7 +150,7 @@ export default {
   },
   data() {
     return {
-      sub: '',
+      title: '',
       countComment: 0,
       dateRange: 'month',
       productType: 'test1',
@@ -212,12 +217,9 @@ export default {
 
       try {
         // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
-        const response = await apiClient.get('/api/require/search', {
+        const response = await apiClient.get('/api/library/list', {
           params: {
-            manager: this.manager,
-            sub: this.sub,
-            status: this.selectedStatus,
-            dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
+            title: this.title
           }
         });
 
@@ -228,21 +230,6 @@ export default {
 
             return {
               ...item,
-              selected: false,
-              // API에서 진행상태가 오지 않으면 임의로 설정
-              status: item.processState === 'S'
-                ? (item.statusNm + ' (' +
-                  (item.srFlag === 'Y'
-                    ? '상신완료'
-                    : item.srFlag === 'F'
-                      ? '반려'
-                      : '상신 전'
-                  ) + ')' || this.getRandomStatus())
-                : (item.statusNm || this.getRandomStatus()),
-
-              // 테이블에 표시할 데이터 매핑
-              manager: item.manager || '-',  // 담당자 필드가 없어서 임시로 요청자 ID 사용
-              memo: item.currentIssue || '-', // 메모 필드가 없어서 임시로 현재 이슈 사용              
             };
           });
 
@@ -251,8 +238,6 @@ export default {
         } else {
           this.tableData = [];
         }
-
-
 
       } catch (error) {
         console.error('데이터 로드 중 오류 발생:', error);
@@ -343,24 +328,28 @@ export default {
 
 .table-container {
   border: 1px solid #e0e0e0;
+  border-radius: 10px;
   width: 100%;
   position: relative;
-  border-radius: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
   overflow: hidden;
 }
 
 .table-header,
 .table-row {
   display: grid;
-  grid-template-columns: 150px 1fr 150px 150px;
+  grid-template-columns: 90px 150px 1fr 150px 150px;
 }
 
 .table-header {
   background-color: #D0DFF1;
   font-weight: 500;
-  border-bottom: 1px solid #e0e0e0;
   color: #3E4B5B !important;
   min-height: 50px;
+  border-bottom: none;
 }
 
 .table-row {
@@ -443,12 +432,17 @@ export default {
 }
 
 .no-data {
-  padding: 30px;
-  text-align: center;
-  color: #757575;
-  font-size: 14px;
+  min-height: 250px;
+  background-color: #F9FAFB;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 0;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
 }
-
 
 .filter-label {
   font-size: 14.5px;
@@ -544,5 +538,12 @@ export default {
 
 .seq-cell {
   justify-content: center;
+}
+
+.no-data {
+  min-height: 300px;
+  border-radius: 8px;
+  background-color: #F9FAFB;
+  border: 1px dashed #D3D3D3;
 }
 </style>

@@ -14,6 +14,7 @@ public class FileAttachDTO {
     private String fileName;
     private Long fileSize;
     private String fileType;
+    private String boardType;
     private LocalDateTime insertDt;
     private LocalDateTime updateDt;
 }

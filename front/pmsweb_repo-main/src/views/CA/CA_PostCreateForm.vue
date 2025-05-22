@@ -4,9 +4,15 @@
     <br>
 
     <v-row no-gutters class="search-row top-row">
-      <v-col class="search-col product-category">
+      <v-col v-if="this.userDeptCd != 'SPH220007'" class="search-col product-category">
         <div class="label-box">작성자</div>
         <div class="author-value">{{ userName }}</div>
+      </v-col>
+      <v-col v-if="this.userDeptCd === 'SPH220007'" class="search-col" style="max-width: 400px;">
+        <div class="label-box">작성자</div>
+        <v-text-field class="mr-8 mt-1 mb-1 ml-2 input-manager" v-model="userName" readonly hide-details
+          density="compact" variant="outlined" append-inner-icon="mdi-magnify" @click="showUserPopup = true" />
+        <input type="hidden" :value="selectedUserId" name="selectedUserId" />
       </v-col>
     </v-row>
 
@@ -14,8 +20,8 @@
       <v-col cols="4" class="search-col product-category">
         <div class="label-box">문의유형</div>
         <v-select v-model="selectedInquiryType" :items="inquiryTypeList" item-title="codeName" item-value="codeId"
-          density="compact" hide-details variant="outlined" class="inquiry-select mr-8 mt-1 mb-1" placeholder="선택"
-          style="margin-left:10px;" />
+          density="compact" hide-details variant="outlined" class="inquiry-select mr-8 mt-1 mb-1 ml-2"
+          placeholder="선택" />
       </v-col>
 
       <v-col cols="4" class="search-col product-category">
@@ -40,11 +46,11 @@
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
-      <v-col class="search-col" style="max-width:350px;">
+      <v-col class="search-col" style="max-width: 400px;">
         <div class="label-box">담당자</div>
-        <v-text-field class="mr-8 mt-1 mb-1 input-manager" v-model="manager" readonly hide-details density="compact"
-          variant="outlined" append-icon="mdi-magnify" @click="showManagerPopup = true" style="margin-left:10px;">
-        </v-text-field>
+        <v-text-field class="input-manager mr-8 mt-1 mb-1 ml-2" v-model="manager" readonly hide-details
+          density="compact" variant="outlined" append-inner-icon="mdi-magnify" @click="showManagerPopup = true"
+          placeholder="담당자를 지정해주세요" />
       </v-col>
 
       <input type="hidden" :value="managerId" name="managerId" />
@@ -56,8 +62,8 @@
       <!-- 제목 필드 -->
       <v-col class="search-col">
         <div class="label-box">제 목</div>
-        <v-text-field class="mr-8 mt-1 mb-1" v-model="sub" placeholder="제목을 입력하세요" clearable hide-details
-          density="compact" variant="outlined" style="margin-left:10px;"></v-text-field>
+        <v-text-field class="mr-8 mt-1 mb-1 ml-2" v-model="sub" placeholder="제목을 입력하세요" clearable hide-details
+          density="compact" variant="outlined"></v-text-field>
       </v-col>
     </v-row>
 
@@ -131,6 +137,7 @@
     </template>
   </v-snackbar>
 
+  <user-popup :show="showUserPopup" @user-selected="onUserAdded" @close="showUserPopup = false" />
   <!-- 관리자 추가하기 팝업 -->
   <manager-popup :show="showManagerPopup" @manager-selected="onAdminAdded" @close="showManagerPopup = false" />
 </template>
@@ -138,12 +145,14 @@
 <script>
 import apiClient from '@/api';
 import ManagerPopup from '@/components/ManagerPopup';
+import UserPopup from '@/components/UserPopup';
 import { inject, onMounted } from 'vue';
 import { useKakaoStore } from '@/store/kakao';
 
 export default {
   components: {
-    ManagerPopup
+    ManagerPopup,
+    UserPopup
   },
   setup() {
     const kakaoStore = useKakaoStore();
@@ -178,8 +187,10 @@ export default {
       loading: false,
       errorMessages: [],
       showError: false,
+      showUserPopup: false,
       showManagerPopup: false,
       userName: null,
+      userDeptCd: null,
       manager: '',
       managerId: '',
       managerTel: '',
@@ -432,13 +443,22 @@ export default {
 
         this.loading = true;
 
+        var saveUserId = '';
+        var saveUserName = '';
 
+        if (this.userDeptCd === 'SPH220007') {
+          saveUserId = this.selectedUserId;
+          saveUserName = this.userName;
+        } else {
+          saveUserId = JSON.parse(localStorage.getItem("userInfo"))?.id || null;
+          saveUserName = JSON.parse(localStorage.getItem("userInfo"))?.name || null;
+        }
 
         const boardData = {
           "sub": this.sub,
           "etc": this.etc,
-          "writerId": this.userId,
-          "uid": this.userName,
+          "writerId": saveUserId,
+          "uid": saveUserName,
           "dpId": JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null,
           "manager": this.manager,
           "managerId": this.managerId,
@@ -475,6 +495,7 @@ export default {
               fileName: fileName,
               fileSize: modifiedFile.size,
               fileType: modifiedFile.type,
+              boardType: 'CA1000_10'
             };
 
             // FileAttach 테이블 INSERT API 호출
@@ -537,11 +558,18 @@ export default {
       // localStorage에서 userInfo를 가져와서 userName에 할당
       this.userName = JSON.parse(localStorage.getItem("userInfo"))?.name || null;
       this.userId = JSON.parse(localStorage.getItem("userInfo"))?.id || null;
+      this.userDeptCd = JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null;
     },
 
     goBack() {
       // 브라우저 히스토리에서 뒤로가기
       this.$router.go(-1);
+    },
+    onUserAdded(selectedUser) {
+      this.userName = selectedUser.name;
+      this.selectedUserId = selectedUser.usrId;
+
+      this.selectedUser = selectedUser;
     },
     onAdminAdded(selectedManager) {
       this.manager = selectedManager.name;
@@ -550,7 +578,6 @@ export default {
       this.managerEmail = selectedManager.emailAddr;
 
       this.selectedManager = selectedManager;
-      // console.log(selectedManager);
     },
     async getCodes() {
       try {
@@ -764,7 +791,7 @@ export default {
 }
 
 ::v-deep(.input-manager .v-field) {
-  width: 740px;
+  max-width: 200px;
   height: 40px !important;
   font-size: 15px !important;
 }
@@ -806,7 +833,7 @@ export default {
 }
 
 .inquiry-select :deep(.v-field) {
-  height: 37px !important;
+  height: 40x !important;
 }
 
 .inquiry-select :deep(.v-field__input) {
@@ -818,8 +845,8 @@ export default {
 }
 
 .inquiry-select :deep(.v-input__control) {
-  width: 167px !important;
+  width: 200px !important;
   /* 원하는 너비로 조정 */
-  min-width: 167px !important;
+  min-width: 200px !important;
 }
 </style>

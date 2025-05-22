@@ -11,52 +11,10 @@
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
-      <v-col cols="4" class="search-col product-category">
-        <div class="label-box">문의유형</div>
-        <v-select v-model="selectedInquiryType" :items="inquiryTypeList" item-title="codeName" item-value="codeId"
-          density="compact" hide-details variant="outlined" class="inquiry-select mr-8 mt-1 mb-1" placeholder="선택"
-          style="margin-left:10px;" />
-      </v-col>
-
-      <v-col cols="4" class="search-col product-category">
-        <div class="label-box">문의부문</div>
-        <div class="category-radio-wrapper">
-          <v-radio-group v-model="selectedCategory" class="small-radios" inline density="compact" hide-details
-            color="#3A70B1">
-            <v-radio v-for="item in categoryList" :key="item.codeId" :label="item.codeName" :value="item.codeId" />
-          </v-radio-group>
-        </div>
-      </v-col>
-
-      <v-col cols="4" class="search-col product-category">
-        <div class="label-box">중요도</div>
-        <div class="priority-radio-wrapper">
-          <v-radio-group v-model="selectedPriority" class="small-radios" inline density="compact" color="#3A70B1"
-            hide-details>
-            <v-radio v-for="item in priorityList" :key="item.codeId" :label="item.codeName" :value="item.codeId" />
-          </v-radio-group>
-        </div>
-      </v-col>
-    </v-row>
-
-    <v-row no-gutters class="search-row middle-row">
-      <v-col class="search-col" style="max-width:350px;">
-        <div class="label-box">담당자</div>
-        <v-text-field class="mr-8 mt-1 mb-1 input-manager" v-model="manager" readonly hide-details density="compact"
-          variant="outlined" append-icon="mdi-magnify" @click="showManagerPopup = true" style="margin-left:10px;">
-        </v-text-field>
-      </v-col>
-
-      <input type="hidden" :value="managerId" name="managerId" />
-      <input type="hidden" :value="managerTel" name="managerTel" />
-      <input type="hidden" :value="managerEmail" name="managerEmail" />
-    </v-row>
-
-    <v-row no-gutters class="search-row middle-row">
       <!-- 제목 필드 -->
       <v-col class="search-col">
         <div class="label-box">제 목</div>
-        <v-text-field class="mr-8 mt-1 mb-1" v-model="sub" placeholder="제목을 입력하세요" clearable hide-details
+        <v-text-field class="mr-8 mt-1 mb-1" v-model="title" placeholder="제목을 입력하세요" clearable hide-details
           density="compact" variant="outlined" style="margin-left:10px;"></v-text-field>
       </v-col>
     </v-row>
@@ -65,8 +23,8 @@
       <!-- 내용 텍스트필드 -->
       <v-col class="search-col">
         <div class="label-box">내 용</div>
-        <v-textarea v-model="etc" placeholder="내용을 입력하세요" auto-grow rows="18" clearable hide-details density="compact"
-          variant="outlined" class="content-textarea">
+        <v-textarea v-model="content" placeholder="내용을 입력하세요" auto-grow rows="18" clearable hide-details
+          density="compact" variant="outlined" class="content-textarea">
         </v-textarea>
       </v-col>
     </v-row>
@@ -131,22 +89,16 @@
     </template>
   </v-snackbar>
 
-  <!-- 관리자 추가하기 팝업 -->
-  <manager-popup :show="showManagerPopup" @manager-selected="onAdminAdded" @close="showManagerPopup = false" />
 </template>
 
 <script>
 import apiClient from '@/api';
-import ManagerPopup from '@/components/ManagerPopup';
 import { inject, onMounted } from 'vue';
-import { useKakaoStore } from '@/store/kakao';
 
 export default {
   components: {
-    ManagerPopup
   },
   setup() {
-    const kakaoStore = useKakaoStore();
     const extraBreadcrumb = inject('extraBreadcrumb', null);
     const listButtonLink = inject('listButtonLink', null);
 
@@ -160,7 +112,6 @@ export default {
       }
     });
 
-    return { kakaoStore };
   },
   unmounted() { // ❗ 컴포넌트가 언마운트될 때
     const listButtonLink = inject('listButtonLink', null);
@@ -180,15 +131,9 @@ export default {
       showError: false,
       showManagerPopup: false,
       userName: null,
-      manager: '',
-      managerId: '',
-      managerTel: '',
-      managerEmail: '',
       userId: null,
-      sub: '',
-      etc: '',
+      title: '',
       content: '',
-      selectedManager: null,
       fileAttach: '',
 
       // 파일 업로드 관련 데이터
@@ -205,12 +150,6 @@ export default {
       showOverwriteDialog: false,
       duplicateFiles: [],
       pendingFiles: [], // 덮어쓰기 대기 중인 파일들 
-      inquiryTypeList: [],
-      categoryList: [],
-      priorityList: [],
-      selectedInquiryType: null,
-      selectedCategory: null,
-      selectedPriority: null,
     }
   },
 
@@ -224,7 +163,6 @@ export default {
   mounted() {
     this.checkLocalStorage();
     this.getUserInfo();
-    this.getCodes();
   },
 
   created() {
@@ -233,17 +171,6 @@ export default {
   },
 
   methods: {
-    // 파일 타입에 따른 아이콘 반환
-    getFileIcon(fileType) {
-      if (fileType.includes('image')) {
-        return 'mdi-file-image';
-      } else if (fileType.includes('pdf')) {
-        return 'mdi-file-pdf';
-      } else {
-        return 'mdi-file-document';
-      }
-    },
-
     // 파일 크기 포맷
     formatFileSize(size) {
       if (size < 1024) {
@@ -406,14 +333,14 @@ export default {
       this.errorMessages = [];
 
       // 제목 검증
-      if (!this.sub || this.sub.trim() === '') {
+      if (!this.title || this.title.trim() === '') {
         this.errorMessages.push('제목을 입력해주세요.');
         this.showError = true;
         return false;
       }
 
       // 내용 검증
-      if (!this.etc || this.etc.trim() === '') {
+      if (!this.content || this.content.trim() === '') {
         this.errorMessages.push('내용을 입력해주세요.');
         this.showError = true;
         return false;
@@ -432,31 +359,15 @@ export default {
 
         this.loading = true;
 
-
-
         const boardData = {
-          "sub": this.sub,
-          "etc": this.etc,
-          "writerId": this.userId,
-          "uid": this.userName,
-          "dpId": JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null,
-          "manager": this.manager,
-          "managerId": this.managerId,
-          "managerTel": this.managerTel,
-          "managerEmail": this.managerEmail,
-          "processState": "C",
-          "division": JSON.parse(localStorage.getItem("userInfo"))?.companyCd || null,
-          "inquiryType": this.selectedInquiryType, // 예: 'Q1'
-          "inquiryPart": this.selectedCategory,    // 예: 'ERP'
-          "priority": this.selectedPriority        // 예: 'P1'
+          "title": this.title,
+          "content": this.content,
+          "insertId": this.userId
         };
 
         // 게시글 등록 및 seq 값 반환
-        const response = await apiClient.post("/api/require/insert", boardData);
+        const response = await apiClient.post("/api/library/insert", boardData);
         const boardSeq = response.data; // 등록된 게시글의 seq
-
-        // console.log('test_1');
-        await this.kakaoStore.sendAlimtalk_Manager(this.sub, this.manager, this.userName, this.managerTel);
 
         // selectedFiles 배열의 각 파일에 대해 반복
         const fileAttachPromises = this.selectedFiles.map(async (file) => {
@@ -475,6 +386,7 @@ export default {
               fileName: fileName,
               fileSize: modifiedFile.size,
               fileType: modifiedFile.type,
+              boardType: 'CA2000_10'
             };
 
             // FileAttach 테이블 INSERT API 호출
@@ -513,7 +425,7 @@ export default {
         }
 
         // 모든 성공 시 페이지 이동 또는 추가 로직
-        this.$router.push({ name: 'CA1000_10' });
+        this.$router.push({ name: 'CA2000_10' });
 
       } catch (error) {
         console.error(error);
@@ -529,8 +441,6 @@ export default {
       this.savedMidMenu = midMenuFromStorage ? JSON.parse(midMenuFromStorage) : null;
       this.savedSubMenu = subMenuFromStorage ? JSON.parse(subMenuFromStorage) : null;
 
-      // console.log('메뉴 클릭 후 midMenu:', this.savedMidMenu);
-      // console.log('메뉴 클릭 후 subMenu:', this.savedSubMenu);
     },
 
     getUserInfo() {
@@ -543,39 +453,7 @@ export default {
       // 브라우저 히스토리에서 뒤로가기
       this.$router.go(-1);
     },
-    onAdminAdded(selectedManager) {
-      this.manager = selectedManager.name;
-      this.managerId = selectedManager.usrId;
-      this.managerTel = selectedManager.handTelNo;
-      this.managerEmail = selectedManager.emailAddr;
 
-      this.selectedManager = selectedManager;
-      // console.log(selectedManager);
-    },
-    async getCodes() {
-      try {
-        // 문의유형
-        const inquiryRes = await apiClient.get("/api/code/list", {
-          params: { category: 'INQUIRY_TYPE' }
-        });
-        this.inquiryTypeList = inquiryRes.data;
-
-        // 문의부문
-        const categoryRes = await apiClient.get("/api/code/list", {
-          params: { category: 'INQUIRY_PART' }
-        });
-        this.categoryList = categoryRes.data;
-
-        // 중요도
-        const priorityRes = await apiClient.get("/api/code/list", {
-          params: { category: 'PRIORITY' }
-        });
-        this.priorityList = priorityRes.data;
-
-      } catch (error) {
-        console.error('코드 리스트 조회 실패:', error);
-      }
-    },
 
   }
 }
@@ -712,7 +590,7 @@ export default {
 .content-textarea {
   padding-block: 10px;
   padding-inline: 10px;
-  width: 100px !important;
+  width: 100% !important;
   font-weight: 400;
 }
 

@@ -1,16 +1,6 @@
 <template>
   <v-container fluid class="pr-0 pl-0 pt-0">
 
-    <!-- <v-row>
-      <v-col>
-        <div class="mt-2">
-          <v-divider thickness="3" color="#578ADB"></v-divider>
-        </div>
-      </v-col>
-    </v-row> -->
-
-    <!-- <br> -->
-
     <!-- 진행 상태 표시 바 -->
     <v-row justify="center" class="mb-0 pt-0">
       <v-col cols="12" class="d-flex align-center justify-center">
