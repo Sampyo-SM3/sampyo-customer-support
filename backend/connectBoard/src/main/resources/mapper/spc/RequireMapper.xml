@@ -54,6 +54,9 @@
 	    <if test="dpId != null and dpId != '' and dpId != 'SPH220007'">
         	AND b.dpId LIKE '%' + #{dpId} + '%'
     	</if>    
+	    <if test="managerId != null and managerId != ''">
+	        AND b.managerId LIKE '%' + #{managerId} + '%'
+	    </if>    	
 	</where>
 		ORDER BY b.seq DESC
 	</select>

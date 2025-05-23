@@ -31,25 +31,25 @@
         <div class="table-container compact">
           <div class="table-header">
             <div class="th-cell"></div>
+            <div class="th-cell">요청일</div>
             <div class="th-cell">제목</div>
-            <div class="th-cell">조회수</div>
-            <div class="th-cell">작성부서</div>
-            <div class="th-cell">작성일자</div>
+            <div class="th-cell">소속</div>
+            <div class="th-cell">작성자</div>
           </div>
 
           <div v-for="(item, index) in paginatedData" :key="index" class="table-row compact">
-            <div class="td-cell seq-cell">{{ item.num }}</div>
+            <div class="td-cell seq-cell">{{ item.seq }}</div>
+            <div class="td-cell seq-cell">{{ formatDate(item.requestDate) }}</div>
             <div class="td-cell title-cell">
               <router-link :to="{
                 name: 'CA_LibraryDetailForm',
                 params: { receivedSeq: item.seq }
               }" class="title-link">
-                {{ item.title }}
+                {{ item.sub }}
               </router-link>
             </div>
-            <div class="td-cell seq-cell">{{ item.viewCount }}</div>
-            <div class="td-cell seq-cell">{{ item.dpNm }}</div>
-            <div class="td-cell seq-cell">{{ formatDate(item.insertDt) }}</div>
+            <div class="td-cell seq-cell">{{ item.uid }}</div>
+            <div class="td-cell seq-cell">{{ item.inquiryType }}</div>
           </div>
         </div>
 
@@ -114,6 +114,8 @@
     </v-snackbar>
   </v-container>
 </template>
+
+
 
 
 <script>
@@ -339,7 +341,7 @@ export default {
 .table-header,
 .table-row {
   display: grid;
-  grid-template-columns: 90px 1fr 150px 100px 150px;
+  grid-template-columns: 90px 150px 1fr 150px 150px;
 }
 
 .table-header {
