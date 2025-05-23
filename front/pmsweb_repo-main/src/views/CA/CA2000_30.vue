@@ -229,7 +229,7 @@
                 @click="fetchData('B')" 
                 :class="{ 'selected-btn': selectedView === 'dept' }"
             >
-                부서 문의글
+                부서 처리글
             </v-btn>
             </v-btn-toggle>
     </v-col>
@@ -776,11 +776,11 @@ Chart.register(
                     params: {
                     startDate: this.formattedDate(this.Date_startDate) + ' 00:00:00',
                     endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',
-                    manager: this.manager,
+                    // manager: this.manager,
                     managerId: this.userId,
-                    sub: this.subscribe,
-                    status: this.selectedStatus,
-                    dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
+                    // sub: this.subscribe,
+                    // status: this.selectedStatus,
+                    // dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
                     }
                 });
                 // 부서 전체 처리글
@@ -789,12 +789,11 @@ Chart.register(
                     params: {
                     startDate: this.formattedDate(this.Date_startDate) + ' 00:00:00',
                     endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',
-                    manager: this.manager,
-                    //managerId: this.userId,
+                    // manager: this.manager,                    
                     managerDeptCd: this.userDeptCd,
-                    sub: this.sub,
-                    status: this.selectedStatus,
-                    dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
+                    // sub: this.sub,
+                    // status: this.selectedStatus,
+                    // dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
                     }
                 });
             }

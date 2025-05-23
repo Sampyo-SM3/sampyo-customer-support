@@ -943,7 +943,6 @@ export default {
   display: flex;
   align-items: center;
   font-size: 14px;
-  justify-content: center;
 }
 
 .th-cell {

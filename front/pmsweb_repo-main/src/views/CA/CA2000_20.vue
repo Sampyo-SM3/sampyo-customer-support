@@ -222,7 +222,7 @@
                   @click="fetchData('A')" 
                   :class="{ 'selected-btn': selectedView === 'my'}"
               >
-                  나의 처리글
+                  나의 문의글
               </v-btn>
               <v-btn 
                   value="dept" 
@@ -516,39 +516,7 @@
           userName: null,
           userId: null,    
           userDeptCd: null,    
-       
-          activeTab: 'group',
-          headers: [
-        { 
-          title: '제목', 
-          key: 'title', 
-          align: 'start',
-          sortable: false 
-        },
-        { 
-          title: '작성자', 
-          key: 'author',
-          sortable: false,
-          width: '120px'
-        },
-        { 
-          title: '날짜', 
-          key: 'date',
-          sortable: false,
-          width: '100px'
-        }
-      ],
-      
-      groupNotices: [
-        { id: 1, title: '그룹공지 제목1', author: '작성자1', date: '05-19' },
-        { id: 2, title: '그룹공지 제목2', author: '작성자2', date: '05-18' }
-      ],
-      
-      symposiumNotices: [
-        { id: 1, title: '심포공지 제목1', author: '작성자1', date: '05-19' }
-      ]
-  
-              
+            
         }
       },
     
@@ -587,6 +555,7 @@
   
   
   
+        this.getCodes();
         this.getUserInfo();
         this.fetchData('A');
         this.drawInquiryTypeChart();
@@ -596,6 +565,31 @@
       },
     
       methods: {
+        async getCodes() {
+          try {
+            // 문의유형
+            const inquiryRes = await apiClient.get("/api/code/list", {
+              params: { category: 'INQUIRY_TYPE' }
+            });
+            this.inquiryTypeList = inquiryRes.data;
+
+            // 문의부문
+            const categoryRes = await apiClient.get("/api/code/list", {
+              params: { category: 'INQUIRY_PART' }
+            });
+            this.categoryList = categoryRes.data;
+
+            // 중요도
+            const priorityRes = await apiClient.get("/api/code/list", {
+              params: { category: 'PRIORITY' }
+            });
+            this.priorityList = priorityRes.data;
+
+          } catch (error) {
+            console.error('코드 리스트 조회 실패:', error);
+          }
+        },
+                
         onStartDateChange(date) {
           this.Date_startDate = date;
           this.startDatePickerOpen = false;
@@ -769,31 +763,22 @@
           this.loading = true;
     
           try {
-              let response = '';
-              // 나의 처리글
+              let response = '';               
+              // 나의 문의글              
               if (para_type == 'A') {
                   response = await apiClient.get('/api/require/search', {
                       params: {
                       startDate: this.formattedDate(this.Date_startDate) + ' 00:00:00',
-                      endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',
-                      manager: this.manager,
-                      managerId: this.userId,
-                      sub: this.subscribe,
-                      status: this.selectedStatus,
-                      dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
+                      endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',                  
+                      writerId: this.userId,                     
                       }
                   });
-                  // 부서 전체 처리글
+                  // 부서 전체 문의글
               } else if (para_type == 'B') {                
                   response = await apiClient.get('/api/require/search', {
                       params: {
                       startDate: this.formattedDate(this.Date_startDate) + ' 00:00:00',
-                      endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',
-                      manager: this.manager,
-                      //managerId: this.userId,
-                      managerDeptCd: this.userDeptCd,
-                      sub: this.sub,
-                      status: this.selectedStatus,
+                      endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',                      
                       dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
                       }
                   });
@@ -1472,19 +1457,7 @@
       font-weight: 600;
       display: inline-block;
     }
-    
-   
-    
-  
-    
-   
-  
-  
-  
-  
-  
-  
-  
+      
     .chart-container {
     position: relative;
     height: 240px;
