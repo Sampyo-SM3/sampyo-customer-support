@@ -85,6 +85,8 @@ export default {
       this.loading = true;
       let result;
 
+      localStorage.setItem('subMenu', JSON.stringify('작업요청'));
+
       try {
         if (this.username != 'admin') {
           // 블루샘 계정테이블에 있는 아이디인지 먼저 확인

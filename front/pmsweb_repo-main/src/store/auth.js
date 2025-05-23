@@ -33,8 +33,7 @@ export const useAuthStore = defineStore("auth", {
           companyCd: credentials.companyCd
         });
 
-        
-
+      
         // 로그인 성공
         if (response.data) {
           this.userId = response.data.id;

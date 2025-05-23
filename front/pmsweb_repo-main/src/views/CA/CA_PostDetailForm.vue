@@ -89,7 +89,7 @@
 
       <v-col cols="4" class="search-col product-category">
         <div class="label-box">중요도</div>
-        <div class="priority-rating-wrapper px-4">
+        <div class="priority-rating-wrapper px-4" style="pointer-events: none; user-select: none;">
           <v-rating :model-value="parseInt(inquiry.priority)" :length="5" :half-increments="false" readonly
             color="primary" background-color="grey lighten-2" empty-icon="mdi-star-outline" full-icon="mdi-star"
             size="28" />
@@ -822,7 +822,6 @@ export default {
 
 .search-col {
   display: flex;
-  /* align-items: center; */
   padding: 0;
   border-left: 1px solid #e0e0e0;
 }
