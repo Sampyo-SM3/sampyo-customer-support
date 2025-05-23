@@ -1361,6 +1361,18 @@ export default {
   display: inline-block;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
 .chart-container {
   position: relative;
   height: 240px;
@@ -1374,8 +1386,6 @@ export default {
   display: inline-flex;
   border-radius: 0px;
   overflow: hidden;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
 }
 
 .custom-btn-toggle .v-btn {

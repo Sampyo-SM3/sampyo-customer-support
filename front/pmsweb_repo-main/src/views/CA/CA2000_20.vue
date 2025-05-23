@@ -877,10 +877,10 @@ export default {
       new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['1월'],
+          labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
           datasets: [{
             label: '작성 건수',
-            data: [5],
+            data: [5, 8, 12, 20, 14, 10, 7, 6, 9, 11, 4, 3],
             backgroundColor: '#66BB6A'
           }]
         },
@@ -1361,6 +1361,18 @@ export default {
   display: inline-block;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
 .chart-container {
   position: relative;
   height: 240px;
@@ -1374,8 +1386,6 @@ export default {
   display: inline-flex;
   border-radius: 0px;
   overflow: hidden;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
 }
 
 .custom-btn-toggle .v-btn {
