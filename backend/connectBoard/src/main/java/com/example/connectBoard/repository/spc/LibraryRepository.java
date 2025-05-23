@@ -19,6 +19,6 @@ public interface LibraryRepository {
 	
 	void deleteLibrary(LibraryDTO library);
 	
-	void addCnt();
+	void addCnt(LibraryDTO library);
 	
 }

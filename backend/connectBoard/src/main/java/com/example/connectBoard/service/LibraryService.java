@@ -42,8 +42,8 @@ public class LibraryService {
     	libraryRepository.deleteLibrary(library);    	
     } 
     
-    public void addCnt() {
-    	libraryRepository.addCnt();    	
+    public void addCnt(LibraryDTO library) {
+    	libraryRepository.addCnt(library);    	
     } 
     
   

@@ -91,7 +91,7 @@
 	</update>
 	
 	<!--조회수++-->
-	<update id="addCnt">
+	<update id="addCnt" parameterType="com.example.connectBoard.dto.LibraryDTO">
 	    UPDATE Library
 		 SET viewCount = viewCount+1
 	    WHERE seq = #{seq}

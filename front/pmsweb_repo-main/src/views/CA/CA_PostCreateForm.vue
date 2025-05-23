@@ -191,6 +191,7 @@ export default {
       showManagerPopup: false,
       userName: null,
       userDeptCd: null,
+      selectedUserId: JSON.parse(localStorage.getItem("userInfo"))?.id || null,
       manager: '',
       managerId: '',
       managerTel: '',
@@ -449,10 +450,14 @@ export default {
         if (this.userDeptCd === 'SPH220007') {
           saveUserId = this.selectedUserId;
           saveUserName = this.userName;
+
         } else {
           saveUserId = JSON.parse(localStorage.getItem("userInfo"))?.id || null;
           saveUserName = JSON.parse(localStorage.getItem("userInfo"))?.name || null;
         }
+
+
+        console.log(saveUserId);
 
         const boardData = {
           "sub": this.sub,
@@ -562,10 +567,11 @@ export default {
     },
 
     goBack() {
-      // 브라우저 히스토리에서 뒤로가기
       this.$router.go(-1);
     },
     onUserAdded(selectedUser) {
+      console.log(selectedUser);
+
       this.userName = selectedUser.name;
       this.selectedUserId = selectedUser.usrId;
 
