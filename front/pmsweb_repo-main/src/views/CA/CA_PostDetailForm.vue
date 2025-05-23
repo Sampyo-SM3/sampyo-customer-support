@@ -89,7 +89,11 @@
 
       <v-col cols="4" class="search-col product-category">
         <div class="label-box">중요도</div>
-        <div class="author-value">{{ inquiry.priority }}</div>
+        <div class="priority-rating-wrapper px-4">
+          <v-rating :model-value="parseInt(inquiry.priority)" :length="5" :half-increments="false" readonly
+            color="primary" background-color="grey lighten-2" empty-icon="mdi-star-outline" full-icon="mdi-star"
+            size="28" />
+        </div>
       </v-col>
     </v-row>
 
@@ -393,7 +397,7 @@ export default {
         writerPhone: response.data?.writerPhone || "",
         inquiryType: response.data?.inquiryTypeNm || "",
         inquiryPart: response.data?.inquiryPartNm || "",
-        priority: response.data?.priorityNm || "",
+        priority: response.data?.priority || "",
       };
 
       this.selectedStatus = this.inquiry.processState;

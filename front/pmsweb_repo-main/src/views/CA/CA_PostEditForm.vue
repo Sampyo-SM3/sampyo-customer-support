@@ -30,13 +30,12 @@
 
       <v-col cols="4" class="search-col product-category">
         <div class="label-box">중요도</div>
-        <div class="priority-radio-wrapper">
-          <v-radio-group v-model="selectedPriority" class="small-radios" inline density="compact" color="#3A70B1"
-            hide-details>
-            <v-radio v-for="item in priorityList" :key="item.codeId" :label="item.codeName" :value="item.codeId" />
-          </v-radio-group>
+        <div class="priority-rating-wrapper px-4">
+          <v-rating v-model="selectedPriority" :length="5" :half-increments="false" color="primary"
+            background-color="grey lighten-2" empty-icon="mdi-star-outline" full-icon="mdi-star" hover size="28" />
         </div>
       </v-col>
+
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
@@ -383,8 +382,6 @@ export default {
     // 업로드된 파일 제거
     async removeFile(file) {
 
-      console.log("랴ㅣㄷ" + file);
-
       await apiClient.post("/api/file-attach/deleteFile", {
         seq: file.seq,
         boardSeq: this.receivedSeq,
@@ -729,12 +726,6 @@ export default {
           params: { category: 'INQUIRY_PART' }
         });
         this.categoryList = categoryRes.data;
-
-        // 중요도
-        const priorityRes = await apiClient.get("/api/code/list", {
-          params: { category: 'PRIORITY' }
-        });
-        this.priorityList = priorityRes.data;
 
       } catch (error) {
         console.error('코드 리스트 조회 실패:', error);
