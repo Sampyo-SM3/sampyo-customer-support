@@ -12,6 +12,20 @@
         <div class="label-box">제 목</div>
         <div class="author-value">{{ title }}</div>
       </v-col>
+      <!-- 조회수 -->
+      <v-col class="d-flex justify-end align-center pr-4" style="gap: 6px;">
+        <v-icon color="#666" size="18">mdi-eye</v-icon>
+        <span class="view-label">조회수</span>
+        <span class="view-value ml-1">{{ viewCount }}</span>
+      </v-col>
+    </v-row>
+
+    <v-row no-gutters class="search-row middle-row">
+      <!-- 작성자 -->
+      <v-col class="search-col">
+        <div class="label-box">작성부서</div>
+        <div class="author-value">{{ dpNm }}</div>
+      </v-col>
     </v-row>
 
     <v-row no-gutters class="search-row middle-row">
@@ -146,7 +160,9 @@ export default {
       showError: false,
       title: '',
       content: '',
-      vuewCount: '',
+      dpNm: '',
+      insertId: '',
+      viewCount: 0,
       showConfirm: false,
     }
   },
@@ -164,8 +180,8 @@ export default {
   mounted() {
     this.checkLocalStorage();
     this.getUserInfo();
+    this.addCount();
     this.getDetailLibrary();
-
   },
   created() {
     // localStorage에서 사용자 정보 불러오기
@@ -180,6 +196,9 @@ export default {
 
       this.title = response.data?.title || "";
       this.content = response.data?.content || "";
+      this.insertId = response.data?.insertId || "";
+      this.dpNm = response.data?.dpNm || "";
+      this.viewCount = response.data?.viewCount || "";
 
       //첨부파일 리스트 불러오기
       try {
@@ -211,6 +230,10 @@ export default {
       }
 
       this.showConfirm = false;
+    },
+
+    async addCount() {
+      await apiClient.post('/api/library/addCnt', { seq: this.receivedSeq });
     },
 
     checkLocalStorage() {
@@ -350,10 +373,10 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   background-color: #e6eef8 !important;
-  color: #333333 !important;
+  color: #4A4B4C !important;
   white-space: nowrap;
   padding: 0 4px;
   border-right: 1px solid #eaeaea;
@@ -381,12 +404,21 @@ export default {
   margin-bottom: 10px;
 }
 
-
 .fileBox {
   border: 1px solid #B0CAE6;
   border-radius: 6px;
   background-color: rgba(231, 239, 248, 0.6);
   cursor: pointer;
   user-select: none;
+}
+
+.view-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.view-value {
+  font-size: 14px;
+  color: #333;
 }
 </style>

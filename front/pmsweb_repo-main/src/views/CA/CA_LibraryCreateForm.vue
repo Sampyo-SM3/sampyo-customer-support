@@ -557,14 +557,6 @@ export default {
   border-bottom-right-radius: 8px;
 }
 
-.label-box {
-  /* 색상 변경 */
-  color: #333333 !important;
-  /* 이전: #578ADB */
-  background-color: #e6eef8 !important;
-  /* 이전: #f5f5f5 */
-}
-
 .search-col {
   display: flex;
   align-items: center;
@@ -613,6 +605,8 @@ export default {
 }
 
 .label-box {
+  color: #333333 !important;
+  background-color: #e6eef8 !important;
   width: 100px;
   flex-shrink: 0;
   height: 100%;
@@ -621,8 +615,6 @@ export default {
   justify-content: center;
   font-size: 15px;
   font-weight: 500;
-  color: #578ADB;
-  background-color: #f5f5f5;
   white-space: nowrap;
   padding: 0 4px;
   border-right: 1px solid #eaeaea;

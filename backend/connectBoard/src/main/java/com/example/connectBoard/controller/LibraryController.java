@@ -94,9 +94,9 @@ public class LibraryController {
     
 	// 문의글 수정
     @PostMapping("/library/addCnt")
-    public ResponseEntity<?> addCnt() {    	
+    public ResponseEntity<?> addCnt(@RequestBody LibraryDTO library) {    	
         try {
-        	libraryService.addCnt();
+        	libraryService.addCnt(library);
             return ResponseEntity.ok("접수상태가 변경되었습니다.");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("서버 오류 발생: " + e.getMessage());
