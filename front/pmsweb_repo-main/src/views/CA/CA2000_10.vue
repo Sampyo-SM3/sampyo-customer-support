@@ -1,5 +1,5 @@
 <template>
-  <!-- 상단 라인 -->
+  <!-- 상단 라인 --->
   <v-row>
     <v-col>
       <v-divider thickness="3" color="#578ADB" class="mb-4"></v-divider>
