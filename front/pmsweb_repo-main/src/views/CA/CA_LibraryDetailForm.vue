@@ -220,7 +220,19 @@ export default {
     },
     async confirmDelete() {
       try {
-        // 실제 삭제 로직
+        if (this.fetchedFiles.length > 0) {
+          for (const file of this.fetchedFiles) {
+            await apiClient.post("/api/file-attach/deleteFile", {
+              seq: file.seq,
+              boardSeq: this.receivedSeq,
+              fileName: file.fileName,
+              boardType: 'CA2000_10'
+            });
+
+            await apiClient.post(`/api/fileDelete?originFile=${encodeURIComponent(file.fileName)}`);
+          }
+        }
+
         await apiClient.post('/api/library/delete', { seq: this.receivedSeq });
         this.showConfirm = false;
         this.$router.push({ name: 'CA2000_10' });
