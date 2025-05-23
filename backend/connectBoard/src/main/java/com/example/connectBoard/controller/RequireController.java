@@ -98,5 +98,14 @@ public class RequireController {
         }
     }
      
+    @PostMapping("/require/deleteRequire")
+    public ResponseEntity<?> deleteRequire(@RequestBody RequireDTO require) {    	
+        try {
+        	requireService.deleteRequire(require);
+            return ResponseEntity.ok("삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 오류 발생: " + e.getMessage());
+        }
+    }
     
 }

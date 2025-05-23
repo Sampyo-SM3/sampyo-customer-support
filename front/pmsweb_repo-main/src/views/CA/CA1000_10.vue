@@ -1,14 +1,6 @@
 <template>
   <v-container fluid class="pr-0 pl-0 pt-4">
 
-    <!-- <v-row>
-      <v-col>        
-        <div class="mt-2">
-          <v-divider thickness="3" color="#578ADB"></v-divider>
-        </div>
-      </v-col>
-    </v-row> -->
-
     <v-row dense align="center" class="flex-wrap rounded-border sky-bg" style="gap:5px;">
 
       <!-- 요청기간 -->
@@ -112,11 +104,21 @@
 
         <v-btn variant="flat" color="green darken-2" class="custom-btn white-text d-flex align-center" size="small"
           @click="$router.push({ name: 'CA_PostCreateForm' })">
-
           <v-icon size="default" class="mr-1">mdi-pencil</v-icon>
           게시글 작성
         </v-btn>
 
+        <v-btn variant="flat" color="red darken-2" class="custom-btn white-text d-flex align-center ml-2" size="small"
+          @click="showConfirm = true">
+          <v-icon size="default" class="mr-1">mdi-delete</v-icon>
+          삭제
+        </v-btn>
+
+        <v-snackbar v-model="showSuccess" timeout="3000" color="success" elevation="3" class="center-snackbar">
+          <div class="snackbar-text">
+            {{ successMessage }}
+          </div>
+        </v-snackbar>
       </v-col>
     </v-row>
 
@@ -255,6 +257,34 @@
       </v-btn>
     </template>
   </v-snackbar>
+
+  <v-dialog v-model="showConfirm" persistent max-width="600" transition="dialog-transition">
+    <v-card class="pa-6 rounded-lg" elevation="10">
+      <div class="text-center mb-2">
+        <v-icon color="warning" size="50">mdi-alert-circle-outline</v-icon>
+      </div>
+
+      <div class="text-h6 font-weight-bold text-center mb-2">
+        문의글을 삭제하시겠습니까?
+      </div>
+
+      <div class="text-body-2 text-grey text-center mb-6">
+        삭제하시면 다시 복구하실 수 없습니다.
+      </div>
+
+      <!-- 버튼 -->
+      <v-card-actions class="justify-center">
+        <v-btn variant="outlined" color="#1E88E5" class="mr-2" @click="showConfirm = false">
+          취소
+        </v-btn>
+
+        <v-btn variant="flat" color="#1E88E5" class="white--text" @click="confirmDelete">
+          삭제
+        </v-btn>
+      </v-card-actions>
+
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -321,6 +351,10 @@ export default {
       savedSubMenu: '',
       countStatus: [],
       inquiryType: '',
+      showConfirm: false,
+      selectedItemsForDelete: [],
+      showSuccess: false,
+      successMessage: '',
     }
   },
 
@@ -689,8 +723,38 @@ export default {
         console.error("❌ 오류 발생:", error);
       }
     },
+    async confirmDelete() {
+      const selectedItems = this.tableData.filter(item => item.selected);
+
+      if (selectedItems.length === 0) {
+        this.errorMessages = ['삭제할 항목을 선택해주세요.'];
+        this.showError = true;
+        return;
+      }
+
+      try {
+        for (const item of selectedItems) {
+          await apiClient.post("/api/require/deleteRequire", {
+            seq: item.seq,
+          });
+        }
+
+        this.selectedItemsForDelete = selectedItems;
+
+        // 성공 후 처리
+        this.showConfirm = false; // 알림창 닫기
+        this.successMessage = '삭제되었습니다.'; // 메시지 설정
+        this.showSuccess = true; // 성공 메시지 표시용 플래그
+        this.fetchData();
+
+      } catch (error) {
+        this.errorMessages = ['삭제 중 오류가 발생했습니다.'];
+        this.showError = true;
+      }
+    },
   }
-}</script>
+}
+</script>
 
 <style scoped>
 /* VueDatePicker 관련 추가 스타일 */
@@ -943,7 +1007,6 @@ export default {
   display: flex;
   align-items: center;
   font-size: 14px;
-  justify-content: center;
 }
 
 .th-cell {
@@ -959,14 +1022,14 @@ export default {
 }
 
 .th-cell:not(:nth-child(1)):not(:nth-child(4)),
-  .td-cell:not(:nth-child(1)):not(:nth-child(4)) {
-    justify-content: center;
-  }
+.td-cell:not(:nth-child(1)):not(:nth-child(4)) {
+  justify-content: center;
+}
 
-  .th-cell:nth-child(4),
-  .td-cell:nth-child(4) {
-    flex: 1;
-  }
+.th-cell:nth-child(4),
+.td-cell:nth-child(4) {
+  flex: 1;
+}
 
 .header-with-divider {
   display: flex;
@@ -1176,5 +1239,22 @@ export default {
 .status-S {
   background-color: #f0f7ff;
   color: #2196F3;
+}
+
+.center-snackbar {
+  position: fixed !important;
+  top: 50%;
+  left: 50%;
+  transform: translate(-90%, -50%);
+  max-width: 300px;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.snackbar-text {
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  width: 100%;
 }
 </style>

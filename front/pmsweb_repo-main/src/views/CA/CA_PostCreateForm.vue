@@ -221,7 +221,7 @@ export default {
       priorityList: [],
       selectedInquiryType: null,
       selectedCategory: null,
-      selectedPriority: null,
+      selectedPriority: 0,
     }
   },
 
@@ -419,13 +419,40 @@ export default {
       // 제목 검증
       if (!this.sub || this.sub.trim() === '') {
         this.errorMessages.push('제목을 입력해주세요.');
-        this.showError = true;
-        return false;
       }
 
       // 내용 검증
       if (!this.etc || this.etc.trim() === '') {
         this.errorMessages.push('내용을 입력해주세요.');
+      }
+
+      // 문의유형
+      if (!this.selectedInquiryType || this.selectedInquiryType === '') {
+        this.errorMessages.push('문의유형을 선택해주세요.');
+      }
+
+      // 문의부문
+      if (!this.selectedCategory || this.selectedCategory === '') {
+        this.errorMessages.push('문의부문을 선택해주세요.');
+      }
+
+      // 중요도
+      if (this.selectedPriority === null || this.selectedPriority === 0) {
+        this.errorMessages.push('중요도를 선택해주세요.');
+      }
+
+      // 담당자
+      if (!this.manager || String(this.manager).trim() === '') {
+        this.errorMessages.push('담당자를 지정해주세요.');
+      }
+
+
+      // 작성자 (특정 부서일 경우만)
+      if (this.userDeptCd === 'SPH220007' && (!this.userName || this.userName.trim() === '' || !this.selectedUserId)) {
+        this.errorMessages.push('작성자를 지정해주세요.');
+      }
+
+      if (this.errorMessages.length > 0) {
         this.showError = true;
         return false;
       }

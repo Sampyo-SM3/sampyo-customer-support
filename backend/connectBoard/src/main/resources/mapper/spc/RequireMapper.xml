@@ -61,7 +61,7 @@
 		<if test="managerDeptCd != null and managerDeptCd != ''">
 			AND s.DEPART1 = #{managerDeptCd}
 		</if>    
-	     	
+	     	AND b.deleteYn = 'N'
 	</where>
 		ORDER BY b.seq DESC
 	</select>
@@ -202,7 +202,8 @@
 		    (SELECT codeName FROM CODE_MASTER WHERE codeId = a.priority) as priorityNm
 		from board a
 		 left outer join sys_empref b on a.writerId = b.id
-		where seq = #{seq};
+		where seq = #{seq}
+		 and a.deleteYn = 'N';
 	</select>
 
 	<update id="updateForm" parameterType="com.example.connectBoard.dto.RequireDTO">
@@ -261,5 +262,11 @@
     		etc = #{etc}
     	WHERE seq = #{seq};
 	</update>
+	
+	<delete id="deleteRequire" parameterType="com.example.connectBoard.dto.RequireDTO">
+		update board 
+		 set deleteYn = 'Y'
+		where seq = #{seq}
+	</delete>
 </mapper>
 

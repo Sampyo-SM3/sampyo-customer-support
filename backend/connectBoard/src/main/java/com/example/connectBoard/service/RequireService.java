@@ -46,5 +46,10 @@ public class RequireService {
     	requireRepository.updateSrForm(require);    	
     }
 
+	public void deleteRequire(RequireDTO require) {
+		requireRepository.deleteRequire(require);   
+		
+	}
+
 
 }

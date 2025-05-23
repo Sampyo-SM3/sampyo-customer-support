@@ -31,10 +31,10 @@
         <div class="table-container compact">
           <div class="table-header">
             <div class="th-cell"></div>
-            <div class="th-cell">제목</div>
-            <div class="th-cell">조회수</div>
-            <div class="th-cell">작성부서</div>
-            <div class="th-cell">작성일자</div>
+            <div class="th-cell fontCenter">제목</div>
+            <div class="th-cell fontCenter">조회수</div>
+            <div class="th-cell fontCenter">작성부서</div>
+            <div class="th-cell fontCenter">작성일자</div>
           </div>
 
           <div v-for="(item, index) in paginatedData" :key="index" class="table-row compact">
@@ -368,11 +368,9 @@ export default {
   display: flex;
   align-items: center;
   font-size: 14px;
-  justify-content: center;
 }
 
 .th-cell {
-  justify-content: center;
   font-weight: 500;
   white-space: nowrap;
   font-size: 14px;
@@ -544,5 +542,9 @@ export default {
   border-radius: 8px;
   background-color: #F9FAFB;
   border: 1px dashed #D3D3D3;
+}
+
+.fontCenter {
+  justify-content: center;
 }
 </style>

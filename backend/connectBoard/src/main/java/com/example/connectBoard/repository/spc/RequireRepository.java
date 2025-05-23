@@ -22,4 +22,6 @@ public interface RequireRepository {
 	
 	void updateSrForm(RequireDTO require);
 
+	void deleteRequire(RequireDTO require);
+
 }
