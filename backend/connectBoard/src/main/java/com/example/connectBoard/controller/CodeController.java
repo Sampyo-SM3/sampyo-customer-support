@@ -30,5 +30,10 @@ public class CodeController {
     	return codeService.getCodes(category);
     }
     
+    //문의유형별 count
+    @GetMapping("/code/count")
+    public List<CodeDTO> getCodeCount(@RequestParam String startDate, @RequestParam String endDate, @RequestParam String writerId, @RequestParam String dpId) {
+        return codeService.getCodeCount(startDate, endDate, writerId, dpId);
+    } 
        
 }

@@ -9,4 +9,6 @@ import com.example.connectBoard.dto.CodeDTO;
 @Mapper
 public interface CodeRepository {
 	List<CodeDTO> getCodes(String category);
+	 
+	List<CodeDTO> getCodeCount(String startDate, String endDate, String writerId, String dpId);
 }

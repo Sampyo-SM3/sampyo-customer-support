@@ -17,4 +17,7 @@ public class CodeDTO {
     private Integer orderNum;	//순번
     private  LocalDate insertDt; // 생성 날짜
     private  LocalDate updateDt; // 업데이트 날짜
+    private Integer cnt;	
+    private String writerId;       // 작성자id
+    private String dpId;       
 }

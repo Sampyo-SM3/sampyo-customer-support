@@ -19,6 +19,40 @@
 		WHERE category = #{category}
 		ORDER BY orderNum;
     </select>
+	    
+	<!--문의유형별 count-->
+	<select id="getCodeCount" parameterType="map" resultType="com.example.connectBoard.dto.CodeDTO">
+	    SELECT
+	        c.codeName,
+	        b.inquiryType,
+	        c.orderNum,
+	        count(*) as cnt
+	    FROM board b
+	    INNER JOIN code_master c ON b.inquiryType = c.codeId
+	    WHERE b.inquiryType &lt;&gt; ''
+		<if test="startDate != null and startDate != ''">
+		    AND b.requestDate &gt;= #{startDate}
+		</if>
+		<if test="endDate != null and endDate != ''">
+		    AND b.requestDate &lt;= #{endDate}
+		</if>
+		<if test="writerId != null and writerId != ''">
+			AND b.writerId = #{writerId}
+		</if>	
+		<if test="dpId != null and dpId != ''">
+			AND b.dpId = #{dpId}
+		</if>	
+	    GROUP BY b.inquiryType, c.orderNum, c.codeName
+	    ORDER BY c.orderNum
+	</select>
+    
+<!--asdsdd
+select inquiryType, orderNum, count(*) as cnt from board b inner join code_master c on b.inquiryType = c.codeId
+where inquiryType <> ''
+group by inquiryType, orderNum
+order by c.orderNum
+
+-->    
 
 </mapper>
 

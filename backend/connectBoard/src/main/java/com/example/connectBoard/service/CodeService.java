@@ -19,5 +19,9 @@ public class CodeService {
     public List<CodeDTO> getCodes(String category) {
     	 return codeRepository.getCodes(category);
     }
+     
+    public List<CodeDTO> getCodeCount(String startDate, String endDate, String writerId, String dpId) {
+        return codeRepository.getCodeCount(startDate, endDate, writerId, dpId);
+    }
     
 }

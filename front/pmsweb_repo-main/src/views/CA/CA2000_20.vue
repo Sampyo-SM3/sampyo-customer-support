@@ -1,77 +1,6 @@
 <template>
   <v-container fluid class="pr-0 pl-0 pt-4">
-  <!--     
-      <v-row>
-          <v-card>
-             
-              <v-tabs v-model="activeTab" bg-color="primary">
-              <v-tab value="group">그룹공지</v-tab>
-              <v-tab value="symposium">심포공지</v-tab>
-              <v-tab value="it">IT공지</v-tab>
-              <v-tab value="safety">안전공지</v-tab>
-              <v-tab value="more">더보기</v-tab>
-              </v-tabs>
-  
-              <v-window v-model="activeTab">
-              <v-window-item value="group">
-                  <v-data-table
-                  :headers="headers"
-                  :items="groupNotices"
-                  item-value="id"
-                  hide-default-footer
-                  class="elevation-0"
-                  >
-                  </v-data-table>
-              </v-window-item>
-              
-              <v-window-item value="symposium">
-                  <v-data-table
-                  :headers="headers"
-                  :items="symposiumNotices"
-                  item-value="id"
-                  hide-default-footer
-                  class="elevation-0"
-                  >
-                  </v-data-table>
-              </v-window-item>
-              
-              <v-window-item value="it">
-                  <v-data-table
-                  :headers="headers"
-                  :items="itNotices"
-                  item-value="id"
-                  hide-default-footer
-                  class="elevation-0"
-                  >
-                  </v-data-table>
-              </v-window-item>
-              
-              <v-window-item value="safety">
-                  <v-data-table
-                  :headers="headers"
-                  :items="safetyNotices"
-                  item-value="id"
-                  hide-default-footer
-                  class="elevation-0"
-                  >
-                  </v-data-table>
-              </v-window-item>
-              
-              <v-window-item value="more">
-                  <v-data-table
-                  :headers="headers"
-                  :items="moreNotices"
-                  item-value="id"
-                  hide-default-footer
-                  class="elevation-0"
-                  >
-                  </v-data-table>
-              </v-window-item>
-              </v-window>
-          </v-card>
-      </v-row> -->
-  
-  
+
       <v-row class="user-row" align="center">
           <v-col sm="6" md="auto" class="d-flex align-center filter-col">
           <span class="filter-label">요청기간<span class="label-divider"></span></span>
@@ -516,7 +445,9 @@
           userName: null,
           userId: null,    
           userDeptCd: null,    
-            
+          aryInquiryRes: [],
+          aryInquiryResCount: [],
+          
         }
       },
     
@@ -546,7 +477,7 @@
         },
       },
     
-      mounted() {
+      async mounted() {
           
   
         this.setDateRange('month');
@@ -555,41 +486,16 @@
   
   
   
-        this.getCodes();
+        
         this.getUserInfo();
-        this.fetchData('A');
+        await this.fetchData('B');        
         this.drawInquiryTypeChart();
         this.drawStatusChart();
         this.drawMonthlyChart();      
         
       },
     
-      methods: {
-        async getCodes() {
-          try {
-            // 문의유형
-            const inquiryRes = await apiClient.get("/api/code/list", {
-              params: { category: 'INQUIRY_TYPE' }
-            });
-            this.inquiryTypeList = inquiryRes.data;
-
-            // 문의부문
-            const categoryRes = await apiClient.get("/api/code/list", {
-              params: { category: 'INQUIRY_PART' }
-            });
-            this.categoryList = categoryRes.data;
-
-            // 중요도
-            const priorityRes = await apiClient.get("/api/code/list", {
-              params: { category: 'PRIORITY' }
-            });
-            this.priorityList = priorityRes.data;
-
-          } catch (error) {
-            console.error('코드 리스트 조회 실패:', error);
-          }
-        },
-                
+      methods: {                        
         onStartDateChange(date) {
           this.Date_startDate = date;
           this.startDatePickerOpen = false;
@@ -768,18 +674,18 @@
               if (para_type == 'A') {
                   response = await apiClient.get('/api/require/search', {
                       params: {
-                      startDate: this.formattedDate(this.Date_startDate) + ' 00:00:00',
-                      endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',                  
-                      writerId: this.userId,                     
+                        startDate: this.formattedDate(this.Date_startDate) + ' 00:00:00',
+                        endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',                  
+                        writerId: this.userId,                     
                       }
                   });
                   // 부서 전체 문의글
               } else if (para_type == 'B') {                
                   response = await apiClient.get('/api/require/search', {
                       params: {
-                      startDate: this.formattedDate(this.Date_startDate) + ' 00:00:00',
-                      endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',                      
-                      dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
+                        startDate: this.formattedDate(this.Date_startDate) + ' 00:00:00',
+                        endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',                      
+                        dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
                       }
                   });
               }
@@ -826,6 +732,47 @@
             } else {
               this.tableData = [];
             }
+
+
+
+            // 문의 유형별 count
+            // 나의 문의글에 해당하는 그래프프
+            if (para_type == 'A') {
+              const response2 = await apiClient.get('/api/code/count', {
+                params: {
+                  startDate: this.formattedDate(this.Date_startDate) + ' 00:00:00',
+                  endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',  
+                  writerId: this.userId,        
+                  dpId: '',
+
+                }
+              });    
+              
+              console.log('111');
+              console.log(this.formattedDate(this.Date_startDate));            
+              console.log(response2.data);
+              console.log('222');
+              this.aryInquiryRes = response2.data.map(item => item.codeName);
+              this.aryInquiryResCount = response2.data.map(item => item.cnt);   
+            } else if (para_type == 'B') {                
+              const response2 = await apiClient.get('/api/code/count', {
+                params: {
+                  startDate: this.formattedDate(this.Date_startDate) + ' 00:00:00',
+                  endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',  
+                  writerId: '',
+                  dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null    
+                }
+              });    
+              
+              console.log('333');
+              console.log(this.formattedDate(this.Date_startDate));            
+              console.log(response2.data);
+              console.log('444');
+              this.aryInquiryRes = response2.data.map(item => item.codeName);
+              this.aryInquiryResCount = response2.data.map(item => item.cnt); 
+            }            
+
+            
     
     
     
@@ -914,14 +861,14 @@
   
   
   
-        drawInquiryTypeChart() {
+        drawInquiryTypeChart() {          
           const ctx = this.$refs.inquiryTypeChartCanvas.getContext('2d');
           new Chart(ctx, {
               type: 'doughnut',
               data: {
-              labels: ['단순문의', '데이터 수정', '프로그램 수정'],
+              labels: this.aryInquiryRes,
               datasets: [{
-                  data: [12, 18, 9],
+                  data: this.aryInquiryResCount,
                   backgroundColor: ['#FF9F40', '#4BC0C0', '#9966FF']
               }]
               },

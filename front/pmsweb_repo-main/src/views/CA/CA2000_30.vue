@@ -516,39 +516,7 @@ Chart.register(
         userName: null,
         userId: null,    
         userDeptCd: null,    
-     
-        activeTab: 'group',
-        headers: [
-      { 
-        title: '제목', 
-        key: 'title', 
-        align: 'start',
-        sortable: false 
-      },
-      { 
-        title: '작성자', 
-        key: 'author',
-        sortable: false,
-        width: '120px'
-      },
-      { 
-        title: '날짜', 
-        key: 'date',
-        sortable: false,
-        width: '100px'
-      }
-    ],
-    
-    groupNotices: [
-      { id: 1, title: '그룹공지 제목1', author: '작성자1', date: '05-19' },
-      { id: 2, title: '그룹공지 제목2', author: '작성자2', date: '05-18' }
-    ],
-    
-    symposiumNotices: [
-      { id: 1, title: '심포공지 제목1', author: '작성자1', date: '05-19' }
-    ]
 
-            
       }
     },
   
