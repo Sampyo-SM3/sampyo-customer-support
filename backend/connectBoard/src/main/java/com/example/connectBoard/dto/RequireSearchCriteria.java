@@ -15,6 +15,7 @@ public class RequireSearchCriteria {
     private String endDate;
     private String manager;
     private String managerId;
+    private String managerDeptCd;    
     private String productType;
     private String sub;
     private String status;
