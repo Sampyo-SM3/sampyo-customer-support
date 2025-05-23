@@ -31,6 +31,7 @@
 		    b.priority,
 		    (SELECT COUNT(*) FROM COMMENTS WHERE postid = b.seq) as countComment   	
 		FROM board b 
+		  inner join sys_empref s on s.id = b.managerId
 		  inner join code_master c on b.processState = c.codeId		
 		  left outer join SPG.DBO.CRM_USER_MASTER d on b.writerId = d.USR_ID					
 	<where>
@@ -54,9 +55,13 @@
 	    <if test="dpId != null and dpId != '' and dpId != 'SPH220007'">
         	AND b.dpId LIKE '%' + #{dpId} + '%'
     	</if>    
-	    <if test="managerId != null and managerId != ''">
-	        AND b.managerId LIKE '%' + #{managerId} + '%'
-	    </if>    	
+		<if test="managerId != null and managerId != ''">
+			AND b.managerId = #{managerId}
+		</if>
+		<if test="managerDeptCd != null and managerDeptCd != ''">
+			AND s.DEPART1 = #{managerDeptCd}
+		</if>    
+	     	
 	</where>
 		ORDER BY b.seq DESC
 	</select>

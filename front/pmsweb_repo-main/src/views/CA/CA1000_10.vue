@@ -943,6 +943,7 @@ export default {
   display: flex;
   align-items: center;
   font-size: 14px;
+  justify-content: center;
 }
 
 .th-cell {
@@ -957,61 +958,15 @@ export default {
   justify-content: center;
 }
 
-.th-cell:nth-child(2),
-.td-cell:nth-child(2) {
-  flex: 0 0 80px;
-  justify-content: center;
-}
+.th-cell:not(:nth-child(1)):not(:nth-child(4)),
+  .td-cell:not(:nth-child(1)):not(:nth-child(4)) {
+    justify-content: center;
+  }
 
-/* 접수번호 */
-.th-cell:nth-child(3),
-.td-cell:nth-child(3) {
-  flex: 0 0 100px;
-  justify-content: center;
-}
-
-/* 요청일 */
-.th-cell:nth-child(4),
-.td-cell:nth-child(4) {
-  flex: 1;
-}
-
-/* 제목 */
-.th-cell:nth-child(5),
-.td-cell:nth-child(5) {
-  flex: 0 0 100px;
-  justify-content: center;
-}
-
-/* 사업부문 */
-.th-cell:nth-child(6),
-.td-cell:nth-child(6) {
-  flex: 0 0 90px;
-  justify-content: center;
-}
-
-/* 진행상태 */
-.th-cell:nth-child(7),
-.td-cell:nth-child(7) {
-  flex: 0 0 100px;
-  justify-content: center;
-}
-
-.th-cell:nth-child(8),
-.td-cell:nth-child(8) {
-  flex: 0 0 90px;
-  justify-content: center;
-}
-
-/* 담당자 */
-.th-cell:nth-child(9),
-.td-cell:nth-child(9) {
-  flex: 0 0 100px;
-  justify-content: center;
-}
-
-/* 소요시간 */
-/* .th-cell:nth-child(10), .td-cell:nth-child(10) { flex: 0 0 180px; }  */
+  .th-cell:nth-child(4),
+  .td-cell:nth-child(4) {
+    flex: 1;
+  }
 
 .header-with-divider {
   display: flex;

@@ -1,62 +1,134 @@
 <template>
   <v-container fluid class="pr-0 pl-0 pt-4">
-    <v-row dense align="center" class="flex-wrap rounded-border sky-bg" style="gap:5px;">
-      <!-- 버튼 그룹 -->
-      <v-col cols="auto" class="mr-4">
-        <div class="btn-toggle-group">
-          <v-btn class="btn-rect" :class="{ 'active-btn': selectedView === 'my' }" @click="selectedView = 'my'">
-            <v-icon left size="18">mdi-account</v-icon>
-            나의 처리글
-          </v-btn>
+    <!--     
+      <v-row>
+          <v-card>
+             
+              <v-tabs v-model="activeTab" bg-color="primary">
+              <v-tab value="group">그룹공지</v-tab>
+              <v-tab value="symposium">심포공지</v-tab>
+              <v-tab value="it">IT공지</v-tab>
+              <v-tab value="safety">안전공지</v-tab>
+              <v-tab value="more">더보기</v-tab>
+              </v-tabs>
+  
+              <v-window v-model="activeTab">
+              <v-window-item value="group">
+                  <v-data-table
+                  :headers="headers"
+                  :items="groupNotices"
+                  item-value="id"
+                  hide-default-footer
+                  class="elevation-0"
+                  >
+                  </v-data-table>
+              </v-window-item>
+              
+              <v-window-item value="symposium">
+                  <v-data-table
+                  :headers="headers"
+                  :items="symposiumNotices"
+                  item-value="id"
+                  hide-default-footer
+                  class="elevation-0"
+                  >
+                  </v-data-table>
+              </v-window-item>
+              
+              <v-window-item value="it">
+                  <v-data-table
+                  :headers="headers"
+                  :items="itNotices"
+                  item-value="id"
+                  hide-default-footer
+                  class="elevation-0"
+                  >
+                  </v-data-table>
+              </v-window-item>
+              
+              <v-window-item value="safety">
+                  <v-data-table
+                  :headers="headers"
+                  :items="safetyNotices"
+                  item-value="id"
+                  hide-default-footer
+                  class="elevation-0"
+                  >
+                  </v-data-table>
+              </v-window-item>
+              
+              <v-window-item value="more">
+                  <v-data-table
+                  :headers="headers"
+                  :items="moreNotices"
+                  item-value="id"
+                  hide-default-footer
+                  class="elevation-0"
+                  >
+                  </v-data-table>
+              </v-window-item>
+              </v-window>
+          </v-card>
+      </v-row> -->
 
-          <v-btn class="btn-rect" :class="{ 'active-btn': selectedView === 'dept' }" @click="selectedView = 'dept'">
-            <v-icon left size="18">mdi-office-building</v-icon>
-            부서 문의글
-          </v-btn>
-        </div>
-      </v-col>
 
-      <!-- 요청기간 필터 영역 -->
-      <v-col cols="auto" class="d-flex align-center filter-col" style="margin-left: -6px;">
+    <v-row class="user-row" align="center">
+      <v-col sm="6" md="auto" class="d-flex align-center filter-col">
         <span class="filter-label">요청기간<span class="label-divider"></span></span>
+
+        <!-- 시작일 입력 필드 -->
         <div class="start-date-wrapper">
-          <VueDatePicker class="date-picker" preview-format="yyyy-MM-dd" v-model="Date_startDate"
-            :enable-time-picker="false" :clearable="false" :text-input="false" format="yyyy-MM-dd"
-            @update:model-value="onStartDateChange" v-model:open="startDatePickerOpen" locale="ko" />
+          <VueDatePicker class="date-picker" :month-picker="false" preview-format="yyyy-MM-dd" v-model="Date_startDate"
+            :teleport="true" position="bottom" :enable-time-picker="false" auto-apply locale="ko" format="yyyy-MM-dd"
+            :week-start="1" @update:model-value="onStartDateChange" v-model:open="startDatePickerOpen"
+            :clearable="false" :text-input="false" />
         </div>
         <span class="date-separator">~</span>
+
+        <!-- 종료일 입력 필드 -->
         <div class="end-date-wrapper">
-          <VueDatePicker class="date-picker" preview-format="yyyy-MM-dd" v-model="Date_endDate"
-            :enable-time-picker="false" :clearable="false" :text-input="false" format="yyyy-MM-dd"
-            @update:model-value="onEndDateChange" v-model:open="endDatePickerOpen" locale="ko" />
+          <VueDatePicker class="date-picker" :month-picker="false" preview-format="yyyy-MM-dd" v-model="Date_endDate"
+            :teleport="true" position="bottom" :enable-time-picker="false" auto-apply locale="ko" format="yyyy-MM-dd"
+            :week-start="1" @update:model-value="onEndDateChange" v-model:open="endDatePickerOpen" :clearable="false"
+            :text-input="false" />
         </div>
 
         <!-- 날짜 버튼 -->
-        <div class="date-buttons ml-2 mr-2">
+        <div class="date-buttons mr-2">
           <div class="date-btn-container">
-            <v-btn class="date-btn" :class="{ 'active-date-btn': dateRange === 'today' }"
-              @click="setDateRange('today')">오늘</v-btn>
-            <v-btn class="date-btn" :class="{ 'active-date-btn': dateRange === 'week' }"
-              @click="setDateRange('week')">1주일</v-btn>
-            <v-btn class="date-btn" :class="{ 'active-date-btn': dateRange === '15days' }"
-              @click="setDateRange('15days')">15일</v-btn>
-            <v-btn class="date-btn" :class="{ 'active-date-btn': dateRange === 'month' }"
-              @click="setDateRange('month')">1개월</v-btn>
-            <v-btn class="date-btn" :class="{ 'active-date-btn': dateRange === '3months' }"
-              @click="setDateRange('3months')">3개월</v-btn>
+            <v-btn value="today" class="date-btn" :class="{ 'active-date-btn': dateRange === 'today' }"
+              @click="setDateRange('today')">
+              오늘
+            </v-btn>
+            <v-btn value="week" class="date-btn" :class="{ 'active-date-btn': dateRange === 'week' }"
+              @click="setDateRange('week')">
+              1주일
+            </v-btn>
+            <v-btn value="15days" class="date-btn" :class="{ 'active-date-btn': dateRange === '15days' }"
+              @click="setDateRange('15days')">
+              15일
+            </v-btn>
+            <v-btn value="month" class="date-btn" :class="{ 'active-date-btn': dateRange === 'month' }"
+              @click="setDateRange('month')">
+              1개월
+            </v-btn>
+            <v-btn value="3months" class="date-btn" :class="{ 'active-date-btn': dateRange === '3months' }"
+              @click="setDateRange('3months')">
+              3개월
+            </v-btn>
           </div>
         </div>
-      </v-col>
 
-      <!-- 검색 버튼 -->
-      <v-col cols="auto" class="d-flex align-center">
-        <v-btn variant="flat" color="primary" class="search-btn ml-2" @click="fetchData()">
+
+      </v-col>
+      <v-col sm="12" md="auto" class="d-flex justify-end">
+        <v-btn variant="flat" color="primary" class="custom-btn" size="small"
+          @click="selectedView === 'my' ? fetchData('A') : fetchData('B')">
           <v-icon size="default" class="mr-1">mdi-magnify</v-icon>
           조회
         </v-btn>
       </v-col>
     </v-row>
-
 
     <v-row>
       <v-col cols="auto" style="width: 280px;">
@@ -88,14 +160,22 @@
     </v-row>
 
 
+
+
     <!-- 데이터 테이블 상단 버튼 영역 -->
-    <v-row class="top-button-row mb-2">
-      <v-col class="d-flex align-center">
-
-
-
-
+    <v-row class="top-button-row">
+      <v-col class="d-flex align-center pb-0">
+        <v-btn-toggle v-model="selectedView" class="custom-btn-toggle" mandatory>
+          <v-btn value="my" @click="fetchData('A')" :class="{ 'selected-btn': selectedView === 'my' }">
+            나의 처리글
+          </v-btn>
+          <v-btn value="dept" @click="fetchData('B')" :class="{ 'selected-btn': selectedView === 'dept' }">
+            부서 문의글
+          </v-btn>
+        </v-btn-toggle>
       </v-col>
+
+
     </v-row>
 
     <!-- 데이터 테이블 -->
@@ -104,9 +184,6 @@
         <div class="table-container">
           <!-- 테이블 헤더 -->
           <div class="table-header">
-            <div class="th-cell checkbox-cell">
-              <v-checkbox hide-details density="compact" v-model="selectAll" @change="toggleSelectAll"></v-checkbox>
-            </div>
             <div class="th-cell">접수번호</div>
             <div class="th-cell">요청일</div>
             <div class="th-cell">제목</div>
@@ -117,14 +194,10 @@
             <div class="th-cell">완료일</div>
             <div class="th-cell">담당자</div>
             <div class="th-cell">소요시간</div>
-            <!-- <div class="th-cell">메모</div> -->
           </div>
 
           <!-- 테이블 데이터 행 -->
           <div v-for="(item, index) in paginatedData" :key="index" class="table-row">
-            <div class="td-cell checkbox-cell">
-              <v-checkbox hide-details density="compact" v-model="item.selected"></v-checkbox>
-            </div>
             <div class="td-cell">{{ item.seq }}</div>
             <div class="td-cell">{{ formatDate(item.requestDate) }}</div>
             <div class="td-cell title-cell">
@@ -136,11 +209,13 @@
               }" class="title-link" style="display: inline-flex; align-items: center;">
                 {{ item.sub }}
 
-                <span v-if="item.countComment > 0" style="color: #737577;">&nbsp;[{{ item.countComment }}]</span>
+                <span v-if="item.countComment > 0" style="color: #737577;">
+                  &nbsp;[{{ item.countComment }}]
+                </span>
 
                 <span v-if="item.new_yn === 'Y'">&nbsp;</span>
                 <v-img v-if="item.new_yn === 'Y'" src="@/assets/new-icon.png" alt="new" width="22" height="22"
-                  style="display: inline-block; vertical-align: middle;"></v-img>
+                  style="display: inline-block; vertical-align: middle;" />
               </router-link>
             </div>
             <div class="td-cell" style="text-align: center;">
@@ -157,13 +232,12 @@
             <div class="td-cell">{{ formatDate(item.completeDt) }}</div>
             <div class="td-cell">{{ item.manager || '-' }}</div>
             <div class="td-cell">{{ calculateDuration(item.requestDate, item.completeDt) }}</div>
-            <!-- <div class="td-cell">{{ item.memo || '-' }}</div> -->
           </div>
         </div>
 
         <!-- 로딩 표시 -->
         <div v-if="loading" class="loading-overlay">
-          <v-progress-circular indeterminate color="primary"></v-progress-circular>
+          <v-progress-circular indeterminate color="primary" />
         </div>
 
         <!-- 데이터 없음 표시 -->
@@ -174,7 +248,7 @@
         <!-- 페이지네이션 -->
         <div class="pagination-container" v-if="tableData.length > 0">
           <v-btn icon="mdi-chevron-left" variant="text" size="small" :disabled="currentPage === 1"
-            @click="currentPage--"></v-btn>
+            @click="currentPage--" />
 
           <template v-if="totalPages <= 5">
             <v-btn v-for="page in totalPages" :key="page" size="small" :variant="currentPage === page ? 'flat' : 'text'"
@@ -217,7 +291,7 @@
           </template>
 
           <v-btn icon="mdi-chevron-right" variant="text" size="small" :disabled="currentPage === totalPages"
-            @click="currentPage++"></v-btn>
+            @click="currentPage++" />
         </div>
       </v-col>
     </v-row>
@@ -262,6 +336,8 @@ Chart.register(
   CategoryScale,
   LinearScale
 );
+
+
 
 export default {
   components: {
@@ -327,6 +403,40 @@ export default {
       selectedView: 'my',
       userName: null,
       userId: null,
+      userDeptCd: null,
+
+      activeTab: 'group',
+      headers: [
+        {
+          title: '제목',
+          key: 'title',
+          align: 'start',
+          sortable: false
+        },
+        {
+          title: '작성자',
+          key: 'author',
+          sortable: false,
+          width: '120px'
+        },
+        {
+          title: '날짜',
+          key: 'date',
+          sortable: false,
+          width: '100px'
+        }
+      ],
+
+      groupNotices: [
+        { id: 1, title: '그룹공지 제목1', author: '작성자1', date: '05-19' },
+        { id: 2, title: '그룹공지 제목2', author: '작성자2', date: '05-18' }
+      ],
+
+      symposiumNotices: [
+        { id: 1, title: '심포공지 제목1', author: '작성자1', date: '05-19' }
+      ]
+
+
     }
   },
 
@@ -510,7 +620,7 @@ export default {
       switch (range) {
         case 'today':
           // 오늘 날짜로 시작일과 종료일 모두 설정
-          break;
+          break
         case 'week':
           // 1주일 전
           start.setDate(today.getDate() - 7);
@@ -562,13 +672,14 @@ export default {
             }
           });
           // 부서 전체 처리글
-        } else {
+        } else if (para_type == 'B') {
           response = await apiClient.get('/api/require/search', {
             params: {
               startDate: this.formattedDate(this.Date_startDate) + ' 00:00:00',
               endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',
               manager: this.manager,
               //managerId: this.userId,
+              managerDeptCd: this.userDeptCd,
               sub: this.sub,
               status: this.selectedStatus,
               dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
@@ -793,11 +904,16 @@ export default {
       // localStorage에서 userInfo를 가져와서 userName에 할당
       this.userName = JSON.parse(localStorage.getItem("userInfo"))?.name || null;
       this.userId = JSON.parse(localStorage.getItem("userInfo"))?.id || null;
+      this.userDeptCd = JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null;
     },
   }
 }</script>
 
 <style scoped>
+.user-row {
+  transform: translateX(10px);
+}
+
 /* VueDatePicker 관련 추가 스타일 */
 .date-picker {
   width: auto;
@@ -994,7 +1110,7 @@ export default {
 
 /* 상단 버튼 행 스타일 */
 .top-button-row {
-  margin-bottom: 8px;
+  margin-bottom: 0px;
 }
 
 .white-text {
@@ -1006,18 +1122,13 @@ export default {
   border: 1px solid #e0e0e0;
   width: 100%;
   position: relative;
-  border-radius: 10px;
+  border-radius: 0px;
   /* 모서리 라운드 처리 */
   overflow: hidden;
   /* 내부 요소가 라운드 처리된 모서리를 벗어나지 않도록 함 */
 }
 
-/* 1페이지의 1행만 열 간격이 틀어지는 현상이 있어서 강제로 사이즈를 지정함 */
-.table-header,
-.table-row {
-  display: grid;
-  grid-template-columns: 60px 80px 100px 1fr 120px 100px 120px 120px 100px 90px 100px;
-}
+
 
 .table-header {
   background-color: #D0DFF1;
@@ -1037,6 +1148,7 @@ export default {
   background-color: #f9f9f9;
 }
 
+
 .th-cell,
 .td-cell {
   padding: 8px 12px;
@@ -1044,6 +1156,7 @@ export default {
   display: flex;
   align-items: center;
   font-size: 14px;
+
 }
 
 .th-cell {
@@ -1053,66 +1166,25 @@ export default {
   font-size: 14px;
 }
 
-.checkbox-cell {
-  flex: 0 0 40px;
+
+/* 1페이지의 1행만 열 간격이 틀어지는 현상이 있어서 강제로 사이즈를 지정함 */
+.table-header,
+.table-row {
+  display: grid;
+  grid-template-columns: 80px 100px 1fr 120px 100px 120px 120px 100px 90px 100px;
+}
+
+.th-cell:not(:nth-child(0)):not(:nth-child(3)),
+.td-cell:not(:nth-child(0)):not(:nth-child(3)) {
   justify-content: center;
 }
 
-.th-cell:nth-child(2),
-.td-cell:nth-child(2) {
-  flex: 0 0 80px;
-  justify-content: center;
-}
-
-/* 접수번호 */
 .th-cell:nth-child(3),
 .td-cell:nth-child(3) {
-  flex: 0 0 100px;
-  justify-content: center;
-}
-
-/* 요청일 */
-.th-cell:nth-child(4),
-.td-cell:nth-child(4) {
   flex: 1;
 }
 
-/* 제목 */
-.th-cell:nth-child(5),
-.td-cell:nth-child(5) {
-  flex: 0 0 100px;
-  justify-content: center;
-}
 
-/* 사업부문 */
-.th-cell:nth-child(6),
-.td-cell:nth-child(6) {
-  flex: 0 0 90px;
-  justify-content: center;
-}
-
-/* 진행상태 */
-.th-cell:nth-child(7),
-.td-cell:nth-child(7) {
-  flex: 0 0 100px;
-  justify-content: center;
-}
-
-.th-cell:nth-child(8),
-.td-cell:nth-child(8) {
-  flex: 0 0 90px;
-  justify-content: center;
-}
-
-/* 담당자 */
-.th-cell:nth-child(9),
-.td-cell:nth-child(9) {
-  flex: 0 0 100px;
-  justify-content: center;
-}
-
-/* 소요시간 */
-/* .th-cell:nth-child(10), .td-cell:nth-child(10) { flex: 0 0 180px; }  */
 
 .header-with-divider {
   display: flex;
@@ -1230,7 +1302,7 @@ export default {
 .search-btn {
   color: white;
   font-weight: 500;
-  height: 45px;
+  height: 36px;
   min-width: 64px;
 }
 
@@ -1268,16 +1340,6 @@ export default {
 }
 
 
-.rounded-border {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 12px;
-  border: 1px solid #D0DFF1;
-  border-radius: 8px;
-  background-color: rgba(208, 223, 241, 0.5);
-  height: auto;
-}
 
 .label-divider {
   display: inline-block;
@@ -1310,7 +1372,7 @@ export default {
 
 .custom-btn-toggle {
   display: inline-flex;
-  border-radius: 6px;
+  border-radius: 0px;
   overflow: hidden;
 }
 
@@ -1328,42 +1390,9 @@ export default {
   color: white;
 }
 
-.tab-btn {
-  min-width: 140px;
-  font-weight: 500;
-  font-size: 15px;
-  border-radius: 6px;
-}
-
-.btn-toggle-group {
-  display: flex;
-  border: 1px solid #cfd9e2;
-  border-radius: 6px;
-  overflow: hidden;
-  height: 50px;
-  background-color: #fff;
-}
-
-.btn-rect {
-  border: none !important;
-  border-radius: 0 !important;
-  padding: 0 18px;
+.custom-btn {
   font-size: 14px;
-  font-weight: 500;
-  min-width: 120px;
-  background-color: #f9f9f9;
-  color: #666;
-  height: 100%;
-  box-shadow: none !important;
-  transition: all 0.2s;
-}
-
-.btn-rect:hover {
-  background-color: #f0f4f9;
-}
-
-.active-btn {
-  background-color: #1976d2 !important;
-  color: white !important;
+  height: 40px;
+  border-radius: 10px;
 }
 </style>
