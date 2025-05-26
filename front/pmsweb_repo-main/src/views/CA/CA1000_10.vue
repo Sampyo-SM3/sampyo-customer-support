@@ -108,13 +108,13 @@
           게시글 작성
         </v-btn>
 
-        <v-btn variant="flat" color="red darken-2" class="custom-btn white-text d-flex align-center ml-2" size="small"
-          @click="showConfirm = true">
+        <v-btn v-if="this.userDeptCd === 'SPH220007'" variant="flat" color="red darken-2"
+          class="custom-btn white-text d-flex align-center ml-2" size="small" @click="showConfirm = true">
           <v-icon size="default" class="mr-1">mdi-delete</v-icon>
           삭제
         </v-btn>
 
-        <v-snackbar v-model="showSuccess" timeout="3000" color="success" elevation="3" class="center-snackbar">
+        <v-snackbar v-model="showSuccess" timeout="3000" color="success" elevation="2" class="center-snackbar">
           <div class="snackbar-text">
             {{ successMessage }}
           </div>
@@ -320,6 +320,7 @@ export default {
   },
   data() {
     return {
+      userDeptCd: JSON.parse(localStorage.getItem("userInfo"))?.deptCd,
       startDatePickerOpen: false,
       endDatePickerOpen: false,
       Date_startDate: new Date(),

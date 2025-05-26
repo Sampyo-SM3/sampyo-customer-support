@@ -1,84 +1,12 @@
 <template>
   <v-container fluid class="pr-0 pl-0 pt-4">
-    <!--     
-      <v-row>
-          <v-card>
-             
-              <v-tabs v-model="activeTab" bg-color="primary">
-              <v-tab value="group">그룹공지</v-tab>
-              <v-tab value="symposium">심포공지</v-tab>
-              <v-tab value="it">IT공지</v-tab>
-              <v-tab value="safety">안전공지</v-tab>
-              <v-tab value="more">더보기</v-tab>
-              </v-tabs>
-  
-              <v-window v-model="activeTab">
-              <v-window-item value="group">
-                  <v-data-table
-                  :headers="headers"
-                  :items="groupNotices"
-                  item-value="id"
-                  hide-default-footer
-                  class="elevation-0"
-                  >
-                  </v-data-table>
-              </v-window-item>
-              
-              <v-window-item value="symposium">
-                  <v-data-table
-                  :headers="headers"
-                  :items="symposiumNotices"
-                  item-value="id"
-                  hide-default-footer
-                  class="elevation-0"
-                  >
-                  </v-data-table>
-              </v-window-item>
-              
-              <v-window-item value="it">
-                  <v-data-table
-                  :headers="headers"
-                  :items="itNotices"
-                  item-value="id"
-                  hide-default-footer
-                  class="elevation-0"
-                  >
-                  </v-data-table>
-              </v-window-item>
-              
-              <v-window-item value="safety">
-                  <v-data-table
-                  :headers="headers"
-                  :items="safetyNotices"
-                  item-value="id"
-                  hide-default-footer
-                  class="elevation-0"
-                  >
-                  </v-data-table>
-              </v-window-item>
-              
-              <v-window-item value="more">
-                  <v-data-table
-                  :headers="headers"
-                  :items="moreNotices"
-                  item-value="id"
-                  hide-default-footer
-                  class="elevation-0"
-                  >
-                  </v-data-table>
-              </v-window-item>
-              </v-window>
-          </v-card>
-      </v-row> -->
-
-
     <v-row class="user-row" align="center">
       <v-col sm="6" md="auto" class="d-flex align-center filter-col">
         <span class="filter-label">요청기간<span class="label-divider"></span></span>
 
         <!-- 시작일 입력 필드 -->
         <div class="start-date-wrapper">
-          <VueDatePicker class="date-picker" :month-picker="false" preview-format="yyyy-MM-dd" v-model="Date_startDate"
+          <VueDatePicker class="date-picker" :month-picker="false" preview-format="yyyy-MM-dd" v-model="dateStartDate"
             :teleport="true" position="bottom" :enable-time-picker="false" auto-apply locale="ko" format="yyyy-MM-dd"
             :week-start="1" @update:model-value="onStartDateChange" v-model:open="startDatePickerOpen"
             :clearable="false" :text-input="false" />
@@ -87,7 +15,7 @@
 
         <!-- 종료일 입력 필드 -->
         <div class="end-date-wrapper">
-          <VueDatePicker class="date-picker" :month-picker="false" preview-format="yyyy-MM-dd" v-model="Date_endDate"
+          <VueDatePicker class="date-picker" :month-picker="false" preview-format="yyyy-MM-dd" v-model="dateEndDate"
             :teleport="true" position="bottom" :enable-time-picker="false" auto-apply locale="ko" format="yyyy-MM-dd"
             :week-start="1" @update:model-value="onEndDateChange" v-model:open="endDatePickerOpen" :clearable="false"
             :text-input="false" />
@@ -118,12 +46,10 @@
             </v-btn>
           </div>
         </div>
-
-
       </v-col>
+
       <v-col sm="12" md="auto" class="d-flex justify-end">
-        <v-btn variant="flat" color="primary" class="custom-btn" size="small"
-          @click="selectedView === 'my' ? fetchData('A') : fetchData('B')">
+        <v-btn variant="flat" color="primary" class="custom-btn" size="small" @click="handleSearch">
           <v-icon size="default" class="mr-1">mdi-magnify</v-icon>
           조회
         </v-btn>
@@ -159,23 +85,20 @@
       </v-col>
     </v-row>
 
-
-
-
     <!-- 데이터 테이블 상단 버튼 영역 -->
     <v-row class="top-button-row">
       <v-col class="d-flex align-center pb-0">
         <v-btn-toggle v-model="selectedView" class="custom-btn-toggle" mandatory>
-          <v-btn value="my" @click="fetchData('A')" :class="{ 'selected-btn': selectedView === 'my' }">
-            나의 처리글
+          <v-btn value="my" @click="handleViewChange('A')" :class="{ 'selected-btn': selectedView === 'my' }"
+            :disabled="loading">
+            나의 문의글
           </v-btn>
-          <v-btn value="dept" @click="fetchData('B')" :class="{ 'selected-btn': selectedView === 'dept' }">
+          <v-btn value="dept" @click="handleViewChange('B')" :class="{ 'selected-btn': selectedView === 'dept' }"
+            :disabled="loading">
             부서 문의글
           </v-btn>
         </v-btn-toggle>
       </v-col>
-
-
     </v-row>
 
     <!-- 데이터 테이블 -->
@@ -309,11 +232,12 @@
   </v-snackbar>
 </template>
 
-<script>
-import apiClient from '@/api';
-import { inject, onMounted } from 'vue';
-import VueDatePicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css';
+<script setup>
+import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+
+import apiClient from '@/api'
+import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
 import {
   Chart,
   DoughnutController,
@@ -324,7 +248,7 @@ import {
   Legend,
   CategoryScale,
   LinearScale
-} from 'chart.js';
+} from 'chart.js'
 
 Chart.register(
   DoughnutController,
@@ -335,579 +259,523 @@ Chart.register(
   Legend,
   CategoryScale,
   LinearScale
-);
-
-
-
-export default {
-  components: {
-    VueDatePicker
-  },
-  setup() {
-    const extraBreadcrumb = inject('extraBreadcrumb', null);
-    const listButtonLink = inject('listButtonLink', null);
-    onMounted(() => {
-      if (extraBreadcrumb) {
-        extraBreadcrumb.value = null;
-      }
-
-      if (listButtonLink) {
-        listButtonLink.value = null;
-      }
-    });
-
-    return {};
-  },
-  unmounted() { // ❗ 컴포넌트가 언마운트될 때
-    const listButtonLink = inject('listButtonLink', null);
-    if (listButtonLink) {
-      listButtonLink.value = null; // 🔥 페이지 벗어날 때 목록버튼 없애기
-    }
-  },
-  data() {
-    return {
-      startDatePickerOpen: false,
-      endDatePickerOpen: false,
-      Date_startDate: new Date(),
-      Date_endDate: new Date(),
-      startDate: '',
-      endDate: '',
-      startDateMenu: false,  // 시작일 날짜 선택기 메뉴 표시 여부
-      endDateMenu: false,    // 종료일 날짜 선택기 메뉴 표시 여부
-      selectedStatus: '',
-      progressStatuses: [],
-      manager: '',
-      sub: '',
-      countComment: 0,
-      new_yn: 'n',
-      dateRange: 'month',
-      productType: 'test1',
-      tableData: [],
-      loading: false,
-      selectAll: false,
-      // 페이징 관련 변수
-      currentPage: 1,
-      itemsPerPage: 10,
-      // 상태값 목록 (실제 API에서 받아올 수 있음)
-      //statusList: ['미처리', '진행중', '보류중', '종결'],
-      processState: '',
-      errorMessages: [],
-      showError: false,
-      savedMidMenu: '',
-      savedSubMenu: '',
-      countStatus: [],
-      inquiryType: '',
-
-
-
-      selectedView: 'my',
-      userName: null,
-      userId: null,
-      userDeptCd: null,
-
-      activeTab: 'group',
-      headers: [
-        {
-          title: '제목',
-          key: 'title',
-          align: 'start',
-          sortable: false
-        },
-        {
-          title: '작성자',
-          key: 'author',
-          sortable: false,
-          width: '120px'
-        },
-        {
-          title: '날짜',
-          key: 'date',
-          sortable: false,
-          width: '100px'
-        }
-      ],
-
-      groupNotices: [
-        { id: 1, title: '그룹공지 제목1', author: '작성자1', date: '05-19' },
-        { id: 2, title: '그룹공지 제목2', author: '작성자2', date: '05-18' }
-      ],
-
-      symposiumNotices: [
-        { id: 1, title: '심포공지 제목1', author: '작성자1', date: '05-19' }
-      ]
-
-
-    }
-  },
-
-  computed: {
-    // 전체 페이지 수 계산
-    totalPages() {
-      return Math.ceil(this.tableData.length / this.itemsPerPage);
-    },
-
-    // 현재 페이지에 표시할 데이터
-    paginatedData() {
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.tableData.slice(start, end);
-    },
-
-
-  },
-
-  watch: {
-    // API 파라미터가 변경되면 데이터 다시 로드
-    startDate() {
-      this.currentPage = 1; // 검색 조건 변경 시 첫 페이지로 리셋      
-    },
-    endDate() {
-      this.currentPage = 1;
-    },
-  },
-
-  mounted() {
-
-
-    this.setDateRange('month');
-    this.getStatus();
-    this.checkLocalStorage();
-
-
-
-    this.getUserInfo();
-    this.fetchData('A');
-    this.drawInquiryTypeChart();
-    this.drawStatusChart();
-    this.drawMonthlyChart();
-
-  },
-
-  methods: {
-    onStartDateChange(date) {
-      this.Date_startDate = date;
-      this.startDatePickerOpen = false;
-    },
-
-    onEndDateChange(date) {
-      this.Date_endDate = date;
-      this.endDatePickerOpen = false;
-      // Date 객체를 'YYYY-MM-DD' 형식의 문자열로 변환
-      if (date) {
-        const formattedDate = new Date(date);
-        const year = formattedDate.getFullYear();
-        const month = String(formattedDate.getMonth() + 1).padStart(2, '0');
-        const day = String(formattedDate.getDate()).padStart(2, '0');
-        this.endDate = `${year}-${month}-${day}`;
-      }
-    },
-    checkLocalStorage() {
-      const midMenuFromStorage = localStorage.getItem('midMenu');
-      const subMenuFromStorage = localStorage.getItem('subMenu');
-
-      this.savedMidMenu = midMenuFromStorage ? JSON.parse(midMenuFromStorage) : null;
-      this.savedSubMenu = subMenuFromStorage ? JSON.parse(subMenuFromStorage) : null;
-    },
-
-    // 유효성검사 다시 수정해야함
-    isValidDate(options = {}) {
-      const errors = [];
-
-      const {
-        maxDays = 92,
-        allowFutureDates = true,
-        allowPastDates = true,
-        minDate = null,
-        maxDate = null,
-      } = options;
-
-      // 입력 존재 여부
-      if (!this.startDate || !this.endDate) {
-        errors.push('시작일과 종료일을 모두 입력해주세요.');
-        this.errorMessages = errors;
-        this.showError = true;
-        return false;
-      }
-
-      // 형식 검사
-      const regex = /^\d{4}-\d{2}-\d{2}$/;
-      if (!regex.test(this.startDate)) {
-        errors.push('시작일 형식이 잘못되었습니다. (YYYY-MM-DD)');
-      }
-      if (!regex.test(this.endDate)) {
-        errors.push('종료일 형식이 잘못되었습니다. (YYYY-MM-DD)');
-      }
-
-      if (errors.length > 0) {
-        this.errorMessages = errors;
-        this.showError = true;
-        return false;
-      }
-
-      // 날짜 객체로 변환
-      const s = new Date(this.startDate);
-      const e = new Date(this.endDate);
-
-      // 날짜 변환 유효성 확인
-      if (isNaN(s.getTime())) {
-        errors.push('시작일이 유효하지 않습니다.');
-      }
-      if (isNaN(e.getTime())) {
-        errors.push('종료일이 유효하지 않습니다.');
-      }
-
-      if (errors.length > 0) {
-        this.errorMessages = errors;
-        this.showError = true;
-        return false;
-      }
-
-      // 시작일과 종료일 비교 (년월일만 비교하기 위해 시간 초기화)
-      const startDate = new Date(s.getFullYear(), s.getMonth(), s.getDate());
-      const endDate = new Date(e.getFullYear(), e.getMonth(), e.getDate());
-
-      // 시작일이 종료일보다 뒤인 경우
-      if (startDate > endDate) {
-        this.errorMessages = ['시작일은 종료일보다 늦을 수 없습니다.'];
-        this.showError = true;
-        return false;
-      }
-
-      // 최대 기간 검사
-      if (maxDays) {
-        const diffTime = Math.abs(endDate - startDate);
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        if (diffDays > maxDays) {
-          errors.push(`조회 기간은 최대 ${maxDays}일을 초과할 수 없습니다.`);
-        }
-      }
-
-      // 미래/과거 제한
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      if (!allowFutureDates && startDate > today) {
-        errors.push('시작일은 미래일 수 없습니다.');
-      }
-      if (!allowPastDates && endDate < today) {
-        errors.push('종료일은 과거일 수 없습니다.');
-      }
-
-      // 제한 범위 검사
-      if (minDate && startDate < new Date(minDate)) {
-        errors.push(`시작일은 ${minDate} 이후여야 합니다.`);
-      }
-      if (maxDate && endDate > new Date(maxDate)) {
-        errors.push(`종료일은 ${maxDate} 이전이어야 합니다.`);
-      }
-
-      // 결과 처리
-      if (errors.length > 0) {
-        this.errorMessages = errors;
-        this.showError = true;
-        return false;
-      }
-
-      return true;
-    },
-
-    // 날짜 범위 설정 함수
-    setDateRange(range) {
-      this.dateRange = range;
-      const today = new Date();
-      let start = new Date(today);
-
-      switch (range) {
-        case 'today':
-          // 오늘 날짜로 시작일과 종료일 모두 설정
-          break
-        case 'week':
-          // 1주일 전
-          start.setDate(today.getDate() - 7);
-          break;
-        case '15days':
-          // 15일 전
-          start.setDate(today.getDate() - 15);
-          break;
-        case 'month':
-          // 1개월 전
-          start.setMonth(today.getMonth() - 1);
-          break;
-        case '3months':
-          // 3개월 전
-          start.setMonth(today.getMonth() - 3);
-          break;
-      }
-
-      this.Date_startDate = start;
-      this.Date_endDate = today;
-    },
-
-    formattedDate(dateObj) {
-      const year = dateObj.getFullYear();
-      const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1 필요
-      const day = String(dateObj.getDate()).padStart(2, '0');
-
-      return `${year}-${month}-${day}`;
-    },
-
-
-    // API 호출하여 데이터 가져오기
-    async fetchData(para_type) {
-      this.loading = true;
-
-      try {
-        let response = '';
-        // 나의 처리글
-        if (para_type == 'A') {
-          response = await apiClient.get('/api/require/search', {
-            params: {
-              startDate: this.formattedDate(this.Date_startDate) + ' 00:00:00',
-              endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',
-              manager: this.manager,
-              managerId: this.userId,
-              sub: this.subscribe,
-              status: this.selectedStatus,
-              dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
-            }
-          });
-          // 부서 전체 처리글
-        } else if (para_type == 'B') {
-          response = await apiClient.get('/api/require/search', {
-            params: {
-              startDate: this.formattedDate(this.Date_startDate) + ' 00:00:00',
-              endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',
-              manager: this.manager,
-              //managerId: this.userId,
-              managerDeptCd: this.userDeptCd,
-              sub: this.sub,
-              status: this.selectedStatus,
-              dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
-            }
-          });
-        }
-
-
-
-        // API 응답 데이터 처리
-        if (response.data && Array.isArray(response.data)) {
-
-
-          this.tableData = response.data.map(item => {
-            const requestDateTime = new Date(item.requestDateTime);
-            const now = new Date();
-            const diffTime = now - requestDateTime;
-            const diffHours = diffTime / (1000 * 60 * 60);
-
-
-            return {
-              ...item,
-              selected: false,
-              // API에서 진행상태가 오지 않으면 임의로 설정
-              status: item.processState === 'S'
-                ? (item.statusNm + ' (' +
-                  (item.srFlag === 'Y'
-                    ? '상신완료'
-                    : item.srFlag === 'F'
-                      ? '반려'
-                      : '상신 전'
-                  ) + ')' || this.getRandomStatus())
-                : (item.statusNm || this.getRandomStatus()),
-
-
-              // 24시간 이내 여부에 따라 new_yn 설정
-              new_yn: diffHours < 24 ? 'Y' : 'N',
-
-              // 테이블에 표시할 데이터 매핑
-              manager: item.manager || '-',  // 담당자 필드가 없어서 임시로 요청자 ID 사용
-              memo: item.currentIssue || '-', // 메모 필드가 없어서 임시로 현재 이슈 사용              
-            };
-          });
-
-          // 서버 측 페이징 구현시 전체 개수 설정 (API 응답에서 받아야 함)
-          // this.totalItems = response.data.totalItems;
-        } else {
-          this.tableData = [];
-        }
-
-
-
-      } catch (error) {
-        console.error('데이터 로드 중 오류 발생:', error);
-      } finally {
-        this.loading = false;
-      }
-    },
-    // 날짜 포맷 함수 (ISO 문자열 -> YYYY-MM-DD 형식)
-    formatDate(dateString) {
-      if (!dateString) return '-';
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return '-';
-
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    },
-
-    // 입력용 날짜 포맷 함수
-    formatDateForInput(date) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    },
-
-    // 소요시간 계산 함수
-    calculateDuration(startDate, endDate) {
-
-      if (!startDate || !endDate) return '-';
-
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      if (isNaN(start.getTime()) || isNaN(end.getTime())) return '-';
-
-      const diffTime = Math.abs(end - start);
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-      // const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
-
-      return `${diffDays}일`;
-    },
-
-
-
-    // 전체 선택/해제 토글
-    toggleSelectAll() {
-      // 현재 페이지의 항목만 선택/해제
-      this.paginatedData.forEach(item => {
-        item.selected = this.selectAll;
-      });
-    },
-
-    // 랜덤 상태값 반환 (API에서 상태값이 없을 경우 사용)
-    getRandomStatus() {
-      return this.statusList[Math.floor(Math.random() * this.statusList.length)];
-    },
-
-    async getStatus() {
-      try {
-        const statusList = await apiClient.get("/api/code/list", {
-          params: {
-            category: 'STATUS'
-          }
-        });
-
-        // 상태 이름 리스트 저장
-        this.progressStatuses = statusList.data.map(status => ({
-          text: status.codeName,
-          value: status.codeId
-        }));
-
-        this.progressStatuses.unshift({ text: '전체', value: '%' });
-
-        this.selectedStatus = '%';
-
-      } catch (error) {
-        console.error("❌ 오류 발생:", error);
-      }
-    },
-
-
-
-
-
-
-    drawInquiryTypeChart() {
-      const ctx = this.$refs.inquiryTypeChartCanvas.getContext('2d');
-      new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: ['단순문의', '데이터 수정', '프로그램 수정'],
-          datasets: [{
-            data: [12, 18, 9],
-            backgroundColor: ['#FF9F40', '#4BC0C0', '#9966FF']
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'top',
-              align: 'start' // 👈 범례 오른쪽 정렬
-            },
-            tooltip: {
-              callbacks: {
-                label: ctx => `${ctx.label}: ${ctx.parsed}건`
-              }
-            }
-          }
-        }
-      });
-    },
-    drawStatusChart() {
-      const ctx = this.$refs.statusChartCanvas.getContext('2d');
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['미처리', '진행중', '보류', 'SR', '종결'],
-          datasets: [{
-            label: '건수',
-            data: [15, 25, 10, 8, 42],
-            backgroundColor: '#42A5F5'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: { y: { beginAtZero: true } },
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: ctx => `${ctx.label}: ${ctx.parsed.y}건`
-              }
-            }
-          }
-        }
-      });
-    },
-    drawMonthlyChart() {
-      const ctx = this.$refs.monthlyChartCanvas.getContext('2d');
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-          datasets: [{
-            label: '작성 건수',
-            data: [5, 8, 12, 20, 14, 10, 7, 6, 9, 11, 4, 3],
-            backgroundColor: '#66BB6A'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: { y: { beginAtZero: true } },
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: ctx => `${ctx.label}: ${ctx.parsed.y}건`
-              }
-            }
-          }
-        }
-      });
-    },
-
-    getUserInfo() {
-      // localStorage에서 userInfo를 가져와서 userName에 할당
-      this.userName = JSON.parse(localStorage.getItem("userInfo"))?.name || null;
-      this.userId = JSON.parse(localStorage.getItem("userInfo"))?.id || null;
-      this.userDeptCd = JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null;
-    },
+)
+
+// Refs
+const inquiryTypeChartCanvas = ref(null)
+const statusChartCanvas = ref(null)
+const monthlyChartCanvas = ref(null)
+
+// Reactive data
+const dateStartDate = ref(new Date())
+const dateEndDate = ref(new Date())
+const startDatePickerOpen = ref(false)
+const endDatePickerOpen = ref(false)
+const startDate = ref('')
+const endDate = ref('')
+const dateRange = ref('month')
+const selectedView = ref('my')
+const tableData = ref([])
+const loading = ref(false)
+const currentPage = ref(1)
+const itemsPerPage = ref(10)
+const errorMessages = ref([])
+const showError = ref(false)
+const progressStatuses = ref([])
+const selectedStatus = ref('')
+const userName = ref(null)
+const userId = ref(null)
+const userDeptCd = ref(null)
+const aryInquiryRes = ref([])
+const aryInquiryResCount = ref([])
+
+// 차트 업데이트 상태 관리 (사용하지 않는 변수들 제거)
+// const isUpdatingCharts = ref(false)
+// const pendingChartUpdate = ref(false)
+
+// Chart instances
+const chartInstances = reactive({
+  inquiryType: null,
+  status: null,
+  monthly: null
+})
+
+// Computed
+const totalPages = computed(() => {
+  return Math.ceil(tableData.value.length / itemsPerPage.value)
+})
+
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return tableData.value.slice(start, end)
+})
+
+// Watchers
+watch([startDate, endDate], () => {
+  currentPage.value = 1
+})
+
+// Methods
+const onStartDateChange = (date) => {
+  dateStartDate.value = date
+  startDatePickerOpen.value = false
+}
+
+const onEndDateChange = (date) => {
+  dateEndDate.value = date
+  endDatePickerOpen.value = false
+  if (date) {
+    const formattedDate = new Date(date)
+    const year = formattedDate.getFullYear()
+    const month = String(formattedDate.getMonth() + 1).padStart(2, '0')
+    const day = String(formattedDate.getDate()).padStart(2, '0')
+    endDate.value = `${year}-${month}-${day}`
   }
-}</script>
+}
+
+const setDateRange = (range) => {
+  dateRange.value = range
+  const today = new Date()
+  let start = new Date(today)
+
+  switch (range) {
+    case 'today':
+      break
+    case 'week':
+      start.setDate(today.getDate() - 7)
+      break
+    case '15days':
+      start.setDate(today.getDate() - 15)
+      break
+    case 'month':
+      start.setMonth(today.getMonth() - 1)
+      break
+    case '3months':
+      start.setMonth(today.getMonth() - 3)
+      break
+  }
+
+  dateStartDate.value = start
+  dateEndDate.value = today
+}
+
+const formattedDate = (dateObj) => {
+  const year = dateObj.getFullYear()
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0')
+  const day = String(dateObj.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+const formatDate = (dateString) => {
+  if (!dateString) return '-'
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) return '-'
+
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+const calculateDuration = (startDate, endDate) => {
+  if (!startDate || !endDate) return '-'
+
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return '-'
+
+  const diffTime = Math.abs(end - start)
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1
+  return `${diffDays}일`
+}
+
+const getUserInfo = () => {
+  const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {}
+  userName.value = userInfo.name || null
+  userId.value = userInfo.id || null
+  userDeptCd.value = userInfo.deptCd || null
+}
+
+const getStatus = async () => {
+  try {
+    const statusList = await apiClient.get("/api/code/list", {
+      params: { category: 'STATUS' }
+    })
+
+    progressStatuses.value = statusList.data.map(status => ({
+      text: status.codeName,
+      value: status.codeId
+    }))
+
+    progressStatuses.value.unshift({ text: '전체', value: '%' })
+    selectedStatus.value = '%'
+
+  } catch (error) {
+    console.error("❌ 상태 로드 오류:", error)
+  }
+}
+
+// 뷰 변경 핸들러 - 중복 클릭 방지
+const handleViewChange = async (paraType) => {
+  if (loading.value) return
+
+  // 먼저 모든 차트 완전히 제거
+  destroyAllCharts()
+
+  // selectedView 값 업데이트
+  if (paraType === 'A') {
+    selectedView.value = 'my'
+  } else if (paraType === 'B') {
+    selectedView.value = 'dept'
+  }
+
+  await fetchData(paraType)
+}
+
+const fetchData = async (paraType) => {
+  // 이미 로딩 중이면 무시
+  if (loading.value) return
+
+  loading.value = true
+
+  try {
+    let response = ''
+
+    if (paraType === 'A') {
+      response = await apiClient.get('/api/require/search', {
+        params: {
+          startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
+          endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
+          writerId: userId.value,
+        }
+      })
+    } else if (paraType === 'B') {
+      response = await apiClient.get('/api/require/search', {
+        params: {
+          startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
+          endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
+          writerDp: userId.value,
+        }
+      })
+    }
+
+    if (response.data && Array.isArray(response.data)) {
+      tableData.value = response.data.map(item => {
+        const requestDateTime = new Date(item.requestDateTime)
+        const now = new Date()
+        const diffTime = now - requestDateTime
+        const diffHours = diffTime / (1000 * 60 * 60)
+
+        return {
+          ...item,
+          selected: false,
+          status: item.processState === 'S'
+            ? (item.statusNm + ' (' +
+              (item.srFlag === 'Y'
+                ? '상신완료'
+                : item.srFlag === 'F'
+                  ? '반려'
+                  : '상신 전'
+              ) + ')' || getRandomStatus())
+            : (item.statusNm || getRandomStatus()),
+          new_yn: diffHours < 24 ? 'Y' : 'N',
+          manager: item.manager || '-',
+          memo: item.currentIssue || '-',
+        }
+      })
+    } else {
+      tableData.value = []
+    }
+
+    // 문의 유형별 count 데이터 가져오기
+    const response2 = await apiClient.post('/api/code/count', {
+      startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
+      endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
+      writerId: paraType === 'A' ? userId.value : '',
+      writerDp: paraType === 'B' ? userId.value : ''
+    })
+
+    aryInquiryRes.value = response2.data.map(item => item.codeName)
+    aryInquiryResCount.value = response2.data.map(item => item.cnt)
+
+  } catch (error) {
+    console.error('데이터 로드 중 오류 발생:', error)
+    showError.value = true
+    errorMessages.value = ['데이터를 불러오는 중 오류가 발생했습니다.']
+  } finally {
+    loading.value = false
+  }
+
+  // 로딩 완료 후 별도로 차트 업데이트
+  await nextTick()
+  setTimeout(() => {
+    if (!loading.value) { // 로딩이 완전히 끝난 후에만 실행
+      updateAllCharts()
+    }
+  }, 300)
+}
+
+const getRandomStatus = () => {
+  const statusList = ['미처리', '진행중', '보류중', '종결']
+  return statusList[Math.floor(Math.random() * statusList.length)]
+}
+
+// Chart methods - 더 안전한 차트 관리
+const destroyAllCharts = () => {
+  try {
+    Object.keys(chartInstances).forEach(key => {
+      if (chartInstances[key] && chartInstances[key].destroy) {
+        try {
+          // 차트가 아직 활성 상태인지 확인
+          if (!chartInstances[key].destroyed) {
+            chartInstances[key].destroy()
+          }
+        } catch (e) {
+          console.warn(`차트 ${key} 정리 중 경고:`, e)
+        }
+        chartInstances[key] = null
+      }
+    })
+  } catch (error) {
+    console.error('차트 제거 중 오류:', error)
+  }
+}
+
+const updateAllCharts = () => {
+  try {
+    // 먼저 모든 차트 정리
+    destroyAllCharts()
+
+    // DOM이 준비되었는지 확인
+    if (!inquiryTypeChartCanvas.value || !statusChartCanvas.value || !monthlyChartCanvas.value) {
+      console.warn('차트 캔버스 요소가 아직 준비되지 않았습니다.')
+      return
+    }
+
+    // 순차적으로 차트 생성
+    setTimeout(() => updateInquiryTypeChart(), 50)
+    setTimeout(() => updateStatusChart(), 100)
+    setTimeout(() => updateMonthlyChart(), 150)
+
+  } catch (error) {
+    console.error('차트 업데이트 중 오류:', error)
+  }
+}
+
+const updateInquiryTypeChart = () => {
+  try {
+    const canvas = inquiryTypeChartCanvas.value
+    if (!canvas) {
+      console.warn('inquiryTypeChartCanvas가 준비되지 않았습니다.')
+      return
+    }
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      console.warn('Canvas context를 가져올 수 없습니다.')
+      return
+    }
+
+    // 데이터가 있는지 확인
+    if (!aryInquiryRes.value || !aryInquiryRes.value.length || !aryInquiryResCount.value || !aryInquiryResCount.value.length) {
+      console.warn('문의유형 차트 데이터가 없습니다.')
+      return
+    }
+
+    // Canvas 크기 재설정 (Chart.js 버그 방지)
+    canvas.width = canvas.offsetWidth
+    canvas.height = canvas.offsetHeight
+
+    chartInstances.inquiryType = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: aryInquiryRes.value,
+        datasets: [{
+          data: aryInquiryResCount.value,
+          backgroundColor: ['#FF9F40', '#4BC0C0', '#9966FF', '#FF6384', '#36A2EB']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false, // 애니메이션 비활성화로 안정성 향상
+        plugins: {
+          legend: {
+            position: 'top',
+            align: 'start'
+          },
+          tooltip: {
+            callbacks: {
+              label: ctx => `${ctx.label}: ${ctx.parsed}건`
+            }
+          }
+        }
+      }
+    })
+  } catch (error) {
+    console.error('문의유형 차트 생성 중 오류:', error)
+  }
+}
+
+const updateStatusChart = () => {
+  try {
+    const canvas = statusChartCanvas.value
+    if (!canvas) {
+      console.warn('statusChartCanvas가 준비되지 않았습니다.')
+      return
+    }
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      console.warn('Canvas context를 가져올 수 없습니다.')
+      return
+    }
+
+    const statusData = getStatusData()
+
+    // 데이터가 있는지 확인
+    if (!statusData.labels.length || !statusData.data.length) {
+      console.warn('상태 차트 데이터가 없습니다.')
+      return
+    }
+
+    // Canvas 크기 재설정
+    canvas.width = canvas.offsetWidth
+    canvas.height = canvas.offsetHeight
+
+    chartInstances.status = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: statusData.labels,
+        datasets: [{
+          label: '건수',
+          data: statusData.data,
+          backgroundColor: '#42A5F5'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false, // 애니메이션 비활성화
+        scales: { y: { beginAtZero: true } },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => `${ctx.label}: ${ctx.parsed.y}건`
+            }
+          }
+        }
+      }
+    })
+  } catch (error) {
+    console.error('상태 차트 생성 중 오류:', error)
+  }
+}
+
+const updateMonthlyChart = () => {
+  try {
+    const canvas = monthlyChartCanvas.value
+    if (!canvas) {
+      console.warn('monthlyChartCanvas가 준비되지 않았습니다.')
+      return
+    }
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      console.warn('Canvas context를 가져올 수 없습니다.')
+      return
+    }
+
+    const monthlyData = getMonthlyData()
+
+    // Canvas 크기 재설정
+    canvas.width = canvas.offsetWidth
+    canvas.height = canvas.offsetHeight
+
+    chartInstances.monthly = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+        datasets: [{
+          label: '작성 건수',
+          data: monthlyData,
+          backgroundColor: '#66BB6A'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false, // 애니메이션 비활성화
+        scales: { y: { beginAtZero: true } },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => `${ctx.label}: ${ctx.parsed.y}건`
+            }
+          }
+        }
+      }
+    })
+  } catch (error) {
+    console.error('월별 차트 생성 중 오류:', error)
+  }
+}
+
+const getStatusData = () => {
+  const statusCount = {}
+
+  tableData.value.forEach(item => {
+    const status = item.processState || 'unknown'
+    statusCount[status] = (statusCount[status] || 0) + 1
+  })
+
+  const statusMapping = {
+    'P': '미처리',
+    'I': '진행중',
+    'H': '보류',
+    'S': 'SR',
+    'C': '종결'
+  }
+
+  const labels = Object.keys(statusCount).map(key => statusMapping[key] || key)
+  const data = Object.values(statusCount)
+
+  return { labels, data }
+}
+
+const getMonthlyData = () => {
+  const monthlyCount = new Array(12).fill(0)
+
+  tableData.value.forEach(item => {
+    if (item.requestDate) {
+      const month = new Date(item.requestDate).getMonth()
+      monthlyCount[month]++
+    }
+  })
+
+  return monthlyCount
+}
+
+const handleSearch = async () => {
+  const viewType = selectedView.value === 'my' ? 'A' : 'B'
+  await fetchData(viewType)
+}
+
+// Lifecycle
+onMounted(async () => {
+  setDateRange('month')
+  getUserInfo()
+  await getStatus()
+  await fetchData('A')
+})
+
+onBeforeUnmount(() => {
+  destroyAllCharts()
+})
+</script>
 
 <style scoped>
 .user-row {
@@ -1360,18 +1228,6 @@ export default {
   font-weight: 600;
   display: inline-block;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 .chart-container {
   position: relative;
