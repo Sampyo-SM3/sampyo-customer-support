@@ -143,15 +143,17 @@
         <v-btn-toggle v-model="selectedView" class="custom-btn-toggle" mandatory>
           <v-btn 
             value="my" 
-            @click="fetchData('A')" 
+            @click="handleViewChange('A')" 
             :class="{ 'selected-btn': selectedView === 'my'}"
+            :disabled="loading"
           >
             나의 문의글
           </v-btn>
           <v-btn 
             value="dept" 
-            @click="fetchData('B')" 
+            @click="handleViewChange('B')" 
             :class="{ 'selected-btn': selectedView === 'dept' }"
+            :disabled="loading"
           >
             부서 문의글
           </v-btn>
@@ -400,6 +402,10 @@ const userDeptCd = ref(null)
 const aryInquiryRes = ref([])
 const aryInquiryResCount = ref([])
 
+// 차트 업데이트 상태 관리 (사용하지 않는 변수들 제거)
+// const isUpdatingCharts = ref(false)
+// const pendingChartUpdate = ref(false)
+
 // Chart instances
 const chartInstances = reactive({
   inquiryType: null,
@@ -523,7 +529,27 @@ const getStatus = async () => {
   }
 }
 
+// 뷰 변경 핸들러 - 중복 클릭 방지
+const handleViewChange = async (paraType) => {
+  if (loading.value) return
+  
+  // 먼저 모든 차트 완전히 제거
+  destroyAllCharts()
+  
+  // selectedView 값 업데이트
+  if (paraType === 'A') {
+    selectedView.value = 'my'
+  } else if (paraType === 'B') {
+    selectedView.value = 'dept'
+  }
+  
+  await fetchData(paraType)
+}
+
 const fetchData = async (paraType) => {
+  // 이미 로딩 중이면 무시
+  if (loading.value) return
+  
   loading.value = true
 
   try {
@@ -537,12 +563,12 @@ const fetchData = async (paraType) => {
           writerId: userId.value,
         }
       })
-    } else if (paraType === 'B') {
+    } else if (paraType === 'B') {    
       response = await apiClient.get('/api/require/search', {
         params: {
           startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
           endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
-          dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
+          writerDp: userId.value,
         }
       })
     }
@@ -576,29 +602,31 @@ const fetchData = async (paraType) => {
     }
 
     // 문의 유형별 count 데이터 가져오기
-    const response2 = await apiClient.get('/api/code/count', {
-      params: {
-        startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
-        endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
-        writerId: paraType === 'A' ? userId.value : '',
-        dpId: paraType === 'B' ? JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null : ''
-      }
+    const response2 = await apiClient.post('/api/code/count', {
+      startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
+      endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
+      writerId: paraType === 'A' ? userId.value : '',
+      writerDp: paraType === 'B' ? userId.value : ''
     })
 
     aryInquiryRes.value = response2.data.map(item => item.codeName)
     aryInquiryResCount.value = response2.data.map(item => item.cnt)
 
-    // 데이터 로드 완료 후 차트들 갱신
-    await nextTick()
-    setTimeout(() => {
-      updateAllCharts()
-    }, 150)
-
   } catch (error) {
     console.error('데이터 로드 중 오류 발생:', error)
+    showError.value = true
+    errorMessages.value = ['데이터를 불러오는 중 오류가 발생했습니다.']
   } finally {
     loading.value = false
   }
+  
+  // 로딩 완료 후 별도로 차트 업데이트
+  await nextTick()
+  setTimeout(() => {
+    if (!loading.value) { // 로딩이 완전히 끝난 후에만 실행
+      updateAllCharts()
+    }
+  }, 300)
 }
 
 const getRandomStatus = () => {
@@ -606,12 +634,19 @@ const getRandomStatus = () => {
   return statusList[Math.floor(Math.random() * statusList.length)]
 }
 
-// Chart methods
+// Chart methods - 더 안전한 차트 관리
 const destroyAllCharts = () => {
   try {
     Object.keys(chartInstances).forEach(key => {
-      if (chartInstances[key]) {
-        chartInstances[key].destroy()
+      if (chartInstances[key] && chartInstances[key].destroy) {
+        try {
+          // 차트가 아직 활성 상태인지 확인
+          if (!chartInstances[key].destroyed) {
+            chartInstances[key].destroy()
+          }
+        } catch (e) {
+          console.warn(`차트 ${key} 정리 중 경고:`, e)
+        }
         chartInstances[key] = null
       }
     })
@@ -621,28 +656,49 @@ const destroyAllCharts = () => {
 }
 
 const updateAllCharts = () => {
-  updateInquiryTypeChart()
-  updateStatusChart()
-  updateMonthlyChart()
+  try {
+    // 먼저 모든 차트 정리
+    destroyAllCharts()
+    
+    // DOM이 준비되었는지 확인
+    if (!inquiryTypeChartCanvas.value || !statusChartCanvas.value || !monthlyChartCanvas.value) {
+      console.warn('차트 캔버스 요소가 아직 준비되지 않았습니다.')
+      return
+    }
+    
+    // 순차적으로 차트 생성
+    setTimeout(() => updateInquiryTypeChart(), 50)
+    setTimeout(() => updateStatusChart(), 100)
+    setTimeout(() => updateMonthlyChart(), 150)
+    
+  } catch (error) {
+    console.error('차트 업데이트 중 오류:', error)
+  }
 }
 
 const updateInquiryTypeChart = () => {
   try {
-    if (!inquiryTypeChartCanvas.value) {
-      console.warn('inquiryTypeChartCanvas ref가 준비되지 않았습니다.')
+    const canvas = inquiryTypeChartCanvas.value
+    if (!canvas) {
+      console.warn('inquiryTypeChartCanvas가 준비되지 않았습니다.')
       return
     }
 
-    if (chartInstances.inquiryType) {
-      chartInstances.inquiryType.destroy()
-      chartInstances.inquiryType = null
-    }
-
-    const ctx = inquiryTypeChartCanvas.value.getContext('2d')
+    const ctx = canvas.getContext('2d')
     if (!ctx) {
       console.warn('Canvas context를 가져올 수 없습니다.')
       return
     }
+
+    // 데이터가 있는지 확인
+    if (!aryInquiryRes.value || !aryInquiryRes.value.length || !aryInquiryResCount.value || !aryInquiryResCount.value.length) {
+      console.warn('문의유형 차트 데이터가 없습니다.')
+      return
+    }
+
+    // Canvas 크기 재설정 (Chart.js 버그 방지)
+    canvas.width = canvas.offsetWidth
+    canvas.height = canvas.offsetHeight
 
     chartInstances.inquiryType = new Chart(ctx, {
       type: 'doughnut',
@@ -656,6 +712,7 @@ const updateInquiryTypeChart = () => {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: false, // 애니메이션 비활성화로 안정성 향상
         plugins: {
           legend: {
             position: 'top',
@@ -676,22 +733,29 @@ const updateInquiryTypeChart = () => {
 
 const updateStatusChart = () => {
   try {
-    if (!statusChartCanvas.value) {
-      console.warn('statusChartCanvas ref가 준비되지 않았습니다.')
+    const canvas = statusChartCanvas.value
+    if (!canvas) {
+      console.warn('statusChartCanvas가 준비되지 않았습니다.')
       return
     }
 
-    if (chartInstances.status) {
-      chartInstances.status.destroy()
-      chartInstances.status = null
-    }
-
-    const statusData = getStatusData()
-    const ctx = statusChartCanvas.value.getContext('2d')
+    const ctx = canvas.getContext('2d')
     if (!ctx) {
       console.warn('Canvas context를 가져올 수 없습니다.')
       return
     }
+
+    const statusData = getStatusData()
+    
+    // 데이터가 있는지 확인
+    if (!statusData.labels.length || !statusData.data.length) {
+      console.warn('상태 차트 데이터가 없습니다.')
+      return
+    }
+
+    // Canvas 크기 재설정
+    canvas.width = canvas.offsetWidth
+    canvas.height = canvas.offsetHeight
 
     chartInstances.status = new Chart(ctx, {
       type: 'bar',
@@ -706,6 +770,7 @@ const updateStatusChart = () => {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: false, // 애니메이션 비활성화
         scales: { y: { beginAtZero: true } },
         plugins: {
           legend: { display: false },
@@ -724,22 +789,23 @@ const updateStatusChart = () => {
 
 const updateMonthlyChart = () => {
   try {
-    if (!monthlyChartCanvas.value) {
-      console.warn('monthlyChartCanvas ref가 준비되지 않았습니다.')
+    const canvas = monthlyChartCanvas.value
+    if (!canvas) {
+      console.warn('monthlyChartCanvas가 준비되지 않았습니다.')
       return
     }
 
-    if (chartInstances.monthly) {
-      chartInstances.monthly.destroy()
-      chartInstances.monthly = null
-    }
-
-    const monthlyData = getMonthlyData()
-    const ctx = monthlyChartCanvas.value.getContext('2d')
+    const ctx = canvas.getContext('2d')
     if (!ctx) {
       console.warn('Canvas context를 가져올 수 없습니다.')
       return
     }
+
+    const monthlyData = getMonthlyData()
+
+    // Canvas 크기 재설정
+    canvas.width = canvas.offsetWidth
+    canvas.height = canvas.offsetHeight
 
     chartInstances.monthly = new Chart(ctx, {
       type: 'bar',
@@ -754,6 +820,7 @@ const updateMonthlyChart = () => {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: false, // 애니메이션 비활성화
         scales: { y: { beginAtZero: true } },
         plugins: {
           legend: { display: false },
@@ -805,9 +872,9 @@ const getMonthlyData = () => {
   return monthlyCount
 }
 
-const handleSearch = () => {
+const handleSearch = async () => {
   const viewType = selectedView.value === 'my' ? 'A' : 'B'
-  fetchData(viewType)
+  await fetchData(viewType)
 }
 
 // Lifecycle
@@ -815,7 +882,7 @@ onMounted(async () => {
   setDateRange('month')
   getUserInfo()
   await getStatus()
-  await fetchData('B')
+  await fetchData('A')
 })
 
 onBeforeUnmount(() => {

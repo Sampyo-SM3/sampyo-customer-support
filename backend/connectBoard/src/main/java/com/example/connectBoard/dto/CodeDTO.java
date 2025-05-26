@@ -19,5 +19,13 @@ public class CodeDTO {
     private  LocalDate updateDt; // 업데이트 날짜
     private Integer cnt;	
     private String writerId;       // 작성자id
-    private String dpId;       
+    private String dpId;
+    private String writerDp;
+    private String managerId;
+    private String managerDp;
+    private String startDate;
+    private String endDate;
+
+    
+    
 }

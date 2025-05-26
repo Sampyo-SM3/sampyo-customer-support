@@ -1,6 +1,7 @@
 package com.example.connectBoard.controller;
 
 import com.example.connectBoard.dto.CodeDTO;
+import com.example.connectBoard.dto.CommentDTO;
 import com.example.connectBoard.service.CodeService;
 
 import java.util.List;
@@ -31,9 +32,10 @@ public class CodeController {
     }
     
     //문의유형별 count
-    @GetMapping("/code/count")
-    public List<CodeDTO> getCodeCount(@RequestParam String startDate, @RequestParam String endDate, @RequestParam String writerId, @RequestParam String dpId) {
-        return codeService.getCodeCount(startDate, endDate, writerId, dpId);
+    @PostMapping("/code/count")
+//    public List<CodeDTO> getCodeCount(@RequestParam String startDate, @RequestParam String endDate, @RequestParam String writerId, @RequestParam String dpId) {
+    public List<CodeDTO> getCodeCount(@RequestBody CodeDTO code) {
+        return codeService.getCodeCount(code);
     } 
        
 }

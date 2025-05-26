@@ -22,6 +22,8 @@ public class RequireSearchCriteria {
     private String status;
     private Integer countComment;
     private String dpId;
+    private String writerDp;
+    
     // Getters and Setters
     // ...
 }

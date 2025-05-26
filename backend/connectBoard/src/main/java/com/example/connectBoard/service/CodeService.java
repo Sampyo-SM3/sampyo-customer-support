@@ -20,8 +20,8 @@ public class CodeService {
     	 return codeRepository.getCodes(category);
     }
      
-    public List<CodeDTO> getCodeCount(String startDate, String endDate, String writerId, String dpId) {
-        return codeRepository.getCodeCount(startDate, endDate, writerId, dpId);
+    public List<CodeDTO> getCodeCount(CodeDTO code) {
+        return codeRepository.getCodeCount(code);
     }
     
 }

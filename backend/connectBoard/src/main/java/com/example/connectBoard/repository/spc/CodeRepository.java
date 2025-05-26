@@ -10,5 +10,5 @@ import com.example.connectBoard.dto.CodeDTO;
 public interface CodeRepository {
 	List<CodeDTO> getCodes(String category);
 	 
-	List<CodeDTO> getCodeCount(String startDate, String endDate, String writerId, String dpId);
+	List<CodeDTO> getCodeCount(CodeDTO code);
 }

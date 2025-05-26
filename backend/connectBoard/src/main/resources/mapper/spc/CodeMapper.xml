@@ -20,8 +20,11 @@
 		ORDER BY orderNum;
     </select>
 	    
+	    
+	       
+    	    
 	<!--문의유형별 count-->
-	<select id="getCodeCount" parameterType="map" resultType="com.example.connectBoard.dto.CodeDTO">
+	<select id="getCodeCount" parameterType="com.example.connectBoard.dto.CodeDTO" resultType="com.example.connectBoard.dto.CodeDTO">
 	    SELECT
 	        c.codeName,
 	        b.inquiryType,
@@ -39,13 +42,30 @@
 		<if test="writerId != null and writerId != ''">
 			AND b.writerId = #{writerId}
 		</if>	
-		<if test="dpId != null and dpId != ''">
-			AND b.dpId = #{dpId}
+		<if test="writerDp != null and writerDp != ''">
+			AND b.dpId = #{writerDp}
 		</if>	
+
+	
+ 		<if test="managerId != null and managerId != ''">
+ 		
+			AND b.managerId = #{managerId}
+		</if>	
+			
+		<if test="managerDp != null and managerDp != ''">	
+			AND b.managerId IN (select id from sys_empref where DEPART1 in (select depart1 from sys_empref where id = #{managerDp}))
+		</if>						
+
+		
+			
 	    GROUP BY b.inquiryType, c.orderNum, c.codeName
 	    ORDER BY c.orderNum
 	</select>
     
+
+
+
+
 <!--asdsdd
 select inquiryType, orderNum, count(*) as cnt from board b inner join code_master c on b.inquiryType = c.codeId
 where inquiryType <> ''

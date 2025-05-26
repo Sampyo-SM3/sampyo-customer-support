@@ -68,6 +68,12 @@
 			AND b.managerId = #{managerId}
 		</if>
 		
+		<if test="writerDp != null and writerDp != ''">
+			and b.writerId in (select id from sys_empref where DEPART1 in (select depart1 from sys_empref where id = #{writerDp}))
+		</if>		
+		
+		
+		
 		<if test="managerDeptCd != null and managerDeptCd != ''">
 			AND s.DEPART1 = #{managerDeptCd}
 		</if>
