@@ -37,6 +37,7 @@ export const useAuthStore = defineStore("auth", {
 
         // 로그인 성공
         if (response.data) {
+          // console.log('response.data ');
           this.userId = response.data.id;
           this.userInfo = response.data;          
           this.isAuthenticated = true;
@@ -55,6 +56,8 @@ export const useAuthStore = defineStore("auth", {
           }
           
           return true;
+        } else {
+          console.log('실패!');
         }
         
         return false;
