@@ -803,6 +803,20 @@ const updateMonthlyChart = () => {
 
     const monthlyData = getMonthlyData()
 
+    // 전체 월 라벨 배열
+    const allMonthLabels = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
+    
+    // 데이터가 있는 월만 필터링
+    const filteredData = []
+    const filteredLabels = []
+    
+    monthlyData.forEach((count, index) => {
+      if (count > 0) {
+        filteredData.push(count)
+        filteredLabels.push(allMonthLabels[index])
+      }
+    })
+
     // Canvas 크기 재설정
     canvas.width = canvas.offsetWidth
     canvas.height = canvas.offsetHeight
@@ -810,10 +824,10 @@ const updateMonthlyChart = () => {
     chartInstances.monthly = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+        labels: filteredLabels,
         datasets: [{
           label: '작성 건수',
-          data: monthlyData,
+          data: filteredData,
           backgroundColor: '#66BB6A'
         }]
       },

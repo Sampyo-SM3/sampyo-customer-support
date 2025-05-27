@@ -92,10 +92,10 @@ export default {
     UserPopup
   },
   setup() {
-    const extraBreadcrumb = inject('extraBreadcrumb', null);
+    // const extraBreadcrumb = inject('extraBreadcrumb', null);
     const listButtonLink = inject('listButtonLink', null);
     onMounted(() => {
-      if (extraBreadcrumb) extraBreadcrumb.value = '권한등록';
+      // if (extraBreadcrumb) extraBreadcrumb.value = '권한등록';
       if (listButtonLink) listButtonLink.value = null;
     });
     return {};
