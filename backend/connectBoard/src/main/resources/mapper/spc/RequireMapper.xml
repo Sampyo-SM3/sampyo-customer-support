@@ -30,8 +30,7 @@
 		    b.inquiryPart,
 		    b.priority,
 		    (SELECT COUNT(*) FROM COMMENTS WHERE postid = b.seq) as countComment   	
-		FROM board b 
-		  inner join sys_empref s on s.id = b.managerId
+		FROM board b 		  
 		  inner join code_master c on b.processState = c.codeId		
 		  left outer join SPG.DBO.CRM_USER_MASTER d on b.writerId = d.USR_ID					
 	<where>
@@ -64,29 +63,170 @@
         	AND b.dpId LIKE '%' + #{dpId} + '%'
     	</if>   
     	 
-		<if test="managerId != null and managerId != ''">
-			AND b.managerId = #{managerId}
-		</if>
-		
-		<if test="writerDp != null and writerDp != ''">
-			and b.writerId in (select id from sys_empref where DEPART1 in (select depart1 from sys_empref where id = #{writerDp}))
-		</if>		
-		
-		
-		
-		<if test="managerDeptCd != null and managerDeptCd != ''">
-			AND s.DEPART1 = #{managerDeptCd}
-		</if>
-		
-		<if test="writerId != null and writerId != ''">
-			AND b.writerId = #{writerId}
-		</if>		    
-		
-
 	     	
 	</where>
 		ORDER BY b.seq DESC
 	</select>
+	
+	
+	<select id="searchRequiresByCriteriaUser" parameterType="com.example.connectBoard.dto.RequireSearchCriteria" resultType="com.example.connectBoard.dto.RequireDTO">
+		SELECT
+		    b.seq,
+	        b.sub,
+		    d.CORP_NM as division,
+		    d.DEPT_NM as dpNm,
+		    b.context,
+		    b.uId,
+		    b.usem,
+			b.processState,
+			c.codeName AS statusNm,	    
+			b.manager,
+			b.managerId,
+			b.managerTel,
+			b.managerEmail,
+		    b.requestDate,
+		    b.requestDate AS requestDateTime,
+		    b.completeDate,
+		    b.completeDt,
+		    b.srFlag,
+		    b.saveFlag,
+		    (SELECT codeName FROM CODE_MASTER WHERE codeId = b.inquiryType) as inquiryType,
+		    b.inquiryPart,
+		    b.priority,
+		    (SELECT COUNT(*) FROM COMMENTS WHERE postid = b.seq) as countComment
+		FROM board b 
+			left join code_master c on b.processState = c.codeId
+			left outer join SPG.DBO.CRM_USER_MASTER d on b.writerId = d.USR_ID					
+	<where>
+	    b.deleteYn = 'N'
+	    
+	    <if test="startDate != null and startDate != ''">
+	        AND b.requestDate >= #{startDate}
+	    </if>
+	    
+	    <if test="endDate != null and endDate != ''">
+	        AND
+	         b.requestDate &lt;= #{endDate}
+	    </if>
+	    	    
+		<if test="writerId != null and writerId != ''">
+			AND b.writerId = #{writerId}
+		</if>		    
+		
+ 		<if test="managerId != null and managerId != ''">
+			AND b.managerId = #{managerId}
+		</if>		  
+	</where>
+		ORDER BY b.seq DESC
+	</select>
+	
+	
+	
+	
+	<select id="searchRequiresByCriteriaDepart" parameterType="com.example.connectBoard.dto.RequireSearchCriteria" resultType="com.example.connectBoard.dto.RequireDTO">
+		SELECT
+		    b.seq,
+	        b.sub,
+		    d.CORP_NM as division,
+		    d.DEPT_NM as dpNm,
+		    b.context,
+		    b.uId,
+		    b.usem,
+			b.processState,
+			c.codeName AS statusNm,	    
+			b.manager,
+			b.managerId,
+			b.managerTel,
+			b.managerEmail,
+		    b.requestDate,
+		    b.requestDate AS requestDateTime,
+		    b.completeDate,
+		    b.completeDt,
+		    b.srFlag,
+		    b.saveFlag,
+		    (SELECT codeName FROM CODE_MASTER WHERE codeId = b.inquiryType) as inquiryType,
+		    b.inquiryPart,
+		    b.priority,
+		    (SELECT COUNT(*) FROM COMMENTS WHERE postid = b.seq) as countComment
+		FROM board b 
+			INNER JOIN sys_empref e ON b.writerId = e.id
+			left join code_master c on b.processState = c.codeId
+			left outer join SPG.DBO.CRM_USER_MASTER d on b.writerId = d.USR_ID					
+	<where>
+	    b.deleteYn = 'N'
+	    
+	    <if test="startDate != null and startDate != ''">
+	        AND b.requestDate >= #{startDate}
+	    </if>
+	    
+	    <if test="endDate != null and endDate != ''">
+	        AND
+	         b.requestDate &lt;= #{endDate}
+	    </if>
+		
+ 		<if test="writerId != null and writerId != ''">
+			and e.depart1 = (
+			    SELECT depart1 
+			    FROM sys_empref 
+			    WHERE id = #{writerId}
+			) 				    
+		</if>	
+	</where>
+		ORDER BY b.seq DESC
+	</select>	
+	
+	
+	<select id="searchRequiresByCriteriaDepartAdmin" parameterType="com.example.connectBoard.dto.RequireSearchCriteria" resultType="com.example.connectBoard.dto.RequireDTO">
+		SELECT
+		    b.seq,
+	        b.sub,
+		    d.CORP_NM as division,
+		    d.DEPT_NM as dpNm,
+		    b.context,
+		    b.uId,
+		    b.usem,
+			b.processState,
+			c.codeName AS statusNm,	    
+			b.manager,
+			b.managerId,
+			b.managerTel,
+			b.managerEmail,
+		    b.requestDate,
+		    b.requestDate AS requestDateTime,
+		    b.completeDate,
+		    b.completeDt,
+		    b.srFlag,
+		    b.saveFlag,
+		    (SELECT codeName FROM CODE_MASTER WHERE codeId = b.inquiryType) as inquiryType,
+		    b.inquiryPart,
+		    b.priority,
+		    (SELECT COUNT(*) FROM COMMENTS WHERE postid = b.seq) as countComment
+		FROM board b 
+			INNER JOIN sys_empref e ON b.writerId = e.id
+			left join code_master c on b.processState = c.codeId
+			left outer join SPG.DBO.CRM_USER_MASTER d on b.writerId = d.USR_ID					
+	<where>
+	    b.deleteYn = 'N'
+	    
+	    <if test="startDate != null and startDate != ''">
+	        AND b.requestDate >= #{startDate}
+	    </if>
+	    
+	    <if test="endDate != null and endDate != ''">
+	        AND
+	         b.requestDate &lt;= #{endDate}
+	    </if>
+		
+ 		<if test="managerId != null and managerId != ''">
+			and e.depart1 = (
+			    SELECT depart1 
+			    FROM sys_empref 
+			    WHERE id = #{managerId}
+			) 				    
+		</if>	
+	</where>
+		ORDER BY b.seq DESC
+	</select>		
 	
 
 	<!-- 게시글 등록2 -->	

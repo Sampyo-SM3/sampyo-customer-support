@@ -11,4 +11,10 @@ public interface CodeRepository {
 	List<CodeDTO> getCodes(String category);
 	 
 	List<CodeDTO> getCodeCount(CodeDTO code);
+	
+	List<CodeDTO> getCodeCountUser(CodeDTO code);
+	
+	List<CodeDTO> getCodeCountDepart(CodeDTO code);
+	
+
 }

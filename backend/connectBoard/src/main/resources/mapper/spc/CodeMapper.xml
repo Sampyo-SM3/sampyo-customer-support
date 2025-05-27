@@ -22,17 +22,20 @@
 	    
 	    
 	       
+    
+
     	    
 	<!--문의유형별 count-->
-	<select id="getCodeCount" parameterType="com.example.connectBoard.dto.CodeDTO" resultType="com.example.connectBoard.dto.CodeDTO">
+	<select id="getCodeCountUser" parameterType="com.example.connectBoard.dto.CodeDTO" resultType="com.example.connectBoard.dto.CodeDTO">
 	    SELECT
 	        c.codeName,
 	        b.inquiryType,
-	        c.orderNum,
+	        
 	        count(*) as cnt
 	    FROM board b
-	    INNER JOIN code_master c ON b.inquiryType = c.codeId
+	    LEFT JOIN code_master c ON b.inquiryType = c.codeId AND c.category = 'INQUIRY_TYPE'
 	    WHERE b.inquiryType &lt;&gt; ''
+	    and b.deleteYn = 'N'
 		<if test="startDate != null and startDate != ''">
 		    AND b.requestDate &gt;= #{startDate}
 		</if>
@@ -41,38 +44,50 @@
 		</if>
 		<if test="writerId != null and writerId != ''">
 			AND b.writerId = #{writerId}
-		</if>	
-		<if test="writerDp != null and writerDp != ''">
-			AND b.dpId = #{writerDp}
-		</if>	
+		</if>
+		<if test="managerId != null and managerId != ''">
+			AND b.managerId = #{managerId}
+		</if>		
+			
+		GROUP BY b.inquiryType, c.codeName
+		ORDER BY cnt DESC;
+	</select>
 
 	
- 		<if test="managerId != null and managerId != ''">
- 		
-			AND b.managerId = #{managerId}
-		</if>	
-			
-		<if test="managerDp != null and managerDp != ''">	
-			AND b.managerId IN (select id from sys_empref where DEPART1 in (select depart1 from sys_empref where id = #{managerDp}))
-		</if>						
-
+	<!--문의유형별 count-->
+	<select id="getCodeCountDepart" parameterType="com.example.connectBoard.dto.CodeDTO" resultType="com.example.connectBoard.dto.CodeDTO">
+	    SELECT
+	        c.codeName,
+	        b.inquiryType,
+	        
+	        count(*) as cnt
+	    FROM board b
+		INNER JOIN sys_empref e ON b.writerId = e.id
+		LEFT JOIN code_master c ON b.inquiryType = c.codeId AND c.category = 'INQUIRY_TYPE'
+	    WHERE b.inquiryType &lt;&gt; ''
+	    and b.deleteYn = 'N'
+	    
+		<if test="startDate != null and startDate != ''">
+		    AND b.requestDate &gt;= #{startDate}
+		</if>
 		
+		<if test="endDate != null and endDate != ''">
+		    AND b.requestDate &lt;= #{endDate}
+		</if>
+
+		<if test="writerId != null and writerId != ''">
+			and e.depart1 = (
+			    SELECT depart1 
+			    FROM sys_empref 
+			    WHERE id = #{writerId}
+			)
+		</if>		
 			
-	    GROUP BY b.inquiryType, c.orderNum, c.codeName
-	    ORDER BY c.orderNum
-	</select>
+		GROUP BY b.inquiryType, c.codeName
+		ORDER BY cnt DESC;
+	</select>	
     
 
-
-
-
-<!--asdsdd
-select inquiryType, orderNum, count(*) as cnt from board b inner join code_master c on b.inquiryType = c.codeId
-where inquiryType <> ''
-group by inquiryType, orderNum
-order by c.orderNum
-
--->    
 
 </mapper>
 

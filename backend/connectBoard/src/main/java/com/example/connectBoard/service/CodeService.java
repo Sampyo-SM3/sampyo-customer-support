@@ -24,4 +24,13 @@ public class CodeService {
         return codeRepository.getCodeCount(code);
     }
     
+    public List<CodeDTO> getCodeCountUser(CodeDTO code) {
+        return codeRepository.getCodeCountUser(code);
+    }
+    
+    public List<CodeDTO> getCodeCountDepart(CodeDTO code) {
+        return codeRepository.getCodeCountDepart(code);
+    }    
+
+    
 }

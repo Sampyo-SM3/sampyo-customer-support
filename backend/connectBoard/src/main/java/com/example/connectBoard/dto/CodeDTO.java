@@ -4,9 +4,11 @@ import java.time.LocalDate;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 public class CodeDTO {
     private String codeId;      // 상태 코드 (예: "P", "I", "H", "C")
     private String codeName;    // 상태명 (예: "미처리", "진행", "보류중", "종결")
@@ -25,7 +27,9 @@ public class CodeDTO {
     private String managerDp;
     private String startDate;
     private String endDate;
-
+    
+    
+   
     
     
 }

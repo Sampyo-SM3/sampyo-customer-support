@@ -63,6 +63,52 @@ public class RequireController {
         }
     }    
     
+    @GetMapping("/require/search-user")
+    public ResponseEntity<?> searchRequires2(@ModelAttribute RequireSearchCriteria criteria) {    	
+        try {        	
+            List<RequireDTO> requires = requireService.searchRequiresByCriteriaUser(criteria);
+            
+            if (requires.isEmpty()) {
+                return ResponseEntity.ok().body("검색 조건에 해당하는 데이터가 존재하지 않습니다.");
+            }
+            
+            return ResponseEntity.ok(requires);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 오류 발생_ /require/search\": " + e.getMessage());
+        }
+    }    
+    
+    @GetMapping("/require/search-depart-admin")
+    public ResponseEntity<?> searchRequires3Admin(@ModelAttribute RequireSearchCriteria criteria) {    	
+        try {        	
+            List<RequireDTO> requires = requireService.searchRequiresByCriteriaDepartAdmin(criteria);
+            
+            if (requires.isEmpty()) {
+                return ResponseEntity.ok().body("검색 조건에 해당하는 데이터가 존재하지 않습니다.");
+            }
+            
+            return ResponseEntity.ok(requires);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 오류 발생_ /require/search\": " + e.getMessage());
+        }
+    }  
+     
+    
+    @GetMapping("/require/search-depart")
+    public ResponseEntity<?> searchRequires3(@ModelAttribute RequireSearchCriteria criteria) {    	
+        try {        	
+            List<RequireDTO> requires = requireService.searchRequiresByCriteriaDepart(criteria);
+            
+            if (requires.isEmpty()) {
+                return ResponseEntity.ok().body("검색 조건에 해당하는 데이터가 존재하지 않습니다.");
+            }
+            
+            return ResponseEntity.ok(requires);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 오류 발생_ /require/search\": " + e.getMessage());
+        }
+    }        
+    
 	/* 게시글 최초등록 */
     @PostMapping("/require/insert")
     public ResponseEntity<?> insertRequire(@RequestBody RequireDTO require) {    	

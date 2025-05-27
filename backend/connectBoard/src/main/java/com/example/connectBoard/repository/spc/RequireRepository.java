@@ -16,6 +16,12 @@ public interface RequireRepository {
 	
 	List<RequireDTO> searchRequiresByCriteria(RequireSearchCriteria criteria);
 	
+	List<RequireDTO> searchRequiresByCriteriaUser(RequireSearchCriteria criteria);
+	
+	List<RequireDTO> searchRequiresByCriteriaDepart(RequireSearchCriteria criteria);
+
+	List<RequireDTO> searchRequiresByCriteriaDepartAdmin(RequireSearchCriteria criteria);	
+	
 	void insertRequire(RequireDTO require);
 	
 	void updateForm(RequireDTO require);

@@ -35,7 +35,22 @@ public class CodeController {
     @PostMapping("/code/count")
 //    public List<CodeDTO> getCodeCount(@RequestParam String startDate, @RequestParam String endDate, @RequestParam String writerId, @RequestParam String dpId) {
     public List<CodeDTO> getCodeCount(@RequestBody CodeDTO code) {
+    
         return codeService.getCodeCount(code);
     } 
        
+    //문의유형별 count
+    @PostMapping("/code/count-user")
+//    public List<CodeDTO> getCodeCount(@RequestParam String startDate, @RequestParam String endDate, @RequestParam String writerId, @RequestParam String dpId) {
+    public List<CodeDTO> getCodeCountUser(@RequestBody CodeDTO code) {    	
+        return codeService.getCodeCountUser(code);
+    } 
+    
+    //문의유형별 count
+    @PostMapping("/code/count-depart")   
+    public List<CodeDTO> getCodeCountDepart(@RequestBody CodeDTO code) {    	
+        return codeService.getCodeCountDepart(code);
+    }     
+
+           
 }

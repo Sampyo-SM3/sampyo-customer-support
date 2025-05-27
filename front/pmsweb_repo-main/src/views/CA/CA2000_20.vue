@@ -556,7 +556,7 @@ const fetchData = async (paraType) => {
     let response = ''
     
     if (paraType === 'A') {
-      response = await apiClient.get('/api/require/search', {
+      response = await apiClient.get('/api/require/search-user', {
         params: {
           startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
           endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
@@ -564,11 +564,13 @@ const fetchData = async (paraType) => {
         }
       })
     } else if (paraType === 'B') {    
-      response = await apiClient.get('/api/require/search', {
+      // console.log(JSON.parse(localStorage.getItem("userInfo"))?.deptCd);
+      response = await apiClient.get('/api/require/search-depart', {
         params: {
           startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
           endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
-          writerDp: userId.value,
+          writerId: userId.value,
+          // dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd,
         }
       })
     }
@@ -602,12 +604,22 @@ const fetchData = async (paraType) => {
     }
 
     // 문의 유형별 count 데이터 가져오기
-    const response2 = await apiClient.post('/api/code/count', {
-      startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
-      endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
-      writerId: paraType === 'A' ? userId.value : '',
-      writerDp: paraType === 'B' ? userId.value : ''
-    })
+    let response2 = ''
+    if (paraType === 'A') {
+      response2 = await apiClient.post('/api/code/count-user', {
+        startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
+        endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
+        writerId: userId.value,
+      })
+    } else if (paraType === 'B') {    
+      response2 = await apiClient.post('/api/code/count-depart', {
+        startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
+        endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
+        writerId: userId.value,
+      })
+    }
+        
+
 
     aryInquiryRes.value = response2.data.map(item => item.codeName)
     aryInquiryResCount.value = response2.data.map(item => item.cnt)

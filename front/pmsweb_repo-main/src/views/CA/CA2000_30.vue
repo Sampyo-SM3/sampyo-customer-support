@@ -556,22 +556,24 @@ const fetchData = async (paraType) => {
     let response = ''
     
     if (paraType === 'A') {
-      response = await apiClient.get('/api/require/search', {
+      response = await apiClient.get('/api/require/search-user', {
         params: {
           startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
           endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
           managerId: userId.value,
         }
       })
-    } else if (paraType === 'B') {
-      response = await apiClient.get('/api/require/search', {
+    } else if (paraType === 'B') {          
+      response = await apiClient.get('/api/require/search-depart-admin', {
         params: {
           startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
           endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
-          managerDeptCd: userDeptCd.value,
+          managerId: userId.value,          
         }
       })
     }
+
+
     if (response.data && Array.isArray(response.data)) {
       tableData.value = response.data.map(item => {
         const requestDateTime = new Date(item.requestDateTime)
@@ -601,15 +603,22 @@ const fetchData = async (paraType) => {
     }
 
     // 문의 유형별 count 데이터 가져오기
-    const response2 = await apiClient.post('/api/code/count', {
-      params: {
+    let response2 = ''
+    if (paraType === 'A') {
+      response2 = await apiClient.post('/api/code/count-user', {
         startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
         endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
-        managerId: paraType === 'A' ? userId.value : '',
-        managerDp: paraType === 'B' ? userId.value : ''                
-        // dpId: paraType === 'B' ? JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null : ''
-      }
-    })
+        managerId: userId.value,
+      })
+    } else if (paraType === 'B') {    
+      response2 = await apiClient.post('/api/code/count-depart', {
+        startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
+        endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
+        writerId: userId.value,
+      })
+    }
+    
+    
     aryInquiryRes.value = response2.data.map(item => item.codeName)
     aryInquiryResCount.value = response2.data.map(item => item.cnt)
   } catch (error) {
@@ -699,7 +708,6 @@ const updateInquiryTypeChart = () => {
     // Canvas 크기 재설정 (Chart.js 버그 방지)
     canvas.width = canvas.offsetWidth
     canvas.height = canvas.offsetHeight
-
     chartInstances.inquiryType = new Chart(ctx, {
       type: 'doughnut',
       data: {
@@ -802,8 +810,8 @@ const updateMonthlyChart = () => {
     }
 
     const monthlyData = getMonthlyData()
-    console.log('monthlyData -> ');
-    console.log(monthlyData);
+    // console.log('monthlyData -> ');
+    // console.log(monthlyData);
 
     // 전체 월 라벨 배열
     const allMonthLabels = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
