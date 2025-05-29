@@ -55,6 +55,10 @@ export const useAuthStore = defineStore("auth", {
             axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
           }
           
+
+          // 🔥 새로 로그인 시 이전 메뉴 상태 클리어 (첫번째 메뉴가 선택되도록)
+          localStorage.removeItem('subMenu');
+                    
           return true;
         } else {
           console.log('실패!');

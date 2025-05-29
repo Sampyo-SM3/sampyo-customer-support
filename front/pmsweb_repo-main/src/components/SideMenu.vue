@@ -71,19 +71,40 @@ export default defineComponent({
           const savedSubMenu = localStorage.getItem('subMenu');
           const cleanSubMenu = savedSubMenu ? savedSubMenu.replace(/^"|"$/g, '') : null;
 
-          if (cleanSubMenu) {
-            // console.log('✅ Saved subMenu from localStorage:', cleanSubMenu);
+          // 모든 메뉴 상태 초기화
+          menuData.value.forEach(menuItem => {
+            menuItem.isActive = false;
+            if (menuItem.children && menuItem.children.length > 0) {
+              menuItem.children.forEach(child => {
+                child.isActive = false;
+              });
+            }
+          });
 
+          if (cleanSubMenu) {
+            // 저장된 메뉴가 있는 경우: 해당 메뉴 활성화
+            let menuFound = false;
             menuData.value.forEach(menuItem => {
-              menuItem.isActive = false;
               if (menuItem.children && menuItem.children.length > 0) {
                 menuItem.children.forEach(child => {
-                  child.isActive = (child.M_NAME === cleanSubMenu);
+                  if (child.M_NAME === cleanSubMenu) {
+                    child.isActive = true;
+                    menuFound = true;
+                  }
                 });
-              } else if (menuItem.LEV === 3) {
-                menuItem.isActive = (menuItem.M_NAME === cleanSubMenu);
+              } else if (menuItem.LEV === 3 && menuItem.M_NAME === cleanSubMenu) {
+                menuItem.isActive = true;
+                menuFound = true;
               }
             });
+            
+            // 저장된 메뉴를 찾지 못한 경우 첫번째 메뉴 활성화
+            if (!menuFound) {
+              activateFirstSubmenuByHeader();
+            }
+          } else {
+            // 🔥 저장된 메뉴가 없는 경우 (새 로그인): 첫번째 메뉴 활성화
+            activateFirstSubmenuByHeader();
           }
 
           isFirstLoad.value = false;
