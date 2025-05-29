@@ -36,11 +36,9 @@
 
       <v-col cols="4" class="search-col product-category">
         <div class="label-box">중요도</div>
-        <div class="priority-radio-wrapper">
-          <v-radio-group v-model="selectedPriority" class="small-radios" inline density="compact" color="#3A70B1"
-            hide-details>
-            <v-radio v-for="item in priorityList" :key="item.codeId" :label="item.codeName" :value="item.codeId" />
-          </v-radio-group>
+        <div class="priority-rating-wrapper px-4">
+          <v-rating v-model="selectedPriority" :length="5" color="primary" background-color="grey lighten-2"
+            empty-icon="mdi-star-outline" full-icon="mdi-star" :half-increments="false" hover size="28" />
         </div>
       </v-col>
     </v-row>
@@ -222,7 +220,7 @@ export default {
       priorityList: [],
       selectedInquiryType: null,
       selectedCategory: null,
-      selectedPriority: null,
+      selectedPriority: 0,
     }
   },
 
@@ -417,16 +415,42 @@ export default {
       // 검증 초기화
       this.errorMessages = [];
 
-      // 제목 검증
       if (!this.sub || this.sub.trim() === '') {
         this.errorMessages.push('제목을 입력해주세요.');
-        this.showError = true;
-        return false;
       }
 
       // 내용 검증
       if (!this.etc || this.etc.trim() === '') {
         this.errorMessages.push('내용을 입력해주세요.');
+      }
+
+      // 문의유형
+      if (!this.selectedInquiryType || this.selectedInquiryType === '') {
+        this.errorMessages.push('문의유형을 선택해주세요.');
+      }
+
+      // 문의부문
+      if (!this.selectedCategory || this.selectedCategory === '') {
+        this.errorMessages.push('문의부문을 선택해주세요.');
+      }
+
+      // 중요도
+      if (this.selectedPriority === null || this.selectedPriority === 0) {
+        this.errorMessages.push('중요도를 선택해주세요.');
+      }
+
+      // 담당자
+      if (!this.manager || String(this.manager).trim() === '') {
+        this.errorMessages.push('담당자를 지정해주세요.');
+      }
+
+
+      // 작성자 (특정 부서일 경우만)
+      if (this.userDeptCd === 'SPH220007' && (!this.userName || this.userName.trim() === '' || !this.selectedUserId)) {
+        this.errorMessages.push('작성자를 지정해주세요.');
+      }
+
+      if (this.errorMessages.length > 0) {
         this.showError = true;
         return false;
       }
@@ -598,12 +622,6 @@ export default {
           params: { category: 'INQUIRY_PART' }
         });
         this.categoryList = categoryRes.data;
-
-        // 중요도
-        const priorityRes = await apiClient.get("/api/code/list", {
-          params: { category: 'PRIORITY' }
-        });
-        this.priorityList = priorityRes.data;
 
       } catch (error) {
         console.error('코드 리스트 조회 실패:', error);
@@ -800,12 +818,6 @@ export default {
   max-width: 200px;
   height: 40px !important;
   font-size: 15px !important;
-}
-
-.priority-radio-wrapper {
-  display: flex;
-  align-items: center;
-  padding-left: 15px;
 }
 
 .v-radio {
