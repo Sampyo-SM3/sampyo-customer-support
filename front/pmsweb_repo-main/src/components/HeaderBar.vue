@@ -4,8 +4,8 @@
       <v-img src="@/assets/SAMPYO.png" max-height="130" max-width="130" class="mr-2" />
 
       <v-tabs v-model="activeTab">
-        <v-tab class="custom-tab" :ripple="false" @click="handleMenuClick(item)" v-for="item in menuItems" :key="item"
-          :value="item">
+        <v-tab class="custom-tab" :ripple="false" @click="handleMenuClick(item)" v-for="item in menuItems"
+          :key="item.m_code" :value="item">
           <p class="tab-text">{{ item.m_name }}</p>
         </v-tab>
       </v-tabs>
@@ -37,26 +37,20 @@
   </v-app-bar>
 
   <!-- 비밀번호 변경 다이얼로그 -->
-  <v-dialog v-model="showPasswordDialog" width="400" max-width="800" persistent transition="dialog-bottom-transition">
+  <v-dialog v-model="showPasswordDialog" width="400" max-width="800" transition="dialog-bottom-transition">
     <v-card class="pa-6" style="width: 100%;">
-      <v-card-title class="text-h6 font-weight-bold">비밀번호 변경</v-card-title>
-      <v-card-text>
+      <v-card-title class=" text-h6 font-weight-bold" style="pointer-events: auto;">비밀번호 변경</v-card-title>
+      <v-card-text style="pointer-events: auto;">
         <v-text-field v-model="newPassword" :type="showNewPassword ? 'text' : 'password'" label="새 비밀번호"
           variant="outlined" color="primary" :append-inner-icon="showNewPassword ? 'mdi-eye' : 'mdi-eye-off'"
-          @click:append-inner="showNewPassword = !showNewPassword"></v-text-field>
-
-        <v-text-field v-model="confirmPassword" :type="showConfirmPassword ? 'text' : 'password'" label="비밀번호 확인"
-          variant="outlined" color="primary" :append-inner-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
-          @click:append-inner="showConfirmPassword = !showConfirmPassword"></v-text-field>
+          @click:append-inner="showNewPassword = !showNewPassword" hide-details="auto"></v-text-field>
       </v-card-text>
-      <v-card-actions class="justify-end">
+      <v-card-actions class="justify-end" style="pointer-events: auto;">
         <v-btn variant="outlined" color="grey" @click="showPasswordDialog = false">취소</v-btn>
-        <v-btn variant="flat" color="primary" @click="confirmPasswordChange">변경</v-btn>
+        <v-btn variant="flat" color="primary" @click="confirmReset">변경</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
-
-
 
   <!-- 성공 스낵바 -->
   <v-snackbar v-model="showSuccess" timeout="2000" color="success" elevation="2" class="center-snackbar">
@@ -68,7 +62,6 @@
     {{ errorMessage }}
   </v-snackbar>
 </template>
-
 <script>
 import { ref, defineComponent, onMounted, watch, provide } from 'vue';
 import { storeToRefs } from 'pinia';
@@ -90,7 +83,10 @@ export default defineComponent({
     const userNameDisplay = ref('');
     const userLoginStatus = ref('');
 
-    const showPasswordDialog = ref(true);
+    const showPasswordDialog = ref(false);
+    const newPassword = ref('');
+    const showNewPassword = ref(false);
+
     const showSuccess = ref(false);
     const successMessage = ref('');
     const showFail = ref(false);
@@ -143,14 +139,17 @@ export default defineComponent({
     const confirmReset = async () => {
       try {
         await apiClient.post("/api/resetPassword", {
-          username: userIdDisplay.value
+          id: userIdDisplay.value,
+          newPw: newPassword.value
         });
-        successMessage.value = '초기 비밀번호는 sampyo1234입니다.';
+
+        successMessage.value = '비밀번호가 변경되었습니다.';
         showSuccess.value = true;
-        showPasswordDialog.value = false;
       } catch (error) {
-        errorMessage.value = '비밀번호 초기화에 실패했습니다.';
+        errorMessage.value = '비밀번호 변경에 실패했습니다. 관리자에게 문의하세요.';
         showFail.value = true;
+      } finally {
+        showPasswordDialog.value = false;
       }
     };
 
@@ -193,6 +192,8 @@ export default defineComponent({
       showPasswordDialog,
       goToChangePassword,
       confirmReset,
+      newPassword,
+      showNewPassword,
       showSuccess,
       successMessage,
       showFail,
@@ -313,5 +314,9 @@ export default defineComponent({
 
 .list-item-text {
   font-size: 14px;
+}
+
+.center-snackbar {
+  bottom: 30px;
 }
 </style>

@@ -265,7 +265,8 @@ export default {
 
       try {
         await apiClient.post("/api/resetPassword", {
-          id: this.username
+          id: this.username,
+          newPw: 'sampyo1234'
         });
 
         this.successMessage = '초기 비밀번호는 sampyo1234입니다.';

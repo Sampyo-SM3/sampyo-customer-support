@@ -86,7 +86,7 @@
     
  	<update id="resetPassword" parameterType="com.example.connectBoard.dto.UserAuthDTO">
 		UPDATE sys_empref
-		SET PWD = PWDENCRYPT('sampyo1234')	
+		SET PWD = PWDENCRYPT(#{newPw})	
 		WHERE ID = #{id}
 	</update>
 
