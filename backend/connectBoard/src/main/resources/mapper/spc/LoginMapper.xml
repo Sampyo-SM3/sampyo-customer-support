@@ -75,6 +75,19 @@
 		VALUES (#{id}, 'CA1000_10', '31', #{id}, GETDATE())
     </insert>
     
- 		    
+    <select id="chkExistUserId" parameterType="String" resultType="boolean">
+        SELECT 
+            CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM 
+            sys_empref 
+        WHERE 
+            ID = #{id} 
+    </select>
+    
+ 	<update id="resetPassword" parameterType="com.example.connectBoard.dto.UserAuthDTO">
+		UPDATE sys_empref
+		SET PWD = PWDENCRYPT('sampyo1234')	
+		WHERE ID = #{id}
+	</update>
 
 </mapper>
