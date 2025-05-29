@@ -301,8 +301,6 @@ export default {
     // 업로드된 파일 제거
     async removeFile(file) {
 
-      console.log("랴ㅣㄷ" + file);
-
       await apiClient.post("/api/file-attach/deleteFile", {
         seq: file.seq,
         boardSeq: this.receivedSeq,

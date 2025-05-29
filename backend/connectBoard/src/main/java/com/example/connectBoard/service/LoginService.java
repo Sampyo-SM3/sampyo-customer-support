@@ -1,9 +1,13 @@
 package com.example.connectBoard.service;
 
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 
 import com.example.connectBoard.dto.CommentDTO;
 import com.example.connectBoard.dto.EmployeePreferenceDto;
+import com.example.connectBoard.dto.RequireDTO;
+import com.example.connectBoard.dto.UserAuthDTO;
 import com.example.connectBoard.exception.Exceptions.PasswordMismatchException;
 import com.example.connectBoard.exception.Exceptions.UserNotFoundException;
 import com.example.connectBoard.repository.spc.LoginRepository;
@@ -71,7 +75,17 @@ public class LoginService {
     public void insertUser(String id, String password, String companyCd, String deptCd, String name, String phone, String email) {        
         loginRepository.insertUser(companyCd, id, name, password, deptCd, phone, email);
         
-    }    
+    }
+    
+    public boolean chkExistUserId(String id) {
+        return loginRepository.chkExistUserId(id);
+    }
+	
+    public void resetPassword(UserAuthDTO userAuth) {
+    	loginRepository.resetPassword(userAuth);    	
+    }
+
+ 
 
 
 }

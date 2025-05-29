@@ -1,80 +1,16 @@
 <template>
   <v-app-bar class="custom-elevation">
     <v-container fluid class="d-flex align-center pl-4">
+      <v-img src="@/assets/SAMPYO.png" max-height="130" max-width="130" class="mr-2" />
 
-      <!-- 로고 및 회사명 -->
-      <v-img src="@/assets/SAMPYO.png" max-height="130" max-width="130" class="mr-2">
-      </v-img>
-
-      <!-- 메뉴 아이템들 -->
       <v-tabs v-model="activeTab">
         <v-tab class="custom-tab" :ripple="false" @click="handleMenuClick(item)" v-for="item in menuItems" :key="item"
           :value="item">
           <p class="tab-text">{{ item.m_name }}</p>
         </v-tab>
-
-        <!-- Business 탭 추가 -->
-        <!-- <v-btn
-          class="business-btn"
-          variant="text"
-        >
-          <p class="business-text">Business</p>
-          <v-icon right>mdi-open-in-new</v-icon>
-        </v-btn>    -->
-
       </v-tabs>
 
       <v-spacer></v-spacer>
-
-      <!-- 검색바 -->
-      <!-- <v-text-field 
-        rounded="lg"        
-        v-model="search"
-        placeholder="검색"
-        prepend-inner-icon="mdi-magnify"
-        filled        
-        dense
-        clearable     
-        hide-details
-        variant="outlined"                   
-        density="compact"
-        class="custom-searchbar"/>            -->
-
-      <!-- 언어 선택 드롭다운 -->
-      <!-- <v-menu offset-y>
-        <template v-slot:activator="{ props }">
-          <v-btn
-            v-bind="props"
-            text
-            class="language-select px-0 mr-2"
-          >
-            <p class="lang-text">한국어</p>
-            <v-icon right>mdi-chevron-down</v-icon>
-          </v-btn>
-        </template>
-<v-list>
-  <v-list-item v-for="(language, index) in languages" :key="index">
-    <v-list-item-title>{{ language }}</v-list-item-title>
-  </v-list-item>
-</v-list>
-</v-menu> -->
-
-      <!-- 알림 아이콘 -->
-      <!-- <v-btn icon class="mr-4">
-        <v-icon>mdi-bell-outline</v-icon>        
-      </v-btn>       -->
-
-      <!-- <div class="pr-5">
-        <v-icon>
-          <span class="mdi mdi-account-circle-outline" style="margin-bottom:1px;"></span>
-        </v-icon>
-        {{ userNameDisplay }}
-      </div> -->
-
-      <!-- 로그인 버튼 -->
-      <!-- <v-btn class="login-btn" @click="handleLoginLogout">
-        <p class="login-text">{{ userLoginStatus ? '로그아웃' : '로그인' }}</p>
-      </v-btn> -->
 
       <v-menu>
         <template #activator="{ props }">
@@ -86,9 +22,10 @@
         </template>
 
         <v-list density="compact">
-          <!-- <v-list-item @click="goToMyPage">
-            <v-list-item-title>내 정보</v-list-item-title>
-          </v-list-item> -->
+          <v-list-item @click="goToChangePassword" class="custom-list-item">
+            <v-list-item-title class="list-item-text">비밀번호 변경</v-list-item-title>
+          </v-list-item>
+
           <v-list-item @click="handleLoginLogout" class="custom-list-item">
             <v-list-item-title class="list-item-text">
               {{ userLoginStatus ? '로그아웃' : '로그인' }}
@@ -96,9 +33,40 @@
           </v-list-item>
         </v-list>
       </v-menu>
-
     </v-container>
   </v-app-bar>
+
+  <!-- 비밀번호 변경 다이얼로그 -->
+  <v-dialog v-model="showPasswordDialog" width="400" max-width="800" persistent transition="dialog-bottom-transition">
+    <v-card class="pa-6" style="width: 100%;">
+      <v-card-title class="text-h6 font-weight-bold">비밀번호 변경</v-card-title>
+      <v-card-text>
+        <v-text-field v-model="newPassword" :type="showNewPassword ? 'text' : 'password'" label="새 비밀번호"
+          variant="outlined" color="primary" :append-inner-icon="showNewPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          @click:append-inner="showNewPassword = !showNewPassword"></v-text-field>
+
+        <v-text-field v-model="confirmPassword" :type="showConfirmPassword ? 'text' : 'password'" label="비밀번호 확인"
+          variant="outlined" color="primary" :append-inner-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          @click:append-inner="showConfirmPassword = !showConfirmPassword"></v-text-field>
+      </v-card-text>
+      <v-card-actions class="justify-end">
+        <v-btn variant="outlined" color="grey" @click="showPasswordDialog = false">취소</v-btn>
+        <v-btn variant="flat" color="primary" @click="confirmPasswordChange">변경</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+
+
+  <!-- 성공 스낵바 -->
+  <v-snackbar v-model="showSuccess" timeout="2000" color="success" elevation="2" class="center-snackbar">
+    {{ successMessage }}
+  </v-snackbar>
+
+  <!-- 실패 스낵바 -->
+  <v-snackbar v-model="showFail" timeout="2000" color="error" elevation="2" class="center-snackbar">
+    {{ errorMessage }}
+  </v-snackbar>
 </template>
 
 <script>
@@ -106,123 +74,108 @@ import { ref, defineComponent, onMounted, watch, provide } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useAuthStore } from '@/store/auth';
 import { useMenuStore } from '@/store/menuStore';
-import { useRouter } from 'vue-router';  // useRouter 임포트
+import { useRouter } from 'vue-router';
 import apiClient from '@/api';
-
 
 export default defineComponent({
   name: 'HeaderBar',
   emits: ['navigate', 'menuSelected'],
   setup(props, { emit }) {
-    const menuStore = useMenuStore()
+    const menuStore = useMenuStore();
     const { isLoading, error } = storeToRefs(menuStore);
-    const activeTab = ref(null)
-    const menuItems = ref([])
+    const activeTab = ref(null);
+    const menuItems = ref([]);
 
     const userIdDisplay = ref('');
     const userNameDisplay = ref('');
     const userLoginStatus = ref('');
 
-    // auth 스토어 사용
-    const authStore = useAuthStore();
+    const showPasswordDialog = ref(true);
+    const showSuccess = ref(false);
+    const successMessage = ref('');
+    const showFail = ref(false);
+    const errorMessage = ref('');
 
-    // 라우터 사용
+    const authStore = useAuthStore();
     const router = useRouter();
 
-    // 로그인/로그아웃 처리 함수
     const handleLoginLogout = () => {
       if (userLoginStatus.value) {
-        // 로그인 상태일 경우 로그아웃
-        authStore.logout();  // Pinia의 logout 호출
-        userLoginStatus.value = false;  // 로그인 상태 반영
-
+        authStore.logout();
+        userLoginStatus.value = false;
         router.push({ name: 'Login' });
-      } else {
-        // 로그인 상태가 아닐 경우 로그인 (로그인 로직은 추가적으로 구현 필요)
-        // userLoginStatus.value = true;
-        // authStore.login();  // Pinia의 login 호출
       }
     };
 
     const showSideMenu = (item) => {
-      // console.log('--------showSideMenu--------')
-      // console.log('item-> ', item)
-
-      // 로컬 저장소에서 user_id 가져오기
       const userId = localStorage.getItem('user_id');
       if (userId) {
-        menuStore.fetchMenuData(item.m_code, userId);  // user_id를 사용하여 메뉴 데이터 가져오기
-      } else {
-        console.error('User ID is not found in localStorage');
+        menuStore.fetchMenuData(item.m_code, userId);
       }
-    }
+    };
 
     const fetchMenuData = async (id) => {
-      // console.log('----------fetchMenuData2----------')
       try {
-        isLoading.value = true
+        isLoading.value = true;
         const response = await apiClient.get('/api/menuitem', {
-          params: {
-            auth: '',
-            id: id
-          }
+          params: { auth: '', id }
         });
-
         if (response.data && Array.isArray(response.data.menuItems)) {
           menuItems.value = response.data.menuItems.map(item => ({
             m_code: item.mcode,
             m_name: item.mname
-          }))
-          // console.log('menuItems.value -> ', menuItems.value)
+          }));
         } else {
-          throw new Error('Invalid data structure or menuItems is not an array')
+          throw new Error('Invalid data structure');
         }
       } catch (error) {
-        console.error('Error fetching menu data:', error)
-        menuItems.value = []
+        console.error('Error fetching menu data:', error);
+        menuItems.value = [];
       } finally {
-        isLoading.value = false
+        isLoading.value = false;
       }
-    }
+    };
+
+    const goToChangePassword = () => {
+      showPasswordDialog.value = true;
+    };
+
+    const confirmReset = async () => {
+      try {
+        await apiClient.post("/api/resetPassword", {
+          username: userIdDisplay.value
+        });
+        successMessage.value = '초기 비밀번호는 sampyo1234입니다.';
+        showSuccess.value = true;
+        showPasswordDialog.value = false;
+      } catch (error) {
+        errorMessage.value = '비밀번호 초기화에 실패했습니다.';
+        showFail.value = true;
+      }
+    };
 
     onMounted(() => {
-      // 로컬 저장소에서 user_id 가져오기
       const userId = localStorage.getItem('user_id');
-      if (userId) {
-        fetchMenuData(userId)  // user_id로 메뉴 데이터 가져오기
-      } else {
-        console.error('User ID is not found in localStorage');
-      }
+      if (userId) fetchMenuData(userId);
 
-      userIdDisplay.value = localStorage.getItem('user_id');
+      userIdDisplay.value = userId;
       userLoginStatus.value = localStorage.getItem('isAuthenticated');
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+      userNameDisplay.value = userInfo?.name || '';
+    });
 
-      const retrievedData = localStorage.getItem('userInfo');
-      const userInfo = JSON.parse(retrievedData);
-      userNameDisplay.value = userInfo.name; // '관리자'                           
-    })
-
-    // 메뉴 아이템이 로드된 후 첫 번째 항목의 클릭 이벤트 트리거
     watch(menuItems, (newMenuItems) => {
       if (newMenuItems.length > 0) {
-        // 첫 번째 메뉴 아이템 선택
-        activeTab.value = newMenuItems[0]
-        // 첫 번째 메뉴 아이템의 showSideMenu 함수 호출
-        showSideMenu(newMenuItems[0])
+        activeTab.value = newMenuItems[0];
+        showSideMenu(newMenuItems[0]);
       }
-    }, { immediate: true })
+    }, { immediate: true });
 
-
-    // 사이드메뉴 참조를 위한 설정
     const sideMenuRef = ref(null);
-    provide('sideMenuRef', sideMenuRef); // 자식 컴포넌트에서 접근 가능하도록 provide    
+    provide('sideMenuRef', sideMenuRef);
 
-    // 메뉴 클릭 핸들러 수정
     const handleMenuClick = (item) => {
-      // 기존 사이드메뉴 데이터 로드 함수 호출
       showSideMenu(item);
-
-      // 헤더 메뉴 클릭 이벤트 발생 - 부모 컴포넌트에 알림
       emit('menuSelected', item.m_code);
     };
 
@@ -237,11 +190,17 @@ export default defineComponent({
       userNameDisplay,
       userLoginStatus,
       handleLoginLogout,
-    }
+      showPasswordDialog,
+      goToChangePassword,
+      confirmReset,
+      showSuccess,
+      successMessage,
+      showFail,
+      errorMessage
+    };
   }
-})
+});
 </script>
-
 
 <style scoped>
 .login-btn {
@@ -249,7 +208,6 @@ export default defineComponent({
   border-radius: 10px !important;
   color: white;
   width: 80px;
-  /* 원하는 길이로 조정 */
 }
 
 .login-text {
@@ -277,7 +235,6 @@ export default defineComponent({
 
 ::v-deep.custom-searchbar {
   margin-right: 30px;
-  /* color: #52555a !important; */
   color: #52555a !important;
   max-width: 320px;
 }
@@ -290,19 +247,16 @@ export default defineComponent({
 .custom-tab:active,
 .custom-tab:focus,
 .custom-tab.v-tab--selected {
-  /* 대메뉴 폰트 색상 */
   color: #1976D2 !important;
   background-color: transparent !important;
 }
 
-/* 배경 효과를 생성하는 가상 요소들 제거 */
 .custom-tab::before,
 .custom-tab::after {
   opacity: 0 !important;
   background-color: transparent !important;
 }
 
-/* 헤더 메뉴 스타일 */
 .custom-tab {
   font-weight: 600;
   font-size: 14px;
@@ -313,18 +267,16 @@ export default defineComponent({
   font-size: 17px;
 }
 
-/* 버튼 오버레이 효과 제거 */
 ::v-deep.custom-tab .v-btn__overlay {
   opacity: 0 !important;
 }
 
-/* 탭 슬라이더(하단 막대) 제거 */
 ::v-deep.custom-tab .v-tab__slider {
   display: none !important;
 }
 
 .custom-elevation {
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08) !important
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08) !important;
 }
 
 .business-btn {
@@ -332,7 +284,6 @@ export default defineComponent({
   text-transform: none;
   font-weight: 600;
   color: #00B0F3 !important;
-  /* Business 텍스트 색상 */
 }
 
 .business-btn .v-icon {
@@ -341,7 +292,7 @@ export default defineComponent({
 }
 
 .business-text {
-  letter-spacing: 0px
+  letter-spacing: 0px;
 }
 
 .user-name-text {
@@ -353,6 +304,11 @@ export default defineComponent({
   min-height: 30px;
   padding-top: 0;
   padding-bottom: 0;
+  cursor: pointer;
+}
+
+.custom-list-item:hover {
+  background-color: #f5f5f5;
 }
 
 .list-item-text {

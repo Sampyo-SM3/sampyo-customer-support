@@ -4,6 +4,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.example.connectBoard.dto.EmployeePreferenceDto;
+import com.example.connectBoard.dto.RequireDTO;
+import com.example.connectBoard.dto.UserAuthDTO;
 
 @Mapper
 public interface LoginRepository {
@@ -74,5 +76,9 @@ public interface LoginRepository {
     		@Param("deptCd") String deptCd,
     		@Param("phone") String phone, 
     		@Param("email") String email);
+    
+    boolean chkExistUserId(String id);
+    
+    void resetPassword(UserAuthDTO userAuth);
     
 }

@@ -13,23 +13,23 @@
                 <h2 class="text-h5 font-weight-bold mb-8">sampyo cement</h2> -->
                 <v-img src="@/assets/SAMPYO_Cement_Signature_영문.png" class='mb-8 ml-8' alt="Sampyo Cement Logo"
                   style="width: 200px;" />
-                <v-form @submit.prevent="login" class="mb-8">
+                <v-form @submit.prevent="login" class="mb-6">
                   <v-text-field v-model="username" label="Account" prepend-inner-icon="mdi-account" variant="outlined"
                     class="mb-4" color="primary"></v-text-field>
                   <v-text-field v-model="password" label="Password" prepend-inner-icon="mdi-lock"
                     :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                     @click:append-inner="showPassword = !showPassword" :type="showPassword ? 'text' : 'password'"
-                    variant="outlined" color="primary" class="mb-2"></v-text-field>
-                  <!-- 개발 전으로 주석처리 -->
-                  <!-- <div class="text-right mb-4">
-                    <v-btn variant="text" color="primary" density="compact" class="text-caption">
-                      비밀번호를 잊으셨나요?
-                    </v-btn>
-                  </div> -->
+                    variant="outlined" color="primary"></v-text-field>
                   <v-btn block color="primary" size="large" type="submit" class="mb-6" elevation="2">
                     로그인
                   </v-btn>
                 </v-form>
+                <div class="text-right mb-4">
+                  <v-btn variant="text" color="#787879" density="compact" class="text-subtitle2 font-weight-bold"
+                    @click="openResetDialog">
+                    비밀번호 초기화
+                  </v-btn>
+                </div>
                 <!-- 개발 전으로 주석처리 -->
                 <!-- <div class="text-divider mb-6" style="color: #808080;">간편 로그인</div>
                 <div class="text-center">
@@ -55,11 +55,49 @@
       </v-btn>
     </template>
   </v-snackbar>
+
+  <!-- 비밀번호 초기화 confirm 창 -->
+  <v-dialog v-model="showConfirm" persistent max-width="600" transition="dialog-bottom-transition">
+    <v-card class="pa-6 rounded-lg" elevation="10">
+      <div class="text-center mb-2">
+        <v-icon color="warning" size="50">mdi-alert-circle-outline</v-icon>
+      </div>
+
+      <div class="text-h6 font-weight-bold text-center mb-2">
+        비밀번호를 초기화하시겠습니까?
+      </div>
+
+      <!-- 버튼 -->
+      <v-card-actions class="justify-center">
+        <v-btn variant="outlined" color="#1E88E5" class="mr-2" @click="showConfirm = false">
+          취소
+        </v-btn>
+
+        <v-btn variant="flat" color="#1E88E5" class="white--text" @click="confirmReset">
+          초기화
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- 성공 스낵바 -->
+  <v-snackbar v-model="showSuccess" timeout="3000" color="success" elevation="2" class="center-snackbar">
+    <div class="snackbar-text">
+      {{ successMessage }}
+    </div>
+  </v-snackbar>
+
+  <!-- 실패 스낵바 -->
+  <v-snackbar v-model="showFail" timeout="2000" color="error" elevation="2" class="center-snackbar">
+    <div class="snackbar-text">
+      {{ errorMessage }}
+    </div>
+  </v-snackbar>
 </template>
 
 <script>
 import { useAuthStore } from '@/store/auth';
-
+import apiClient from '@/api';
 
 export default {
   name: 'LoginPage',
@@ -71,6 +109,11 @@ export default {
       loading: false,
       showError: false,
       errorMessages: '',
+      showConfirm: false,
+      showSuccess: false,
+      successMessage: '',
+      showFail: false,
+      errorMessage: ''
     }
   },
   computed: {
@@ -135,7 +178,7 @@ export default {
             // console.log('success2');
             // this.$router.push({ name: 'Main' });
             // 처음 로그인할 경우 메뉴가 안보이는 현상 때문에 임시로 한번 더 로그인처리
-            await this.login2(para_name, para_phone, para_email, para_deptCd, para_companyCd);            
+            await this.login2(para_name, para_phone, para_email, para_deptCd, para_companyCd);
           } else {
             // 로그인 실패 (authStore에서 false 반환)
             this.showError = true;
@@ -159,13 +202,13 @@ export default {
     },
 
     // 처음 로그인할 경우 메뉴가 안보이는 현상 때문에 임시로 한번 더 로그인처리
-    async login2(para_name, para_phone, para_email, para_deptCd, para_companyCd) {      
+    async login2(para_name, para_phone, para_email, para_deptCd, para_companyCd) {
       // console.log('--login2--');
       // console.log(para_name);
       // console.log(para_phone);
       // console.log(para_email);
       // console.log(para_deptCd);
-      try {              
+      try {
         // console.log('-- 블루샘 아이디 존재여부 통과 --');
         // console.log(result.phone);          
         // 우리쪽 계정테이블에 데이터 없으면 insert후 로그인
@@ -181,9 +224,9 @@ export default {
           // username: '1',
           // password: '1' 
 
-            
+
         });
-          // console.log('2');
+        // console.log('2');
         if (success2) {
           // console.log('3');
           this.$router.push({ name: 'Main' });
@@ -191,16 +234,50 @@ export default {
           console.log('fail!!!');
           console.log(success2);
         }
-      } catch (error) {        
+      } catch (error) {
         console.error('로그인 처리 중 오류_2:', error);
         this.errorMessages = '로그인 처리 중 오류가 발생했습니다_2';
         this.showError = true;
-      } 
-    },       
+      }
+    },
 
-    googleLogin() {
-      // 여기에 Google 로그인 로직을 구현하세요
+    openResetDialog() {
+      if (!this.username || this.username.trim() === '') {
+        this.errorMessages = '아이디를 입력해주세요.';
+        this.showError = true;
+      } else {
+        this.showConfirm = true;
+      }
+    },
+
+    async confirmReset() {
+
+      const res = await apiClient.get("/api/chkExistUserId", {
+        params: { id: this.username }
+      });
+
+      if (!res.data) {
+        this.errorMessage = '존재하지 않는 사용자입니다.';
+        this.showFail = true;
+        this.showConfirm = false;
+        return;
+      }
+
+      try {
+        await apiClient.post("/api/resetPassword", {
+          id: this.username
+        });
+
+        this.successMessage = '초기 비밀번호는 sampyo1234입니다.';
+        this.showSuccess = true;
+      } catch (error) {
+        this.errorMessage = '비밀번호 초기화에 실패했습니다. 관리자에게 문의하세요.';
+        this.showFail = true;
+      } finally {
+        this.showConfirm = false;
+      }
     }
+
   }
 }
 </script>

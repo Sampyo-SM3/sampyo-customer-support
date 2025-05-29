@@ -4,12 +4,16 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.connectBoard.dto.EmployeePreferenceDto;
+import com.example.connectBoard.dto.RequireDTO;
+import com.example.connectBoard.dto.UserAuthDTO;
 import com.example.connectBoard.exception.Exceptions;
 import com.example.connectBoard.service.LoginService;
 
@@ -103,4 +107,26 @@ public class LoginController {
                    .body(Map.of("message", "로그인 처리 중 오류가 발생했습니다."));
         }
     }    
+    
+    @GetMapping("/chkExistUserId")
+    public ResponseEntity<Boolean> chkExistUserId(@RequestParam("id") String id) {
+        try {
+            boolean exists = loginService.chkExistUserId(id); // 이미 true/false
+            return ResponseEntity.ok(exists);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(false); // 서버 에러 시 false 반환 (또는 에러 메시지로 변경 가능)
+        }
+    }
+    
+    @PostMapping("/resetPassword")
+    public ResponseEntity<?> resetPassword(@RequestBody UserAuthDTO userAuth) {    	
+        try {
+        	loginService.resetPassword(userAuth);
+            return ResponseEntity.ok("비밀번호가 초기화ㅓ되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 오류 발생: " + e.getMessage());
+        }
+    }    
+    
+    
 }
