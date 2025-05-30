@@ -1,83 +1,9 @@
-<template>
+ <template>
   <v-container fluid class="pr-0 pl-0 pt-4">
 
-    <!-- <v-row>
-      <v-col>        
-        <div class="mt-2">
-          <v-divider thickness="3" color="#578ADB"></v-divider>
-        </div>
-      </v-col>
-    </v-row> -->
-
-    <v-row dense align="center" class="flex-wrap rounded-border sky-bg" style="gap:5px;">
-
-      <!-- 요청기간 -->
-      <v-col cols="12" sm="6" md="auto" class="d-flex align-center filter-col">
-        <span class="filter-label">요청기간<span class="label-divider"></span></span>
-        <!-- 시작일 입력 필드 -->
-        <div class="start-date-wrapper">
-          <VueDatePicker class="date-picker" :month-picker="false" preview-format="yyyy-MM-dd" v-model="Date_startDate"
-            :teleport="true" position="bottom" :enable-time-picker="false" auto-apply locale="ko" format="yyyy-MM-dd"
-            :week-start="1" @update:model-value="onStartDateChange" v-model:open="startDatePickerOpen"
-            :clearable="false" :text-input="false" />
-        </div>
-        <span class="date-separator">~</span>
-
-        <!-- 종료일 입력 필드 -->
-        <div class="end-date-wrapper">
-          <VueDatePicker class="date-picker" :month-picker="false" preview-format="yyyy-MM-dd" v-model="Date_endDate"
-            :teleport="true" position="bottom" :enable-time-picker="false" auto-apply locale="ko" format="yyyy-MM-dd"
-            :week-start="1" @update:model-value="onEndDateChange" v-model:open="endDatePickerOpen" :clearable="false"
-            :text-input="false" />
-        </div>
-
-        <!-- 날짜 버튼 -->
-        <div class="date-buttons mr-2">
-          <div class="date-btn-container">
-            <v-btn value="today" class="date-btn" :class="{ 'active-date-btn': dateRange === 'today' }"
-              @click="setDateRange('today')">오늘</v-btn>
-            <v-btn value="week" class="date-btn" :class="{ 'active-date-btn': dateRange === 'week' }"
-              @click="setDateRange('week')">1주일</v-btn>
-            <v-btn value="15days" class="date-btn" :class="{ 'active-date-btn': dateRange === '15days' }"
-              @click="setDateRange('15days')">15일</v-btn>
-            <v-btn value="month" class="date-btn" :class="{ 'active-date-btn': dateRange === 'month' }"
-              @click="setDateRange('month')">1개월</v-btn>
-            <v-btn value="3months" class="date-btn" :class="{ 'active-date-btn': dateRange === '3months' }"
-              @click="setDateRange('3months')">3개월</v-btn>
-          </div>
-        </div>
-      </v-col>
-
-      <!-- 접수상태 -->
-      <v-col cols="12" sm="6" md="auto" class="d-flex align-center filter-col">
-        <span class="filter-label">접수상태<span class="label-divider"></span></span>
-        <v-select v-model="selectedStatus" :items="progressStatuses" item-title="text" item-value="value"
-          variant="outlined" density="compact" hide-details class="filter-input" />
-      </v-col>
-
-      <!-- 담당자 -->
-      <v-col cols="12" sm="6" md="auto" class="d-flex align-center filter-col">
-        <span class="filter-label">담당자<span class="label-divider"></span></span>
-        <v-text-field v-model="manager" @keydown.enter="fetchData" variant="outlined" density="compact" hide-details
-          class="filter-input" />
-      </v-col>
-
-      <!-- 제목 -->
-      <v-col cols="12" sm="6" md="auto" class="d-flex align-center filter-col">
-        <span class="filter-label">제목<span class="label-divider"></span></span>
-        <v-text-field v-model="sub" @keydown.enter="fetchData" variant="outlined" density="compact" hide-details
-          class="filter-input-sub" />
-      </v-col>
-
-      <!-- 검색 버튼 -->
-      <v-col cols="12" sm="6" md="auto" class="d-flex justify-end">
-        <v-btn variant="flat" color="primary" class="custom-btn" size="small" @click="fetchData()">
-          <v-icon size="default" class="mr-1">mdi-magnify</v-icon>
-          조회
-        </v-btn>
-      </v-col>
-
-    </v-row>
+    <SearchFilter 
+      @search="onSearch"
+    />
 
     <!-- 데이터 테이블 상단 버튼 영역 -->
     <v-row class="top-button-row mb-2">
@@ -271,12 +197,12 @@
 <script>
 import apiClient from '@/api';
 import { inject, onMounted } from 'vue';
-import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
+import SearchFilter from '@/components/SearchFilter.vue';
 
 export default {
   components: {
-    VueDatePicker
+    SearchFilter,
   },
   setup() {
     const extraBreadcrumb = inject('extraBreadcrumb', null);
@@ -355,41 +281,15 @@ export default {
     }
   },
 
-  watch: {
-    // API 파라미터가 변경되면 데이터 다시 로드
-    startDate() {
-      this.currentPage = 1; // 검색 조건 변경 시 첫 페이지로 리셋      
-    },
-    endDate() {
-      this.currentPage = 1;
-    },
-  },
+
 
   mounted() {
-    this.setDateRange('month');
-    this.getStatus();
-    this.fetchData();
+    this.onSearch();
     this.checkLocalStorage();
   },
 
   methods: {
-    onStartDateChange(date) {
-      this.Date_startDate = date;
-      this.startDatePickerOpen = false;
-    },
-
-    onEndDateChange(date) {
-      this.Date_endDate = date;
-      this.endDatePickerOpen = false;
-      // Date 객체를 'YYYY-MM-DD' 형식의 문자열로 변환
-      if (date) {
-        const formattedDate = new Date(date);
-        const year = formattedDate.getFullYear();
-        const month = String(formattedDate.getMonth() + 1).padStart(2, '0');
-        const day = String(formattedDate.getDate()).padStart(2, '0');
-        this.endDate = `${year}-${month}-${day}`;
-      }
-    },
+   
     checkLocalStorage() {
       const midMenuFromStorage = localStorage.getItem('midMenu');
       const subMenuFromStorage = localStorage.getItem('subMenu');
@@ -500,62 +400,27 @@ export default {
       return true;
     },
 
-    // 날짜 범위 설정 함수
-    setDateRange(range) {
-      this.dateRange = range;
-      const today = new Date();
-      let start = new Date(today);
+   
 
-      switch (range) {
-        case 'today':
-          // 오늘 날짜로 시작일과 종료일 모두 설정
-          break;
-        case 'week':
-          // 1주일 전
-          start.setDate(today.getDate() - 7);
-          break;
-        case '15days':
-          // 15일 전
-          start.setDate(today.getDate() - 15);
-          break;
-        case 'month':
-          // 1개월 전
-          start.setMonth(today.getMonth() - 1);
-          break;
-        case '3months':
-          // 3개월 전
-          start.setMonth(today.getMonth() - 3);
-          break;
-      }
+    async searchWithParams(para_params) {
+      // console.log('--searchWithParams--');
+      // console.log(para_params);
 
-      this.Date_startDate = start;
-      this.Date_endDate = today;
-    },
+      // 최종 전달될 파라미터 확인
+      const finalParams = {
+        ...para_params,
+        dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
+      };
 
-    formattedDate(dateObj) {
-      const year = dateObj.getFullYear();
-      const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1 필요
-      const day = String(dateObj.getDate()).padStart(2, '0');
-
-      return `${year}-${month}-${day}`;
-    },
-
-
-    // API 호출하여 데이터 가져오기
-    async fetchData() {
+      // console.log('최종 파라미터:', finalParams);
+            
       this.loading = true;
 
       try {
         // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
         const response = await apiClient.get('/api/require/search', {
-          params: {
-            startDate: this.formattedDate(this.Date_startDate) + ' 00:00:00',
-            endDate: this.formattedDate(this.Date_endDate) + ' 23:59:59',
-            manager: this.manager,
-            sub: this.sub,
-            status: this.selectedStatus,
-            dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
-          }
+          params: 
+            finalParams
         });
 
         // API 응답 데이터 처리
@@ -606,7 +471,14 @@ export default {
       } finally {
         this.loading = false;
       }
+
     },
+
+    onSearch(searchParams) {
+      // console.log('--onSearch--');
+      this.searchWithParams(searchParams);
+    },
+
     // 날짜 포맷 함수 (ISO 문자열 -> YYYY-MM-DD 형식)
     formatDate(dateString) {
       if (!dateString) return '-';
@@ -679,39 +551,11 @@ export default {
           return '';
       }
     },
-    async getStatus() {
-      try {
-        const statusList = await apiClient.get("/api/code/list", {
-          params: {
-            category: 'STATUS'
-          }
-        });
 
-        // 상태 이름 리스트 저장
-        this.progressStatuses = statusList.data.map(status => ({
-          text: status.codeName,
-          value: status.codeId
-        }));
-
-        this.progressStatuses.unshift({ text: '전체', value: '%' });
-
-        this.selectedStatus = '%';
-
-      } catch (error) {
-        console.error("❌ 오류 발생:", error);
-      }
-    },
   }
 }</script>
 
 <style scoped>
-/* VueDatePicker 관련 추가 스타일 */
-.date-picker {
-  width: auto;
-  min-width: 0;
-  padding: 0;
-}
-
 
 :deep(.dp__input) {
   border: none;
@@ -740,28 +584,6 @@ export default {
   color: #A1A6A6;
 }
 
-.title-div {
-  font-size: 25px;
-}
-
-.manager-search {
-  padding-block: 10px;
-  padding-left: 10px;
-  width: 800px;
-  font-weight: 400;
-}
-
-.title-search {
-  padding-block: 10px;
-  padding-left: 10px;
-  width: 800px;
-  font-weight: 400;
-}
-
-.select-btn {
-  color: white;
-  background-color: #23BBF5 !important;
-}
 
 .custom-btn {
   font-size: 14px;
@@ -769,138 +591,9 @@ export default {
   border-radius: 10px;
 }
 
-/* 날짜 선택 관련 스타일 */
-.date-field-wrapper {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  width: 100%;
-
-}
-
-.calendar-icon-container {
-  display: flex;
-  align-items: center;
-  margin-left: 12px;
-}
-
-.date-separator {
-  margin-left: -15px;
-  z-index: 100;
-  font-size: 16px;
-  color: #7A7A7A;
-}
-
-.start-date-wrapper {
-  margin-left: -0px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 150px;
-  color: #737577;
-}
-
-.end-date-wrapper {
-  margin-left: 10px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 150px;
-  color: #737577;
-}
-
-.date-buttons {
-  margin-left: 5px;
-}
-
-.date-btn-container {
-  display: flex;
-}
-
-.date-btn {
-  min-width: 48px;
-  padding: 0 12px;
-  height: 32px;
-  letter-spacing: -0.5px;
-  border: 1px solid #eaeaea;
-  border-radius: 0;
-  background-color: #ffffff;
-  color: #7A7A7A;
-  box-shadow: none;
-  margin: 0;
-}
-
-.date-btn:not(:first-child) {
-  border-left: none;
-}
-
-.date-btn:hover {
-  background-color: #f9f9f9;
-}
-
-.date-btn.active {
-  background-color: #e8f4fd;
-  color: #2196F3;
-}
-
-.active-date-btn {
-  background-color: #e8f4fd !important;
-  color: #2196F3 !important;
-  border-color: #2196F3 !important;
-  font-weight: 500;
-  border-left: 1px solid #2196F3 !important;
-}
-
-.search-row {
-  display: flex;
-  flex-direction: column;
-  /* 세로 정렬 */
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: white;
-  padding: 12px;
-  /* 여백 주기 */
-  gap: 12px;
-  /* 두 줄 사이 간격 */
-}
-
-.search-col {
-  display: flex;
-  align-items: center;
-  padding: 0;
-  border-left: 1px solid #e0e0e0;
-}
-
-.request-period,
-.product-category,
-.title-category {
-  max-width: 550px;
-  flex-grow: 0;
-}
-
-.label-box {
-  height: 40px;
-  min-width: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #e3ecf8;
-  font-weight: 500;
-  padding: 0 12px;
-  white-space: nowrap;
-  border-right: 1px solid #ccc;
-}
-
 .v-col.pa-0 {
   height: 100%;
   /* v-col도 확실하게 높이 채우기 */
-}
-
-.input-container {
-  display: flex;
-  align-items: center;
-  flex: 1;
-  padding: 0 16px;
 }
 
 /* 상단 버튼 행 스타일 */

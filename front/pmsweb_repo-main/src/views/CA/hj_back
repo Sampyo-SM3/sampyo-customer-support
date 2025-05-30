@@ -1,19 +1,90 @@
 <template>
-        <v-container fluid class="pr-0 pl-0 pt-4">
-
-            <!-- <SearchFilter 
-                :status-options="progressStatuses"
-                :initial-start-date="Date_startDate"
-                :initial-end-date="Date_endDate"
-                :initial-status="selectedStatus"
-                :initial-manager="manager"
-                :initial-subject="sub"
-                @search="onSearch"
-           /> -->
-           <SearchFilter 
-                :status-options="progressStatuses"
-                @search="onSearch"
-           />           
+    <v-app>
+      <v-main>
+        <v-container fluid class="pa-6">
+          <!-- 헤더 -->
+          <div class="d-flex justify-space-between align-center mb-6">
+            <div>
+              <h1 class="text-h4 font-weight-bold primary--text">업무요청 통계 현황</h1>
+              <p class="text-subtitle-1 grey--text">실시간 업무처리 현황 및 분석 리포트</p>
+            </div>
+            <v-chip color="success" text-color="white">
+              <v-icon left>mdi-update</v-icon>
+              실시간 업데이트
+            </v-chip>
+          </div>
+  
+          <!-- 필터 및 검색 영역 -->
+          <v-card class="mb-6 elevation-2">
+            <v-card-title class="pb-2">
+              <v-icon left color="primary">mdi-filter-variant</v-icon>
+              조회 조건
+            </v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" md="2">
+                  <v-select
+                    v-model="selectedPeriod"
+                    :items="periods"
+                    label="기간"
+                    outlined
+                    dense
+                    prepend-inner-icon="mdi-calendar"
+                  />
+                </v-col>
+                <v-col cols="12" md="3">
+                  <v-autocomplete
+                    v-model="selectedCompanies"
+                    :items="companies"
+                    label="법인 선택"
+                    multiple
+                    chips
+                    outlined
+                    dense
+                    prepend-inner-icon="mdi-office-building"
+                  />
+                </v-col>
+                <v-col cols="12" md="2">
+                  <v-select
+                    v-model="selectedStatuses"
+                    :items="statuses"
+                    label="처리상태"
+                    multiple
+                    outlined
+                    dense
+                    prepend-inner-icon="mdi-clipboard-list"
+                  />
+                </v-col>
+                <v-col cols="12" md="2">
+                  <v-select
+                    v-model="selectedCategories"
+                    :items="categories"
+                    label="문의유형"
+                    multiple
+                    outlined
+                    dense
+                    prepend-inner-icon="mdi-tag"
+                  />
+                </v-col>
+                <v-col cols="12" md="2">
+                  <v-select
+                    v-model="selectedPriority"
+                    :items="priorities"
+                    label="우선순위"
+                    multiple
+                    outlined
+                    dense
+                    prepend-inner-icon="mdi-alert"
+                  />
+                </v-col>
+                <v-col cols="12" md="1">
+                  <v-btn color="primary" block @click="applyFilters">
+                    <v-icon>mdi-magnify</v-icon>
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
   
           <!-- 핵심 지표 카드 영역 -->
           <v-row class="mb-6">
@@ -34,8 +105,38 @@
             </v-col>
           </v-row>
   
-
-
+          <!-- 실시간 알림 영역 -->
+          <v-row class="mb-6">
+            <v-col cols="12">
+              <v-card class="elevation-2">
+                <v-card-title class="pb-2">
+                  <v-icon left color="warning">mdi-bell-ring</v-icon>
+                  실시간 알림
+                  <v-spacer></v-spacer>
+                  <v-chip small color="error" text-color="white">{{ urgentCount }}건 긴급</v-chip>
+                </v-card-title>
+                <v-card-text>
+                  <v-timeline dense>
+                    <v-timeline-item
+                      v-for="(alert, index) in realtimeAlerts"
+                      :key="index"
+                      :color="alert.color"
+                      small
+                    >
+                      <v-row>
+                        <v-col cols="8">
+                          <strong>{{ alert.company }}</strong> - {{ alert.message }}
+                        </v-col>
+                        <v-col cols="4" class="text-right">
+                          <small class="grey--text">{{ alert.time }}</small>
+                        </v-col>
+                      </v-row>
+                    </v-timeline-item>
+                  </v-timeline>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
   
           <!-- 메인 차트 영역 -->
           <v-row class="mb-6">
@@ -151,7 +252,60 @@
               </v-card>
             </v-col>
           </v-row>
-    
+  
+          <!-- 담당자별 성과 -->
+          <v-row class="mb-6">
+            <v-col cols="12">
+              <v-card class="elevation-3">
+                <v-card-title>
+                  <v-icon left color="teal">mdi-account-group</v-icon>
+                  담당자별 처리 성과
+                </v-card-title>
+                <v-card-text>
+                  <v-data-table
+                    :headers="performanceHeaders"
+                    :items="performanceData"
+                    :items-per-page="10"
+                    class="elevation-1"
+                  >
+                    <template #[`item.performance`]="{ item }">
+                      <v-progress-linear
+                        :value="item.performance"
+                        :color="getPerformanceColor(item.performance)"
+                        height="20"
+                        rounded
+                      >
+                        <strong>{{ item.performance }}%</strong>
+                      </v-progress-linear>
+                    </template>
+                    <template #[`item.satisfaction`]="{ item }">
+                      <v-rating
+                        :value="item.satisfaction"
+                        color="yellow darken-3"
+                        background-color="grey darken-1"
+                        half-increments
+                        readonly
+                        small
+                      ></v-rating>
+                    </template>
+                    <template #[`item.trend`]="{ item }">
+                      <v-chip
+                        small
+                        :color="item.trend > 0 ? 'success' : item.trend < 0 ? 'error' : 'warning'"
+                        :text-color="item.trend === 0 ? 'black' : 'white'"
+                      >
+                        <v-icon small left>
+                          {{ item.trend > 0 ? 'mdi-trending-up' : item.trend < 0 ? 'mdi-trending-down' : 'mdi-trending-neutral' }}
+                        </v-icon>
+                        {{ item.trend > 0 ? '+' : '' }}{{ item.trend }}%
+                      </v-chip>
+                    </template>
+                  </v-data-table>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+  
           <!-- 법인별 상세 현황 -->
           <v-row class="mb-6">
             <v-col cols="12">
@@ -217,7 +371,60 @@
                 </v-card-text>
               </v-card>
             </v-col>
-          </v-row>      
+          </v-row>
+  
+          <!-- 예측 분석 -->
+          <v-row class="mb-6">
+            <v-col cols="12" md="8">
+              <v-card class="elevation-3">
+                <v-card-title>
+                  <v-icon left color="cyan">mdi-crystal-ball</v-icon>
+                  AI 예측 분석
+                </v-card-title>
+                <v-card-text>
+                  <canvas ref="predictionChart" style="height: 350px;"></canvas>
+                </v-card-text>
+              </v-card>
+            </v-col>
+            <v-col cols="12" md="4">
+              <v-card class="elevation-3 mb-4">
+                <v-card-title>
+                  <v-icon left color="amber">mdi-lightbulb</v-icon>
+                  인사이트
+                </v-card-title>
+                <v-card-text>
+                  <v-alert
+                    v-for="(insight, index) in insights"
+                    :key="index"
+                    :type="insight.type"
+                    text
+                    dense
+                    class="mb-2"
+                  >
+                    {{ insight.message }}
+                  </v-alert>
+                </v-card-text>
+              </v-card>
+              <v-card class="elevation-3">
+                <v-card-title>
+                  <v-icon left color="green">mdi-target</v-icon>
+                  개선 제안
+                </v-card-title>
+                <v-card-text>
+                  <v-list dense>
+                    <v-list-item v-for="(suggestion, index) in suggestions" :key="index">
+                      <v-list-item-icon>
+                        <v-icon small color="success">mdi-check-circle</v-icon>
+                      </v-list-item-icon>
+                      <v-list-item-content>
+                        <v-list-item-title class="caption">{{ suggestion }}</v-list-item-title>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-list>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
   
           <!-- 액션 버튼 -->
           <v-row>
@@ -237,19 +444,12 @@
             </v-col>
           </v-row>
         </v-container>
-  
-  
+      </v-main>
+    </v-app>
   </template>
-
-
-
+  
   <script>
-     import SearchFilter from '@/components/SearchFilter.vue';    
-    //  import apiClient from '@/api';
   export default {
-    components: {
-    SearchFilter,
-  },    
     name: 'BusinessDashboard',
     data() {
       return {
@@ -461,12 +661,8 @@
         ]
       }
     },
-    mounted() {
-        // this.setDateRange('month');
-        // this.getStatus();        
-    },        
+  
     methods: {
-      
       applyFilters() {
         console.log('필터 적용');
       },
