@@ -293,18 +293,7 @@ export default {
 </script>
 
 <style scoped>
-/* VueDatePicker 관련 추가 스타일 */
-.date-picker {
-  width: auto;
-  min-width: 0;
-  padding: 0;
-}
 
-:deep(.dp__input) {
-  border: none;
-  box-shadow: none;
-  color: #7a7a7a;
-}
 
 :deep(.dp__main) {
   font-family: inherit;
@@ -333,6 +322,19 @@ export default {
   z-index: 100;
   font-size: 16px;
   color: #7A7A7A;
+}
+
+/* VueDatePicker 관련 추가 스타일 */
+.date-picker {
+  width: auto;
+  min-width: 0;
+  padding: 0;
+}
+
+:deep(.dp__input) {
+  border: none;
+  box-shadow: none;
+  color: #7a7a7a;
 }
 
 .start-date-wrapper {

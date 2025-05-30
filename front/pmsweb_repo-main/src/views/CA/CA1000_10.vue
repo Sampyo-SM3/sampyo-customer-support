@@ -1,7 +1,15 @@
  <template>
   <v-container fluid class="pr-0 pl-0 pt-4">
 
-    <SearchFilter 
+    <!-- <SearchFilter 
+      @search="onSearch"
+    /> -->
+
+    <!-- 모든 필터 표시 -->
+    <DynamicSearchFilter
+      :showManagerFilter="true"
+      :showStatusFilter="true"
+      :showTitleFilter="true"
       @search="onSearch"
     />
 
@@ -198,11 +206,13 @@
 import apiClient from '@/api';
 import { inject, onMounted } from 'vue';
 import '@vuepic/vue-datepicker/dist/main.css';
-import SearchFilter from '@/components/SearchFilter.vue';
+// import SearchFilter from '@/components/SearchFilter.vue';
+import DynamicSearchFilter from '@/components/DynamicSearchfilter';
 
 export default {
   components: {
-    SearchFilter,
+    // SearchFilter,
+    DynamicSearchFilter,
   },
   setup() {
     const extraBreadcrumb = inject('extraBreadcrumb', null);
