@@ -209,7 +209,7 @@ import apiClient from '@/api';
 import { inject, onMounted } from 'vue';
 import '@vuepic/vue-datepicker/dist/main.css';
 // import SearchFilter from '@/components/SearchFilter.vue';
-import DynamicSearchFilter from '@/components/DynamicSearchfilter';
+import DynamicSearchFilter from '@/components/DynamicSearchFilter';
 
 export default {
   components: {

@@ -1,19 +1,15 @@
 <template>
         <v-container fluid class="pr-0 pl-0 pt-4">
 
-            <!-- <SearchFilter 
-                :status-options="progressStatuses"
-                :initial-start-date="Date_startDate"
-                :initial-end-date="Date_endDate"
-                :initial-status="selectedStatus"
-                :initial-manager="manager"
-                :initial-subject="sub"
-                @search="onSearch"
-           /> -->
-           <SearchFilter 
-                :status-options="progressStatuses"
-                @search="onSearch"
-           />           
+        <!-- 모든 필터 표시 -->
+        <DynamicSearchFilter
+          :showManagerFilter="true"
+          :showStatusFilter="true"
+          :showTitleFilter="true"
+          :showCompanyFilter="true"
+
+          @search="onSearch"
+        />       
   
           <!-- 핵심 지표 카드 영역 -->
           <v-row class="mb-6">
@@ -244,11 +240,11 @@
 
 
   <script>
-     import SearchFilter from '@/components/SearchFilter.vue';    
+     import DynamicSearchFilter from '@/components/DynamicSearchFilter';    
     //  import apiClient from '@/api';
   export default {
     components: {
-    SearchFilter,
+      DynamicSearchFilter,
   },    
     name: 'BusinessDashboard',
     data() {
@@ -515,10 +511,6 @@
   <style scoped>
   .v-card {
     transition: all 0.3s ease;
-  }
-  
-  .v-card:hover {
-    transform: translateY(-2px);
   }
   
   .elevation-1 {

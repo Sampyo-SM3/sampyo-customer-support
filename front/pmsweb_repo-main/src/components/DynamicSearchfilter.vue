@@ -6,7 +6,7 @@
         <!-- 테이블 형식 검색 필터 -->
         <v-table class="search-table" density="compact">
           <tbody>
-            <!-- 첫 번째 행: 요청기간 + 버튼 -->
+            <!-- 첫 번째 행: 요청기간 + 버튼 (항상 고정) -->
             <tr class="date-row">
               <td class="label-cell">
                 <span class="filter-label">요청기간</span>
@@ -93,15 +93,45 @@
               </td>
             </tr>
 
-            <!-- 두 번째 행: 접수상태, 담당자 -->
-            <tr v-if="showStatusFilter || showManagerFilter" class="filter-row">
-              <!-- 접수상태만 있는 경우 -->
-              <template v-if="showStatusFilter && !showManagerFilter">
+            <!-- 동적 필터 행들 -->
+            <tr v-for="(row, rowIndex) in filterRows" :key="'row-' + rowIndex" class="filter-row">
+              <template v-for="(filter, colIndex) in row" :key="'filter-' + rowIndex + '-' + colIndex">
+                <!-- 라벨 셀 -->
                 <td class="label-cell">
-                  <span class="filter-label">접수상태</span>
+                  <span class="filter-label">{{ filter.label }}</span>
                 </td>
-                <td class="input-cell" colspan="3">
+                
+                <!-- 입력 셀 -->
+                <td class="input-cell" :class="getInputCellClass(row, colIndex)">
+                  <!-- 제목 필터 -->
+                  <v-text-field 
+                    v-if="filter.type === 'title'"
+                    v-model="localSubject" 
+                    @keydown.enter="handleSearch" 
+                    variant="outlined" 
+                    density="compact" 
+                    hide-details
+                    class="table-input" 
+                    placeholder="제목 입력"
+                  />
+                  
+                  <!-- 법인 필터 -->
                   <v-select 
+                    v-else-if="filter.type === 'company'"
+                    v-model="localSelectedCompany" 
+                    :items="companyOptions" 
+                    item-title="text" 
+                    item-value="value"
+                    variant="outlined" 
+                    density="compact" 
+                    hide-details 
+                    class="table-input" 
+                    placeholder="법인 선택"
+                  />
+                  
+                  <!-- 접수상태 필터 -->
+                  <v-select 
+                    v-else-if="filter.type === 'status'"
                     v-model="localSelectedStatus" 
                     :items="statusOptions" 
                     item-title="text" 
@@ -112,16 +142,10 @@
                     class="table-input" 
                     placeholder="상태 선택"
                   />
-                </td>
-              </template>
-              
-              <!-- 담당자만 있는 경우 -->
-              <template v-else-if="!showStatusFilter && showManagerFilter">
-                <td class="label-cell">
-                  <span class="filter-label">담당자</span>
-                </td>
-                <td class="input-cell" colspan="3">
+                  
+                  <!-- 담당자 필터 -->
                   <v-text-field 
+                    v-else-if="filter.type === 'manager'"
                     v-model="localManager" 
                     @keydown.enter="handleSearch" 
                     variant="outlined" 
@@ -133,120 +157,9 @@
                 </td>
               </template>
               
-              <!-- 둘 다 있는 경우 (5:5 비율) -->
-              <template v-else>
-                <td class="label-cell">
-                  <span class="filter-label">접수상태</span>
-                </td>
-                <td class="input-cell half-width">
-                  <v-select 
-                    v-model="localSelectedStatus" 
-                    :items="statusOptions" 
-                    item-title="text" 
-                    item-value="value"
-                    variant="outlined" 
-                    density="compact" 
-                    hide-details 
-                    class="table-input" 
-                    placeholder="상태 선택"
-                  />
-                </td>
-                <td class="label-cell">
-                  <span class="filter-label">담당자</span>
-                </td>
-                <td class="input-cell half-width">
-                  <v-text-field 
-                    v-model="localManager" 
-                    @keydown.enter="handleSearch" 
-                    variant="outlined" 
-                    density="compact" 
-                    hide-details
-                    class="table-input" 
-                    placeholder="담당자 입력"
-                  />
-                </td>
-              </template>
-            </tr>
-
-            <!-- 세 번째 행: 제목, 법인 -->
-            <tr v-if="showTitleFilter || showCompanyFilter" class="filter-row">            
-              <!-- 제목만 있는 경우 -->
-              <template v-if="showTitleFilter && !showCompanyFilter">    
-                <td class="label-cell">
-                  <span class="filter-label">제목</span>
-                </td>
-                <td class="input-cell" colspan="3">
-                  <v-text-field 
-                    v-model="localSubject" 
-                    @keydown.enter="handleSearch" 
-                    variant="outlined" 
-                    density="compact" 
-                    hide-details
-                    class="table-input" 
-                    placeholder="제목 입력"
-                  />
-                </td>                
-
-
-              </template>
-              
-              <!-- 법인인만 있는 경우 -->
-              <template v-else-if="!showTitleFilter && showCompanyFilter">
-                <td class="label-cell">
-                  <span class="filter-label">법인</span>
-                </td>
-                <td class="input-cell" colspan="3">
-                  <v-select 
-                    v-model="localSelectedCompany" 
-                    :items="companyOptions" 
-                    item-title="text" 
-                    item-value="value"
-                    variant="outlined" 
-                    density="compact" 
-                    hide-details 
-                    class="table-input" 
-                    placeholder="상태 선택"
-                  />
-                </td>          
-                
-              </template>
-              
-              <!-- 둘 다 있는 경우 (5:5 비율) -->
-              <template v-else>
-                <td class="label-cell">
-                  <span class="filter-label">제목</span>
-                </td>
-                <td class="input-cell half-width">
-                  <v-text-field 
-                    v-model="localSubject" 
-                    @keydown.enter="handleSearch" 
-                    variant="outlined" 
-                    density="compact" 
-                    hide-details
-                    class="table-input" 
-                    placeholder="제목 입력"
-                  />
-                </td>
-
-                
-                <td class="label-cell">
-                  <span class="filter-label">법인</span>
-                </td>
-                <td class="input-cell half-width">
-                  <v-select 
-                    v-model="localSelectedCompany" 
-                    :items="companyOptions" 
-                    item-title="text" 
-                    item-value="value"
-                    variant="outlined" 
-                    density="compact" 
-                    hide-details 
-                    class="table-input" 
-                    placeholder="상태 선택"
-                  />
-                </td>                
-              </template>
-            </tr>                                    
+              <!-- 빈 셀 채우기 (홀수 개일 때) -->
+              <td v-if="row.length === 1" class="empty-cell" colspan="2"></td>
+            </tr>          
           </tbody>
         </v-table>
 
@@ -309,9 +222,34 @@ export default {
     }
   },
   computed: {
-    // 검색 조건이 하나라도 있는지 확인
-    hasAnyFilter() {
-      return this.showStatusFilter || this.showManagerFilter || this.showTitleFilter || this.showCompanyFilter;
+    // 표시할 필터들을 순서대로 배열로 만들기
+    availableFilters() {
+      const filters = [];
+      
+      if (this.showTitleFilter) {
+        filters.push({ type: 'title', label: '제목' });
+      }
+      if (this.showCompanyFilter) {
+        filters.push({ type: 'company', label: '법인' });
+      }
+      if (this.showStatusFilter) {
+        filters.push({ type: 'status', label: '접수상태' });
+      }
+      if (this.showManagerFilter) {
+        filters.push({ type: 'manager', label: '담당자' });
+      }
+      
+      return filters;
+    },
+    
+    // 필터들을 2개씩 묶어서 행으로 만들기
+    filterRows() {
+      const rows = [];
+      for (let i = 0; i < this.availableFilters.length; i += 2) {
+        const row = this.availableFilters.slice(i, i + 2);
+        rows.push(row);
+      }
+      return rows;
     }
   },
   mounted() {
@@ -321,6 +259,17 @@ export default {
     this.handleSearch();
   },
   methods: {
+    // 입력 셀의 클래스 결정
+    // getInputCellClass(row, colIndex) {
+      getInputCellClass(row) {
+      // 행에 2개의 필터가 있으면 절반씩
+      if (row.length === 2) {
+        return 'half-width';
+      }
+      // 행에 1개의 필터만 있으면 절반만 차지
+      return 'half-width';
+    },
+
     async getStatus() {
       try {
         const apiClient = (await import('@/api')).default;
@@ -367,7 +316,7 @@ export default {
       } catch (error) {
         console.error("❌ 상태 목록 조회 오류:", error);
         this.companyOptions = [{ text: '전체', value: '%' }];
-        this.localSelectedComapny = '%';
+        this.localSelectedCompany = '%';
       }
     },    
 
@@ -479,7 +428,7 @@ export default {
 /* 셀 스타일 */
 .label-cell {
   width: 100px;
-  min-width: 80px;
+  min-width: 150px;
   background-color: #f8f9fa;
   border-right: 1px solid #e0e0e0;
   padding: 12px 16px !important;
@@ -493,6 +442,11 @@ export default {
 
 .half-width {
   width: 50%;
+}
+
+.empty-cell {
+  /* background-color: #f8f9fa;*/
+  /* border-left: 1px solid #e0e0e0;  */
 }
 
 .date-cell {
@@ -536,9 +490,8 @@ export default {
   font-size: 16px;
   color: #7A7A7A;
   font-weight: 500;
-  transform: translateX(-12px); /* 왼쪽으로 20px 이동 */
-  z-index: 1000; /* 높은 숫자일수록 위에 표시 */
-  
+  transform: translateX(-12px);
+  z-index: 1000;
 }
 
 .date-quick-buttons {
@@ -549,7 +502,6 @@ export default {
 .date-btn-group {
   border-radius: 6px;
   overflow: hidden;
-  /* box-shadow: 0 1px 3px rgba(0,0,0,0.1); */
 }
 
 .date-btn {
@@ -628,7 +580,6 @@ export default {
   box-shadow: none;
   color: #7a7a7a;
 }
-
 
 :deep(.dp__theme_light) {
   --dp-primary-color: #2196F3;
