@@ -14,7 +14,8 @@
             PWD as pwd,
             PHONE as phone,
             EMAIL as email,
-            DEPART1 as deptCd
+            DEPART1 as deptCd,
+            AUTH_LEVEL as authLevel
         FROM 
             sys_empref 
         WHERE 

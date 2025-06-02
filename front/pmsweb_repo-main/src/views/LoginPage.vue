@@ -149,6 +149,9 @@ export default {
           return;
         }
 
+        console.log('1111');
+        console.log(result);
+
         let para_companyCd = result.companyCd;
         let para_name = result.name;
         let para_phone = result.phone;
@@ -169,7 +172,7 @@ export default {
             name: result.name,
             phone: result.phone,
             email: result.email,
-            deptCd: result.deptCd,
+            deptCd: result.deptCd,  
             // username: '1',
             // password: '1' 
           });
@@ -220,7 +223,8 @@ export default {
           name: para_name,
           phone: para_phone,
           email: para_email,
-          deptCd: para_deptCd
+          deptCd: para_deptCd,
+
           // username: '1',
           // password: '1' 
 

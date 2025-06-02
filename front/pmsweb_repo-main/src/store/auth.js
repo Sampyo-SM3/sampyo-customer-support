@@ -15,7 +15,8 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     // 로그인 시도
     async login(credentials) {   
-      // console.log('--login--');
+      console.log('--login--');
+      console.log(credentials);
       try {
         this.isLoading = true;
         this.error = null;
@@ -37,7 +38,8 @@ export const useAuthStore = defineStore("auth", {
 
         // 로그인 성공
         if (response.data) {
-          // console.log('response.data ');
+          console.log('response.data!! ');
+          console.log(response.data);
           this.userId = response.data.id;
           this.userInfo = response.data;          
           this.isAuthenticated = true;
@@ -87,7 +89,9 @@ export const useAuthStore = defineStore("auth", {
         });      
 
         this.userId = response.data.id;
-        this.userInfo = response.data;      
+        this.userInfo = response.data;     
+        console.log('!!!');
+        console.log(response.data) ;
                                                    
         const responseData = {
           ...response.data,

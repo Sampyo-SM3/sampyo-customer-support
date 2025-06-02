@@ -10,7 +10,7 @@
       :showManagerFilter="true"
       :showStatusFilter="true"
       :showTitleFilter="true"
-      :showCompanyFilter="true"
+      :showCompanyFilter="authLevel >= 30 ? true : false"
 
       @search="onSearch"
     />
@@ -43,7 +43,7 @@
           }}</span></span>
 
         </span>
-
+      
         <v-spacer></v-spacer>
 
         <v-btn variant="flat" color="green darken-2" class="custom-btn white-text d-flex align-center" size="small"
@@ -240,6 +240,7 @@ export default {
   data() {
     return {
       userDeptCd: JSON.parse(localStorage.getItem("userInfo"))?.deptCd,
+      authLevel: JSON.parse(localStorage.getItem("userInfo"))?.authLevel,
       startDatePickerOpen: false,
       endDatePickerOpen: false,
       Date_startDate: new Date(),

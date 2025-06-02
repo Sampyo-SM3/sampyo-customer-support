@@ -129,7 +129,7 @@
                     placeholder="법인 선택"
                   />
                   
-                  <!-- 접수상태 필터 -->
+                  <!-- 진행상태 필터 -->
                   <v-select 
                     v-else-if="filter.type === 'status'"
                     v-model="localSelectedStatus" 
@@ -233,7 +233,7 @@ export default {
         filters.push({ type: 'company', label: '법인' });
       }
       if (this.showStatusFilter) {
-        filters.push({ type: 'status', label: '접수상태' });
+        filters.push({ type: 'status', label: '진행상태' });
       }
       if (this.showManagerFilter) {
         filters.push({ type: 'manager', label: '담당자' });
@@ -374,8 +374,8 @@ export default {
         division: this.localSelectedCompany
       };
 
-      console.log('--handleSearch--');
-      console.log(searchParams);
+      // console.log('--handleSearch--');
+      // console.log(searchParams);
 
       this.$emit('search', searchParams);
     },
@@ -442,11 +442,6 @@ export default {
 
 .half-width {
   width: 50%;
-}
-
-.empty-cell {
-  /* background-color: #f8f9fa;*/
-  /* border-left: 1px solid #e0e0e0;  */
 }
 
 .date-cell {

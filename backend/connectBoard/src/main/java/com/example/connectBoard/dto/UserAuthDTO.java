@@ -19,5 +19,5 @@ public class UserAuthDTO {
 	private String menuCode;
 	private String insertUser;
 	private String updateUser;
-	private String newPw;
+	private String newPw;	
 }
