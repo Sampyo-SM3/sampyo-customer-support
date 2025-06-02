@@ -61,7 +61,13 @@
 	    
 	    <if test="dpId != null and dpId != '' and dpId != 'SPH220007'">
         	AND b.dpId LIKE '%' + #{dpId} + '%'
-    	</if>   
+    	</if>  
+    	
+	    <if test="division != null and division != ''">
+	        AND b.division LIKE '%' + #{division} + '%'	        
+	    </if>
+    	
+
     	 
 	     	
 	</where>

@@ -168,24 +168,85 @@
               </template>
             </tr>
 
-            <!-- 세 번째 행: 제목 -->
-            <tr v-if="showTitleFilter" class="filter-row">
-              <td class="label-cell">
-                <span class="filter-label">제목</span>
-              </td>
-              <td class="input-cell" colspan="3">
-                <v-text-field 
-                  v-model="localSubject" 
-                  @keydown.enter="handleSearch" 
-                  variant="outlined" 
-                  density="compact" 
-                  hide-details
-                  class="table-input" 
-                  placeholder="제목 입력"
-                />
-              </td>
-            </tr>
-            
+            <!-- 세 번째 행: 제목, 법인 -->
+            <tr v-if="showTitleFilter || showCompanyFilter" class="filter-row">            
+              <!-- 제목만 있는 경우 -->
+              <template v-if="showTitleFilter && !showCompanyFilter">    
+                <td class="label-cell">
+                  <span class="filter-label">제목</span>
+                </td>
+                <td class="input-cell" colspan="3">
+                  <v-text-field 
+                    v-model="localSubject" 
+                    @keydown.enter="handleSearch" 
+                    variant="outlined" 
+                    density="compact" 
+                    hide-details
+                    class="table-input" 
+                    placeholder="제목 입력"
+                  />
+                </td>                
+
+
+              </template>
+              
+              <!-- 법인인만 있는 경우 -->
+              <template v-else-if="!showTitleFilter && showCompanyFilter">
+                <td class="label-cell">
+                  <span class="filter-label">법인</span>
+                </td>
+                <td class="input-cell" colspan="3">
+                  <v-select 
+                    v-model="localSelectedCompany" 
+                    :items="companyOptions" 
+                    item-title="text" 
+                    item-value="value"
+                    variant="outlined" 
+                    density="compact" 
+                    hide-details 
+                    class="table-input" 
+                    placeholder="상태 선택"
+                  />
+                </td>          
+                
+              </template>
+              
+              <!-- 둘 다 있는 경우 (5:5 비율) -->
+              <template v-else>
+                <td class="label-cell">
+                  <span class="filter-label">제목</span>
+                </td>
+                <td class="input-cell half-width">
+                  <v-text-field 
+                    v-model="localSubject" 
+                    @keydown.enter="handleSearch" 
+                    variant="outlined" 
+                    density="compact" 
+                    hide-details
+                    class="table-input" 
+                    placeholder="제목 입력"
+                  />
+                </td>
+
+                
+                <td class="label-cell">
+                  <span class="filter-label">법인</span>
+                </td>
+                <td class="input-cell half-width">
+                  <v-select 
+                    v-model="localSelectedCompany" 
+                    :items="companyOptions" 
+                    item-title="text" 
+                    item-value="value"
+                    variant="outlined" 
+                    density="compact" 
+                    hide-details 
+                    class="table-input" 
+                    placeholder="상태 선택"
+                  />
+                </td>                
+              </template>
+            </tr>                                    
           </tbody>
         </v-table>
 
@@ -216,6 +277,10 @@ export default {
       type: Boolean,
       default: true
     },       
+    showCompanyFilter: {
+      type: Boolean,
+      default: true
+    },         
     initialExpanded: {
       type: Boolean,
       default: true
@@ -228,10 +293,12 @@ export default {
       localStartDate: new Date(),
       localEndDate: new Date(),
       localSelectedStatus: '%',
+      localSelectedCompany: '%',
       localManager: '',
       localSubject: '',
       dateRange: 'month',
       statusOptions: [],
+      companyOptions: [],
       datePresets: [
         { label: '오늘', value: 'today' },
         { label: '1주일', value: 'week' },
@@ -244,12 +311,13 @@ export default {
   computed: {
     // 검색 조건이 하나라도 있는지 확인
     hasAnyFilter() {
-      return this.showStatusFilter || this.showManagerFilter || this.showTitleFilter;
+      return this.showStatusFilter || this.showManagerFilter || this.showTitleFilter || this.showCompanyFilter;
     }
   },
   mounted() {
     this.setDateRange('month');
     this.getStatus();
+    this.getCompany();
     this.handleSearch();
   },
   methods: {
@@ -277,6 +345,31 @@ export default {
         this.localSelectedStatus = '%';
       }
     },
+
+    async getCompany() {
+      try {
+        const apiClient = (await import('@/api')).default;
+        
+        const statusList = await apiClient.get("/api/code/list", {
+          params: {
+            category: 'COMPANY'
+          }
+        });
+
+        this.companyOptions = statusList.data.map(status => ({
+          text: status.codeName,
+          value: status.codeId
+        }));
+
+        this.companyOptions.unshift({ text: '전체', value: '%' });
+        this.localSelectedCompany = '%';
+
+      } catch (error) {
+        console.error("❌ 상태 목록 조회 오류:", error);
+        this.companyOptions = [{ text: '전체', value: '%' }];
+        this.localSelectedComapny = '%';
+      }
+    },    
 
     onStartDateChange(date) {
       this.localStartDate = date;
@@ -328,11 +421,12 @@ export default {
         endDate: this.formatDate(this.localEndDate) + ' 23:59:59',
         status: this.localSelectedStatus,
         manager: this.localManager,
-        sub: this.localSubject
+        sub: this.localSubject,
+        division: this.localSelectedCompany
       };
 
-      // console.log('--handleSearch--');
-      // console.log(searchParams);
+      console.log('--handleSearch--');
+      console.log(searchParams);
 
       this.$emit('search', searchParams);
     },
@@ -340,6 +434,7 @@ export default {
     resetFilters() {
       this.setDateRange('month');
       this.localSelectedStatus = '%';
+      this.localSelectedCompany = '%';
       this.localManager = '';
       this.localSubject = '';
       this.handleSearch();

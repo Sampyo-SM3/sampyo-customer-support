@@ -481,7 +481,7 @@ export default {
         }
 
 
-        console.log(saveUserId);
+        // console.log(saveUserId);
 
         const boardData = {
           "sub": this.sub,

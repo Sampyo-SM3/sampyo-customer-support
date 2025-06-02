@@ -21,6 +21,8 @@
         WHERE 
             USR_ID = #{id} 
     </select>    
+    
+
 
 
 </mapper>

@@ -10,6 +10,8 @@
       :showManagerFilter="true"
       :showStatusFilter="true"
       :showTitleFilter="true"
+      :showCompanyFilter="true"
+
       @search="onSearch"
     />
 

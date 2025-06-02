@@ -23,6 +23,7 @@ public class RequireSearchCriteria {
     private Integer countComment;
     private String dpId;
     private String writerDp;
+    private String division;
     
     // Getters and Setters
     // ...
