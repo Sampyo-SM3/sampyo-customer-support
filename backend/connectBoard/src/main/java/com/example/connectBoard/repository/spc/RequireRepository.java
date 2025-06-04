@@ -16,6 +16,8 @@ public interface RequireRepository {
 	
 	List<RequireDTO> searchRequiresByCriteria(RequireSearchCriteria criteria);
 	
+	List<RequireDTO> getDashboardData(RequireSearchCriteria criteria);
+	
 	List<RequireDTO> searchRequiresByCriteriaUser(RequireSearchCriteria criteria);
 	
 	List<RequireDTO> searchRequiresByCriteriaDepart(RequireSearchCriteria criteria);

@@ -19,12 +19,12 @@
                   <v-icon size="48" class="mb-2">{{ metric.icon }}</v-icon>
                   <div class="text-h3 font-weight-bold">{{ metric.value }}</div>
                   <div class="text-subtitle-1">{{ metric.title }}</div>
-                  <div class="text-caption">
+                  <!-- <div class="text-caption">
                     <v-icon small :color="metric.trend > 0 ? 'green' : 'red'">
                       {{ metric.trend > 0 ? 'mdi-trending-up' : 'mdi-trending-down' }}
                     </v-icon>
                     {{ Math.abs(metric.trend) }}% 전월 대비
-                  </div>
+                  </div> -->
                 </v-card-text>
               </v-card>
             </v-col>
@@ -466,7 +466,6 @@
       async onSearch(searchParams) {
         console.log('--onSearch--');
         console.log(searchParams);
-
         this.loading = true;
           
         // 최종 전달될 파라미터 확인
@@ -474,21 +473,26 @@
           ...searchParams,
           dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
         };
-
-        // console.log('최종 파라미터:', finalParams);
+        console.log('최종 파라미터:', finalParams);
               
-        
-
         try {
           // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
-          const response = await apiClient.get('/api/require/search', {
-            params: 
-              finalParams
+          const response = await apiClient.get('/api/require/search-dashboard', {
+            params: finalParams
           });
-
-          console.log(response.data);
-
-
+          console.log(response);
+          
+          // API 응답 데이터가 있는 경우 keyMetrics 업데이트
+          if (response.data && response.data.length > 0) {
+            const stats = response.data[0];
+            
+            // keyMetrics 값 업데이트
+            this.keyMetrics[0].value = stats.totalCount?.toLocaleString() || '0';
+            this.keyMetrics[1].value = stats.completeCount?.toLocaleString() || '0';
+            this.keyMetrics[2].value = stats.completeRate ? `${stats.completeRate}%` : '0%';
+            this.keyMetrics[3].value = stats.avgProcessDays ? `${stats.avgProcessDays}일` : '0일';
+          }
+          
         } catch (error) {
           console.error('데이터 로드 중 오류 발생:', error);
         } finally {

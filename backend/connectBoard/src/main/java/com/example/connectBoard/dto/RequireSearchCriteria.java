@@ -25,6 +25,13 @@ public class RequireSearchCriteria {
     private String writerDp;
     private String division;
     
+    private Integer totalCount;
+    private Integer completeCount;
+    private Float completeRate;
+    private Float avgProcessDays;
+    
+    
+    
     // Getters and Setters
     // ...
 }

@@ -429,5 +429,84 @@
     		etc = #{etc}
     	WHERE seq = #{seq};
 	</update>
+	
+	<!-- 통계 -->
+	<select id="getDashboardData" parameterType="com.example.connectBoard.dto.RequireSearchCriteria" resultType="com.example.connectBoard.dto.RequireSearchCriteria">
+		SELECT 
+		  
+		    COUNT(*) AS totalCount,
+		    
+		    
+		    SUM(CASE WHEN processState = 'C' THEN 1 ELSE 0 END) AS completeCount,
+		    
+		    
+		    CASE 
+		        WHEN COUNT(*) = 0 THEN 0 
+		        ELSE ROUND(
+		            CAST(SUM(CASE WHEN processState = 'C' THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) * 100, 
+		            1
+		        ) 
+		    END AS completeRate,
+		    		    
+		    CASE 
+		        WHEN SUM(CASE WHEN processState = 'C' THEN 1 ELSE 0 END) = 0 THEN NULL
+		        ELSE ROUND(
+		            AVG(CASE 
+		                WHEN processState = 'C' AND completeDt IS NOT NULL
+		                THEN 
+		                    CASE 
+		                        WHEN DATEDIFF(DAY, requestDate, completeDt) = 0 THEN 1
+		                        ELSE DATEDIFF(DAY, requestDate, completeDt)
+		                    END
+		                ELSE NULL 
+		            END), 
+		            1
+		        )
+		    END AS avgProcessDays
+		
+		FROM board b
+	  	  				 
+	<where>
+	    1=1
+	    
+	    <if test="manager != null and manager != ''">
+	        AND b.manager LIKE '%' + #{manager} + '%'
+	    </if>
+	    		
+	    <if test="startDate != null and startDate != ''">
+	        AND b.requestDate >= #{startDate}
+	    </if>
+	    
+	    <if test="endDate != null and endDate != ''">
+	        AND
+	         b.requestDate &lt;= #{endDate}
+	    </if>
+	    
+	    <if test="sub != null and sub != ''">
+	        AND b.sub LIKE '%' + #{sub} + '%'
+	        
+	    </if>	
+	    
+	    <if test="status != null and status != ''">
+	        AND b.processState LIKE '%' + #{status} + '%'
+	    
+	    </if>
+	    
+	    <if test="dpId != null and dpId != '' and dpId != 'SPH220007'">
+        	AND b.dpId LIKE '%' + #{dpId} + '%'
+    	</if>  
+    	
+	    <if test="division != null and division != ''">
+	        AND b.division LIKE '%' + #{division} + '%'	        
+	    </if>		
+	
+
+    	
+
+    	 
+	     	
+	</where>
+
+	</select>	
 </mapper>
 
