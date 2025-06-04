@@ -22,7 +22,11 @@ public interface RequireRepository {
 	
 	List<RequireDTO> searchRequiresByCriteriaDepart(RequireSearchCriteria criteria);
 
-	List<RequireDTO> searchRequiresByCriteriaDepartAdmin(RequireSearchCriteria criteria);	
+	List<RequireDTO> searchRequiresByCriteriaDepartAdmin(RequireSearchCriteria criteria);
+	
+	List<RequireDTO> getDashBoardMonthlyTotal(RequireSearchCriteria criteria);
+	
+	
 	
 	void insertRequire(RequireDTO require);
 	

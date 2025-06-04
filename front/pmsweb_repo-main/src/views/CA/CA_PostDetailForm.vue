@@ -33,7 +33,7 @@
     <!-- 전체 래퍼: 접수상태 박스 + 버튼을 나란히 배치 -->
     <div class="d-flex align-center mb-4">
       <!-- 접수상태 박스 -->
-      <v-row v-if="this.userDeptCd === 'SPH220007'" no-gutters class="status-row status-select-row" style="width: 220px; 
+      <v-row v-if="this.authLevel >= 20" no-gutters class="status-row status-select-row" style="width: 220px; 
         min-width: 220px; 
         max-width: 220px;">
         <v-col class="search-col">
@@ -43,12 +43,12 @@
         </v-col>
       </v-row>
 
-      <v-btn v-if="this.userDeptCd === 'SPH220007'" variant="flat" color="#3A70B1" size="small"
+      <v-btn v-if="this.authLevel >= 20" variant="flat" color="#3A70B1" size="small"
         class="save-status-btn ml-3" @click="saveStatus">
         저장
       </v-btn>
 
-      <v-btn v-if="this.userDeptCd === 'SPH220007'" variant="flat" color="#F7A000"
+      <v-btn v-if="this.authLevel >= 20" variant="flat" color="#F7A000"
         class="save-status-btn ml-3 white-text" size="small" @click="showManagerPopup = true">
         담당자 이관
       </v-btn>
@@ -249,6 +249,7 @@ export default {
   },
   data() {
     return {
+      authLevel: JSON.parse(localStorage.getItem("userInfo"))?.authLevel,
       showManagerPopup: false,
       step: 1,
       loading: false,

@@ -350,7 +350,7 @@ import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick, watch } 
 
 import apiClient from '@/api'
 import VueDatePicker from '@vuepic/vue-datepicker'
-import '@vuepic/vue-datepicker/dist/main.css'
+
 import {
   Chart,
   DoughnutController,

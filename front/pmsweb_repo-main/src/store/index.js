@@ -1,5 +1,4 @@
 import { createStore } from 'vuex';
-import menuService from '@/services/menuService';
 
 export default createStore({
   state: {

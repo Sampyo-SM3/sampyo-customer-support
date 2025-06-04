@@ -252,7 +252,7 @@ export default {
       return rows;
     }
   },
-  mounted() {
+  mounted() {    
     this.setDateRange('month');
     this.getStatus();
     this.getCompany();

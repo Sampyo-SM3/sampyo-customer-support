@@ -182,6 +182,7 @@ export default {
   },
   data() {
     return {
+      authLevel: JSON.parse(localStorage.getItem("userInfo"))?.authLevel,
       loading: false,
       errorMessages: [],
       showError: false,
@@ -446,7 +447,7 @@ export default {
 
 
       // 작성자 (특정 부서일 경우만)
-      if (this.userDeptCd === 'SPH220007' && (!this.userName || this.userName.trim() === '' || !this.selectedUserId)) {
+      if (this.authLevel === 'SPH220007' && (!this.userName || this.userName.trim() === '' || !this.selectedUserId)) {
         this.errorMessages.push('작성자를 지정해주세요.');
       }
 

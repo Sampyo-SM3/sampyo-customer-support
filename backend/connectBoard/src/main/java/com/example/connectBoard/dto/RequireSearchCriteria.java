@@ -25,10 +25,22 @@ public class RequireSearchCriteria {
     private String writerDp;
     private String division;
     
+    // 통계용
     private Integer totalCount;
     private Integer completeCount;
     private Float completeRate;
     private Float avgProcessDays;
+    
+    private Integer year_val;
+    private Integer month_val;
+    private Integer complete_count;
+    
+    
+     
+    
+        
+    
+    
     
     
     

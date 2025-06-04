@@ -32,10 +32,14 @@ public class RequireService {
     }   
     
     public List<RequireDTO> getDashboardData(RequireSearchCriteria criteria) {
-        // 매퍼를 통해 검색 조건으로 데이터 조회
-    	
+        // 매퍼를 통해 검색 조건으로 데이터 조회    	
         return requireRepository.getDashboardData(criteria);
-    }     
+    }
+    
+    public List<RequireDTO> getDashBoardMonthlyTotal(RequireSearchCriteria criteria) {
+        // 매퍼를 통해 검색 조건으로 데이터 조회    	
+        return requireRepository.getDashBoardMonthlyTotal(criteria);
+    }    
     
     public List<RequireDTO> searchRequiresByCriteriaUser(RequireSearchCriteria criteria) {
         // 매퍼를 통해 검색 조건으로 데이터 조회

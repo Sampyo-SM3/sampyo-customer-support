@@ -145,7 +145,7 @@ public class RequireController {
     }
     
     // 통계조회
-    @GetMapping("/require/search-dashboard")
+    @GetMapping("/require/dashboard/card")
     public ResponseEntity<?> searchDashBoard(@ModelAttribute RequireSearchCriteria criteria) {    	
         try {        	
             List<RequireDTO> requires = requireService.getDashboardData(criteria);
@@ -156,9 +156,25 @@ public class RequireController {
             
             return ResponseEntity.ok(requires);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("서버 오류 발생_ /require/search-dashboard\": " + e.getMessage());
+            return ResponseEntity.status(500).body("서버 오류 발생_ /require/dashboard/card\": " + e.getMessage());
         }
-    }        
+    }      
+    
+    // 월별 총 문의건수
+    @GetMapping("/require/dashboard/monthly-total")
+    public ResponseEntity<?> searchDashBoardMonthlyTotal(@ModelAttribute RequireSearchCriteria criteria) {    	
+        try {        	
+            List<RequireDTO> requires = requireService.getDashBoardMonthlyTotal(criteria);
+            
+            if (requires.isEmpty()) {
+                return ResponseEntity.ok().body("검색 조건에 해당하는 데이터가 존재하지 않습니다.");
+            }
+            
+            return ResponseEntity.ok(requires);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 오류 발생_ /require/dashboard/monthly-total\": " + e.getMessage());
+        }
+    }      
      
     
 }

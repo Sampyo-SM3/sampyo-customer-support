@@ -1,547 +1,552 @@
 <template>
-  <!-- 상단 라인 -->
-  <v-row>
-    <v-col>
-      <v-divider thickness="3" color="#578ADB" class="mb-4"></v-divider>
-    </v-col>
-  </v-row>
+  <div>
+    <v-divider thickness="3" color="#578ADB"></v-divider>
+  </div>
 
-  <v-container fluid class="pr-4 pl-4 pt-4">
+  <v-container fluid>
+    <br>
+    <div class="d-flex">
+      <div style="flex: 2; margin-right: 20px; padding-left: 70px;">
+        <div class="d-flex align-center justify-end mb-2">
+          <v-btn @click="handleAddUser" prepend-icon="mdi-plus" size="small" color="green darken-2"
+            class="text-none mr-2">추가</v-btn>
+          <v-btn @click="deleteUser" prepend-icon="mdi-delete" size="small" color="grey darken-2"
+            class="text-none">삭제</v-btn>
+        </div>
+        <v-table density="compact" fixed-header class="table-style">
+          <thead class="table-header">
+            <tr>
+              <th class="text-left" style="width: 70px;">선택</th>
+              <th class="text-left">사용자ID</th>
+              <th class="text-left">이름</th>
+              <th class="text-left">직급</th>
+              <th class="text-left">부서</th>
+              <th class="text-left">회사</th>
+              <th class="text-left" style="width: 150px;">권한</th>          
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="user in users" :key="user.id" :class="{ 'selected-row': selectedUserId === user.id }"
+              @click="selectUser(user.id);" style="cursor: pointer;">
+              <td @click.stop>
+                <v-icon @click="selectUser(user.id)" :color="selectedUserId === user.id ? 'primary' : '#aaa'">
+                  {{ selectedUserId === user.id ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline' }}
+                </v-icon>
+              </td>
+              <td>{{ user.id }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.rollPstnNm }}</td>
+              <td>{{ user.deptNm }}</td>
+              <td>{{ user.corpNm }}</td>
+              <td @click.stop>
+                <v-select
+                  v-model="user.authLevel"
+                  :items="authLevelOptions"
+                  item-title="name"
+                  item-value="code"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  class="auth-select"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
+      </div>
+      <div style="flex: 1; padding-right: 70px;">
+        <div class="d-flex justify-space-between align-center mb-1">
+          <div class="text-h6">게시판 목록</div>
+          <v-btn color="primary" class="ml-auto py-2 text-body-1" @click="savePermissions">저장</v-btn>
+        </div>
+        <v-card>
+          <div class="height-scroll-container" ref="menuScrollContainer">
+            <div v-for="(group, groupIdx) in menuGroups" :key="group.groupKey" class="mb-2">
+              <div class="text-subtitle-1 font-weight-bold d-flex align-center">
+                <v-checkbox v-model="group.checked" :label="group.groupLabel" hide-details density="compact"
+                  class="my-1 main-label" @change="toggleGroup(groupIdx)"
+                  :style="{ color: group.checked ? '#1867C0' : '#888888' }" />
+              </div>
+              <div v-for="(mid) in group.options" :key="mid.value" class="ml-6">
+                <div class="font-weight-medium mb-1 d-flex align-center">
+                  <v-checkbox :label="mid.label" :model-value="isMidChecked(group, mid)"
+                    @update:model-value="checked => toggleMid(group, mid, checked)" hide-details density="compact"
+                    class="my-1 checkbox-mid" :style="{
+                      color: isMidChecked(group, mid) ? '#1867C0' : '#888888'
+                    }" />
+                </div>
+                <div>
+                  <v-checkbox v-for="sub in mid.children" :key="sub.value" :label="sub.label" :value="sub.value"
+                    v-model="group.selected" hide-details density="compact" class="my-1 ml-7 sub-label"
+                    @change="updateParentCheckStatus(group, mid)"
+                    :style="{ color: isChecked(sub.value, group.selected) }" />
 
-    <!-- 총 건수 및 검색 영역 -->
-    <v-row dense align="center" class="flex-wrap mb-2" style="gap: 8px;">
-      <v-col cols="12" sm="6" md="4" class="d-flex align-center">
-        <span class="text-subtitle-2 text-grey">총&nbsp;</span>
-        <span class="text-subtitle-2 font-weight-bold">{{ totalItems }}</span>
-        <span class="text-subtitle-2 text-grey">건</span>
-      </v-col>
-
-      <v-spacer></v-spacer>
-
-      <v-col cols="12" sm="6" md="4" class="d-flex justify-end align-center">
-        <span class="filter-label">제목<span class="label-divider"></span></span>
-        <v-text-field v-model="title" @keydown.enter="fetchData" variant="outlined" density="compact" hide-details
-          class="filter-input-sub" append-inner-icon="mdi-magnify" />
-      </v-col>
-    </v-row>
-
-    <!-- 테이블 -->
-    <v-row class="grid-table ma-0 pa-0 mt-4">
-      <v-col class="pa-0">
-        <div class="table-container compact">
-          <div class="table-header">
-            <div class="th-cell"></div>
-            <div class="th-cell">제목</div>
-            <div class="th-cell">조회수</div>
-            <div class="th-cell">작성부서</div>
-            <div class="th-cell">작성일자</div>
-          </div>
-
-          <div v-for="(item, index) in paginatedData" :key="index" class="table-row compact">
-            <div class="td-cell seq-cell">{{ item.num }}</div>
-            <div class="td-cell title-cell">
-              <router-link :to="{
-                name: 'CA_LibraryDetailForm',
-                params: { receivedSeq: item.seq }
-              }" class="title-link">
-                {{ item.title }}
-              </router-link>
+                </div>
+              </div>
             </div>
-            <div class="td-cell seq-cell">{{ item.viewCount }}</div>
-            <div class="td-cell seq-cell">{{ item.dpNm }}</div>
-            <div class="td-cell seq-cell">{{ formatDate(item.insertDt) }}</div>
           </div>
-        </div>
-
-        <!-- 로딩 -->
-        <div v-if="loading" class="loading-overlay">
-          <v-progress-circular indeterminate color="primary"></v-progress-circular>
-        </div>
-
-        <!-- 데이터 없음 -->
-        <div v-if="!loading && tableData.length === 0"
-          class="no-data d-flex flex-column align-center justify-center py-10">
-          <v-icon size="64" color="#9E9E9E">mdi-file-document-outline</v-icon>
-          <div class="mt-4 text-center">
-            <p class="text-h6 font-weight-medium" style="color: #757575;">조회된 데이터가 없습니다.</p>
-          </div>
-        </div>
-
-        <!-- 페이지네이션 -->
-        <div class="pagination-container" v-if="tableData.length > 0">
-          <v-btn icon="mdi-chevron-left" variant="text" size="default" :disabled="currentPage === 1"
-            @click="currentPage--"></v-btn>
-
-          <template v-if="totalPages <= 5">
-            <v-btn v-for="page in totalPages" :key="page" class="pagination-btn mx-1"
-              :variant="currentPage === page ? 'flat' : 'text'" :color="currentPage === page ? 'primary' : ''"
-              @click="currentPage = page">
-              {{ page }}
-            </v-btn>
-
-          </template>
-
-          <template v-else>
-            <v-btn v-if="currentPage > 3" size="default" variant="text" @click="currentPage = 1">1</v-btn>
-            <span v-if="currentPage > 3" class="mx-1">...</span>
-            <v-btn v-if="currentPage > 1" size="default" variant="text" @click="currentPage = currentPage - 1">{{
-              currentPage - 1 }}</v-btn>
-            <v-btn size="default" variant="flat" color="primary">{{ currentPage }}</v-btn>
-            <v-btn v-if="currentPage < totalPages" size="default" variant="text"
-              @click="currentPage = currentPage + 1">{{ currentPage + 1 }}</v-btn>
-            <span v-if="currentPage < totalPages - 2" class="mx-1">...</span>
-            <v-btn v-if="currentPage < totalPages - 2" size="default" variant="text"
-              @click="currentPage = totalPages">{{ totalPages }}</v-btn>
-          </template>
-
-          <v-btn icon="mdi-chevron-right" variant="text" size="default" :disabled="currentPage === totalPages"
-            @click="currentPage++"></v-btn>
-        </div>
-      </v-col>
-    </v-row>
-
-    <!-- 플로팅 버튼 -->
-    <v-btn icon color="green" class="fab-btn" @click="$router.push({ name: 'CA_LibraryCreateForm' })">
-      <v-icon>mdi-pencil</v-icon>
-    </v-btn>
-
-    <!-- 스낵바 -->
-    <v-snackbar v-model="showError" color="warning" timeout="5000" location="center" elevation="8" variant="elevated">
-      {{ errorMessages[0] }}
-      <template v-slot:actions>
-        <v-btn variant="text" @click="showError = false">닫기</v-btn>
-      </template>
-    </v-snackbar>
+        </v-card>
+      </div>
+    </div>
   </v-container>
+
+  <!-- user 추가하기 팝업 -->
+  <user-popup :show="showUserPopup" @user-selected="onUserAdded" @close="showUserPopup = false" />
+
 </template>
 
-
 <script>
-import apiClient from '@/api';
 import { inject, onMounted } from 'vue';
-import '@vuepic/vue-datepicker/dist/main.css';
+import apiClient from '@/api';
+import UserPopup from '@/components/UserPopup';
 
 export default {
   components: {
-
+    UserPopup
   },
   setup() {
-    const extraBreadcrumb = inject('extraBreadcrumb', null);
+    // const extraBreadcrumb = inject('extraBreadcrumb', null);
     const listButtonLink = inject('listButtonLink', null);
     onMounted(() => {
-      if (extraBreadcrumb) {
-        extraBreadcrumb.value = null;
-      }
-
-      if (listButtonLink) {
-        listButtonLink.value = null;
-      }
+      // if (extraBreadcrumb) extraBreadcrumb.value = '권한등록';
+      if (listButtonLink) listButtonLink.value = null;
     });
-
     return {};
-  },
-  unmounted() { // ❗ 컴포넌트가 언마운트될 때
-    const listButtonLink = inject('listButtonLink', null);
-    if (listButtonLink) {
-      listButtonLink.value = null; // 🔥 페이지 벗어날 때 목록버튼 없애기
-    }
   },
   data() {
     return {
-      title: '',
-      countComment: 0,
-      dateRange: 'month',
-      productType: 'test1',
-      tableData: [],
-      loading: false,
-      selectAll: false,
-      // 페이징 관련 변수
-      currentPage: 1,
-      itemsPerPage: 10,
-      processState: '',
-      errorMessages: [],
-      showError: false,
-      savedMidMenu: '',
-      savedSubMenu: '',
-    }
+      selectedUserId: null,
+      users: [],
+      menuGroups: [],
+      showUserPopup: false,
+      selectedUser: null,
+      // 권한 레벨 옵션
+      authLevelOptions: [
+        { code: 10, name: '일반' },
+        { code: 20, name: 'IT관리자' },
+        { code: 30, name: '마스터' }
+      ]
+    };
   },
-
-  computed: {
-    // 전체 페이지 수 계산
-    totalPages() {
-      return Math.ceil(this.tableData.length / this.itemsPerPage);
-    },
-
-    // 현재 페이지에 표시할 데이터
-    paginatedData() {
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.tableData.slice(start, end);
-    },
-
-    // 전체 아이템 수
-    totalItems() {
-      return this.tableData.length;
-    }
-  },
-
-  watch: {
-    // API 파라미터가 변경되면 데이터 다시 로드
-    startDate() {
-      this.currentPage = 1; // 검색 조건 변경 시 첫 페이지로 리셋      
-    },
-    endDate() {
-      this.currentPage = 1;
-    },
-  },
-
   mounted() {
-    this.fetchData();
-    this.checkLocalStorage();
+    this.getAuthUser();
+    this.fetchMenuGroups();
   },
-
   methods: {
-    checkLocalStorage() {
-      const midMenuFromStorage = localStorage.getItem('midMenu');
-      const subMenuFromStorage = localStorage.getItem('subMenu');
-
-      this.savedMidMenu = midMenuFromStorage ? JSON.parse(midMenuFromStorage) : null;
-      this.savedSubMenu = subMenuFromStorage ? JSON.parse(subMenuFromStorage) : null;
+    async getAuthUser() {
+      const res = await apiClient.get('/api/userAuth/list');
+      this.users = res.data.map(item => ({
+        selected: false,
+        auth: item.auth,
+        id: item.id,
+        name: item.name || '',
+        rollPstnNm: item.rollPstnNm || '',
+        deptNm: item.deptNm || '',
+        corpNm: item.corpNm || '',
+        authLevel: this.convertAuthLevelToCode(item.authLevel), // 한글 → code 변환
+        isNew: false
+      }));
     },
 
-    // API 호출하여 데이터 가져오기
-    async fetchData() {
-      this.loading = true;
-
-      try {
-        // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
-        const response = await apiClient.get('/api/library/list', {
-          params: {
-            title: this.title
-          }
+    // 한글 권한명을 code로 변환하는 함수 추가
+    convertAuthLevelToCode(authLevelName) {
+      const mapping = {
+        '일반': 10,
+        'IT관리자': 20,
+        '마스터': 30
+      };
+      return mapping[authLevelName] || 10; // 기본값 10
+    },    
+      
+    selectUser(userId) {
+      if (this.selectedUserId === userId) {
+        // 이미 선택된 사용자 다시 클릭 → 해제 처리
+        this.selectedUserId = null;
+        this.menuGroups.forEach(group => {
+          group.checked = false;
+          group.selected = [];
         });
-
-        // API 응답 데이터 처리
-        if (response.data && Array.isArray(response.data)) {
-
-          this.tableData = response.data.map(item => {
-
-            return {
-              ...item,
-            };
-          });
-
-          // 서버 측 페이징 구현시 전체 개수 설정 (API 응답에서 받아야 함)
-          // this.totalItems = response.data.totalItems;
-        } else {
-          this.tableData = [];
-        }
-
-      } catch (error) {
-        console.error('데이터 로드 중 오류 발생:', error);
-      } finally {
-        this.loading = false;
+        this.fetchUserAuth(null); // 체크 해제 시 이 함수 호출
+      } else {
+        // 새 사용자 선택
+        this.selectedUserId = userId;
+        this.menuGroups.forEach(group => {
+          group.checked = false;
+          group.selected = [];
+        });
+        this.$nextTick(() => {
+          const container = this.$refs.menuScrollContainer;
+          if (container?.scrollTo) container.scrollTo({ top: 0, behavior: 'smooth' });
+          else if (container) container.scrollTop = 0;
+        });
+        this.fetchUserAuth(userId);
       }
     },
-    // 날짜 포맷 함수 (ISO 문자열 -> YYYY-MM-DD 형식)
-    formatDate(dateString) {
-      if (!dateString) return '-';
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return '-';
+    async fetchUserAuth(userId) {
+      const res = await apiClient.get(`/api/userAuth/detailList`, { params: { userId } });
 
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
+      this.menuGroups.forEach(group => {
+        const matched = res.data.filter(auth => auth.mcode.startsWith(group.groupKey));
+
+        const availableCodes = group.options.flatMap(mid => {
+          const codes = mid.children.length > 0 ? mid.children.map(sub => sub.value) : [];
+          return [...codes, mid.value];  // <- 중메뉴도 추가
+        });
+
+        group.selected = matched
+          .map(auth => auth.mcode)
+          .filter(code => availableCodes.includes(code));
+
+        // 초기 상태에서 하위 메뉴 상태에 따라 그룹 체크 상태 설정.
+        group.checked = this.hasAnySelected(group);
+      });
+
+      // 권한 로드 후 모든 메뉴 체크 상태 업데이트
+      this.updateAllCheckStatus();
     },
+    // 해당 그룹에 선택된 항목이 있는지 확인
+    hasAnySelected(group) {
+      return group.selected.length > 0;
+    },
+    // 중메뉴 체크 상태 확인 - 하위에 하나라도 체크되면 체크된 상태
+    isMidChecked(group, mid) {
+      if (mid.children && mid.children.length > 0) {
+        return mid.children.some(sub => group.selected.includes(sub.value)) || group.selected.includes(mid.value);
+      }
+      return group.selected.includes(mid.value);
+    },
+    toggleGroup(index) {
+      const group = this.menuGroups[index];
+      if (group.checked) {
+        // 대메뉴 체크: 모든 하위 메뉴 체크
+        const allCodes = [group.groupKey];
+        group.options.forEach(mid => {
+          allCodes.push(mid.value);
+          if (mid.children && mid.children.length > 0) {
+            mid.children.forEach(sub => allCodes.push(sub.value));
+          }
+        });
+        group.selected = allCodes;
+      } else {
+        // 대메뉴 해제: 모든 하위 메뉴 해제
+        group.selected = [];
+      }
+    },
+    toggleMid(group, mid, isChecked) {
+      const hasChildren = mid.children && mid.children.length > 0;
+      const selected = new Set(group.selected);
 
+      if (isChecked) {
+        selected.add(mid.value);
+
+        if (hasChildren) {
+          mid.children.forEach(sub => selected.add(sub.value));
+        }
+        group.checked = true; // 중메뉴가 체크되면 대메뉴도 체크
+      } else {
+        selected.delete(mid.value);
+        if (hasChildren) {
+          mid.children.forEach(sub => selected.delete(sub.value));
+        }
+
+        // ✅ 중메뉴 해제 후 대메뉴 체크 상태 다시 계산
+        const stillChecked = group.options.some(opt =>
+          selected.has(opt.value) ||
+          (opt.children && opt.children.some(sub => selected.has(sub.value)))
+        );
+        group.checked = stillChecked;
+      }
+      group.selected = Array.from(selected);
+    },
+    // 하위 메뉴 변경 시 상위 메뉴 상태 업데이트
+    updateParentCheckStatus(group, mid) {
+      const isAnyChecked = mid.children.some(sub => group.selected.includes(sub.value));
+      const selected = new Set(group.selected);
+
+      if (!isAnyChecked) {
+        //selected.delete(mid.value); // 하위 항목이 모두 해제되면 중메뉴도 해제
+      } else {
+        selected.add(mid.value); // 하나라도 선택되면 중메뉴는 체크 유지
+      }
+
+      group.selected = Array.from(selected);
+
+      // 그룹 체크 상태도 갱신
+      group.checked = this.hasAnySelected(group);
+    },
+    // 모든 메뉴의 체크 상태 업데이트
+    updateAllCheckStatus() {
+      this.menuGroups.forEach(group => {
+        // 그룹 체크 상태 업데이트 - 하나라도 선택됐으면 체크
+        group.checked = this.hasAnySelected(group);
+      });
+    },
+    isChecked(value, selected) {
+      return selected.includes(value) ? '#1867C0' : '#888888';
+    },
+    async fetchMenuGroups() {
+      const res = await apiClient.get('/api/menuitem/all-menu');
+
+      this.menuGroups = res.data.map(group => ({
+        groupLabel: group.groupLabel,
+        groupKey: group.groupKey,
+        checked: false,
+        selected: [],
+        options: group.options
+      }));
+    },
+    async deleteUser() {
+      const selectedUser = this.users.find(user => user.id === this.selectedUserId);
+
+      if (!selectedUser) {
+        alert('삭제할 사용자를 선택해주세요.');
+        return;
+      }
+
+      const isNew = selectedUser.isNew === true;
+      const isSaved = selectedUser.isNew === false;
+
+      // 1. 추가된 사용자만 선택한 경우 → 바로 삭제
+      if (isNew) {
+        this.users = this.users.filter(user => user.id !== selectedUser.id);
+        this.selectedUserId = null;
+        return;
+      }
+
+      // 2. 저장된 사용자만 선택한 경우 → confirm 후 삭제
+      if (isSaved) {
+        const confirmed = confirm("해당 사용자의 권한을 제거하시겠습니까?");
+
+        if (confirmed) {
+          await apiClient.post('/api/userAuth/deleteUser', {
+            id: this.selectedUserId
+          }, {});
+
+          this.getAuthUser()
+          this.fetchUserAuth(null);
+          alert('삭제하였습니다.');
+        }
+
+        return;
+      }
+    },
+    async savePermissions() {
+      // console.log('--savePermissions--');
+      if (!this.selectedUserId)
+        return alert('사용자를 먼저 선택해주세요.');
+
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+      const insertUser = userInfo?.id || 'system';        
+
+      
+      const selectedUser = this.users.find(user => user.id === this.selectedUserId);      
+      // console.log('selectedAuthLevel');
+      // console.log(this.users);
+      // console.log(selectedUser.authLevel);
+      
+      try {
+        // 1. 선택된 사용자의 권한 레벨 업데이트
+        const authLevelPayload = {
+          id: selectedUser.id,
+          authLevel: selectedUser.authLevel,
+          insertUser: insertUser,
+          updateUser: insertUser,          
+        };
+
+        // console.log(authLevelPayload);
+
+         
+        await apiClient.post('/api/userAuth/update-auth-level', authLevelPayload);
+
+        // 2. 기존 권한 조회
+        const res = await apiClient.get(`/api/userAuth/detailList`, { params: { userId: this.selectedUserId } });
+
+        const existingCodes = res.data.map(auth => auth.mcode);
+        const selectedCodes = [];
+
+        this.menuGroups.forEach(group => {
+          if (group.checked) selectedCodes.push(group.groupKey);
+          selectedCodes.push(...group.selected);
+        });
+
+        if (selectedCodes.length === 0) {
+          alert('권한을 부여할 게시판을 하나 이상 선택해주세요.');
+          return;
+        }
+
+        const toInsert = selectedCodes.filter(c => !existingCodes.includes(c));
+        const toDelete = existingCodes.filter(c => !selectedCodes.includes(c));
+                
+        // 3. 메뉴 권한 추가
+        for (const menuCd of toInsert) {
+          const payload = {
+            id: this.selectedUserId,
+            menuCode: menuCd,
+            auth: 31,
+            insertUser: insertUser,
+            updateUser: insertUser,
+          };
+
+          await apiClient.post('/api/userAuth/save', payload);
+        }
+
+        // 4. 메뉴 권한 제거
+        for (const menuCd of toDelete) {
+          const payload = {
+            id: this.selectedUserId,
+            menuCode: menuCd,
+            auth: 0,
+            insertUser: insertUser,
+            updateUser: insertUser
+          };
+
+          await apiClient.post('/api/userAuth/save', payload);
+        }
+
+        this.fetchUserAuth(this.selectedUserId);
+        alert('권한이 저장되었습니다.');
+
+      } catch (error) {
+        console.error('권한 저장 오류:', error);
+        alert('권한 저장 중 오류가 발생했습니다.');
+      }
+    },
+    handleAddUser() {
+      const hasUnsavedUser = this.users.some(user => user.isNew);
+      if (hasUnsavedUser) {
+        alert('기존 추가된 사용자를 먼저 저장해주세요.');
+        return;
+      }
+
+      this.showUserPopup = true; // 조건 만족 시 팝업 오픈
+    },
+    onUserAdded(selectedUser) {
+      if (!selectedUser) return;
+
+      const exists = this.users.some(user => user.id === selectedUser.usrId);
+      if (exists) {
+        alert('이미 등록된 사용자입니다.');
+        return;
+      }
+
+      this.users.push({
+        id: selectedUser.usrId,
+        name: selectedUser.name,
+        rollPstnNm: selectedUser.rollPstnNm || '',
+        deptNm: selectedUser.deptNm || '',
+        corpNm: selectedUser.corpNm || '',
+        authLevel: 10, // 새 사용자 기본값: 일반
+        isNew: true // 새로 추가된 유저 표시
+      });
+
+      this.selectedUserId = selectedUser.usrId; // 체크 표시용 선택
+
+      this.fetchUserAuth(null);
+    },
   }
-}</script>
+};
+</script>
 
 <style scoped>
-:deep(.dp__input) {
-  border: none;
-  box-shadow: none;
-  color: #7a7a7a;
+.v-table th {
+  font-weight: bold;
+  background-color: #f5f5f5;
 }
 
-:deep(.dp__main) {
-  font-family: inherit;
-  border-radius: 8px;
-  z-index: 100;
+.title-div {
+  font-size: 25px;
 }
 
-:deep(.dp__theme_light) {
-  --dp-primary-color: #2196F3;
-  --dp-border-radius: 8px;
-}
-
-:deep(.dp__overlay_cell_active) {
-  background-color: var(--dp-primary-color);
-  color: white;
-}
-
-.breadcrumb-div {
-  font-size: 12px;
-  color: #A1A6A6;
-}
-
-.title-search {
-  padding-block: 10px;
-  padding-left: 10px;
-  width: 800px;
-  font-weight: 400;
-}
-
-.custom-btn {
-  font-size: 14px;
-  height: 40px;
-  border-radius: 10px;
-}
-
-.date-btn {
-  min-width: 48px;
-  padding: 0 12px;
-  height: 32px;
-  letter-spacing: -0.5px;
-  border: 1px solid #eaeaea;
-  border-radius: 0;
-  background-color: #ffffff;
-  color: #7A7A7A;
-  box-shadow: none;
-  margin: 0;
-}
-
-.v-col.pa-0 {
-  height: 100%;
-}
-
-.top-button-row {
-  margin-bottom: 8px;
-}
-
-.white-text {
-  color: white !important;
-}
-
-.table-container {
+.table-style {
+  min-height: auto;
   border: 1px solid #e0e0e0;
-  border-radius: 10px;
   width: 100%;
   position: relative;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
+  border-radius: 10px;
   overflow: hidden;
 }
 
-.table-header,
-.table-row {
-  display: grid;
-  grid-template-columns: 90px 1fr 150px 100px 150px;
+::v-deep(.table-header) {
+  height: 56px;
 }
 
-.table-header {
-  background-color: #D0DFF1;
+::v-deep(.table-header th) {
+  /* background-color: #D0DFF1 !important;
   font-weight: 500;
+  border-bottom: 1px solid #e0e0e0 !important; */
+  background-color: #D0DFF1 !important;
   color: #3E4B5B !important;
-  min-height: 50px;
-  border-bottom: none;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+  text-align: center;
 }
 
-.table-row {
-  border-bottom: 1px solid #e0e0e0;
-  height: 54px;
-  color: #5B5D60;
-  font-size: 15px;
+.v-table tbody tr {
+  height: 40px;
 }
 
-.table-row:hover {
-  background-color: #f9f9f9;
+.v-table tbody td {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  height: 40px;
+  vertical-align: middle;
 }
 
-.th-cell,
-.td-cell {
-  padding: 8px 12px;
-  border-right: none;
-  display: flex;
-  align-items: center;
-  font-size: 14px;
+.lickable-icon {
+  cursor: pointer;
+  font-size: 22px;
 }
 
-.th-cell {
-  justify-content: center;
+.selected-row {
+  background-color: #FAF9F1;
+  transition: background-color 0.3s;
+}
+
+::v-deep(.main-label .v-label) {
+  color: black !important;
   font-weight: 500;
-  white-space: nowrap;
-  font-size: 14px;
+  opacity: 1 !important;
 }
 
-.checkbox-cell {
-  flex: 0 0 40px;
-  justify-content: center;
-}
-
-.title-cell {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding-left: 12px;
-}
-
-.title-link {
-  color: #1976d2;
-  text-decoration: none;
-}
-
-.title-link:hover {
-  text-decoration: underline;
-}
-
-.pagination-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 16px 0;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.pagination-btn {
-  width: 36px;
-  height: 36px;
-  min-width: 36px !important;
-  border-radius: 6px;
+::v-deep(.checkbox-mid .v-label) {
+  color: #5A5C5F !important;
   font-weight: 500;
-  font-size: 14px;
+  opacity: 1 !important;
 }
 
-.loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 5;
-}
-
-.no-data {
-  min-height: 250px;
-  background-color: #F9FAFB;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 0;
-  border-top-left-radius: 0 !important;
-  border-top-right-radius: 0 !important;
-}
-
-.filter-label {
-  font-size: 14.5px;
-  min-width: 45px;
+::v-deep(.sub-label .v-label) {
+  color: #5A5C5F !important;
   font-weight: 500;
-  color: #005bac;
-  margin-left: 10px;
-  margin-right: 0px;
+  opacity: 1 !important;
 }
 
-
-.filter-label::after {
-  content: "";
-  height: 16px;
-  width: 1px;
-  background: #ddd;
-  margin-top: 13px;
-  margin-left: 11px;
+.height-scroll-container {
+  padding: 15px;
+  max-height: 700px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
 }
 
-.filter-input-sub {
-  width: 200px;
-  margin-right: 6px;
-  color: #5271C1;
+/* 권한 콤보박스 스타일 */
+.auth-select {
+  min-width: 120px;
 }
 
-.date-btn {
-  font-size: 12px;
+.auth-select :deep(.v-input__control) {
+  min-height: 32px;
   height: 32px;
-  min-width: 56px;
 }
 
-.search-btn {
-  color: white;
-  font-weight: 500;
-  height: 36px;
-  min-width: 64px;
-}
-
-.v-btn.date-btn {
-  margin-top: 2px;
-  /* 버튼 살짝 내려서 정렬 */
-  padding: 0 8px;
+.auth-select :deep(.v-field__input) {
+  padding-top: 0;
+  padding-bottom: 0;
+  min-height: 32px;
   font-size: 13px;
 }
 
-.v-btn.search-btn {
-  margin-top: 2px;
-  /* 검색 버튼도 아래 요소와 정렬 */
-}
-
-.filter-col {
-  height: 50px;
-  border: 1.5px solid #D0DFF1;
-  border-radius: 8px;
-  background-color: white;
-}
-
-.rounded-border {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 12px;
-  border: 1px solid #D0DFF1;
-  border-radius: 8px;
-  background-color: rgba(208, 223, 241, 0.5);
-  height: auto;
-  max-width: 450px;
-}
-
-.label-divider {
-  display: inline-block;
-  height: 18px;
-  background-color: #bbb;
-  margin-left: 10px;
-  margin-bottom: 2px;
-  border-radius: 1px;
-  vertical-align: middle;
-  width: 2px;
-  background-color: #B0CAE6;
-}
-
-.fab-btn {
-  position: fixed;
-  bottom: 32px;
-  right: 32px;
-  border-radius: 50%;
-  height: 56px;
-  width: 56px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-  z-index: 999;
-}
-
-.seq-cell {
-  justify-content: center;
-}
-
-.no-data {
-  min-height: 300px;
-  border-radius: 8px;
-  background-color: #F9FAFB;
-  border: 1px dashed #D3D3D3;
+.auth-select :deep(.v-field) {
+  border-radius: 4px;
 }
 </style>
