@@ -38,7 +38,12 @@
           <span class="text-subtitle-2 text-grey ml-2"> SR: </span>
           <span class="text-subtitle-2 font-weight-bold text-blue"><span :class="getStatusClass('S')">{{
             getUnprocessedCount('S') }}</span></span>
+          <!-- <span class="text-subtitle-2 text-grey ml-2"> 종결: </span> -->
+
           <span class="text-subtitle-2 text-grey ml-2"> 종결: </span>
+          <span class="text-subtitle-2 font-weight-bold text-blue"><span :class="getStatusClass('R')">{{
+            getUnprocessedCount('R') }}</span></span>
+
           <span class="text-subtitle-2 font-weight-bold"><span :class="getStatusClass('C')">{{ getUnprocessedCount('C')
           }}</span></span>
 
@@ -425,7 +430,7 @@ export default {
         dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
       };
 
-      // console.log('최종 파라미터:', finalParams);
+      console.log('최종 파라미터:', finalParams);
             
       this.loading = true;
 
@@ -557,7 +562,9 @@ export default {
         case 'H':
           return 'text-warning';
         case 'S':
-          return 'text-info';
+          return 'text-info';     
+        case 'R':
+          return 'text-secondary';          
         case 'C':
           return 'text-success';
         default:
@@ -888,6 +895,11 @@ export default {
 .status-C {
   background-color: #e6f4ea;
   color: #137333;
+}
+
+.status-R {
+  background-color: #e6f4ea;
+  color: #6b7280;
 }
 
 .status-S {

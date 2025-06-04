@@ -241,7 +241,7 @@
 
   <script>
      import DynamicSearchFilter from '@/components/DynamicSearchFilter';    
-    //  import apiClient from '@/api';
+     import apiClient from '@/api';
   export default {
     components: {
       DynamicSearchFilter,
@@ -297,19 +297,19 @@
             trend: 12.3
           },
           {
+            title: '처리완료율',
+            value: '4.2/5',
+            icon: 'mdi-progress-check',
+            color: 'warning',
+            trend: 3.1
+          },
+          {
             title: '평균처리시간',
             value: '2.1일',
             icon: 'mdi-clock-fast',
             color: 'info',
             trend: -5.2
-          },
-          {
-            title: '만족도',
-            value: '4.2/5',
-            icon: 'mdi-star',
-            color: 'warning',
-            trend: 3.1
-          }
+          }          
         ],
   
         // 실시간 알림
@@ -460,9 +460,41 @@
     mounted() {
         // this.setDateRange('month');
         // this.getStatus();        
+        this.onSearch();
     },        
     methods: {
-      
+      async onSearch(searchParams) {
+        console.log('--onSearch--');
+        console.log(searchParams);
+
+        this.loading = true;
+          
+        // 최종 전달될 파라미터 확인
+        const finalParams = {
+          ...searchParams,
+          dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
+        };
+
+        // console.log('최종 파라미터:', finalParams);
+              
+        
+
+        try {
+          // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가
+          const response = await apiClient.get('/api/require/search', {
+            params: 
+              finalParams
+          });
+
+          console.log(response.data);
+
+
+        } catch (error) {
+          console.error('데이터 로드 중 오류 발생:', error);
+        } finally {
+          this.loading = false;
+        }        
+      },
       applyFilters() {
         console.log('필터 적용');
       },
