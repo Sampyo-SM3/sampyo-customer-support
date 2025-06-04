@@ -52,6 +52,18 @@ public class UserAuthController {
         }
     }
     
+    // 권한 등록 또는 수정 (Upsert)
+    @PostMapping("/userAuth/update-auth-level")
+    public ResponseEntity<String> updateAuthLevl(@RequestBody UserAuthDTO userAuthDTO) {
+        try {
+            userAuthService.updateAuthLevel(userAuthDTO);
+            return ResponseEntity.ok("권한이 성공적으로 저장되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("권한 저장 중 오류가 발생했습니다." + e.getMessage());
+        }
+    }    
+    
     //user의 권한 조회
     @PostMapping("/userAuth/deleteUser")
     public ResponseEntity<String> deleteUserAuth(@RequestBody UserAuthDTO userAuthDTO) {

@@ -14,7 +14,7 @@ public class EmployeePreferenceDto {
 	private String phone;
 	private String email;
 	private String deptCd;
-	private String authLevel;
+	private int authLevel;
 	private boolean admin;
 	private byte[] pwd;
 }

@@ -9,6 +9,13 @@
 		SELECT 
 		a.ID AS id,
 		MAX(a.AUTH) AS auth,
+		CASE 
+		    WHEN isnull((select auth_level from sys_empref where id = a.id), 0) = 0 THEN '없음'
+		    WHEN isnull((select auth_level from sys_empref where id = a.id), 0) = 10 THEN '일반'
+		    WHEN isnull((select auth_level from sys_empref where id = a.id), 0) = 20 THEN 'IT관리자'
+		    WHEN isnull((select auth_level from sys_empref where id = a.id), 0) = 30 THEN '마스터'
+		    ELSE '일반'
+		END as auth_level,
 		MAX(ISNULL(b.NAME, '')) AS name,
 		MAX(ISNULL(b.ROLL_PSTN_NM, '')) AS ROLL_PSTN_NM,
 		MAX(ISNULL(b.DEPT_NM, '')) AS deptNm,
@@ -43,6 +50,12 @@
 		SET AUTH = #{auth}, UPDATE_USER = #{updateUser}, UPDATE_DT = GETDATE()
 		WHERE ID = #{id} AND M_CODE = #{menuCode}
 	</update>
+	
+	<update id="updateAuthLevel" parameterType="com.example.connectBoard.dto.UserAuthDTO">
+		UPDATE sys_empref
+		SET AUTH_LEVEL = #{authLevel}, UPDATE_USER = #{updateUser}, UPDATE_DT = GETDATE()
+		WHERE ID = #{id}
+	</update>	
 	
 	<insert id="insertMenuAuth" parameterType="com.example.connectBoard.dto.UserAuthDTO">
 		INSERT INTO sys_menu_auth (ID, M_CODE, AUTH, INSERT_USER, INSERT_DT)

@@ -19,6 +19,8 @@ public interface UserAuthRepository {
 
     // 권한 업데이트
     int updateMenuAuth(UserAuthDTO userAuthDTO);
+    
+    int updateAuthLevel(UserAuthDTO userAuthDTO);       
 
     // 권한 삽입
     int insertMenuAuth(UserAuthDTO userAuthDTO);

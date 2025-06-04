@@ -102,7 +102,7 @@ public class LoginController {
           return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
           .body(Map.of("message", "존재하지 않는 사용자입니다. (bluesam)"));        	
         } catch (Exception e) {
-        	System.out.println("2");
+//        	System.out.println("2");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                    .body(Map.of("message", "로그인 처리 중 오류가 발생했습니다."));
         }

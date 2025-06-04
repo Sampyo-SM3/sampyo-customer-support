@@ -22,6 +22,7 @@
               <th class="text-left">직급</th>
               <th class="text-left">부서</th>
               <th class="text-left">회사</th>
+              <th class="text-left" style="width: 150px;">권한</th>          
             </tr>
           </thead>
           <tbody>
@@ -37,6 +38,18 @@
               <td>{{ user.rollPstnNm }}</td>
               <td>{{ user.deptNm }}</td>
               <td>{{ user.corpNm }}</td>
+              <td @click.stop>
+                <v-select
+                  v-model="user.authLevel"
+                  :items="authLevelOptions"
+                  item-title="name"
+                  item-value="code"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  class="auth-select"
+                />
+              </td>
             </tr>
           </tbody>
         </v-table>
@@ -107,6 +120,12 @@ export default {
       menuGroups: [],
       showUserPopup: false,
       selectedUser: null,
+      // 권한 레벨 옵션
+      authLevelOptions: [
+        { code: 10, name: '일반' },
+        { code: 20, name: 'IT관리자' },
+        { code: 30, name: '마스터' }
+      ]
     };
   },
   mounted() {
@@ -124,9 +143,30 @@ export default {
         rollPstnNm: item.rollPstnNm || '',
         deptNm: item.deptNm || '',
         corpNm: item.corpNm || '',
+        authLevel: item.authLevel || 10, // 기본값 10 (일반)
         isNew: false
       }));
     },
+    
+    // 사용자 권한 레벨 업데이트 (저장 시에만 호출)
+    async updateUserAuthLevel(user) {
+      try {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const updateUser = userInfo?.id || 'system';
+        
+        await apiClient.post('/api/userAuth/updateAuthLevel', {
+          userId: user.id,
+          authLevel: user.authLevel,
+          updateUser: updateUser
+        });
+        
+        console.log(`사용자 ${user.id}의 권한이 ${user.authLevel}로 변경되었습니다.`);
+      } catch (error) {
+        console.error('권한 레벨 업데이트 오류:', error);
+        throw error;
+      }
+    },
+    
     selectUser(userId) {
       if (this.selectedUserId === userId) {
         // 이미 선택된 사용자 다시 클릭 → 해제 처리
@@ -303,42 +343,60 @@ export default {
       if (!this.selectedUserId)
         return alert('사용자를 먼저 선택해주세요.');
 
-      const res = await apiClient.get(`/api/userAuth/detailList`, { params: { userId: this.selectedUserId } });
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+      const insertUser = userInfo?.id || 'system';        
 
-      const existingCodes = res.data.map(auth => auth.mcode);
-      const selectedCodes = [];
-
-      this.menuGroups.forEach(group => {
-        if (group.checked) selectedCodes.push(group.groupKey);
-        selectedCodes.push(...group.selected);
-      });
-
-      if (selectedCodes.length === 0) {
-        alert('권한을 부여할 게시판을 하나 이상 선택해주세요.');
-        return;
-      }
-
-      const toInsert = selectedCodes.filter(c => !existingCodes.includes(c));
-      const toDelete = existingCodes.filter(c => !selectedCodes.includes(c));
-
+      
+      const selectedUser = this.users.find(user => user.id === this.selectedUserId);      
+      // console.log('selectedAuthLevel');
+      // console.log(this.users);
+      // console.log(selectedUser.authLevel);
+      
       try {
-        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-        const insertUser = userInfo?.id || 'system'; // 혹시 null일 경우 대비
+        // 1. 선택된 사용자의 권한 레벨 업데이트
+        const authLevelPayload = {
+          id: selectedUser.id,
+          authLevel: selectedUser.authLevel,
+          insertUser: insertUser,
+          updateUser: insertUser,          
+        };
 
+         
+        await apiClient.post('/api/userAuth/update-auth-level', authLevelPayload);
+
+        // 2. 기존 권한 조회
+        const res = await apiClient.get(`/api/userAuth/detailList`, { params: { userId: this.selectedUserId } });
+
+        const existingCodes = res.data.map(auth => auth.mcode);
+        const selectedCodes = [];
+
+        this.menuGroups.forEach(group => {
+          if (group.checked) selectedCodes.push(group.groupKey);
+          selectedCodes.push(...group.selected);
+        });
+
+        if (selectedCodes.length === 0) {
+          alert('권한을 부여할 게시판을 하나 이상 선택해주세요.');
+          return;
+        }
+
+        const toInsert = selectedCodes.filter(c => !existingCodes.includes(c));
+        const toDelete = existingCodes.filter(c => !selectedCodes.includes(c));
+                
+        // 3. 메뉴 권한 추가
         for (const menuCd of toInsert) {
-          // console.log(menuCd)
           const payload = {
             id: this.selectedUserId,
             menuCode: menuCd,
             auth: 31,
             insertUser: insertUser,
-            updateUser: insertUser
+            updateUser: insertUser,
           };
 
           await apiClient.post('/api/userAuth/save', payload);
         }
 
-        // 권한 제거 처리 (auth = 0으로 설정)
+        // 4. 메뉴 권한 제거
         for (const menuCd of toDelete) {
           const payload = {
             id: this.selectedUserId,
@@ -383,6 +441,7 @@ export default {
         rollPstnNm: selectedUser.rollPstnNm || '',
         deptNm: selectedUser.deptNm || '',
         corpNm: selectedUser.corpNm || '',
+        authLevel: 10, // 새 사용자 기본값: 일반
         isNew: true // 새로 추가된 유저 표시
       });
 
@@ -474,5 +533,26 @@ export default {
   overflow-y: auto;
   border: 1px solid #ddd;
   border-radius: 8px;
+}
+
+/* 권한 콤보박스 스타일 */
+.auth-select {
+  min-width: 120px;
+}
+
+.auth-select :deep(.v-input__control) {
+  min-height: 32px;
+  height: 32px;
+}
+
+.auth-select :deep(.v-field__input) {
+  padding-top: 0;
+  padding-bottom: 0;
+  min-height: 32px;
+  font-size: 13px;
+}
+
+.auth-select :deep(.v-field) {
+  border-radius: 4px;
 }
 </style>

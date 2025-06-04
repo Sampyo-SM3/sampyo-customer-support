@@ -62,9 +62,9 @@
     
     <insert id="insertUser">
         INSERT INTO sys_empref 
-            (COMPANY_CD, id, name, admin, pwd, phone, depart1, email, smsyn) 
+            (COMPANY_CD, id, name, admin, AUTH_LEVEL, pwd, phone, depart1, email, smsyn) 
         VALUES 
-            (#{companyCd}, #{id}, #{name}, 0, PWDENCRYPT(#{password}), #{phone}, #{deptCd}, #{email}, 1)
+            (#{companyCd}, #{id}, #{name}, 0, 10, PWDENCRYPT(#{password}), #{phone}, #{deptCd}, #{email}, 1)
         
    		INSERT INTO sys_menu_auth (ID, M_CODE, AUTH, INSERT_USER, INSERT_DT)
 		VALUES (#{id}, 'CA', '31', #{id}, GETDATE())

@@ -29,7 +29,7 @@ public class UserAuthService {
      */
     public void saveOrUpdateUserAuth(UserAuthDTO userAuthDTO) {
         int count = userAuthRepository.checkMenuAuthExists(userAuthDTO);
-        System.out.println("🧮 checkMenuAuthExists count = " + count);
+//        System.out.println("🧮 checkMenuAuthExists count = " + count);
         
         if (count > 0) {
             userAuthRepository.updateMenuAuth(userAuthDTO);
@@ -37,6 +37,12 @@ public class UserAuthService {
             userAuthRepository.insertMenuAuth(userAuthDTO);
         }
     }
+    
+    public void updateAuthLevel(UserAuthDTO userAuthDTO) {
+    	userAuthRepository.updateAuthLevel(userAuthDTO);
+    }
+    
+    
     
     public void deleteUserAuth(UserAuthDTO userAuthDTO) {    	
        userAuthRepository.deleteUserAuth(userAuthDTO);
