@@ -508,79 +508,58 @@
 	
 	
 	
-	<select id="getMonthlyTotalData" parameterType="com.example.connectBoard.dto.RequireSearchCriteria" resultType="com.example.connectBoard.dto.RequireSearchCriteria">
-	    WITH MonthRange AS (
-	        SELECT 
-	            MONTH(CONVERT(DATETIME, #{startDate})) AS start_month,
-	            MONTH(CONVERT(DATETIME, #{endDate})) AS end_month
-	    ),
-	    AllMonthsInRange AS (
-	        SELECT 1 AS month_val, '1월' AS month_name WHERE 1 BETWEEN (SELECT start_month FROM MonthRange) AND (SELECT end_month FROM MonthRange)
-	        UNION SELECT 2, '2월' WHERE 2 BETWEEN (SELECT start_month FROM MonthRange) AND (SELECT end_month FROM MonthRange)
-	        UNION SELECT 3, '3월' WHERE 3 BETWEEN (SELECT start_month FROM MonthRange) AND (SELECT end_month FROM MonthRange)
-	        UNION SELECT 4, '4월' WHERE 4 BETWEEN (SELECT start_month FROM MonthRange) AND (SELECT end_month FROM MonthRange)
-	        UNION SELECT 5, '5월' WHERE 5 BETWEEN (SELECT start_month FROM MonthRange) AND (SELECT end_month FROM MonthRange)
-	        UNION SELECT 6, '6월' WHERE 6 BETWEEN (SELECT start_month FROM MonthRange) AND (SELECT end_month FROM MonthRange)
-	        UNION SELECT 7, '7월' WHERE 7 BETWEEN (SELECT start_month FROM MonthRange) AND (SELECT end_month FROM MonthRange)
-	        UNION SELECT 8, '8월' WHERE 8 BETWEEN (SELECT start_month FROM MonthRange) AND (SELECT end_month FROM MonthRange)
-	        UNION SELECT 9, '9월' WHERE 9 BETWEEN (SELECT start_month FROM MonthRange) AND (SELECT end_month FROM MonthRange)
-	        UNION SELECT 10, '10월' WHERE 10 BETWEEN (SELECT start_month FROM MonthRange) AND (SELECT end_month FROM MonthRange)
-	        UNION SELECT 11, '11월' WHERE 11 BETWEEN (SELECT start_month FROM MonthRange) AND (SELECT end_month FROM MonthRange)
-	        UNION SELECT 12, '12월' WHERE 12 BETWEEN (SELECT start_month FROM MonthRange) AND (SELECT end_month FROM MonthRange)
-	    ),
-	    MonthlyData AS (
-	        SELECT 
-	            MONTH(requestDate) AS month_val,
-	            COUNT(*) AS total_count,
-	            SUM(CASE WHEN processState = 'C' THEN 1 ELSE 0 END) AS completed_count,
-	            SUM(CASE WHEN processState IN ('I', 'P', 'S') THEN 1 ELSE 0 END) AS progress_count,
-	            SUM(CASE WHEN processState = 'H' THEN 1 ELSE 0 END) AS hold_cancel_count
-	        FROM board b
-	        <where>
-	            1=1
-	            
-	            AND requestDate IS NOT NULL
-	            
-	            <if test="startDate != null and startDate != ''">
-	                AND b.requestDate >= #{startDate}
-	            </if>
-	            
-	            <if test="endDate != null and endDate != ''">
-	                AND b.requestDate &lt;= #{endDate}
-	            </if>
-	            
-	            <if test="manager != null and manager != ''">
-	                AND b.manager LIKE '%' + #{manager} + '%'
-	            </if>
-	            
-	            <if test="sub != null and sub != ''">
-	                AND b.sub LIKE '%' + #{sub} + '%'
-	            </if>
-	            
-	            <if test="status != null and status != ''">
-	                AND b.processState LIKE '%' + #{status} + '%'
-	            </if>
-	            
-	            <if test="dpId != null and dpId != '' and dpId != 'SPH220007'">
-	                AND b.dpId LIKE '%' + #{dpId} + '%'
-	            </if>
-	            
-	            <if test="division != null and division != ''">
-	                AND b.division LIKE '%' + #{division} + '%'
-	            </if>
-	        </where>
-	        GROUP BY MONTH(requestDate)
-	    )
-	    SELECT 
-	        am.month_val,
-	        am.month_name,
-	        ISNULL(md.total_count, 0) AS totalCount,
-	        ISNULL(md.completed_count, 0) AS completedCount,
-	        ISNULL(md.progress_count, 0) AS progressCount,
-	        ISNULL(md.hold_cancel_count, 0) AS holdCancelCount
-	    FROM AllMonthsInRange am
-	    LEFT JOIN MonthlyData md ON am.month_val = md.month_val
-	    ORDER BY am.month_val
+	<select id="getDashBoardMonthlyTotal" parameterType="com.example.connectBoard.dto.RequireSearchCriteria" resultType="map">
+		SELECT
+		    YEAR(b.requestDate) AS year_val,
+		    MONTH(b.requestDate) AS month_val,
+		    CASE MONTH(b.requestDate)
+		        WHEN 1 THEN '1월'
+		        WHEN 2 THEN '2월'
+		        WHEN 3 THEN '3월'
+		        WHEN 4 THEN '4월'
+		        WHEN 5 THEN '5월'
+		        WHEN 6 THEN '6월'
+		        WHEN 7 THEN '7월'
+		        WHEN 8 THEN '8월'
+		        WHEN 9 THEN '9월'
+		        WHEN 10 THEN '10월'
+		        WHEN 11 THEN '11월'
+		        WHEN 12 THEN '12월'
+		    END AS month_name,
+		    COUNT(*) AS total_count
+		FROM board b
+	<where>
+	    requestDate IS NOT NULL
+	    
+	    <if test="startDate != null and startDate != ''">
+		    AND b.requestDate >= #{startDate}
+	    </if>
+	    <if test="endDate != null and endDate != ''">
+	  	  AND b.requestDate &lt;= #{endDate}
+	    </if>
+	    <if test="manager != null and manager != ''">
+	   	  AND b.manager LIKE '%' + #{manager} + '%'
+	    </if>
+	    <if test="sub != null and sub != ''">
+	   	  AND b.sub LIKE '%' + #{sub} + '%'
+	    </if>
+	    <if test="status != null and status != ''">
+	  	  AND b.processState LIKE '%' + #{status} + '%'
+	    </if>
+	    
+		<if test="inStatus != null and inStatus.size() > 0">
+		  AND b.processState IN
+		  <foreach item="status" collection="inStatus" open="(" separator="," close=")">
+		    #{status}
+		  </foreach>
+		</if>
+	    
+	    <if test="division != null and division != ''">
+	  	  AND b.division LIKE '%' + #{division} + '%'
+	    </if>    	   
+	</where>
+		GROUP BY YEAR(b.requestDate), MONTH(b.requestDate)
+		ORDER BY YEAR(b.requestDate), MONTH(b.requestDate)
 	</select>
 </mapper>
 

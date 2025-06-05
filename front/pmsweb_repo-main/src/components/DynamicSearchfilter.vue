@@ -386,7 +386,7 @@ export default {
       this.localSelectedCompany = '%';
       this.localManager = '';
       this.localSubject = '';
-      this.handleSearch();
+      // this.handleSearch();
     }
   }
 }

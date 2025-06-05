@@ -6,6 +6,7 @@ import com.example.connectBoard.dto.RequireDTO;
 import com.example.connectBoard.dto.RequireSearchCriteria;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface RequireRepository {
@@ -24,7 +25,7 @@ public interface RequireRepository {
 
 	List<RequireDTO> searchRequiresByCriteriaDepartAdmin(RequireSearchCriteria criteria);
 	
-	List<RequireDTO> getDashBoardMonthlyTotal(RequireSearchCriteria criteria);
+	List<Map<String, Object>> getDashBoardMonthlyTotal(RequireSearchCriteria criteria);
 	
 	
 	

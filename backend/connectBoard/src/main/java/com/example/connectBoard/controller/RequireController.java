@@ -7,6 +7,7 @@ import com.example.connectBoard.service.RequireService;
 import ch.qos.logback.core.recovery.ResilientSyslogOutputStream;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -162,19 +163,20 @@ public class RequireController {
     
     // 월별 총 문의건수
     @GetMapping("/require/dashboard/monthly-total")
-    public ResponseEntity<?> searchDashBoardMonthlyTotal(@ModelAttribute RequireSearchCriteria criteria) {    	
-        try {        	
-            List<RequireDTO> requires = requireService.getDashBoardMonthlyTotal(criteria);
-            
+    public ResponseEntity<?> searchDashBoardMonthlyTotal(@ModelAttribute RequireSearchCriteria criteria) {
+        System.out.println("--searchDashBoardMonthlyTotal--");
+        try {
+            List<Map<String, Object>> requires = requireService.getDashBoardMonthlyTotal(criteria);
+
             if (requires.isEmpty()) {
                 return ResponseEntity.ok().body("검색 조건에 해당하는 데이터가 존재하지 않습니다.");
             }
-            
+
             return ResponseEntity.ok(requires);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("서버 오류 발생_ /require/dashboard/monthly-total\": " + e.getMessage());
         }
-    }      
+    }
      
     
 }

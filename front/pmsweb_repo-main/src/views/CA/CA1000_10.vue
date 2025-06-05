@@ -430,7 +430,7 @@ export default {
         dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
       };
 
-      console.log('최종 파라미터:', finalParams);
+      // console.log('최종 파라미터:', finalParams);
             
       this.loading = true;
 

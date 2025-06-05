@@ -1,6 +1,7 @@
 package com.example.connectBoard.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -30,20 +31,9 @@ public class RequireSearchCriteria {
     private Integer completeCount;
     private Float completeRate;
     private Float avgProcessDays;
-    
-    private Integer year_val;
-    private Integer month_val;
-    private Integer complete_count;
-    
-    
-     
-    
-        
-    
-    
-    
-    
-    
+    private Float progressCount;
+    private List<String> inStatus;
+
     // Getters and Setters
     // ...
 }

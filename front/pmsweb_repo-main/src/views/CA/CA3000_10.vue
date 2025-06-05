@@ -2,9 +2,9 @@
   <v-container fluid class="pr-0 pl-0 pt-4">
     <!-- 모든 필터 표시 -->
     <DynamicSearchFilter
-      :showManagerFilter="true"
-      :showStatusFilter="true"
-      :showTitleFilter="true"
+      :showManagerFilter="false"
+      :showStatusFilter="false"
+      :showTitleFilter="false"
       :showCompanyFilter="true"
       @search="onSearch"
     />       
@@ -225,6 +225,7 @@
 </template>
 
 <script>
+import qs from 'qs'
 import { ref, reactive, onMounted, onUnmounted, nextTick } from 'vue'
 import DynamicSearchFilter from '@/components/DynamicSearchFilter'
 import apiClient from '@/api'
@@ -391,7 +392,7 @@ export default {
           pointHoverRadius: 8
         },
         {
-          label: '보류/취소',
+          label: '보류',
           data: [7, 3, 3, 6, 7, 11, 8, 7, 8, 6, 7, 17],
           borderColor: '#D32F2F',
           backgroundColor: 'rgba(211, 47, 47, 0.1)',
@@ -550,32 +551,41 @@ export default {
       '담당자별 업무량 균등 배분',
       '고객 피드백 시스템 강화'
     ])
-
-    // 메소드들
+    
     const onSearch = async (searchParams) => {
       // 이미 로딩 중이면 무시 (중복 실행 방지)
       if (loading.value) return
       
-      console.log('--onSearch--')
-      console.log(searchParams)
-      loading.value = true
+      // console.log('--onSearch--')
+      // console.log(searchParams)
+
+      await fetchDashboardData(searchParams)
       
-      // 먼저 모든 차트 완전히 제거
-      destroyAllCharts()
+      // 로딩 완료 후 별도로 차트 업데이트 (searchParams 전달)
+      await nextTick()
+      setTimeout(() => {
+        if (!loading.value) { // 로딩이 완전히 끝난 후에만 실행
+          updateAllCharts(searchParams)
+        }
+      }, 300)
+    }
+
+    const fetchDashboardData = async (searchParams) => {
+      loading.value = true
         
       // 최종 전달될 파라미터 확인
       const finalParams = {
         ...searchParams,
-        dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
+        // dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd || null
       }
-      console.log('최종 파라미터:', finalParams)
+      // console.log('최종 파라미터:', finalParams)
             
       try {
         // 서버 측 페이징을 구현할 경우 페이지 관련 파라미터 추가        
         const response = await apiClient.get('/api/require/dashboard/card', {
           params: finalParams
         })
-        console.log(response)
+        // console.log(response)
         
         // API 응답 데이터가 있는 경우 keyMetrics 업데이트
         if (response.data && response.data.length > 0) {
@@ -588,9 +598,9 @@ export default {
           keyMetrics[3].value = stats.avgProcessDays ? `${stats.avgProcessDays}일` : '0일'
 
           // 만약 API에서 월별 트렌드 데이터도 받아온다면
-          if (stats.monthlyTrend) {
-            Object.assign(monthlyTrendData, stats.monthlyTrend)
-          }
+          // if (stats.monthlyTrend) {
+          //   Object.assign(monthlyTrendData, stats.monthlyTrend)
+          // }
         }
         
       } catch (error) {
@@ -598,14 +608,109 @@ export default {
       } finally {
         loading.value = false
       }
-      
-      // 로딩 완료 후 별도로 차트 업데이트
-      await nextTick()
-      setTimeout(() => {
-        if (!loading.value) { // 로딩이 완전히 끝난 후에만 실행
-          updateAllCharts()
+    }    
+
+    // 월별 트렌드 데이터를 가져오는 함수
+    const fetchMonthlyTrendData = async (searchParams) => {
+      loading.value = true
+        
+      try {
+        // 파라미터 설정        
+        const finalParams = {
+          ...searchParams,          
         }
-      }, 300)
+        
+        const finalParams_c = {
+          ...searchParams,
+          status: 'C'          
+        }
+        
+        const finalParams_p = {
+          ...searchParams,
+          inStatus: ['I', 'P', 'S'] 
+        }
+
+        const finalParams_h = {
+          ...searchParams,
+          status: 'H'          
+        }        
+              
+        // 세 API를 병렬로 호출
+        const [response, response2, response3, response4] = await Promise.all([          
+          apiClient.get('/api/require/dashboard/monthly-total', { params: finalParams }),
+          apiClient.get('/api/require/dashboard/monthly-total', { params: finalParams_c }),
+          apiClient.get('/api/require/dashboard/monthly-total', {
+            params: finalParams_p,
+            paramsSerializer: params => qs.stringify(params, { indices: false })
+          }),
+          apiClient.get('/api/require/dashboard/monthly-total', { params: finalParams_h }),
+        ])
+        
+        // console.log('월별 트렌드 데이터:', response)
+        // console.log('월별 트렌드 데이터_처리완료:', response2)
+        // console.log('월별 트렌드 데이터_진행중:', response3)
+        // console.log('월별 트렌드 데이터_보류류:', response4)
+
+        // 데이터 처리
+        if (response.data && response.data.length > 0) {
+          const trendData = response.data
+          
+          // 월별 라벨 생성 (month_name 사용)
+          const labels = trendData.map(item => item.month_name)
+          
+          // 총 문의건수 데이터 생성 (total_count 사용)
+          const totalRequests = trendData.map(item => item.total_count || 0)
+          
+          // 처리완료 데이터 매핑 (월별로 매칭)
+          const completedMap = new Map()
+          if (response2.data && response2.data.length > 0) {
+            response2.data.forEach(item => {
+              completedMap.set(item.month_name, item.total_count || 0)
+            })
+          }
+          
+          // 진행중 데이터 매핑 (월별로 매칭)
+          const progressMap = new Map()
+          if (response3.data && response3.data.length > 0) {
+            response3.data.forEach(item => {
+              progressMap.set(item.month_name, item.total_count || 0)
+            })
+          }
+
+          // 보류류 데이터 매핑 (월별로 매칭)
+          const pendingMap = new Map()
+          if (response4.data && response4.data.length > 0) {
+            response4.data.forEach(item => {
+              pendingMap.set(item.month_name, item.total_count || 0)
+            })
+          }          
+          
+          // 전체 데이터와 동일한 순서로 데이터 생성
+          const completeRequests = labels.map(monthName => {
+            return completedMap.get(monthName) || 0
+          })
+          
+          const progressRequests = labels.map(monthName => {
+            return progressMap.get(monthName) || 0
+          })
+
+          const pendingRequests = labels.map(monthName => {
+            return pendingMap.get(monthName) || 0
+          })          
+          
+          // monthlyTrendData 업데이트
+          monthlyTrendData.labels = labels
+          monthlyTrendData.datasets[0].data = totalRequests
+          monthlyTrendData.datasets[1].data = completeRequests
+          monthlyTrendData.datasets[2].data = progressRequests
+          monthlyTrendData.datasets[3].data = pendingRequests                                        
+        }
+        
+      } catch (error) {
+        console.error('월별 트렌드 데이터 로드 중 오류 발생:', error)
+      } finally {
+        loading.value = false
+      }
     }
 
     // 모든 차트 안전하게 제거하는 함수
@@ -630,7 +735,7 @@ export default {
     }
 
     // 모든 차트 업데이트
-    const updateAllCharts = () => {
+    const updateAllCharts = (searchParams = {}) => {
       try {
         // 먼저 모든 차트 정리
         destroyAllCharts()
@@ -642,7 +747,7 @@ export default {
         }
         
         // 순차적으로 차트 생성 (타이밍 분산)
-        setTimeout(() => initTrendChart(), 50)
+        setTimeout(() => initTrendChart(searchParams), 50)
         
       } catch (error) {
         console.error('차트 업데이트 중 오류:', error)
@@ -650,8 +755,11 @@ export default {
     }
 
     // 월별 트렌드 차트 초기화
-    const initTrendChart = () => {
+    const initTrendChart = async (searchParams = {}) => {
       try {
+        // 먼저 월별 트렌드 데이터 가져오기
+        await fetchMonthlyTrendData(searchParams)
+        
         // canvas 요소와 컨텍스트가 유효한지 확인
         if (!trendChart.value) {
           console.warn('Canvas element not found')
@@ -682,11 +790,12 @@ export default {
 
         chartInstances.trend = new Chart(ctx, {
           type: 'line',
-          data: monthlyTrendData,
+          data: monthlyTrendData, // 업데이트된 데이터 사용
           options: {
+            // ... 기존 옵션들 그대로 유지
             responsive: true,
             maintainAspectRatio: false,
-            animation: false, // 애니메이션 비활성화로 안정성 향상
+            animation: false,
             plugins: {
               legend: {
                 position: 'top',
@@ -772,6 +881,7 @@ export default {
         console.error('Chart initialization failed:', error)
       }
     }
+
 
     // 차트 데이터 업데이트 함수
     const updateTrendChart = (newData) => {
@@ -879,6 +989,7 @@ export default {
       destroyAllCharts,
       updateAllCharts,
       initTrendChart,
+      fetchMonthlyTrendData,
       updateTrendChart,
       applyFilters,
       getPerformanceColor,
