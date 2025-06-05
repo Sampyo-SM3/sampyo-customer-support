@@ -1,4 +1,4 @@
- <template>
+<template>
   <v-container fluid class="pr-0 pl-0 pt-4">
 
     <!-- <SearchFilter 
@@ -59,7 +59,7 @@
         </v-btn>
 
         <v-btn v-if="this.authLevel >= 20" variant="flat" color="red darken-2"
-          class="custom-btn white-text d-flex align-center ml-2" size="small" @click="showConfirm = true">
+          class="custom-btn white-text d-flex align-center ml-2" size="small" @click="showDeleteConfirm = true">
           <v-icon size="default" class="mr-1">mdi-delete</v-icon>
           삭제
         </v-btn>
@@ -197,6 +197,42 @@
     </v-row>
   </v-container>
 
+  <!-- 삭제 확인 다이얼로그 -->
+  <v-dialog v-model="showDeleteConfirm" max-width="400">
+    <v-card>
+      <v-card-title class="text-h6 text-center py-4">
+        <v-icon color="warning" size="large" class="mr-2">mdi-alert-circle</v-icon>
+        삭제 확인
+      </v-card-title>
+      
+      <v-card-text class="text-center pb-4">
+        선택한 항목을 정말로 삭제하시겠습니까?<br>
+        <!-- <span class="text-red text-body-2">삭제된 데이터는 복구할 수 없습니다.</span> -->
+      </v-card-text>
+      
+      <v-card-actions class="justify-center pb-4">
+        <v-btn 
+          variant="outlined" 
+          color="grey" 
+          @click="showDeleteConfirm = false"
+          :disabled="deleteLoading"
+          class="mr-2"
+        >
+          취소
+        </v-btn>
+        <v-btn 
+          variant="flat" 
+          color="red darken-2" 
+          @click="confirmDelete"
+          :loading="deleteLoading"
+          class="white-text"
+        >
+          삭제
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
   <!-- 스낵바로 오류 메시지 표시 -->
   <v-snackbar v-model="showError" color="warning" timeout="5000" location="center" elevation="8" variant="elevated">
     {{ errorMessages[0] }}
@@ -277,6 +313,9 @@ export default {
       savedSubMenu: '',
       countStatus: [],
       inquiryType: '',
+      // 삭제 관련 변수 추가
+      showDeleteConfirm: false,
+      deleteLoading: false,
     }
   },
 
@@ -299,8 +338,6 @@ export default {
     }
   },
 
-
-
   mounted() {
     this.onSearch();
     this.checkLocalStorage();
@@ -314,6 +351,58 @@ export default {
 
       this.savedMidMenu = midMenuFromStorage ? JSON.parse(midMenuFromStorage) : null;
       this.savedSubMenu = subMenuFromStorage ? JSON.parse(subMenuFromStorage) : null;
+    },
+
+    // 삭제 확인 함수
+    async confirmDelete() {
+      this.deleteLoading = true;
+      
+      try {
+        // 선택된 항목들의 seq 값을 수집
+        const selectedItems = this.tableData.filter(item => item.selected);
+        
+        if (selectedItems.length === 0) {
+          this.errorMessages = ['삭제할 항목을 선택해주세요.'];
+          this.showError = true;
+          return;
+        }
+
+        // 각 선택된 항목에 대해 삭제 API 호출
+        for (const item of selectedItems) {
+          await this.deleteBoard(item.seq);
+        }
+
+        // 삭제 성공 메시지
+        this.successMessage = `${selectedItems.length}개 항목이 삭제되었습니다.`;
+        this.showSuccess = true;
+        
+        // 페이지 새로고침
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+
+      } catch (error) {
+        console.error("삭제 오류:", error);
+        this.errorMessages = [error.message || "삭제 중 오류가 발생했습니다."];
+        this.showError = true;
+      } finally {
+        this.deleteLoading = false;
+        this.showDeleteConfirm = false;
+      }
+    },
+
+    // 삭제 API 호출 함수
+    async deleteBoard(seq) {
+      try {
+        const payload = {
+          "seq": seq,
+          "deleteYn": 'Y'
+        };
+        await apiClient.post("/api/require/updateForm", payload);
+      } catch (error) {
+        console.error("글 삭제 오류:", error);
+        throw new Error(error.message || "오류가 발생했습니다-delete board.");
+      }
     },
 
     // 유효성검사 다시 수정해야함

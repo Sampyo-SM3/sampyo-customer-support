@@ -57,6 +57,7 @@ public class RequireDTO {
 	private String inquiryTypeNm;
 	private String inquiryPartNm;
 	private String priorityNm;
+	private String deleteYn;
 
     private Integer yearVal;
     private Integer monthVal;

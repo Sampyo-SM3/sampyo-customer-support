@@ -27,9 +27,11 @@ public class CodeDTO {
     private String managerDp;
     private String startDate;
     private String endDate;
-    
+    private String deleteYn;
+        
     
    
     
     
 }
+

@@ -34,7 +34,7 @@
 		  inner join code_master c on b.processState = c.codeId		
 		  left outer join SPG.DBO.CRM_USER_MASTER d on b.writerId = d.USR_ID					
 	<where>
-	    1=1
+	    b.deleteYn = 'N'
 	    
 	    <if test="manager != null and manager != ''">
 	        AND b.manager LIKE '%' + #{manager} + '%'
@@ -403,6 +403,9 @@
 	        <if test="priority != null and priority != ''">
 	            priority = #{priority},
 	        </if>
+	        <if test="deleteYn != null and deleteYn != ''">
+	            deleteYn = #{deleteYn},
+	        </if>	        
 	        saveFlag = 'Y',
 	        updateDt = GETDATE()
 	    </set>
@@ -467,7 +470,7 @@
 		FROM board b
 	  	  				 
 	<where>
-	    1=1
+	    b.deleteYn = 'N'
 	    
 	    <if test="manager != null and manager != ''">
 	        AND b.manager LIKE '%' + #{manager} + '%'
@@ -529,7 +532,7 @@
 		    COUNT(*) AS total_count
 		FROM board b
 	<where>
-	    requestDate IS NOT NULL
+	    b.deleteYn = 'N'
 	    
 	    <if test="startDate != null and startDate != ''">
 		    AND b.requestDate >= #{startDate}

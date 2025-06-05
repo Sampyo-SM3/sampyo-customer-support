@@ -25,6 +25,7 @@ public class RequireSearchCriteria {
     private String dpId;
     private String writerDp;
     private String division;
+    private String deleteYn;
     
     // 통계용
     private Integer totalCount;
