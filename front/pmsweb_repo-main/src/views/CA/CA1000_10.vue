@@ -533,13 +533,21 @@ export default {
         // API 응답 데이터 처리
         if (response.data && Array.isArray(response.data)) {
 
-
           this.tableData = response.data.map(item => {
             const requestDateTime = new Date(item.requestDateTime);
+            const latestCommentUpdate = item.latestCommentUpdate ? new Date(item.latestCommentUpdate) : null;
             const now = new Date();
-            const diffTime = now - requestDateTime;
-            const diffHours = diffTime / (1000 * 60 * 60);
-
+            
+            // requestDateTime 24시간 이내 체크
+            const diffTimeRequest = now - requestDateTime;
+            const diffHoursRequest = diffTimeRequest / (1000 * 60 * 60);
+            
+            // latestCommentUpdate 24시간 이내 체크 (null이 아닌 경우에만)
+            let diffHoursComment = null;
+            if (latestCommentUpdate) {
+              const diffTimeComment = now - latestCommentUpdate;
+              diffHoursComment = diffTimeComment / (1000 * 60 * 60);
+            }
 
             return {
               ...item,
@@ -555,9 +563,8 @@ export default {
                   ) + ')' || this.getRandomStatus())
                 : (item.statusNm || this.getRandomStatus()),
 
-
-              // 24시간 이내 여부에 따라 new_yn 설정
-              new_yn: diffHours < 24 ? 'Y' : 'N',
+              // 24시간 이내 여부에 따라 new_yn 설정 (requestDateTime OR latestCommentUpdate) AND 종결상태가 아닌 경우
+              new_yn: ((diffHoursRequest < 24 || (diffHoursComment !== null && diffHoursComment < 24)) && item.processState !== 'C') ? 'Y' : 'N',
 
               // 테이블에 표시할 데이터 매핑
               manager: item.manager || '-',  // 담당자 필드가 없어서 임시로 요청자 ID 사용
@@ -571,14 +578,11 @@ export default {
           this.tableData = [];
         }
 
-
-
       } catch (error) {
         console.error('데이터 로드 중 오류 발생:', error);
       } finally {
         this.loading = false;
       }
-
     },
 
     onSearch(searchParams) {

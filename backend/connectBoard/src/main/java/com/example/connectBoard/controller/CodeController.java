@@ -34,8 +34,7 @@ public class CodeController {
     //문의유형별 count
     @PostMapping("/code/count")
 //    public List<CodeDTO> getCodeCount(@RequestParam String startDate, @RequestParam String endDate, @RequestParam String writerId, @RequestParam String dpId) {
-    public List<CodeDTO> getCodeCount(@RequestBody CodeDTO code) {
-    
+    public List<CodeDTO> getCodeCount(@RequestBody CodeDTO code) {    	
         return codeService.getCodeCount(code);
     } 
        

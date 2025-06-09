@@ -58,6 +58,8 @@ public class RequireDTO {
 	private String inquiryPartNm;
 	private String priorityNm;
 	private String deleteYn;
+	private LocalDateTime latestCommentUpdate;
+	
 
     private Integer yearVal;
     private Integer monthVal;

@@ -5,7 +5,7 @@
 <mapper namespace="com.example.connectBoard.repository.blueaccount.BlueLoginRepository">
 
    
-    <!-- 사용자 ID와 회사코드로 사용자 정보 조회 조희재테스트-->
+    <!-- 사용자 ID와 회사코드로 사용자 정보 조회 -->
     <select id="findBlueAccountById" resultType="com.example.connectBoard.dto.EmployeePreferenceDto">
     
         SELECT 

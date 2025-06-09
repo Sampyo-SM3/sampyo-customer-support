@@ -8,11 +8,13 @@
     <select id="findByPostIdOrderByCreatedAtAsc" parameterType="Long" resultType="com.example.connectBoard.dto.CommentDTO">   	
 		SELECT 
 		   c.*,
+		   s.name AS authorName,
 		   CASE 
 		       WHEN c.depth = 0 THEN c.commentId
 		       ELSE c.parentId 
 		   END as groupId
 		FROM Comments c
+		LEFT JOIN sys_empref s ON c.userId = s.id
 		WHERE c.postId = #{postId}
 		   AND c.deleteYn = 'N'
 		ORDER BY groupId, c.depth, c.createdAt;

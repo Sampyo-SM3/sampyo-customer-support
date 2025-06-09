@@ -505,27 +505,38 @@ export default {
       }
     },
     async addComment() {
-
       if (!this.newComment.content) {
         alert("댓글을 입력해주세요.");
         return;
       }
 
-      // 부모 댓글인지 확인 후 parentId 설정
-      var newParentId = this.replyTo ? this.replyTo.commentId : null;
-
-      // 백엔드로 보낼 데이터 객체
-      const commentData = {
-        postId: this.receivedSeq, // 게시글 ID
-        userId: this.userId || "", // 유저 ID
-        content: this.newComment.content, // 댓글 내용
-        parentId: newParentId, // 부모 댓글 ID (없으면 NULL)
-        depth: this.replyTo ? Number(this.replyTo.depth) + 1 : 0, // 대댓글이면 +1, 최상위 댓글이면 0
-        createdAt: new Date().toISOString(),
-        deleteYn: "N"
-      };
-
       try {
+        // 게시글 상태 확인
+        const postDetailResponse = await apiClient.get("/api/require/detail", {
+          params: { seq: this.receivedSeq }
+        });
+
+        // 게시글이 종결(C) 상태인 경우 댓글 등록 불가
+        if (postDetailResponse.data.processState === 'C') {
+          alert("종결된 게시글에는 댓글을 등록할 수 없습니다.");
+          return;
+        }
+
+        // 게시글이 종결 상태가 아닌 경우에만 댓글 등록 진행
+        // 부모 댓글인지 확인 후 parentId 설정
+        var newParentId = this.replyTo ? this.replyTo.commentId : null;
+
+        // 백엔드로 보낼 데이터 객체
+        const commentData = {
+          postId: this.receivedSeq, // 게시글 ID
+          userId: this.userId || "", // 유저 ID
+          content: this.newComment.content, // 댓글 내용
+          parentId: newParentId, // 부모 댓글 ID (없으면 NULL)
+          depth: this.replyTo ? Number(this.replyTo.depth) + 1 : 0, // 대댓글이면 +1, 최상위 댓글이면 0
+          createdAt: new Date().toISOString(),
+          deleteYn: "N"
+        };
+
         // API 요청: 댓글 DB에 저장
         await apiClient.post("/api/insertComment", commentData);
 
@@ -533,11 +544,12 @@ export default {
         this.newComment.content = "";
         this.replyTo = null;
 
-        // 댓글 목록 새로고침
+        // 댓글 목록 새로고름
         this.fetchComments();
 
       } catch (error) {
-        console.error("댓글 등록 실패");
+        console.error("댓글 등록 실패:", error);
+        alert("오류가 발생하였습니다. 관리자에게 문의해주세요.");
         this.fetchComments();
       }
     },
@@ -549,6 +561,12 @@ export default {
         const response = await apiClient.get(`/api/comments?postId=${this.receivedSeq}`);
         // /api/comments?postId=1
         this.comments = response.data;
+        
+        console.log('!!!!');        
+        console.log(response.data);
+        // console.log(this.comments);
+        console.log('!!!!');
+        
       } catch (error) {
         console.error('댓글 조회 실패:', error);
         this.comments = []; // ✅ 오류 발생 시 빈 배열 설정

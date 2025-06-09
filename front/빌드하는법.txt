@@ -7,3 +7,7 @@ pom.xml ->  <packaging>war</packaging>
 
 [INFO] Building war: C:\Sampyo\web\sampyo-customer-support\backend\connectBoard\target\connectBoard-0.0.1-SNAPSHOT.war
 이런식으로 war파일 생김
+
+
+---------------------------
+npm run build

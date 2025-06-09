@@ -6,7 +6,7 @@
       </div>
       <div class="comment-content">
         <div class="comment-header">
-          <span class="comment-user">{{ comment.userId }}</span>
+          <span class="comment-user">{{ comment.authorName }}</span>
           <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
         </div>
 
@@ -137,7 +137,7 @@ export default {
       this.userName = JSON.parse(localStorage.getItem("userInfo"))?.name || null;
     },
     toggleReplyInput(cmt) {
-      this.replyParent = cmt;
+      this.replyParent = cmt;      
       this.showReplyInput = !this.showReplyInput;  // 클릭할 때마다 입력창 표시/숨김
 
       // 토글 시 최신 사용자 정보 다시 가져오기
@@ -243,29 +243,41 @@ export default {
         return;
       }
 
-      obj.content = this.editedContent;
-
-      const commentData = {
-        commentId: obj.commentId,  // 게시글 ID
-        userId: this.userName,  // 유저 ID 변경
-        content: obj.content  // 댓글 내용
-      };
-
       try {
-        await apiClient.post("api/updateComment", commentData);
-      } catch (error) {
-        alert("오류가 발생하였습니다. 관리자에게 문의해주세요.");
+        // 게시글 상태 확인
+        const postDetailResponse = await apiClient.get("/api/require/detail", {
+          params: { seq: obj.postId }
+        });
 
+        // 게시글이 종결(C) 상태인 경우 수정 불가
+        if (postDetailResponse.data.processState === 'C') {
+          alert("종결된 게시글의 댓글은 수정할 수 없습니다.");
+          return;
+        }
+
+        // 게시글이 종결 상태가 아닌 경우에만 댓글 수정 진행
+        obj.content = this.editedContent;
+
+        const commentData = {
+          commentId: obj.commentId,  // 게시글 ID
+          userId: this.userName,  // 유저 ID 변경
+          content: obj.content  // 댓글 내용
+        };
+
+        await apiClient.post("api/updateComment", commentData);
+        
+      } catch (error) {
+        console.error("댓글 수정 중 오류:", error);
+        alert("오류가 발생하였습니다. 관리자에게 문의해주세요.");
       } finally {
         // ✅ 입력 필드 초기화 & 대댓글 입력창 닫기
         this.$emit("refresh");
         this.replyContent = "";
         this.showReplyInput = false;
         this.replyParent = null;
+        this.isEditing = false;
       }
-
-      this.isEditing = false;
-    },
+    }
   }
 };
 </script>

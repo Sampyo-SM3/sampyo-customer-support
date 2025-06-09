@@ -45,6 +45,7 @@ public class CommentController {
     @GetMapping("/comments/{postId}")
     public ResponseEntity<?> getCommentsByPostIdWithPath(@PathVariable("postId") Long postId) {	        
         try {
+//        	System.out.println("11111");
             List<CommentDTO> comments = commentService.getCommentsByPostId(postId);
             if (comments.isEmpty()) {
                 return ResponseEntity.ok().body("해당 게시글에 댓글이 존재하지 않습니다.");
