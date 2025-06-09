@@ -47,7 +47,7 @@
 
             <v-list class="more-actions-list">
               <v-list-item @click="onEdit" title="수정" class="more-actions-item" />
-              <v-list-item @click="deleteComment(comment.commentId)" title="삭제" class="more-actions-item" />
+              <!-- <v-list-item @click="deleteComment(comment.commentId)" title="삭제" class="more-actions-item" /> -->
             </v-list>
           </v-menu>
         </div>
@@ -69,7 +69,7 @@
             <v-btn variant="flat" color="#666" class="white--text submit-reply-btn" @click="cancelReply">
               취소
             </v-btn>
-            <v-btn variant="flat" color="#3A70B1" class="white--text submit-reply-btn" @click="submitReply">
+            <v-btn variant="flat" color="#3A70B1" class="white--text submit-reply-btn" @click="submitReply(comment)">
               등록
             </v-btn>
           </div>
@@ -153,7 +153,18 @@ export default {
       // 토글 시 최신 사용자 정보 다시 가져오기
       this.getUserInfoFromLocalStorage();
     },
-    async submitReply() {
+    async submitReply(obj) {
+      // 게시글 상태 확인
+      const postDetailResponse = await apiClient.get("/api/require/detail", {
+        params: { seq: obj.postId }
+      });
+
+      // 게시글이 종결(C) 상태인 경우 수정 불가
+      if (postDetailResponse.data.processState === 'C') {
+        alert("종결된 게시글의 댓글은 수정할 수 없습니다.");
+        return;
+      }
+            
       if (!this.replyContent.trim()) {
         alert("댓글을 입력해주세요.");
         return;

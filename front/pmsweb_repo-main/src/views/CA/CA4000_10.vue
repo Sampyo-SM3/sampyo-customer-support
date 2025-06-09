@@ -1,479 +1,633 @@
 <template>
-  <v-container fluid class="pr-0 pl-0 pt-4">
-    <v-row dense align="center" class="flex-wrap rounded-border sky-bg" style="gap:5px;">
-
-      <!-- 요청기간 -->
-      <v-col cols="12" sm="6" md="auto" class="d-flex align-center filter-col">
-        <span class="filter-label">요청기간<span class="label-divider"></span></span>
+  <div class="gantt-chart-container">
+    <div class="chart-header">
+      <h2>공정 진행 현황 (D3.js)</h2>
+      <div class="chart-info">Ø5.5mm-87mL</div>
+      <div class="usage-info">
+        • 마우스 오버: 상세 정보 | • 클릭: 작업 선택 | • 체크박스: 행 선택
+      </div>
+    </div>
+    
+    <!-- 메인 차트 영역 - 그리드와 SVG 조합 -->
+    <div class="chart-main">
+      <!-- 왼쪽 정보 그리드 -->
+      <div class="info-grid">
+        <!-- 헤더 -->
+        <div class="info-header">
+          <div class="info-cell header">선택</div>
+          <div class="info-cell header">기간</div>
+          <div class="info-cell header">일수</div>
+          <div class="info-cell header">길이</div>
+        </div>
         
-        <!-- 시작일 입력 필드 -->
-        <div class="start-date-wrapper">
-          <VueDatePicker 
-            class="date-picker" 
-            :month-picker="false" 
-            preview-format="yyyy-MM-dd" 
-            v-model="localStartDate"
-            :teleport="true" 
-            position="bottom" 
-            :enable-time-picker="false" 
-            auto-apply 
-            locale="ko" 
-            format="yyyy-MM-dd"
-            :week-start="1" 
-            @update:model-value="onStartDateChange" 
-            v-model:open="startDatePickerOpen"
-            :clearable="false" 
-            :text-input="false" 
-          />
-        </div>
-        <span class="date-separator">~</span>
-
-        <!-- 종료일 입력 필드 -->
-        <div class="end-date-wrapper">
-          <VueDatePicker 
-            class="date-picker" 
-            :month-picker="false" 
-            preview-format="yyyy-MM-dd" 
-            v-model="localEndDate"
-            :teleport="true" 
-            position="bottom" 
-            :enable-time-picker="false" 
-            auto-apply 
-            locale="ko" 
-            format="yyyy-MM-dd"
-            :week-start="1" 
-            @update:model-value="onEndDateChange" 
-            v-model:open="endDatePickerOpen" 
-            :clearable="false"
-            :text-input="false" 
-          />
-        </div>
-
-        <!-- 날짜 버튼 -->
-        <div class="date-buttons mr-2">
-          <div class="date-btn-container">
-            <v-btn 
-              value="today" 
-              class="date-btn" 
-              :class="{ 'active-date-btn': dateRange === 'today' }"
-              @click="setDateRange('today')"
-            >
-              오늘
-            </v-btn>
-            <v-btn 
-              value="week" 
-              class="date-btn" 
-              :class="{ 'active-date-btn': dateRange === 'week' }"
-              @click="setDateRange('week')"
-            >
-              1주일
-            </v-btn>
-            <v-btn 
-              value="15days" 
-              class="date-btn" 
-              :class="{ 'active-date-btn': dateRange === '15days' }"
-              @click="setDateRange('15days')"
-            >
-              15일
-            </v-btn>
-            <v-btn 
-              value="month" 
-              class="date-btn" 
-              :class="{ 'active-date-btn': dateRange === 'month' }"
-              @click="setDateRange('month')"
-            >
-              1개월
-            </v-btn>
-            <v-btn 
-              value="3months" 
-              class="date-btn" 
-              :class="{ 'active-date-btn': dateRange === '3months' }"
-              @click="setDateRange('3months')"
-            >
-              3개월
-            </v-btn>
+        <!-- 데이터 행들 -->
+        <div 
+          v-for="item in chartData" 
+          :key="item.id" 
+          class="info-row"
+          :class="{ selected: selectedItems.includes(item.id) }"
+        >
+          <div class="info-cell checkbox-cell">
+            <input 
+              type="checkbox" 
+              :checked="selectedItems.includes(item.id)"
+              @change="handleRowSelect(item.id)"
+              class="row-checkbox"
+            />
+          </div>
+          <div class="info-cell name-cell">
+            {{ item.name }}
+          </div>
+          <div class="info-cell duration-cell">
+            {{ item.duration }}일
+          </div>
+          <div class="info-cell length-cell">
+            {{ item.length }}
           </div>
         </div>
-      </v-col>
+      </div>
+      
+      <!-- 오른쪽 차트 영역 -->
+      <div ref="containerRef" class="chart-container">
+        <svg ref="svgRef"></svg>
+      </div>
+    </div>
 
-      <!-- 접수상태 -->
-      <v-col cols="12" sm="6" md="auto" class="d-flex align-center filter-col">
-        <span class="filter-label">접수상태<span class="label-divider"></span></span>
-        <v-select 
-          v-model="localSelectedStatus" 
-          :items="statusOptions" 
-          item-title="text" 
-          item-value="value"
-          variant="outlined" 
-          density="compact" 
-          hide-details 
-          class="filter-input" 
-        />
-      </v-col>
+    <!-- 범례 -->
+    <div class="legend">
+      <h3>범례</h3>
+      <div class="legend-items">
+        <div class="legend-item">
+          <div class="legend-color out"></div>
+          <span>OUT / L.T.Z</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color coating"></div>
+          <span>COATING</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color utz"></div>
+          <span>U.T.Z</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color safety"></div>
+          <span>SAFETY</span>
+        </div>
+      </div>
+    </div>
 
-      <!-- 담당자 -->
-      <v-col cols="12" sm="6" md="auto" class="d-flex align-center filter-col">
-        <span class="filter-label">담당자<span class="label-divider"></span></span>
-        <v-text-field 
-          v-model="localManager" 
-          @keydown.enter="handleSearch()" 
-          variant="outlined" 
-          density="compact" 
-          hide-details
-          class="filter-input" 
-        />
-      </v-col>
-
-      <!-- 제목 -->
-      <v-col cols="12" sm="6" md="auto" class="d-flex align-center filter-col">
-        <span class="filter-label">제목<span class="label-divider"></span></span>
-        <v-text-field 
-          v-model="localSubject" 
-          @keydown.enter="handleSearch()" 
-          variant="outlined" 
-          density="compact" 
-          hide-details
-          class="filter-input-sub" 
-        />
-      </v-col>
-
-      <!-- 검색 버튼 -->
-      <v-col cols="12" sm="6" md="auto" class="d-flex justify-end">
-        <v-btn 
-          variant="flat" 
-          color="primary" 
-          class="custom-btn" 
-          size="small" 
-          @click="handleSearch()"
-        >
-          <v-icon size="default" class="mr-1">mdi-magnify</v-icon>
-          조회
-        </v-btn>
-      </v-col>
-
-    </v-row>
-  </v-container>
+    <!-- 선택된 항목 표시 -->
+    <div v-if="selectedItems.length > 0" class="selected-info">
+      <h3>선택된 항목</h3>
+      <div>선택된 행: {{ selectedItems.join(', ') }}</div>
+    </div>
+  </div>
 </template>
 
-<script>
-import VueDatePicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css';
+<script setup>
+import { ref, onMounted, watch, nextTick } from 'vue'
+import * as d3 from 'd3'
 
-export default {
-  name: 'SearchFilter',
-  components: {
-    VueDatePicker
+// Props 정의
+const props = defineProps({
+  chartData: {
+    type: Array,
+    default: () => [
+      {
+        id: 1,
+        name: '25-01-22 ~ 25-03-09',
+        duration: 129,
+        length: '32.4m (162R)',
+        tasks: [
+          { name: 'OUT', start: 0, duration: 1.5, color: '#87CEEB', value: '' },
+          { name: 'L.T.Z', start: 5, duration: 4, color: '#87CEEB', value: '' },
+          { name: 'COATING', start: 9, duration: 20, color: '#FFD700', value: '' },
+          { name: 'U.T.Z', start: 52, duration: 5, color: '#FFA500', value: '8.1' },          
+        ]
+      },
+      {
+        id: 2,
+        name: '24-09-14 ~ 24-09-15',
+        duration: 8,
+        length: '0.4m (2R)',
+        tasks: [
+          { name: 'OUT', start: 31, duration: 1, color: '#87CEEB', value: '0.4' }
+        ]
+      },
+    ]
   },
-  props: {
-    // 부모 컴포넌트에서 받을 props
-    statusOptions: {
-      type: Array,
-      default: () => []
-    },
-    // 초기값들
-    initialStartDate: {
-      type: Date,
-      default: () => new Date()
-    },
-    initialEndDate: {
-      type: Date,
-      default: () => new Date()
-    },
-    initialStatus: {
-      type: String,
-      default: '%'
-    },
-    initialManager: {
-      type: String,
-      default: ''
-    },
-    initialSubject: {
-      type: String,
-      default: ''
-    }
-  },
-  emits: ['search'],
-  data() {
-    return {
-      startDatePickerOpen: false,
-      endDatePickerOpen: false,
-      localStartDate: new Date(),
-      localEndDate: new Date(),
-      localSelectedStatus: '%',
-      localManager: '',
-      localSubject: '',
-      dateRange: 'month'
-    }
-  },
-  mounted() {
-    // props로 받은 초기값 설정
-    this.localStartDate = this.initialStartDate;
-    this.localEndDate = this.initialEndDate;
-    this.localSelectedStatus = this.initialStatus;
-    this.localManager = this.initialManager;
-    this.localSubject = this.initialSubject;
-    
-    // 기본 날짜 범위 설정
-    this.setDateRange('month');
-  },
-  methods: {
-    onStartDateChange(date) {
-      this.localStartDate = date;
-      this.startDatePickerOpen = false;
-    },
-
-    onEndDateChange(date) {
-      this.localEndDate = date;
-      this.endDatePickerOpen = false;
-    },
-
-    // 날짜 범위 설정 함수
-    setDateRange(range) {
-      this.dateRange = range;
-      const today = new Date();
-      let start = new Date(today);
-
-      switch (range) {
-        case 'today':
-          // 오늘 날짜로 시작일과 종료일 모두 설정
-          break;
-        case 'week':
-          // 1주일 전
-          start.setDate(today.getDate() - 7);
-          break;
-        case '15days':
-          // 15일 전
-          start.setDate(today.getDate() - 15);
-          break;
-        case 'month':
-          // 1개월 전
-          start.setMonth(today.getMonth() - 1);
-          break;
-        case '3months':
-          // 3개월 전
-          start.setMonth(today.getMonth() - 3);
-          break;
-      }
-
-      this.localStartDate = start;
-      this.localEndDate = today;
-    },
-
-    // 날짜 포맷팅 함수
-    formattedDate(dateObj) {
-      const year = dateObj.getFullYear();
-      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-      const day = String(dateObj.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    },
-
-    // 검색 이벤트 발생
-    handleSearch() {
-      const searchParams = {
-        startDate: this.formattedDate(this.localStartDate) + ' 00:00:00',
-        endDate: this.formattedDate(this.localEndDate) + ' 23:59:59',
-        status: this.localSelectedStatus,
-        manager: this.localManager,
-        subject: this.localSubject
-      };
-
-      // 부모 컴포넌트에 검색 파라미터 전달
-      this.$emit('search', searchParams);
-    },
-
-    // 검색 조건 초기화
-    resetFilters() {
-      this.setDateRange('month');
-      this.localSelectedStatus = '%';
-      this.localManager = '';
-      this.localSubject = '';
-    }
+  config: {
+    type: Object,
+    default: () => ({
+      margin: { top: 60, right: 30, bottom: 30, left: 50 },
+      rowHeight: 50,
+      barHeight: 30,
+      maxDuration: 87,
+      phases: [
+        { name: 'OUT', color: '#87CEEB', range: [0, 3] },
+        { name: 'L.T.Z', color: '#87CEEB', range: [3, 9] },
+        { name: 'COATING ZONE', color: '#90EE90', range: [9, 25] },
+        { name: 'U.T.Z', color: '#FFA07A', range: [25, 40] },
+        { name: 'SAFETY ZONE', color: '#90EE90', range: [40, 60] },
+        { name: 'CALCINING ZONE', color: '#40GE90', range: [60, 87] }
+      ]
+    })
   }
+})
+
+// Emits 정의
+const emit = defineEmits(['task-clicked', 'row-selected', 'chart-updated'])
+
+// Reactive 상태
+const svgRef = ref(null)
+const containerRef = ref(null)
+const selectedItems = ref([])
+const hoveredTask = ref(null)
+
+// 헤더 그리기 함수
+const drawHeader = (svg, xScale) => {
+  const headerGroup = svg.append('g')
+    .attr('transform', `translate(${props.config.margin.left}, 10)`)
+
+  // 단계별 헤더
+  props.config.phases.forEach(phase => {
+    const startX = xScale(phase.range[0])
+    const endX = xScale(phase.range[1])
+    
+    headerGroup.append('rect')
+      .attr('x', startX)
+      .attr('y', 0)
+      .attr('width', endX - startX)
+      .attr('height', 25)
+      .attr('fill', phase.color)
+      .attr('stroke', '#fff')
+      .attr('stroke-width', 1)
+
+    headerGroup.append('text')
+      .attr('x', startX + (endX - startX) / 2)
+      .attr('y', 17)
+      .attr('text-anchor', 'middle')
+      .attr('fill', 'white')
+      .attr('font-size', '12px')
+      .attr('font-weight', 'bold')
+      .text(phase.name)
+  })
+
+  // 시간축
+  const timeAxis = d3.axisTop(xScale)
+    .tickValues(d3.range(0, props.config.maxDuration + 1, 5))
+    .tickSize(-props.chartData.length * props.config.rowHeight)
+
+  headerGroup.append('g')
+    .attr('transform', 'translate(0, 40)')
+    .call(timeAxis)
+    .selectAll('text')
+    .attr('font-size', '10px')
 }
+
+// 격자선 그리기 함수
+const drawGridlines = (g, xScale) => {
+  const gridlines = g.append('g')
+    .attr('class', 'gridlines')
+
+  const tickValues = d3.range(0, props.config.maxDuration + 1, 5)
+  
+  gridlines.selectAll('.grid-line')
+    .data(tickValues)
+    .enter()
+    .append('line')
+    .attr('class', 'grid-line')
+    .attr('x1', d => xScale(d))
+    .attr('x2', d => xScale(d))
+    .attr('y1', 0)
+    .attr('y2', props.chartData.length * props.config.rowHeight)
+    .attr('stroke', '#e5e7eb')
+    .attr('stroke-width', 1)
+    .attr('stroke-dasharray', '2,2')
+}
+
+// 데이터 행 그리기 함수  
+const drawDataRows = (g, xScale, yScale, width) => {
+  const rows = g.selectAll('.row')
+    .data(props.chartData)
+    .enter()
+    .append('g')
+    .attr('class', 'row')
+    .attr('transform', d => `translate(0, ${yScale(d.id)})`)
+
+  // 행 배경
+  rows.append('rect')
+    .attr('x', 0)
+    .attr('y', 0)
+    .attr('width', width)
+    .attr('height', yScale.bandwidth())
+    .attr('fill', '#f9f9f9')
+    .attr('stroke', '#eee')
+
+  // 작업 바
+  const bars = rows.selectAll('.task-bar')
+    .data(d => d.tasks.map(task => ({...task, parentId: d.id})))
+    .enter()
+    .append('g')
+    .attr('class', 'task-bar')
+
+  bars.append('rect')
+    .attr('x', d => xScale(d.start))
+    .attr('y', (yScale.bandwidth() - props.config.barHeight) / 2)
+    .attr('width', d => xScale(d.duration))
+    .attr('height', props.config.barHeight)
+    .attr('fill', d => d.color)
+    .attr('stroke', '#fff')
+    .attr('stroke-width', 1)
+    .attr('rx', 3)
+    .style('cursor', 'pointer')
+    .style('opacity', 0.8)
+    .on('mouseover', handleTaskHover)
+    .on('mouseout', handleTaskLeave)
+    .on('click', handleTaskClick)
+
+  // 바 안의 텍스트
+  bars.append('text')
+    .attr('x', d => xScale(d.start) + xScale(d.duration) / 2)
+    .attr('y', yScale.bandwidth() / 2 + 4)
+    .attr('text-anchor', 'middle')
+    .attr('fill', 'white')
+    .attr('font-size', '10px')
+    .attr('font-weight', 'bold')
+    .text(d => d.duration > 3 ? d.value : '')
+
+  // 시작점과 끝점 표시 (빨간색 텍스트)
+  bars.append('text')
+    .attr('x', d => xScale(d.start))
+    .attr('y', yScale.bandwidth() / 2 + 25)
+    .attr('text-anchor', 'middle')
+    .attr('fill', 'red')
+    .attr('font-size', '10px')
+    .attr('font-weight', 'bold')
+    .text(d => d.start)
+
+  bars.append('text')
+    .attr('x', d => xScale(d.start + d.duration))
+    .attr('y', yScale.bandwidth() / 2 + 25)
+    .attr('text-anchor', 'middle')
+    .attr('fill', 'red')
+    .attr('font-size', '10px')
+    .attr('font-weight', 'bold')
+    .text(d => d.start + d.duration)
+}
+
+// 이벤트 핸들러들
+const handleTaskHover = (event, d) => {
+  hoveredTask.value = d
+  d3.select(event.target)
+    .style('opacity', 1)
+    .attr('stroke-width', 2)
+  
+  showTooltip(event, d)
+}
+
+const handleTaskLeave = (event) => {
+  hoveredTask.value = null
+  d3.select(event.target)
+    .style('opacity', 0.8)
+    .attr('stroke-width', 1)
+  
+  hideTooltip()
+}
+
+const handleTaskClick = (event, d) => {
+  emit('task-clicked', d)
+}
+
+const handleRowSelect = (rowId) => {
+  const index = selectedItems.value.indexOf(rowId)
+  if (index > -1) {
+    selectedItems.value.splice(index, 1)
+  } else {
+    selectedItems.value.push(rowId)
+  }
+  emit('row-selected', selectedItems.value)
+}
+
+// 툴팁 함수들
+const showTooltip = (event, d) => {
+  const tooltip = d3.select('body').append('div')
+    .attr('class', 'gantt-tooltip')
+    .style('position', 'absolute')
+    .style('background', 'rgba(0,0,0,0.8)')
+    .style('color', 'white')
+    .style('padding', '8px')
+    .style('border-radius', '4px')
+    .style('font-size', '12px')
+    .style('pointer-events', 'none')
+    .style('z-index', '1000')
+    .style('opacity', 0)
+
+  tooltip.html(`
+    <strong>${d.name}</strong><br/>
+    시작: ${d.start}<br/>
+    기간: ${d.duration}<br/>
+    값: ${d.value}
+  `)
+    .style('left', (event.pageX + 10) + 'px')
+    .style('top', (event.pageY - 10) + 'px')
+    .transition()
+    .duration(200)
+    .style('opacity', 1)
+}
+
+const hideTooltip = () => {
+  d3.selectAll('.gantt-tooltip').remove()
+}
+
+// D3 차트 그리기 함수 (SVG 부분만)
+const drawChart = () => {
+  if (!svgRef.value || !containerRef.value) return
+
+  // 이전 차트 클리어
+  d3.select(svgRef.value).selectAll("*").remove()
+
+  const containerWidth = containerRef.value.offsetWidth
+  const width = containerWidth - props.config.margin.left - props.config.margin.right
+  const height = props.chartData.length * props.config.rowHeight + props.config.margin.top + props.config.margin.bottom
+
+  // SVG 설정
+  const svg = d3.select(svgRef.value)
+    .attr('width', containerWidth)
+    .attr('height', height)
+
+  // 메인 그룹
+  const g = svg.append('g')
+    .attr('transform', `translate(${props.config.margin.left}, ${props.config.margin.top})`)
+
+  // 스케일 설정
+  const xScale = d3.scaleLinear()
+    .domain([0, props.config.maxDuration])
+    .range([0, width])
+
+  const yScale = d3.scaleBand()
+    .domain(props.chartData.map(d => d.id))
+    .range([0, props.chartData.length * props.config.rowHeight])
+    .padding(0.1)
+
+  // 헤더 그리기
+  drawHeader(svg, xScale)
+  
+  // 격자선 그리기
+  drawGridlines(g, xScale)
+  
+  // 데이터 행 그리기 (바 차트 부분만)
+  drawDataRows(g, xScale, yScale, width)
+}
+
+// 차트 업데이트 함수
+const updateChart = () => {
+  nextTick(() => {
+    drawChart()
+    emit('chart-updated')
+  })
+}
+
+// 리사이즈 핸들러
+const handleResize = () => {
+  updateChart()
+}
+
+// 라이프사이클 훅
+onMounted(() => {
+  drawChart()
+  window.addEventListener('resize', handleResize)
+})
+
+// 데이터 변경 감지
+watch(() => props.chartData, updateChart, { deep: true })
+watch(() => props.config, updateChart, { deep: true })
+
+// 외부에서 사용할 수 있는 메서드들
+const exportChart = () => {
+  const svgElement = svgRef.value
+  const serializer = new XMLSerializer()
+  const svgString = serializer.serializeToString(svgElement)
+  return svgString
+}
+
+const selectAllRows = () => {
+  selectedItems.value = props.chartData.map(d => d.id)
+}
+
+const clearSelection = () => {
+  selectedItems.value = []
+}
+
+// 외부에서 접근 가능한 메서드들 expose
+defineExpose({
+  updateChart,
+  exportChart,
+  selectAllRows,
+  clearSelection,
+  selectedItems,
+  handleRowSelect
+})
 </script>
 
 <style scoped>
+.gantt-chart-container {
+  width: 100%;
+  font-family: 'Arial', sans-serif;
+}
 
-
-:deep(.dp__main) {
-  font-family: inherit;
+.chart-header {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
   border-radius: 8px;
-  z-index: 100;
 }
 
-:deep(.dp__theme_light) {
-  --dp-primary-color: #2196F3;
-  --dp-border-radius: 8px;
+.chart-header h2 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #333;
 }
 
-:deep(.dp__overlay_cell_active) {
-  background-color: var(--dp-primary-color);
-  color: white;
+.chart-info {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 0.5rem;
 }
 
-.custom-btn {
-  font-size: 14px;
-  height: 40px;
-  border-radius: 10px;
+.usage-info {
+  font-size: 0.75rem;
+  color: #888;
 }
 
-.date-separator {
-  margin-left: -15px;
-  z-index: 100;
-  font-size: 16px;
-  color: #7A7A7A;
+/* 메인 차트 영역 - 그리드 레이아웃 */
+.chart-main {
+  display: flex;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
 }
 
-/* VueDatePicker 관련 추가 스타일 */
-.date-picker {
-  width: auto;
-  min-width: 0;
-  padding: 0;
+/* 왼쪽 정보 그리드 */
+.info-grid {
+  min-width: 350px;
+  border-right: 2px solid #ddd;
+  background: #fafafa;
 }
 
-:deep(.dp__input) {
-  border: none;
-  box-shadow: none;
-  color: #7a7a7a;
+.info-header {
+  display: grid;
+  grid-template-columns: 60px 1fr 80px 120px;
+  background: #e9ecef;
+  border-bottom: 2px solid #ddd;
+  font-weight: bold;
 }
 
-.start-date-wrapper {
-  margin-left: -0px;
-  position: relative;
+.info-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 80px 120px;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s;
+  height: 50px; /* 차트의 rowHeight와 동일하게 */
+}
+
+.info-row:hover {
+  background-color: #f1f3f4;
+}
+
+.info-row.selected {
+  background-color: #e3f2fd;
+  border-left: 4px solid #2196f3;
+}
+
+.info-cell {
+  padding: 8px 12px;
   display: flex;
   align-items: center;
-  width: 150px;
-  color: #737577;
+  font-size: 11px;
+  border-right: 1px solid #e5e7eb;
 }
 
-.end-date-wrapper {
-  margin-left: 10px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 150px;
-  color: #737577;
+.info-cell.header {
+  background: #e9ecef;
+  font-weight: bold;
+  font-size: 12px;
+  text-align: center;
+  justify-content: center;
 }
 
-.date-buttons {
-  margin-left: 5px;
+.checkbox-cell {
+  justify-content: center;
 }
 
-.date-btn-container {
-  display: flex;
-}
-
-.date-btn {
-  min-width: 48px;
-  padding: 0 12px;
-  height: 32px;
-  letter-spacing: -0.5px;
-  border: 1px solid #eaeaea;
-  border-radius: 0;
-  background-color: #ffffff;
-  color: #7A7A7A;
-  box-shadow: none;
-  margin: 0;
-}
-
-.date-btn:not(:first-child) {
-  border-left: none;
-}
-
-.date-btn:hover {
-  background-color: #f9f9f9;
-}
-
-.date-btn.active {
-  background-color: #e8f4fd;
-  color: #2196F3;
-}
-
-.active-date-btn {
-  background-color: #e8f4fd !important;
-  color: #2196F3 !important;
-  border-color: #2196F3 !important;
-  font-weight: 500;
-  border-left: 1px solid #2196F3 !important;
-}
-
-.filter-label {
-  font-size: 14.5px;
-  min-width: 45px;
-  font-weight: 500;
-  color: #005bac;
-  margin-left: 10px;
-  margin-right: 0px;
-}
-
-.filter-label::after {
-  content: "";
+.row-checkbox {
+  width: 16px;
   height: 16px;
-  width: 1px;
-  background: #ddd;
-  margin-top: 13px;
-  margin-left: 11px;
+  cursor: pointer;
 }
 
-.filter-input {
-  width: 120px;
-  margin-right: 6px;
-  color: #5271C1;
+.name-cell {
+  font-weight: 500;
+  color: #333;
 }
 
-.filter-input-sub {
-  width: 220px;
-  margin-right: 6px;
-  color: #5271C1;
+.duration-cell {
+  justify-content: center;
+  color: #666;
 }
 
-.v-text-field.filter-input :deep(.v-input__control) {
-  min-height: 36px;
-  padding-top: 0;
-  padding-bottom: 0;
-  align-items: center;
+.length-cell {
+  color: #666;
+  font-size: 10px;
 }
 
-.v-select.filter-input :deep(.v-input__control) {
-  min-height: 36px;
-  padding-top: 0;
-  padding-bottom: 0;
-  align-items: center;
+/* 오른쪽 차트 영역 */
+.chart-container {
+  flex: 1;
+  overflow-x: auto;
+  background: white;
 }
 
-.v-btn.date-btn {
-  margin-top: 2px;
-  padding: 0 8px;
-  font-size: 13px;
-}
-
-.filter-col {
-  height: 50px;
-  border: 1.5px solid #D0DFF1;
+.legend {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
   border-radius: 8px;
-  background-color: white;
 }
 
-.rounded-border {
+.legend h3 {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.legend-items {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  padding: 12px;
-  border: 1px solid #D0DFF1;
-  border-radius: 8px;
-  background-color: rgba(208, 223, 241, 0.5);
-  height: auto;
+  gap: 1rem;
 }
 
-.label-divider {
-  display: inline-block;
-  height: 18px;
-  background-color: #bbb;
-  margin-left: 10px;
-  margin-bottom: 2px;
-  border-radius: 1px;
-  vertical-align: middle;
-  width: 2px;
-  background-color: #B0CAE6;
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.legend-color {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 2px;
+}
+
+.legend-color.out {
+  background-color: #87CEEB;
+}
+
+.legend-color.coating {
+  background-color: #FFD700;
+}
+
+.legend-color.utz {
+  background-color: #FFA500;
+}
+
+.legend-color.safety {
+  background-color: #191970;
+}
+
+.selected-info {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #eff6ff;
+  border-radius: 8px;
+  border-left: 4px solid #3b82f6;
+}
+
+.selected-info h3 {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #1e40af;
+}
+
+.selected-info div {
+  font-size: 0.875rem;
+  color: #1e40af;
+}
+
+/* D3 관련 스타일 */
+:deep(.tick line) {
+  stroke: #ddd;
+  stroke-dasharray: 2,2;
+}
+
+:deep(.tick text) {
+  fill: #666;
+}
+
+:deep(.domain) {
+  stroke: #333;
 }
 </style>

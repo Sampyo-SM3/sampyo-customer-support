@@ -74,6 +74,27 @@
 		
 		INSERT INTO sys_menu_auth (ID, M_CODE, AUTH, INSERT_USER, INSERT_DT)
 		VALUES (#{id}, 'CA1000_10', '31', #{id}, GETDATE())
+
+		INSERT INTO sys_menu_auth (ID, M_CODE, AUTH, INSERT_USER, INSERT_DT)
+		VALUES (#{id}, 'CA1000_20', '31', #{id}, GETDATE())
+
+		INSERT INTO sys_menu_auth (ID, M_CODE, AUTH, INSERT_USER, INSERT_DT)
+		VALUES (#{id}, 'CA1000_30', '31', #{id}, GETDATE())
+
+		INSERT INTO sys_menu_auth (ID, M_CODE, AUTH, INSERT_USER, INSERT_DT)
+		VALUES (#{id}, 'CA20', '31', #{id}, GETDATE())
+
+		INSERT INTO sys_menu_auth (ID, M_CODE, AUTH, INSERT_USER, INSERT_DT)
+		VALUES (#{id}, 'CA2000_10', '31', #{id}, GETDATE())
+
+		INSERT INTO sys_menu_auth (ID, M_CODE, AUTH, INSERT_USER, INSERT_DT)
+		VALUES (#{id}, 'CA2000_20', '31', #{id}, GETDATE())
+
+		INSERT INTO sys_menu_auth (ID, M_CODE, AUTH, INSERT_USER, INSERT_DT)
+		VALUES (#{id}, 'CA30', '31', #{id}, GETDATE())
+
+		INSERT INTO sys_menu_auth (ID, M_CODE, AUTH, INSERT_USER, INSERT_DT)
+		VALUES (#{id}, 'CA3000_10', '31', #{id}, GETDATE())
     </insert>
     
     <select id="chkExistUserId" parameterType="String" resultType="boolean">

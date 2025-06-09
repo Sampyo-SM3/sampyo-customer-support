@@ -400,6 +400,7 @@ const userName = ref(null)
 const userId = ref(null)
 const userDeptCd = ref(null)
 const aryInquiryRes = ref([])
+const aryInquiryResTbl = ref([])
 const aryInquiryResCount = ref([])
 
 // 차트 업데이트 상태 관리 (사용하지 않는 변수들 제거)
@@ -543,44 +544,52 @@ const handleViewChange = async (paraType) => {
     selectedView.value = 'dept'
   }
   
-  await fetchData(paraType)
+  await fetchData(paraType, '')
 }
 
-const fetchData = async (paraType) => {
+const fetchData = async (paraType, para_inquery) => {
+  console.log('para_inquery -> ', para_inquery);
   // 이미 로딩 중이면 무시
   if (loading.value) return
-  
+    
   loading.value = true
 
   try {
     let response = ''
-    
+
+    // 최종 전달될 파라미터 확인
+    const finalParams = {
+      startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
+      endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
+      writerId: userId.value,
+    };
+            
     if (paraType === 'A') {
       response = await apiClient.get('/api/require/search-user', {
-        params: {
-          startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
-          endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
-          writerId: userId.value,
-        }
+        params: finalParams
       })
-    } else if (paraType === 'B') {    
-      // console.log(JSON.parse(localStorage.getItem("userInfo"))?.deptCd);
+    } else if (paraType === 'B') {          
       response = await apiClient.get('/api/require/search-depart', {
-        params: {
-          startDate: formattedDate(dateStartDate.value) + ' 00:00:00',
-          endDate: formattedDate(dateEndDate.value) + ' 23:59:59',
-          writerId: userId.value,
-          // dpId: JSON.parse(localStorage.getItem("userInfo"))?.deptCd,
-        }
+        params: finalParams
       })
     }
 
     if (response.data && Array.isArray(response.data)) {
       tableData.value = response.data.map(item => {
-        const requestDateTime = new Date(item.requestDateTime)
-        const now = new Date()
-        const diffTime = now - requestDateTime
-        const diffHours = diffTime / (1000 * 60 * 60)
+        const requestDateTime = new Date(item.requestDateTime);
+        const latestCommentUpdate = item.latestCommentUpdate ? new Date(item.latestCommentUpdate) : null;
+        const now = new Date();
+        
+        // requestDateTime 24시간 이내 체크
+        const diffTimeRequest = now - requestDateTime;
+        const diffHoursRequest = diffTimeRequest / (1000 * 60 * 60);
+        
+        // latestCommentUpdate 24시간 이내 체크 (null이 아닌 경우에만)
+        let diffHoursComment = null;
+        if (latestCommentUpdate) {
+          const diffTimeComment = now - latestCommentUpdate;
+          diffHoursComment = diffTimeComment / (1000 * 60 * 60);
+        }           
 
         return {
           ...item,
@@ -594,7 +603,7 @@ const fetchData = async (paraType) => {
                   : '상신 전'
               ) + ')' || getRandomStatus())
             : (item.statusNm || getRandomStatus()),
-          new_yn: diffHours < 24 ? 'Y' : 'N',
+          new_yn: ((diffHoursRequest < 24 || (diffHoursComment !== null && diffHoursComment < 24)) && item.processState !== 'C') ? 'Y' : 'N',
           manager: item.manager || '-',
           memo: item.currentIssue || '-',
         }
@@ -621,8 +630,9 @@ const fetchData = async (paraType) => {
         
 
 
-    aryInquiryRes.value = response2.data.map(item => item.codeName)
+    aryInquiryRes.value = response2.data.map(item => item.codeName)    
     aryInquiryResCount.value = response2.data.map(item => item.cnt)
+    aryInquiryResTbl.value = response2.data;
 
   } catch (error) {
     console.error('데이터 로드 중 오류 발생:', error)
@@ -688,6 +698,30 @@ const updateAllCharts = () => {
   }
 }
 
+// 문의유형별 코드 매핑 (실제 데이터에 맞게 수정 필요)
+// const inquiryTypeCodeMapping = {
+//   '단순문의': 'SIMPLE_INQUIRY',
+//   '프로그램 개선': 'PROGRAM_IMPROVEMENT',
+//   '기술문의': 'TECH_INQUIRY',
+//   '불편사항': 'COMPLAINT',
+//   '기타': 'OTHER'
+// }
+// aryInquiryRes.value
+
+
+// 문의유형 클릭 처리 함수
+const handleInquiryTypeClick = async (value) => {
+  // value는 codeName이므로, aryInquiryResTbl에서 해당하는 code 찾기
+  const foundItem = aryInquiryResTbl.value.find(item => item.codeName === value)    
+  const codeId = foundItem ? foundItem.codeId : null      
+  console.log(codeId);
+
+  await fetchData('A', codeId);
+
+  
+  
+}
+
 const updateInquiryTypeChart = () => {
   try {
     const canvas = inquiryTypeChartCanvas.value
@@ -718,13 +752,16 @@ const updateInquiryTypeChart = () => {
         labels: aryInquiryRes.value,
         datasets: [{
           data: aryInquiryResCount.value,
-          backgroundColor: ['#FF9F40', '#4BC0C0', '#9966FF', '#FF6384', '#36A2EB']
+          backgroundColor: ['#FF9F40', '#4BC0C0', '#9966FF', '#FF6384', '#36A2EB'],
+          hoverBackgroundColor: ['#FF8C1A', '#33B5B5', '#8A4FFF', '#FF4D6D', '#1E88E5'], // 호버 시 색상 변경
+          borderWidth: 2,
+          borderColor: '#fff'
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        animation: false, // 애니메이션 비활성화로 안정성 향상
+        animation: false,
         plugins: {
           legend: {
             position: 'top',
@@ -735,6 +772,25 @@ const updateInquiryTypeChart = () => {
               label: ctx => `${ctx.label}: ${ctx.parsed}건`
             }
           }
+        },
+        // 클릭 이벤트 추가
+        onClick: (event, elements) => {
+          if (elements.length > 0) {
+            const elementIndex = elements[0].index
+            const clickedLabel = aryInquiryRes.value[elementIndex]
+            const clickedValue = aryInquiryResCount.value[elementIndex]
+            // const codeValue = inquiryTypeCodeMapping[clickedLabel] || clickedLabel
+            
+            console.log('클릭된 문의유형:', clickedLabel)
+            // console.log('코드값:', codeValue)
+            console.log('건수:', clickedValue)
+            
+            handleInquiryTypeClick(clickedLabel)
+          }
+        },
+        // 마우스 커서 스타일 변경
+        onHover: (event, elements) => {
+          event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default'
         }
       }
     })
@@ -900,7 +956,7 @@ const getMonthlyData = () => {
 
 const handleSearch = async () => {
   const viewType = selectedView.value === 'my' ? 'A' : 'B'
-  await fetchData(viewType)
+  await fetchData(viewType, '')
 }
 
 // Lifecycle
@@ -908,7 +964,7 @@ onMounted(async () => {
   setDateRange('month')
   getUserInfo()
   await getStatus()
-  await fetchData('A')
+  await fetchData('A', '')
 })
 
 onBeforeUnmount(() => {

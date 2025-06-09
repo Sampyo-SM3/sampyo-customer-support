@@ -132,7 +132,7 @@ export default {
     this.getAuthUser();
     this.fetchMenuGroups();
   },
-  methods: {
+  methods: {  
     async getAuthUser() {
       const res = await apiClient.get('/api/userAuth/list');
       this.users = res.data.map(item => ({
@@ -355,7 +355,7 @@ export default {
 
         // console.log(authLevelPayload);
 
-         
+        
         await apiClient.post('/api/userAuth/update-auth-level', authLevelPayload);
 
         // 2. 기존 권한 조회
@@ -401,6 +401,12 @@ export default {
           };
 
           await apiClient.post('/api/userAuth/save', payload);
+        }
+
+        // 5. 저장 완료 후 isNew 상태 초기화
+        const userIndex = this.users.findIndex(user => user.id === this.selectedUserId);
+        if (userIndex !== -1) {
+          this.users[userIndex].isNew = false;
         }
 
         this.fetchUserAuth(this.selectedUserId);

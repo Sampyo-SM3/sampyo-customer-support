@@ -286,11 +286,13 @@ export default {
   },
   data() {
     return {
+      authLevel: JSON.parse(localStorage.getItem("userInfo"))?.authLevel,
       userInfo: null,       //사용자 ID
-
       step: 1,
       selectedStatus: '', // 추가된 상태 변수
+      resStatus: '', // 초기 상태 저장용
       oldStatus: '', // 추가된 상태 변수
+      isInitialized: false, // 초기화 완료 여부 확인용
       inquiry: {
         sub: "",
         context: "",
@@ -401,6 +403,14 @@ export default {
         }
 
         const processState = response.data?.processState || "P"; // 기본값 설정
+
+        // 한번만 실행: 페이지 로드 시 초기 상태를 resStatus에 저장
+        if (!this.isInitialized) {
+          this.resStatus = processState;
+          this.oldStatus = processState;
+          this.isInitialized = true;
+          console.log('초기 상태 저장:', this.getStatusName(this.resStatus));
+        }
 
         // ✅ 상태 매핑 체크 후 기본값 설정
         this.step = this.statusMapping?.[processState] ?? 1;
@@ -527,7 +537,7 @@ export default {
     },
     // 추가된 메서드
     async saveStatus() {
-      //   c 종결
+      // C 종결
       // H 보류중
       // I 접수
       // P 미처리
@@ -544,11 +554,46 @@ export default {
           return;
         }
 
-        // 이전 상태가 P(미처리)가 아니고, 선택된 상태가 P(미처리)인 경우 변경 불가
+        // 상태 변경 조건 검증
+        // 0. 상태가 변경되지 않은 경우
+        if (this.selectedStatus === this.resStatus) {
+          alert("상태가 변경되지 않았습니다.");
+          return;
+        }
+
+        // 1. 미처리(P)에서 다른 상태로 넘어간 후에는 미처리(P)로 돌아갈 수 없음
         if (this.oldStatus !== 'P' && this.selectedStatus === 'P') {
           alert("처리가 시작된 이후에는 미처리 상태로 돌아갈 수 없습니다.");
-          // 선택된 상태를 이전 상태로 되돌림
+          this.tempStatus = this.selectedStatus;         
           this.selectedStatus = this.oldStatus;
+          this.oldStatus = this.selectedStatus
+          return;
+        }
+
+        // 2. 접수(I)에서는 보류중(H)으로만 돌아갈 수 있음 (미처리 제외)
+        if (this.oldStatus === 'I' && (this.selectedStatus === 'P')) {
+          alert("접수 상태에서는 미처리로 돌아갈 수 없습니다.");
+          this.tempStatus = this.selectedStatus;         
+          this.selectedStatus = this.oldStatus;
+          this.oldStatus = this.selectedStatus
+          return;
+        }
+
+        // 3. SR(S) 상태에서는 이전 단계로 돌아갈 수 없음
+        if (this.oldStatus === 'S' && (this.selectedStatus === 'P' || this.selectedStatus === 'I' || this.selectedStatus === 'H')) {
+          alert("SR 상태에서는 이전 단계로 돌아갈 수 없습니다.");
+          this.tempStatus = this.selectedStatus;         
+          this.selectedStatus = this.oldStatus;
+          this.oldStatus = this.selectedStatus
+          return;
+        }
+
+        // 4. 종결(C) 상태에서는 모든 이전 단계로 돌아갈 수 없음
+        if (this.oldStatus === 'C' && (this.selectedStatus === 'P' || this.selectedStatus === 'I' || this.selectedStatus === 'H' || this.selectedStatus === 'S')) {
+          alert("종결 상태에서는 이전 단계로 돌아갈 수 없습니다.");
+          this.tempStatus = this.selectedStatus;         
+          this.selectedStatus = this.oldStatus;
+          this.oldStatus = this.selectedStatus
           return;
         }
 
@@ -559,6 +604,10 @@ export default {
         // API 요청: 댓글 DB에 저장
         await apiClient.post("/api/updateStatus", statusData);
         alert("접수상태가 저장되었습니다.");
+
+        // 저장 성공 후 resStatus 업데이트
+        this.resStatus = this.selectedStatus;
+
         // 상태변경
         await this.kakaoStore.sendAlimtalk_Status(this.receivedSeq, this.getStatusName(this.oldStatus), this.getStatusName(this.selectedStatus), phone);
         // 상세정보 새로고침
@@ -566,6 +615,7 @@ export default {
         //this.management.PROGRESS = this.selectedStatus;
       } catch (error) {
         console.error("상태 저장 실패");
+        this.selectedStatus = this.oldStatus;
         this.fetchRequireDetail();
       }
     },
@@ -741,11 +791,19 @@ export default {
   },
   watch: {
     receivedSeq: {
-      immediate: true  // 컴포넌트 생성 시점에도 즉시 실행
+      handler(newVal) {
+        if (newVal && !this.isInitialized) {
+          // receivedSeq가 변경되면 초기화 상태 리셋
+          this.isInitialized = false;
+        }
+      },
+      immediate: true
     },
     selectedStatus(newVal, oldVal) {
-      // console.log(`📌 상태 변경: ${oldVal} → ${newVal}`);
-      this.oldStatus = oldVal;
+      console.log(`📌 상태 변경: ${this.getStatusName(oldVal)} → ${this.getStatusName(newVal)}`);
+      if (oldVal && this.isInitialized) { // 초기화 완료 후에만 oldStatus 업데이트
+        this.oldStatus = oldVal;
+      }
     }
   }
 };

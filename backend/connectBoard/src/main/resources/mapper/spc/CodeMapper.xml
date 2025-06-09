@@ -28,6 +28,7 @@
 	<!--문의유형별 count-->
 	<select id="getCodeCountUser" parameterType="com.example.connectBoard.dto.CodeDTO" resultType="com.example.connectBoard.dto.CodeDTO">
 	    SELECT
+	    	c.codeId,
 	        c.codeName,
 	        b.inquiryType,
 	        
@@ -49,7 +50,7 @@
 			AND b.managerId = #{managerId}
 		</if>		
 			
-		GROUP BY b.inquiryType, c.codeName
+		GROUP BY b.inquiryType, c.codeId, c.codeName
 		ORDER BY cnt DESC;
 	</select>
 
@@ -57,6 +58,7 @@
 	<!--문의유형별 count-->
 	<select id="getCodeCountDepart" parameterType="com.example.connectBoard.dto.CodeDTO" resultType="com.example.connectBoard.dto.CodeDTO">
 	    SELECT
+	    	c.codeId,
 	        c.codeName,
 	        b.inquiryType,
 	        
@@ -83,7 +85,7 @@
 			)
 		</if>		
 			
-		GROUP BY b.inquiryType, c.codeName
+		GROUP BY b.inquiryType, c.codeId, c.codeName
 		ORDER BY cnt DESC;
 	</select>	
     

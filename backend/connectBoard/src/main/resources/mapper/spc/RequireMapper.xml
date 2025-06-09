@@ -100,7 +100,8 @@
 		    (SELECT codeName FROM CODE_MASTER WHERE codeId = b.inquiryType) as inquiryType,
 		    b.inquiryPart,
 		    b.priority,
-		    (SELECT COUNT(*) FROM COMMENTS WHERE postid = b.seq) as countComment
+		    (SELECT COUNT(*) FROM COMMENTS WHERE postid = b.seq and deleteYn = 'N') as countComment,
+		    (SELECT MAX(updatedAt) FROM COMMENTS WHERE postid = b.seq and deleteYn = 'N') as latestCommentUpdate   	
 		FROM board b 
 			left join code_master c on b.processState = c.codeId
 			left outer join SPG.DBO.CRM_USER_MASTER d on b.writerId = d.USR_ID					
@@ -154,7 +155,8 @@
 		    (SELECT codeName FROM CODE_MASTER WHERE codeId = b.inquiryType) as inquiryType,
 		    b.inquiryPart,
 		    b.priority,
-		    (SELECT COUNT(*) FROM COMMENTS WHERE postid = b.seq) as countComment
+		    (SELECT COUNT(*) FROM COMMENTS WHERE postid = b.seq and deleteYn = 'N') as countComment,
+		    (SELECT MAX(updatedAt) FROM COMMENTS WHERE postid = b.seq and deleteYn = 'N') as latestCommentUpdate   	
 		FROM board b 
 			INNER JOIN sys_empref e ON b.writerId = e.id
 			left join code_master c on b.processState = c.codeId
@@ -207,7 +209,8 @@
 		    (SELECT codeName FROM CODE_MASTER WHERE codeId = b.inquiryType) as inquiryType,
 		    b.inquiryPart,
 		    b.priority,
-		    (SELECT COUNT(*) FROM COMMENTS WHERE postid = b.seq) as countComment
+		    (SELECT COUNT(*) FROM COMMENTS WHERE postid = b.seq and deleteYn = 'N') as countComment,
+		    (SELECT MAX(updatedAt) FROM COMMENTS WHERE postid = b.seq and deleteYn = 'N') as latestCommentUpdate   	
 		FROM board b 
 			INNER JOIN sys_empref e ON b.writerId = e.id
 			left join code_master c on b.processState = c.codeId

@@ -35,7 +35,12 @@
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" md="4">
+
+      <v-col cols="12" md="4" class="text-center">
+        개발 중
+      </v-col> 
+
+      <!-- <v-col cols="12" md="4">
         <v-card class="elevation-3 mb-4">
           <v-card-title>
             <v-icon left color="success">mdi-chart-donut</v-icon>
@@ -65,11 +70,11 @@
             </div>
           </v-card-text>
         </v-card>
-      </v-col>
+      </v-col> -->
     </v-row>
 
     <!-- 상태별 분석 -->
-    <v-row class="mb-6">
+    <!-- <v-row class="mb-6">
       <v-col cols="12" md="6">
         <v-card class="elevation-3">
           <v-card-title>
@@ -92,10 +97,10 @@
           </v-card-text>
         </v-card>
       </v-col>
-    </v-row>
+    </v-row> -->
 
     <!-- 처리시간 분석 -->
-    <v-row class="mb-6">
+    <!-- <v-row class="mb-6">
       <v-col cols="12">
         <v-card class="elevation-3">
           <v-card-title>
@@ -135,10 +140,10 @@
           </v-card-text>
         </v-card>
       </v-col>
-    </v-row>
+    </v-row> -->
 
     <!-- 법인별 상세 현황 -->
-    <v-row class="mb-6">
+    <!-- <v-row class="mb-6">
       <v-col cols="12">
         <v-card class="elevation-3">
           <v-card-title>
@@ -202,10 +207,10 @@
           </v-card-text>
         </v-card>
       </v-col>
-    </v-row>      
+    </v-row>       -->
 
     <!-- 액션 버튼 -->
-    <v-row>
+    <!-- <v-row>
       <v-col cols="12" class="text-center">
         <v-btn color="primary" large class="mx-2" @click="exportFullReport">
           <v-icon left>mdi-file-excel</v-icon>
@@ -220,7 +225,11 @@
           알림 설정
         </v-btn>
       </v-col>
-    </v-row>
+
+      
+    </v-row> -->
+
+    
   </v-container>
 </template>
 
