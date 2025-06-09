@@ -29,7 +29,7 @@
 		    (SELECT codeName FROM CODE_MASTER WHERE codeId = b.inquiryType) as inquiryType,
 		    b.inquiryPart,
 		    b.priority,
-		    (SELECT COUNT(*) FROM COMMENTS WHERE postid = b.seq) as countComment,
+		    (SELECT COUNT(*) FROM COMMENTS WHERE postid = b.seq and deleteYn = 'N') as countComment,
 		    (SELECT MAX(updatedAt) FROM COMMENTS WHERE postid = b.seq and deleteYn = 'N') as latestCommentUpdate   	
 		FROM board b 		  
 		  inner join code_master c on b.processState = c.codeId		

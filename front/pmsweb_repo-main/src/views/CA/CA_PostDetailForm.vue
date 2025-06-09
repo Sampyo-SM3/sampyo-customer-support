@@ -562,10 +562,10 @@ export default {
         // /api/comments?postId=1
         this.comments = response.data;
         
-        console.log('!!!!');        
-        console.log(response.data);
+        // console.log('!!!!');        
+        // console.log(response.data);
         // console.log(this.comments);
-        console.log('!!!!');
+        // console.log('!!!!');
         
       } catch (error) {
         console.error('댓글 조회 실패:', error);

@@ -6,8 +6,15 @@
       </div>
       <div class="comment-content">
         <div class="comment-header">
-          <span class="comment-user">{{ comment.authorName }}</span>
-          <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
+          <span class="comment-user" @click="test(comment)">{{ comment.authorName }}</span>
+          <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>          
+          
+          <img 
+            v-if="comment.updatedAt && (new Date() - new Date(comment.updatedAt)) / (1000 * 60 * 60 * 24) < 1"
+            :src="require('@/assets/new-icon.png')" 
+            alt="new"
+            class="new-icon" />
+
         </div>
 
         <!-- 수정모드가 아닐때 -->
@@ -131,6 +138,9 @@ export default {
     next();
   },
   methods: {
+    test(para) {
+      console.log(para);
+    },
     getUserInfoFromLocalStorage() {
       // 로컬 스토리지에서 사용자 정보 가져와서 userId에 설정
       this.userId = JSON.parse(localStorage.getItem("userInfo"))?.id || null;
@@ -173,18 +183,6 @@ export default {
       try {
         // API 요청: 댓글 DB에 저장
         await apiClient.post("api/insertComment", commentData);
-
-        // const apiClient = axios.create({
-        //   baseURL: process.env.VUE_APP_API_URL || 'http://10.50.10.10:29001/',
-          
-        //   timeout: 10000,
-        //   headers: {
-        //     'Content-Type': 'application/json'
-        //   }
-        // });
-
-
-
 
       } catch (error) {
         alert("오류가 발생했습니다. 관리자에게 문의해주세요.");
@@ -325,11 +323,25 @@ export default {
   margin-right: 10px;
   color: #333;
   font-size: 14px;
+  margin-right: 10px;
 }
 
 .comment-date {
   color: #888;
   font-size: 12px;
+  margin-right: 5px; /* 날짜와 아이콘 사이 간격을 줄임 */
+}
+
+.new-icon {  
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  max-width: 18px !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  vertical-align: middle;
 }
 
 .comment-text {
