@@ -42,6 +42,21 @@ public class CommentController {
        }
     }      
     
+    @GetMapping("/comments/check-child")
+    public ResponseEntity<?> getCommentsCheckChildByCommentId(@RequestParam("commentId") Long commentId) {	       
+       try {
+           List<CommentDTO> comments = commentService.checkCommentsChildByCommentId(commentId);
+
+           if (comments.isEmpty()) {
+               return ResponseEntity.ok().body("해당 게시글에 댓글이 존재하지 않습니다_2.");
+           }
+
+           return ResponseEntity.ok(comments);
+       } catch (Exception e) {
+           return ResponseEntity.status(500).body("서버 오류 발생_ /comments/check-child: " + e.getMessage());
+       }
+    }      
+    
     @GetMapping("/comments/{postId}")
     public ResponseEntity<?> getCommentsByPostIdWithPath(@PathVariable("postId") Long postId) {	        
         try {

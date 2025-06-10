@@ -20,6 +20,21 @@
 		ORDER BY groupId, c.depth, c.createdAt;
         
     </select>
+    
+    <select id="checkCommentsChildByCommentId" parameterType="Long" resultType="com.example.connectBoard.dto.CommentDTO">   	
+	
+		SELECT commentId
+		FROM comments 
+		WHERE 1=1
+		and commentId = #{commendId}
+		and EXISTS (
+		    SELECT 1 
+		    FROM comments c2 
+		    WHERE c2.parentId = comments.commentId
+		);		
+        
+    </select>    
+    
 
 	<insert id="insertComment" parameterType="com.example.connectBoard.dto.CommentDTO">
     	INSERT INTO Comments (postId, userId, content, parentId, depth, createdAt, updatedAt, deleteYn)

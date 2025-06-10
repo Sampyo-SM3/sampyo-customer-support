@@ -20,6 +20,12 @@ public class CommentService {
         return commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
     }
     
+    public List<CommentDTO> checkCommentsChildByCommentId(Long postId) {    	
+        return commentRepository.checkCommentsChildByCommentId(postId);
+    }    
+    
+    
+    
     public void insertComment(CommentDTO comment) {        
         commentRepository.insertComment(comment);
     }

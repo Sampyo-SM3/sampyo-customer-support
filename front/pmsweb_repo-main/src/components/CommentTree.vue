@@ -251,35 +251,77 @@ export default {
         alert("댓글을 입력해주세요.");
         return;
       }
-
+      
       try {
-        // 게시글 상태 확인
+        // 1. 댓글에 대댓글이 있는지 먼저 체크
+        const checkChildResponse = await apiClient.get("/api/comments/check-child", {
+          params: { commentId: obj.commentId }
+        });
+        
+        // 대댓글이 있으면 수정 불가
+        if (checkChildResponse.data && Array.isArray(checkChildResponse.data) && checkChildResponse.data.length > 0) {
+          alert("대댓글이 달린 댓글은 수정할 수 없습니다.");
+          return;
+        }
+
+        // 2. 게시글 상태 확인
         const postDetailResponse = await apiClient.get("/api/require/detail", {
           params: { seq: obj.postId }
         });
-
+        
         // 게시글이 종결(C) 상태인 경우 수정 불가
         if (postDetailResponse.data.processState === 'C') {
           alert("종결된 게시글의 댓글은 수정할 수 없습니다.");
           return;
         }
-
-        // 게시글이 종결 상태가 아닌 경우에만 댓글 수정 진행
+        
+        // 3. 모든 검증을 통과한 경우에만 댓글 수정 진행
         obj.content = this.editedContent;
-
         const commentData = {
-          commentId: obj.commentId,  // 게시글 ID
-          userId: this.userName,  // 유저 ID 변경
-          content: obj.content  // 댓글 내용
+          commentId: obj.commentId,
+          userId: this.userName,
+          content: obj.content
         };
-
         await apiClient.post("api/updateComment", commentData);
         
       } catch (error) {
         console.error("댓글 수정 중 오류:", error);
         alert("오류가 발생하였습니다. 관리자에게 문의해주세요.");
+
+        // // API 응답이 문자열인 경우 (대댓글이 없는 경우)
+        // if (error.response && typeof error.response.data === 'string' && 
+        //     error.response.data.includes('해당 게시글에 댓글이 존재하지 않습니다')) {
+        //   // 대댓글이 없는 경우이므로 게시글 상태 확인으로 진행
+        //   try {
+        //     const postDetailResponse = await apiClient.get("/api/require/detail", {
+        //       params: { seq: obj.postId }
+        //     });
+            
+        //     if (postDetailResponse.data.processState === 'C') {
+        //       alert("종결된 게시글의 댓글은 수정할 수 없습니다.");
+        //       return;
+        //     }
+            
+        //     // 댓글 수정 진행
+        //     obj.content = this.editedContent;
+        //     const commentData = {
+        //       commentId: obj.commentId,
+        //       userId: this.userName,
+        //       content: obj.content
+        //     };
+        //     await apiClient.post("api/updateComment", commentData);
+            
+        //   } catch (innerError) {
+        //     console.error("댓글 수정 중 오류:", innerError);
+        //     alert("오류가 발생하였습니다. 관리자에게 문의해주세요.");
+        //     return;
+        //   }
+        // } else {
+        //   alert("오류가 발생하였습니다. 관리자에게 문의해주세요.");
+        //   return;
+        // }
       } finally {
-        // ✅ 입력 필드 초기화 & 대댓글 입력창 닫기
+        // 입력 필드 초기화 & 대댓글 입력창 닫기
         this.$emit("refresh");
         this.replyContent = "";
         this.showReplyInput = false;
