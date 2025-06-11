@@ -563,8 +563,9 @@ export default {
                   ) + ')' || this.getRandomStatus())
                 : (item.statusNm || this.getRandomStatus()),
 
-              // 24시간 이내 여부에 따라 new_yn 설정 (requestDateTime OR latestCommentUpdate) AND 종결상태가 아닌 경우
-              new_yn: ((diffHoursRequest < 24 || (diffHoursComment !== null && diffHoursComment < 24)) && item.processState !== 'C') ? 'Y' : 'N',
+              // 24시간 이내 여부에 따라 new_yn 설정 (requestDateTime OR latestCommentUpdate)
+              // 종결 상태여도 당일 작성된 글이면 'Y'로 처리
+              new_yn: (diffHoursRequest < 24 || (diffHoursComment !== null && diffHoursComment < 24)) ? 'Y' : 'N',
 
               // 테이블에 표시할 데이터 매핑
               manager: item.manager || '-',  // 담당자 필드가 없어서 임시로 요청자 ID 사용

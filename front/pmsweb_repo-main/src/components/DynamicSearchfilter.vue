@@ -197,7 +197,11 @@ export default {
     initialExpanded: {
       type: Boolean,
       default: true
-    }
+    },
+    propsDateRange: {
+      type: String,
+      default: 'month'
+    },      
   },
   emits: ['search'],
   data() {
@@ -253,7 +257,8 @@ export default {
     }
   },
   mounted() {    
-    this.setDateRange('month');
+    console.log('this.propsDateRange->', this.propsDateRange);
+    this.setDateRange(this.propsDateRange);
     this.getStatus();
     this.getCompany();
     this.handleSearch();

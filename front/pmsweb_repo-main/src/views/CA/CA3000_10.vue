@@ -6,6 +6,7 @@
       :showStatusFilter="false"
       :showTitleFilter="false"
       :showCompanyFilter="true"
+      :propsDateRange="'3months'"
       @search="onSearch"
     />       
 
