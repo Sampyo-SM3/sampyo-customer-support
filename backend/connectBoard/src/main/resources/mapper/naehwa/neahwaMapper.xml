@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.connectBoard.repository.naehwa.NaeHwaRepository">
+
+    <select id="selectNaehwaChartData"
+            parameterType="com.example.connectBoard.dto.NaeHwaDTO"
+            resultType="com.example.connectBoard.dto.NaeHwaDTO">
+
+        SELECT
+            A.REPORT_NO AS reportNo,
+            A.REPAIR_FR_DT AS repairFrDt,
+            A.REPAIR_TO_DT AS repairToDt,
+            (DATEDIFF(DD, REPAIR_FR_DT, REPAIR_TO_DT) + 1) AS repairDay,
+            (
+                SELECT SUM(REPAIR_METER_CL - REPAIR_METER_ST)
+                FROM P_PROD_REPAIR_BRICK_DTL_KO804 B1 (NOLOCK)
+                WHERE A.REPORT_NO = B1.REPORT_NO
+            ) AS repairMeter,
+            B.BRICK_TYPE_CD AS brickTypeCd,
+            B.REPAIR_METER_ST AS repairMeterSt,
+            B.REPAIR_METER_CL AS repairMeterCl,
+            C.BRICK_COLOR AS brickColor
+        FROM P_PROD_REPAIR_BRICK_HDR_KO804 A (NOLOCK)
+        INNER JOIN P_PROD_REPAIR_BRICK_DTL_KO804 B (NOLOCK)
+            ON A.REPORT_NO = B.REPORT_NO
+        LEFT OUTER JOIN P_PROD_REPAIR_BRICK_INFO_KO804 C (NOLOCK)
+            ON B.BRICK_TYPE_CD = C.BRICK_TYPE_CD
+        WHERE A.PLANT_CD = 'SA1'
+          AND A.WC_CD = 'SA1KL7'
+        ORDER BY A.REPORT_NO DESC, B.SEQ
+
+        <!-- 
+        <where>
+            b.deleteYn = 'N'
+
+            <if test="manager != null and manager != ''">
+                AND b.manager LIKE '%' + #{manager} + '%'
+            </if>
+
+            <if test="startDate != null and startDate != ''">
+                AND b.requestDate >= #{startDate}
+            </if>
+
+            <if test="endDate != null and endDate != ''">
+                AND b.requestDate &lt;= #{endDate}
+            </if>
+
+            <if test="sub != null and sub != ''">
+                AND b.sub LIKE '%' + #{sub} + '%'
+            </if>
+
+            <if test="status != null and status != ''">
+                AND b.processState LIKE '%' + #{status} + '%'
+            </if>
+
+            <if test="dpId != null and dpId != '' and dpId != 'SPH220007'">
+                AND b.dpId LIKE '%' + #{dpId} + '%'
+            </if>
+
+            <if test="division != null and division != ''">
+                AND b.division LIKE '%' + #{division} + '%'
+            </if>
+        </where>
+        ORDER BY b.seq DESC
+        -->
+
+    </select>
+
+    <select id="selectNaehwaConfig"
+            parameterType="com.example.connectBoard.dto.NaeHwaDTO"
+            resultType="com.example.connectBoard.dto.NaeHwaDTO">
+
+        SELECT
+            A.WC_CD AS wcCd,
+            B.WC_NM AS wcNm,
+            A.WC_ZONE_CD AS wcZoneCd,
+            C.UD_MINOR_NM AS wcZoneNm,
+            A.WC_ZONE_ST AS wcZoneSt,
+            A.WC_ZONE_CL AS wcZoneCl,
+            C.UD_REFERENCE AS wcZoneColor
+        FROM P_PROD_REPAIR_BRICK_WC_ZONE_KO804 A (NOLOCK)
+        INNER JOIN P_WORK_CENTER B (NOLOCK)
+            ON A.WC_CD = B.WC_CD
+        LEFT OUTER JOIN B_USER_DEFINED_MINOR C (NOLOCK)
+            ON A.WC_ZONE_CD = C.UD_MINOR_CD
+           AND C.UD_MAJOR_CD = 'PM111'
+        WHERE A.WC_CD = 'SA1KL7'
+        ORDER BY WC_ZONE_CD
+
+    </select>
+
+    <select id="selectNaehwaLength"
+            parameterType="com.example.connectBoard.dto.NaeHwaDTO"
+            resultType="Integer">
+
+        SELECT CONVERT(NUMERIC, UD_MINOR_NM)
+        FROM B_USER_DEFINED_MINOR
+        WHERE UD_MAJOR_CD = 'PM110'
+          AND UD_MINOR_CD = 'SA1KL7'
+
+    </select>
+
+</mapper>
